@@ -228,18 +228,29 @@ export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
 			<section className="relative mx-auto mb-6 sm:mb-10 bg-white w-full sm:w-[95%] lg:w-[95%] rounded-[20px] sm:rounded-[26px] p-4 sm:p-8 md:p-12 lg:p-20 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
 				{/* Header */}
 				<div className="flex items-center justify-between mb-6 sm:mb-8">
-					<h2
-						className="font-extrabold text-center sm:text-left"
-						style={{
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "clamp(1.5rem, 5vw, 2.5rem)",
-							fontWeight: 800,
-							color: getConcernColor(userInfo),
-							lineHeight: 1.2,
-						}}
-					>
-						{analysisData.title}
-					</h2>
+					<div className="w-full">
+						<h2
+							className="font-extrabold text-center sm:text-left"
+							style={{
+								fontFamily: "Noto Serif TC, serif",
+								fontSize: "clamp(1.5rem, 5vw, 2.5rem)",
+								fontWeight: 800,
+								color: getConcernColor(userInfo),
+								lineHeight: 1.2,
+							}}
+						>
+							{analysisData.title}
+						</h2>
+						<p
+							className="mt-2 text-sm text-gray-600 sm:text-base"
+							style={{
+								fontFamily: "Noto Sans TC, sans-serif",
+								lineHeight: 1.5,
+							}}
+						>
+							針對您當前的具體問題，提供立即可執行的解決方案和明確的禁忌事項。建議著重於短期內的實際行動和問題解決。
+						</p>
+					</div>
 				</div>
 
 				{/* Suggestions Section */}

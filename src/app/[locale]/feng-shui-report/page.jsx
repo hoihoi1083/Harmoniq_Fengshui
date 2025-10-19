@@ -1005,7 +1005,7 @@ export default function FengShuiReportPage() {
 					)}
 
 					{/* Liu Nian Key Word Analysis */}
-					{shouldRenderComponents() && (
+					{/* {shouldRenderComponents() && (
 						<div className="mb-6">
 							<LiuNianKeyWord
 								userInfo={{
@@ -1017,7 +1017,7 @@ export default function FengShuiReportPage() {
 								currentYear={new Date().getFullYear()}
 							/>
 						</div>
-					)}
+					)} */}
 					<div className="mb-8 ml-0 md:ml-[5%]">
 						<h1
 							className="mb-2 font-extrabold text-center md:text-left"

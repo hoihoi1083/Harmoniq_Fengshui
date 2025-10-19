@@ -397,18 +397,29 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 			<section className="relative mx-auto mb-6 sm:mb-10 bg-white w-full sm:w-[95%] lg:w-[95%] rounded-[20px] sm:rounded-[26px] p-4 sm:p-8 md:p-12 lg:p-20 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
 				{/* Header */}
 				<div className="flex items-center justify-between mb-6 sm:mb-8">
-					<h2
-						className="font-extrabold text-center sm:text-left"
-						style={{
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "clamp(1.5rem, 5vw, 2.5rem)",
-							fontWeight: 800,
-							color: getConcernColor(userInfo),
-							lineHeight: 1.2,
-						}}
-					>
-						核心原則
-					</h2>
+					<div className="w-full">
+						<h2
+							className="font-extrabold text-center sm:text-left"
+							style={{
+								fontFamily: "Noto Serif TC, serif",
+								fontSize: "clamp(1.5rem, 5vw, 2.5rem)",
+								fontWeight: 800,
+								color: getConcernColor(userInfo),
+								lineHeight: 1.2,
+							}}
+						>
+							核心原則
+						</h2>
+						<p
+							className="mt-2 text-sm text-gray-600 sm:text-base"
+							style={{
+								fontFamily: "Noto Sans TC, sans-serif",
+								lineHeight: 1.5,
+							}}
+						>
+							基於您的八字命理，著重於長期的生活調整和基礎運勢提升。
+						</p>
+					</div>
 				</div>
 
 				{/* Core Icons Section */}

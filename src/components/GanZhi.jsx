@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { getConcernColor } from "../utils/colorTheme";
+import getWuxingData from "../lib/nayin";
 
 // Helper functions to map stems and branches to their elements
 const getStemElement = (stem) => {
@@ -38,6 +39,46 @@ const getBranchElement = (branch) => {
 		亥: "水",
 	};
 	return branchElements[branch] || "火";
+};
+
+// Helper function to determine the relationship between two stems/branches (simplified)
+const getRelationship = (stem1, stem2) => {
+	// This is a simplified version - in real application would use proper 十神 calculation
+	if (stem1 === stem2) return "比肩";
+	// Add more sophisticated relationship calculation here based on 五行 theory
+	return "相互作用";
+};
+
+// Helper function to get ten god relationship (simplified)
+const getTenGodRelation = (flowStem, dayMaster) => {
+	// Simplified ten god calculation - in real app would use proper 十神 rules
+	if (flowStem === dayMaster) return "比肩";
+	if (flowStem === "乙" && dayMaster === "己") return "七殺"; // 乙木克己土
+	if (flowStem === "巳" && dayMaster === "己") return "傷官"; // 巳火被己土所生
+	// Add more sophisticated calculations here
+	return "待分析";
+};
+
+// Helper function to get yearly stems and branches
+const getYearlyStems = (year) => {
+	const stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+	const branches = [
+		"子",
+		"丑",
+		"寅",
+		"卯",
+		"辰",
+		"巳",
+		"午",
+		"未",
+		"申",
+		"酉",
+		"戌",
+		"亥",
+	];
+	const stemIndex = (year - 4) % 10;
+	const branchIndex = (year - 4) % 12;
+	return { stem: stems[stemIndex], branch: branches[branchIndex] };
 };
 
 // Helper function to generate concern-specific fallback content
@@ -83,10 +124,51 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 		const birthday = userInfo?.birthDateTime || "";
 		const gender = userInfo?.gender || "male";
 
+		// Calculate actual birth chart using the same system as other components
+		let actualBaziData = null;
+		let dayMaster = "丙"; // fallback
+		let dayMasterElement = "火"; // fallback
+		let fourPillars = null;
+
+		try {
+			// Calculate actual birth chart using imported getWuxingData
+			if (birthday) {
+				actualBaziData = getWuxingData(birthday, gender);
+				dayMaster = actualBaziData.dayStem;
+				dayMasterElement = actualBaziData.dayStemWuxing;
+				fourPillars = {
+					year: {
+						stem: actualBaziData.yearStem,
+						branch: actualBaziData.yearBranch,
+					},
+					month: {
+						stem: actualBaziData.monthStem,
+						branch: actualBaziData.monthBranch,
+					},
+					day: {
+						stem: actualBaziData.dayStem,
+						branch: actualBaziData.dayBranch,
+					},
+					hour: {
+						stem: actualBaziData.hourStem,
+						branch: actualBaziData.hourBranch,
+					},
+				};
+				console.log("🎯 GanZhi calculated actual birth chart:", {
+					dayMaster: dayMaster + dayMasterElement,
+					fourPillars: `${fourPillars.year.stem}${fourPillars.year.branch}年 ${fourPillars.month.stem}${fourPillars.month.branch}月 ${fourPillars.day.stem}${fourPillars.day.branch}日 ${fourPillars.hour.stem}${fourPillars.hour.branch}時`,
+				});
+			}
+		} catch (error) {
+			console.error("❌ Failed to calculate actual birth chart:", error);
+		}
+
 		const prompt = `
 角色设定：「你是一位资深八字命理师，精通事业格局与流年互动。请严格按以下结构生成报告，所有【】标题必须原文保留，专业术语需精确对应十神生克关系。」
 
 客户资料：${birthday}出生，${gender === "male" ? "男性" : "女性"}，关注领域：${concern}
+日主信息：${dayMaster}${dayMasterElement}日主
+四柱信息：${fourPillars ? `${fourPillars.year.stem}${fourPillars.year.branch}年 ${fourPillars.month.stem}${fourPillars.month.branch}月 ${fourPillars.day.stem}${fourPillars.day.branch}日 ${fourPillars.hour.stem}${fourPillars.hour.branch}時` : "四柱待计算"}
 具体问题：${problem}
 当前年份：${year}年
 
@@ -94,51 +176,22 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 1. 结构强制：依序输出7大模块，不可删改标题或调整顺序
 2. 术语规范：
    - 刑冲合害需标注符号（如「寅巳刑」「未戌刑」）
-   - 十神属性精确表述（如「巳火劫财」「乙木正印」）
+   - 十神属性必须基于${dayMaster}${dayMasterElement}日主精确计算（如针对${dayMaster}日主，分析乙木、巳火等的十神关系）
    - 格局命名需含五行矛盾（例：「火炎土燥」「焦土熔金」）
 3. 流年关键词：固定输出3个四字词＋破折号解释
 4. 变量替换：方括号 [ ] 内为可替换字段，保持其他文字不变
 
 【${year}流年詳解】
-1.【流年干支作用】
-2.【流年天干/地支各自觸發的三重效應】  
+1.【流年干支作用】 - 分析${year}年乙巳如何与${dayMaster}${dayMasterElement}日主的原局互动
+2.【流年天干乙木/地支巳火各自對${dayMaster}日主觸發的三重效應】  
 3.【白話版實際表現】
+
+重要：所有十神关系必须基于实际日主${dayMaster}${dayMasterElement}计算，不可使用其他日主的关系。
 
 请根据客户的具体关注领域${concern}和问题"${problem}"，调整分析重点和建议方向。
 `;
 
-		// Generate content based on user's specific concern and birth data
-		const getYearlyStems = (year) => {
-			const stems = [
-				"甲",
-				"乙",
-				"丙",
-				"丁",
-				"戊",
-				"己",
-				"庚",
-				"辛",
-				"壬",
-				"癸",
-			];
-			const branches = [
-				"子",
-				"丑",
-				"寅",
-				"卯",
-				"辰",
-				"巳",
-				"午",
-				"未",
-				"申",
-				"酉",
-				"戌",
-				"亥",
-			];
-			const stemIndex = (year - 4) % 10;
-			const branchIndex = (year - 4) % 12;
-			return { stem: stems[stemIndex], branch: branches[branchIndex] };
-		};
+		// Generate content based on user's specific concern and actual birth data
 
 		const yearGanZhi = getYearlyStems(year);
 		const currentStem = yearGanZhi.stem;
@@ -176,10 +229,17 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 		const analysis =
 			concernBasedAnalysis[concern] || concernBasedAnalysis["事業"];
 
-		// For demo purposes, return structured data based on the example you provided
+		// Generate dynamic description based on actual birth chart
+		const flowYearDescription = actualBaziData
+			? `針對${concern}領域的專業分析：${year}年乙巳流年與您的${dayMaster}${dayMasterElement}日主形成特定互动格局。天干乙木對${dayMaster}日主的作用，地支巳火對您日支${fourPillars.day.branch}${actualBaziData.dayBranchWuxing}的影響，都需要結合您的完整四柱（${fourPillars.year.stem}${fourPillars.year.branch}年 ${fourPillars.month.stem}${fourPillars.month.branch}月 ${fourPillars.day.stem}${fourPillars.day.branch}日 ${fourPillars.hour.stem}${fourPillars.hour.branch}時）進行分析。流年作用重點在於如何調和${dayMasterElement}與流年五行的關係，預防可能的${analysis.risks}，並把握${analysis.focus}的發展機會。`
+			: `針對${concern}領域的專業分析：如同一陣東風來襲（${currentStem}木），引發各種變動，易生異動。流年作用重點在調和機緣，否則五行失調，導致${analysis.risks}。整體而言，此年干支提升${analysis.focus}的關注度，適合${analysis.advice}，惟需謹慎應對各種挑戰。`;
+
 		return {
 			title: `${year}年流年詳解`,
-			description: `針對${concern}領域的專業分析：如同一陣東風來襲（${currentStem}木），點燃原有的火苗（丙火），引發漣漪，但巨實相衝濟勢如場蕩適，易生異動。流年作用重點在調和機緣，否則火土失調，導致${analysis.risks}。整體而言，此年干支提升${analysis.focus}的關注度，適合${analysis.advice}，惟需謹慎應對各種挑戰。`,
+			description: flowYearDescription,
+			actualBaziData: actualBaziData, // Pass the real birth chart data
+			dayMaster: dayMaster,
+			dayMasterElement: dayMasterElement,
 
 			sections: {
 				[`天干${currentStem}${getStemElement(currentStem)}-正印`]: {
@@ -251,7 +311,9 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 
 			ganZhiCore: {
 				title: "流年干支作用",
-				content: `${currentStem}${currentBranch}流年作用於原局：天干${currentStem}木（正印）：再生旺丙火日主（身本旺，印生更旺），${currentStem}庚合（原局庚虛透或無，此合難化，更多是羈絆消耗之象，或暗示與金相關的機遇有阻礙）加劇火勢克金（財）。地支${currentBranch}火（劫財祿神）：${currentBranch}火為劫財（丙火之祿）：強力助火，火勢登頂，猛烈熔煉財星辛金。${currentBranch === "巳" ? "巳刑寅" : `${currentBranch}刑寅`}（日支）- 核心凶動！：寅${currentBranch}相刑（主變動、是非、內部損耗）動搖事業/財富根基，易引發合作破裂、計畫生變、意外支出。針對${concern}領域，${problem ? `特別是"${problem}"相關的問題，` : ""}此年需要格外謹慎應對各種挑戰。`,
+				content: actualBaziData
+					? `${year}年${currentStem}${currentBranch}流年對您${dayMaster}${dayMasterElement}日主的作用分析：天干${currentStem}木對${dayMaster}${dayMasterElement}日主形成${getRelationship(currentStem, dayMaster)}關係，地支${currentBranch}火對您的日支${fourPillars.day.branch}${actualBaziData.dayBranchWuxing}產生${getRelationship(currentBranch, fourPillars.day.branch)}作用。結合您的月柱${fourPillars.month.stem}${fourPillars.month.branch}和時柱${fourPillars.hour.stem}${fourPillars.hour.branch}，整體格局呈現${dayMasterElement}與流年五行的互動模式。針對${concern}領域，${problem ? `特別是"${problem}"相關的問題，` : ""}需要根據您實際的八字結構制定對應策略。`
+					: `${currentStem}${currentBranch}流年作用分析：天干${currentStem}木與地支${currentBranch}火的組合，對不同日主會產生不同影響。針對${concern}領域，${problem ? `特別是"${problem}"相關的問題，` : ""}此年需要謹慎應對各種挑戰。`,
 			},
 
 			practicalManifestations: {
@@ -346,7 +408,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 					description:
 						fallbackData.description || "流年分析載入中...",
 					tianGan: {
-						title: `天干${yearGanZhi.stem}${getStemElement(yearGanZhi.stem)}-正官`,
+						title: `天干${yearGanZhi.stem}${getStemElement(yearGanZhi.stem)}-${getTenGodRelation(yearGanZhi.stem, actualDayMaster)}`,
 						effects: [
 							{
 								title: "職權提升",
@@ -367,7 +429,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 						keyActions: [],
 					},
 					diZhi: {
-						title: `地支${yearGanZhi.branch}${getBranchElement(yearGanZhi.branch)}-偏印`,
+						title: `地支${yearGanZhi.branch}${getBranchElement(yearGanZhi.branch)}-${getTenGodRelation(yearGanZhi.branch, actualDayMaster)}`,
 						effects: [
 							{
 								title: "火旺生土",
@@ -403,6 +465,23 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 		const yearGanZhi = aiData.yearGanZhi;
 		const analysis = aiData.analysis;
 
+		// Calculate actual day master for this context
+		let actualDayMaster = "乙";
+		try {
+			if (userInfo?.birthDateTime) {
+				const baziData = getWuxingData(
+					userInfo.birthDateTime,
+					userInfo.gender || "male"
+				);
+				actualDayMaster = baziData.dayStem;
+			}
+		} catch (error) {
+			console.error(
+				"Failed to calculate day master in parseAIResponse:",
+				error
+			);
+		}
+
 		// Parse the AI analysis to extract structured content
 		const parseAIContent = (text) => {
 			console.log(
@@ -413,12 +492,12 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			const result = {
 				description: "",
 				tianGan: {
-					title: `天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-正官`,
+					title: `天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-${getTenGodRelation(yearGanZhi?.stem || "乙", actualDayMaster)}`,
 					effects: [],
 					keyActions: [],
 				},
 				diZhi: {
-					title: `地支${yearGanZhi?.branch || "巳"}${getBranchElement(yearGanZhi?.branch || "巳")}-偏印`,
+					title: `地支${yearGanZhi?.branch || "巳"}${getBranchElement(yearGanZhi?.branch || "巳")}-${getTenGodRelation(yearGanZhi?.branch || "巳", actualDayMaster)}`,
 					effects: [],
 					keyActions: [],
 				},
@@ -491,9 +570,16 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 						result.tianGan.title
 					);
 				} else {
-					// Fallback: extract from year info
-					result.tianGan.title = `天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-正官`;
-					console.log("⚠️ TianGan title fallback used");
+					// Fallback: extract from year info with actual relationship
+					const stem = yearGanZhi?.stem || "乙";
+					const tenGodRelation = getTenGodRelation(
+						stem,
+						actualDayMaster
+					);
+					result.tianGan.title = `天干${stem}${getStemElement(stem)}-${tenGodRelation}`;
+					console.log(
+						"⚠️ TianGan title fallback used with actual day master"
+					);
 				}
 
 				// Extract numbered effects (1., 2., 3.)
@@ -554,7 +640,12 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				if (titleMatch) {
 					result.diZhi.title = `地支${titleMatch[1].trim()}-${titleMatch[2].trim()}`;
 				} else {
-					result.diZhi.title = `地支${yearGanZhi?.branch || "巳"}${getBranchElement(yearGanZhi?.branch || "巳")}-偏印`;
+					const branch = yearGanZhi?.branch || "巳";
+					const branchRelation = getTenGodRelation(
+						branch,
+						actualDayMaster
+					);
+					result.diZhi.title = `地支${branch}${getBranchElement(branch)}-${branchRelation}`;
 				}
 
 				// Extract numbered effects
@@ -708,7 +799,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			tianGan: {
 				title:
 					parsedContent.tianGan?.title ||
-					`天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-正官`,
+					`天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-${getTenGodRelation(yearGanZhi?.stem || "乙", actualDayMaster)}`,
 				effects:
 					parsedContent.tianGan?.effects?.length > 0
 						? parsedContent.tianGan.effects
@@ -810,17 +901,38 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				setActiveSection("tianGan");
 			} catch (error) {
 				console.error("Failed to load analysis:", error);
-				// Fallback to mock data with proper structure
+				// Fallback to mock data with proper structure using actual birth chart
 				const mockData = generateGanZhiAnalysis(userInfo, currentYear);
 				const yearGanZhi = getYearlyStems(currentYear);
-				// Convert mock data to expected format
+
+				// Calculate actual birth chart for fallback too
+				let actualDayMaster = "乙";
+				let actualDayMasterElement = "木";
+				try {
+					if (userInfo?.birthDateTime) {
+						const baziData = getWuxingData(
+							userInfo.birthDateTime,
+							userInfo.gender || "male"
+						);
+						actualDayMaster = baziData.dayStem;
+						actualDayMasterElement = baziData.dayStemWuxing;
+					}
+				} catch (baziError) {
+					console.error(
+						"Fallback bazi calculation failed:",
+						baziError
+					);
+				}
+
+				// Convert mock data to expected format with actual day master
 				const structuredMockData = {
 					...mockData,
 					parsedContent: {
 						description:
-							mockData.description || "流年分析載入中...",
+							mockData.description ||
+							`基於您的${actualDayMaster}${actualDayMasterElement}日主，分析${currentYear}年乙巳流年的影響。`,
 						tianGan: {
-							title: `天干${yearGanZhi.stem}${getStemElement(yearGanZhi.stem)}-正官`,
+							title: `天干${yearGanZhi.stem}${getStemElement(yearGanZhi.stem)}-${getTenGodRelation(yearGanZhi.stem, actualDayMaster)}`,
 							effects: [
 								{
 									title: "職權提升",

@@ -10,8 +10,51 @@ const normalizeConcern = (concern) => {
 	const mapping = {
 		事业: "事業",
 		财运: "財運",
+		健康: "健康", // Ensure health concern is properly handled
+		感情: "感情", // Ensure relationship concern is properly handled
+		关系: "感情", // Map simplified relationship to traditional
+		恋爱: "感情", // Map love to relationship
 	};
 	return mapping[concern] || concern;
+};
+
+// Helper function to get current year's Gan-Zhi (干支)
+const getCurrentYearGanZhi = () => {
+	const currentYear = new Date().getFullYear();
+	const ganList = [
+		"甲",
+		"乙",
+		"丙",
+		"丁",
+		"戊",
+		"己",
+		"庚",
+		"辛",
+		"壬",
+		"癸",
+	];
+	const zhiList = [
+		"子",
+		"丑",
+		"寅",
+		"卯",
+		"辰",
+		"巳",
+		"午",
+		"未",
+		"申",
+		"酉",
+		"戌",
+		"亥",
+	];
+
+	const ganIndex = (currentYear - 4) % 10;
+	const zhiIndex = (currentYear - 4) % 12;
+
+	return {
+		year: currentYear,
+		ganZhi: ganList[ganIndex] + zhiList[zhiIndex],
+	};
 };
 
 const TAB_CONFIG = {
@@ -193,24 +236,63 @@ async function generateMingJuAnalysis(
 
 			if (response.ok) {
 				const data = await response.json();
-				// Parse the JSON content returned by AI API
-				try {
-					const aiData = JSON.parse(data.content);
-					if (aiData.analysis && aiData.analysis.length > 50) {
-						// Ensure substantial content
-						console.log(`AI Success on attempt ${attempt}`);
+
+				// Different handling for 日主特性 (plain text) vs other tabs (JSON)
+				if (tab === "日主特性") {
+					// For 日主特性, expect plain text content
+					if (data.content && data.content.length > 200) {
+						console.log(
+							`AI Success on attempt ${attempt} for 日主特性`
+						);
 						return {
-							content: aiData.analysis,
+							content: data.content,
 							isAI: true,
 							confidence: data.confidence || "medium",
 						};
 					}
-				} catch (parseError) {
-					console.error(
-						`JSON parse error on attempt ${attempt}:`,
-						parseError
-					);
-					console.log("Raw content:", data.content);
+				} else {
+					// For other tabs, parse JSON content and return full structure
+					try {
+						const aiData = JSON.parse(data.content);
+
+						// Support both old (keywords) and new (sections) format
+						const hasOldFormat =
+							aiData.analysis &&
+							aiData.keywords &&
+							aiData.analysis.length > 50;
+						const hasNewFormat =
+							aiData.sections &&
+							Array.isArray(aiData.sections) &&
+							aiData.sections.length > 0;
+
+						if (hasOldFormat || hasNewFormat) {
+							// Ensure substantial content and proper structure
+							console.log(
+								`AI Success on attempt ${attempt} - Format: ${hasNewFormat ? "sections" : "keywords"}`
+							);
+							return {
+								content: JSON.stringify(aiData), // Return full JSON structure
+								isAI: true,
+								confidence: data.confidence || "medium",
+							};
+						} else {
+							console.log(
+								`AI content validation failed - missing required structure:`,
+								{
+									hasAnalysis: !!aiData.analysis,
+									hasKeywords: !!aiData.keywords,
+									hasSections: !!aiData.sections,
+									sectionsLength: aiData.sections?.length,
+								}
+							);
+						}
+					} catch (parseError) {
+						console.error(
+							`JSON parse error on attempt ${attempt}:`,
+							parseError
+						);
+						console.log("Raw content:", data.content);
+					}
 				}
 			} else {
 				console.log(
@@ -385,13 +467,79 @@ function generatePersonalizedDayMaster(
 		!problem.includes("選項") &&
 		problem.length > 10;
 
-	return `根據您的出生信息分析，您的日主為【${baziInfo.dayMaster}】，${baziInfo.element}命，${concernAdvice[concern]}
+	// Get current year's 干支 for dynamic year references
+	const currentYearInfo = getCurrentYearGanZhi();
+	const yearText = `${currentYearInfo.year}年流年${currentYearInfo.ganZhi}`;
 
-優勢表現在${baziInfo.strengths}，${baziInfo.dayMaster}日主具有${baziInfo.characteristics}的本質特征。
+	// Generate concern-specific content
+	let concernSpecificContent = "";
 
-然而需要注意的是，${baziInfo.weaknesses}，這是${baziInfo.dayMaster}日主需要調和的方面。
+	if (concern === "健康") {
+		concernSpecificContent = `${yearText}與您的命局形成特殊的五行互動關係。您的日主為【${baziInfo.dayMaster}】，${baziInfo.element}命，這代表您在健康方面天生具有${baziInfo.dayMaster.includes("木") ? "木性的生發調節能力，但需注意肝膽系統" : baziInfo.dayMaster.includes("火") ? "火性的循環代謝特質，需關注心血管系統" : baziInfo.dayMaster.includes("土") ? "土性的消化吸收本質，重點調理脾胃功能" : baziInfo.dayMaster.includes("金") ? "金性的呼吸排毒力量，需養護肺部系統" : "水性的腎臟調節天賦，注重泌尿生殖系統"}。
 
-調候重點在於平衡陰陽五行，${baziInfo.dayMaster}${baziInfo.strength}，${lifeStage}階段特別需要注重${concern === "財運" || concern === "财运" || concern === "工作" || concern === "事業" || concern === "事业" ? "事業財運的穩固發展" : concern === "健康" ? "身心的溫養調理" : "感情的和諧經營"}，長期策略宜採取${baziInfo.strength === "偏強" ? "收斂內修" : baziInfo.strength === "偏弱" ? "溫養扶持" : "平衡發展"}的方針。`;
+從八字健康角度分析，您${baziInfo.characteristics}的體質特點，在身體調理上${baziInfo.strengths}。但需要注意的是，${baziInfo.weaknesses}，這在健康方面表現為${baziInfo.dayMaster.includes("木") ? "容易肝氣鬱結，需要疏通氣血" : baziInfo.dayMaster.includes("火") ? "心火偏旺，需要滋陰降火" : baziInfo.dayMaster.includes("土") ? "脾胃消化功能需要調理" : baziInfo.dayMaster.includes("金") ? "肺部呼吸系統需要養護" : "腎水不足，需要滋養腎陰"}。`;
+	} else if (
+		concern === "事業" ||
+		concern === "工作" ||
+		concern === "career"
+	) {
+		concernSpecificContent = `${yearText}與您的命局形成特殊的五行互動關係。您的日主為【${baziInfo.dayMaster}】，${baziInfo.element}命，這代表您在事業發展上天生具有${baziInfo.dayMaster.includes("木") ? "木性的創新成長能力，適合開拓新領域" : baziInfo.dayMaster.includes("火") ? "火性的領導激勵特質，善於帶動團隊" : baziInfo.dayMaster.includes("土") ? "土性的穩健執行本質，適合管理建設" : baziInfo.dayMaster.includes("金") ? "金性的決斷執行力量，擅長制度規劃" : "水性的靈活應變天賦，適合溝通協調"}。
+
+在事業特質上，您${baziInfo.characteristics}，這使您在職場中${baziInfo.strengths}。然而需要留意的是，${baziInfo.weaknesses}，這是您需要在工作中注意平衡的方面。`;
+	} else if (concern === "財運") {
+		concernSpecificContent = `${yearText}與您的命局形成特殊的五行互動關係。您的日主為【${baziInfo.dayMaster}】，${baziInfo.element}命，這代表您在財富管理上天生具有${baziInfo.dayMaster.includes("木") ? "木性的成長投資眼光，適合長期理財" : baziInfo.dayMaster.includes("火") ? "火性的敏銳商機嗅覺，善於把握機會" : baziInfo.dayMaster.includes("土") ? "土性的穩健理財本質，適合保守投資" : baziInfo.dayMaster.includes("金") ? "金性的精準判斷力量，擅長價值分析" : "水性的靈活資金運用天賦，適合多元投資"}。
+
+在財運特質上，您${baziInfo.characteristics}，這使您在理財方面${baziInfo.strengths}。然而需要留意的是，${baziInfo.weaknesses}，這是您在財務規劃時需要注意的地方。`;
+	} else if (concern === "感情" || concern === "關係" || concern === "戀愛") {
+		concernSpecificContent = `${yearText}與您的命局形成特殊的五行互動關係。您的日主為【${baziInfo.dayMaster}】，${baziInfo.element}命，這代表您在感情關係中天生具有${baziInfo.dayMaster.includes("木") ? "木性的成長包容特質，善於培養長期關係" : baziInfo.dayMaster.includes("火") ? "火性的熱情主動特質，容易吸引異性注意" : baziInfo.dayMaster.includes("土") ? "土性的穩重忠誠本質，重視承諾與責任" : baziInfo.dayMaster.includes("金") ? "金性的理性堅定力量，追求高品質感情" : "水性的靈活溝通天賦，善於理解對方心意"}。
+
+在感情模式上，您${baziInfo.characteristics}，這使您在親密關係中${baziInfo.strengths}。然而需要留意的是，${baziInfo.weaknesses}，這是您在感情經營中需要調整的地方。`;
+	} else {
+		concernSpecificContent = `${yearText}與您的命局形成特殊的五行互動關係。您的日主為【${baziInfo.dayMaster}】，${baziInfo.element}命，這代表您天生具有${baziInfo.dayMaster.includes("木") ? "木性的生長創新能力" : baziInfo.dayMaster.includes("火") ? "火性的熱情活力特質" : baziInfo.dayMaster.includes("土") ? "土性的穩重包容本質" : baziInfo.dayMaster.includes("金") ? "金性的決斷執行力量" : "水性的靈活智慧天賦"}。
+
+在性格特質上，您${baziInfo.characteristics}，這使您在人際關係中${baziInfo.strengths}。然而需要留意的是，${baziInfo.weaknesses}，這是您需要透過後天調理來平衡的地方。`;
+	}
+
+	// Add concern-specific guidance
+	if (concern === "健康") {
+		concernSpecificContent += `
+
+針對${currentYearInfo.year}年的流年特點，${baziInfo.dayMaster}${baziInfo.strength}的您特別需要注意身體的溫養調理。建議您在寅時（凌晨3-5點）進行深呼吸養肝氣，申時（下午3-5點）散步潤肺金。日常飲食要${baziInfo.dayMaster.includes("木") ? "少食辛辣，多吃綠色蔬菜" : baziInfo.dayMaster.includes("金") ? "避免過度寒涼，適量溫補" : "清淡為主，注意營養均衡"}。
+
+長期調候方案建議您建立規律的作息：${lifeStage}階段的您應該${baziInfo.strength === "偏強" ? "注重收斂內修，透過冥想靜坐平衡過旺的能量" : baziInfo.strength === "偏弱" ? "加強溫養扶持，多曬太陽、適度運動來提升陽氣" : "保持動靜平衡，既要有適度活動也要有充分休息"}。這樣的調理方式能夠有效改善您在健康方面的運勢，讓您的天賦能量得到最佳發揮。`;
+	} else if (
+		concern === "事業" ||
+		concern === "工作" ||
+		concern === "career"
+	) {
+		concernSpecificContent += `
+
+針對${currentYearInfo.year}年的流年特點，${baziInfo.dayMaster}${baziInfo.strength}的您特別需要注意事業發展的穩健推進。您適合在${baziInfo.dayMaster.includes("木") ? "創意文教" : baziInfo.dayMaster.includes("火") ? "服務娛樂" : baziInfo.dayMaster.includes("土") ? "房地產建築" : baziInfo.dayMaster.includes("金") ? "金融科技" : "物流貿易"}相關領域發揮所長。
+
+長期事業規劃建議您：${lifeStage}階段的您應該${baziInfo.strength === "偏強" ? "注重團隊合作，發揮領導優勢" : baziInfo.strength === "偏弱" ? "加強專業技能，尋求貴人協助" : "保持穩健發展，平衡創新與保守"}。這樣的策略能夠有效提升您在事業方面的競爭力，讓您的職涯發展更加順遂。`;
+	} else if (concern === "財運") {
+		concernSpecificContent += `
+
+針對${currentYearInfo.year}年的流年特點，${baziInfo.dayMaster}${baziInfo.strength}的您特別需要注意財務管理的策略調整。投資理財宜採取${baziInfo.strength === "偏強" ? "積極但謹慎" : "保守穩健"}的策略，重點關注${baziInfo.dayMaster.includes("木") ? "成長型投資" : baziInfo.dayMaster.includes("火") ? "靈活型理財" : baziInfo.dayMaster.includes("土") ? "穩定型資產" : baziInfo.dayMaster.includes("金") ? "價值型投資" : "流動性投資"}。
+
+長期財運提升建議您：${lifeStage}階段的您應該${baziInfo.strength === "偏強" ? "注重資產配置，避免過度投機" : baziInfo.strength === "偏弱" ? "加強理財知識，穩健累積財富" : "保持收支平衡，逐步增加投資"}。這樣的理財方式能夠有效改善您的財務狀況，讓您的財富穩步增長。`;
+	} else if (concern === "感情" || concern === "關係" || concern === "戀愛") {
+		concernSpecificContent += `
+
+針對${currentYearInfo.year}年的流年特點，${baziInfo.dayMaster}${baziInfo.strength}的您在感情方面需要特別注意以下幾點：
+
+感情發展策略：${lifeStage}階段的您應該${baziInfo.strength === "偏強" ? "主動出擊但保持適度，避免過於強勢而嚇跑潛在對象" : baziInfo.strength === "偏弱" ? "先提升自信心，透過培養興趣愛好增加個人魅力" : "保持真實自然的交往方式，不刻意迎合也不過分冷漠"}。
+
+理想對象特質：根據您的${baziInfo.dayMaster}特質，最適合與${baziInfo.dayMaster.includes("木") ? "火土特質的人交往，他們能給您溫暖和安全感" : baziInfo.dayMaster.includes("火") ? "木土特質的人配對，能形成相互滋養的關係" : baziInfo.dayMaster.includes("土") ? "火金特質的人結合，既有激情又有理性平衡" : baziInfo.dayMaster.includes("金") ? "土水特質的人搭配，能提供穩定和靈活性" : "金木特質的人組合，形成互補的完美平衡"}。
+
+溝通相處建議：${baziInfo.characteristics}的您在關係中要學會${baziInfo.strength === "偏強" ? "適時示弱，讓對方有被需要的感覺" : baziInfo.strength === "偏弱" ? "表達真實需求，不要總是委屈求全" : "直接坦誠，避免過度猜測對方心意"}。這樣能有效提升您的感情運勢，創造更和諧的親密關係。`;
+	} else {
+		concernSpecificContent += `
+
+針對${currentYearInfo.year}年的流年特點，您需要注重個人成長與人際關係的平衡發展。`;
+	}
+
+	return concernSpecificContent;
 }
 
 // Enhanced personalized middle content with BaZi elements
@@ -445,40 +593,40 @@ function generatePersonalizedMiddle(
 
 	if (normalizeConcern(concern) === "財運") {
 		return JSON.stringify({
-			财星核心: {
-				主要内容: `${gender}${lifeStage}，${baziInfo.year}年${baziInfo.element}命，日主${baziInfo.dayMaster}${baziInfo.strength}，財星配置分析`,
-				状态列表: [
+			財星核心: {
+				主要內容: `${gender}${lifeStage}，${baziInfo.year}年${baziInfo.element}命，日主${baziInfo.dayMaster}${baziInfo.strength}，財星配置分析`,
+				狀態列表: [
 					`財星根基：${baziInfo.dayMaster}生人，${lifeStage}階段財星${baziInfo.strength === "偏強" ? "得力有根" : baziInfo.strength === "偏弱" ? "虛浮少根" : "中平穩定"}`,
 					`五行生剋：${baziInfo.element}納音，${gender}特質配合${baziInfo.dayMaster}日主，${baziInfo.strength === "偏強" ? "身強能勝財" : "身弱需助力"}`,
 					`格局特點：${birthYear}年出生者多屬${baziInfo.dayMaster.includes("木") ? "木性溫和" : baziInfo.dayMaster.includes("金") ? "金性果斷" : baziInfo.dayMaster.includes("火") ? "火性急躁" : baziInfo.dayMaster.includes("水") ? "水性靈活" : "土性穩重"}特質`,
 				],
-				结论: `${baziInfo.dayMaster}日主配合${lifeStage}運勢，財運${baziInfo.strength === "偏強" ? "有力但需控制" : baziInfo.strength === "偏弱" ? "需要扶助方能發揮" : "穩定發展為宜"}`,
+				結論: `${baziInfo.dayMaster}日主配合${lifeStage}運勢，財運${baziInfo.strength === "偏強" ? "有力但需控制" : baziInfo.strength === "偏弱" ? "需要扶助方能發揮" : "穩定發展為宜"}`,
 			},
 			生财之源: {
 				主要分析: `${baziInfo.dayMaster}日主的食傷星為生財之源，${gender}在${lifeStage}階段，${baziInfo.element}命格特質顯示創意與技能並重。根據${birthYear}年出生的命理特徵，最適合發展與${baziInfo.dayMaster.includes("木") ? "文創設計" : baziInfo.dayMaster.includes("金") ? "精密技術" : baziInfo.dayMaster.includes("火") ? "表演創意" : baziInfo.dayMaster.includes("水") ? "流通服務" : "不動產建設"}相關的事業。`,
-				关键问题: {
-					问题1: {
-						名称: `${baziInfo.dayMaster}日主制財困難`,
-						解释: `${baziInfo.strength === "偏弱" ? "身弱財多，難以駕馭大財，需要印比助身" : baziInfo.strength === "偏強" ? "身強財弱，需要食傷生財或流年助財" : "身財平衡，但需要適當調候"}`,
+				關鍵問題: {
+					問題1: {
+						名稱: `${baziInfo.dayMaster}日主制財困難`,
+						解釋: `${baziInfo.strength === "偏弱" ? "身弱財多，難以駕馭大財，需要印比助身" : baziInfo.strength === "偏強" ? "身強財弱，需要食傷生財或流年助財" : "身財平衡，但需要適當調候"}`,
 					},
-					问题2: {
-						名称: `${lifeStage}階段運勢特點`,
-						解释: `${lifeStage === "青年" ? "大運剛起，根基未穩，宜累積實力" : lifeStage === "中年" ? "大運當旺，是發財關鍵期，把握機會" : "大運漸衰，宜守成保財，避免大投資"}`,
+					問題2: {
+						名稱: `${lifeStage}階段運勢特點`,
+						解釋: `${lifeStage === "青年" ? "大運剛起，根基未穩，宜累積實力" : lifeStage === "中年" ? "大運當旺，是發財關鍵期，把握機會" : "大運漸衰，宜守成保財，避免大投資"}`,
 					},
 				},
 			},
-			十神互动关键: {
+			十神互動關鍵: {
 				十神列表: [
 					{
-						名称: `印星（生${baziInfo.dayMaster}）`,
+						名稱: `印星（生${baziInfo.dayMaster}）`,
 						作用: `${gender}貴人運配合印星，適合透過學習進修、前輩提攜來增強實力`,
 					},
 					{
-						名称: `食傷（${baziInfo.dayMaster}生財）`,
+						名稱: `食傷（${baziInfo.dayMaster}生財）`,
 						作用: `${lifeStage}優勢在創新思維，是主要生財工具，但需要落實執行`,
 					},
 					{
-						名称: `比劫（與${baziInfo.dayMaster}同類）`,
+						名稱: `比劫（與${baziInfo.dayMaster}同類）`,
 						作用: `${birthYear}年代出生者競爭激烈，容易有合作分財或同行競爭問題`,
 					},
 				],
@@ -490,40 +638,40 @@ function generatePersonalizedMiddle(
 	// Add similar BaZi-based analysis for other concerns...
 	else if (normalizeConcern(concern) === "事業") {
 		return JSON.stringify({
-			事业根基: {
-				主要内容: `${gender}${lifeStage}，${baziInfo.year}年${baziInfo.element}命，日主${baziInfo.dayMaster}特質分析事業根基`,
-				状态列表: [
+			事業根基: {
+				主要內容: `${gender}${lifeStage}，${baziInfo.year}年${baziInfo.element}命，日主${baziInfo.dayMaster}特質分析事業根基`,
+				狀態列表: [
 					`事業宮位：${baziInfo.dayMaster}坐支分析，${lifeStage}階段事業宮${baziInfo.strength === "偏強" ? "有力主導性強" : "需要扶助合作"}`,
 					`職場特質：${baziInfo.element}納音特性，${gender}適合${baziInfo.dayMaster.includes("木") ? "成長型行業" : baziInfo.dayMaster.includes("金") ? "技術型工作" : "服務型事業"}發展`,
 					`發展潛力：${birthYear}年出生世代，在${lifeStage}階段具備${baziInfo.strength === "偏強" ? "領導統御" : "專業技術"}優勢`,
 				],
-				结论: `${baziInfo.dayMaster}日主在事業發展上${baziInfo.strength === "偏強" ? "宜主導創業" : "宜專業深耕"}，配合${lifeStage}運勢節奏`,
+				結論: `${baziInfo.dayMaster}日主在事業發展上${baziInfo.strength === "偏強" ? "宜主導創業" : "宜專業深耕"}，配合${lifeStage}運勢節奏`,
 			},
-			事业发展: {
+			事業發展: {
 				主要分析: `根據${baziInfo.dayMaster}日主特質，${gender}在${lifeStage}階段最適合從事與${baziInfo.dayMaster.includes("木") ? "教育文化、環保綠能" : baziInfo.dayMaster.includes("金") ? "科技製造、金融投資" : baziInfo.dayMaster.includes("火") ? "傳媒娛樂、能源化工" : baziInfo.dayMaster.includes("水") ? "運輸物流、餐飲服務" : "建築房地產、農業土地"}相關的行業。`,
-				关键问题: {
-					问题1: {
-						名称: `${baziInfo.dayMaster}日主發展瓶頸`,
-						解释: `${baziInfo.strength === "偏弱" ? "能力有限需要團隊支持，不宜獨自承擔重責" : baziInfo.strength === "偏強" ? "個性強勢需要學習協調，避免孤軍奮戰" : "能力適中宜穩健發展"}`,
+				關鍵問題: {
+					問題1: {
+						名稱: `${baziInfo.dayMaster}日主發展瓶頸`,
+						解釋: `${baziInfo.strength === "偏弱" ? "能力有限需要團隊支持，不宜獨自承擔重責" : baziInfo.strength === "偏強" ? "個性強勢需要學習協調，避免孤軍奮戰" : "能力適中宜穩健發展"}`,
 					},
-					问题2: {
-						名称: `${lifeStage}階段挑戰`,
-						解释: `${lifeStage === "青年" ? "經驗不足需要多學習，把握每個成長機會" : lifeStage === "中年" ? "責任加重需要平衡，避免過度勞累" : "體力精神有限，宜傳承經驗指導後進"}`,
+					問題2: {
+						名稱: `${lifeStage}階段挑戰`,
+						解釋: `${lifeStage === "青年" ? "經驗不足需要多學習，把握每個成長機會" : lifeStage === "中年" ? "責任加重需要平衡，避免過度勞累" : "體力精神有限，宜傳承經驗指導後進"}`,
 					},
 				},
 			},
-			十神互动关键: {
+			十神互動關鍵: {
 				十神列表: [
 					{
-						名称: `官殺（管制${baziInfo.dayMaster}）`,
+						名稱: `官殺（管制${baziInfo.dayMaster}）`,
 						作用: `事業中的上司制度，${baziInfo.strength === "偏強" ? "需要適當約束發揮更好" : "壓力過大需要緩解"}`,
 					},
 					{
-						名称: `印星（生助${baziInfo.dayMaster}）`,
+						名稱: `印星（生助${baziInfo.dayMaster}）`,
 						作用: `學習進修的機會，${gender}在${lifeStage}階段特別需要知識技能提升`,
 					},
 					{
-						名称: `食傷（${baziInfo.dayMaster}發揮）`,
+						名稱: `食傷（${baziInfo.dayMaster}發揮）`,
 						作用: `創新表現的能力，是在職場上展現才華的主要管道`,
 					},
 				],
@@ -593,31 +741,31 @@ function generatePersonalizedRight(
 
 	if (normalizeConcern(concern) === "財運") {
 		return JSON.stringify({
-			核心论述: {
-				财星本体: `${gender}${lifeStage}，${baziInfo.year}年${baziInfo.element}命，日主${baziInfo.dayMaster}，財星以金為主體`,
-				财星状态: `財星如同${baziInfo.dayMaster.includes("木") ? "樹木需要修剪才能結果" : baziInfo.dayMaster.includes("金") ? "金屬需要錘鍊才能成器" : baziInfo.dayMaster.includes("火") ? "火焰需要燃料才能旺盛" : baziInfo.dayMaster.includes("水") ? "流水需要河道才能奔騰" : "土地需要耕耘才能豐收"}，${gender}在${lifeStage}階段理財特質為${baziInfo.strength === "偏強" ? "積極進取但需控制風險" : baziInfo.strength === "偏弱" ? "保守穩健需要助力" : "平衡發展穩中求進"}`,
-				财源: `透過${baziInfo.dayMaster.includes("木") ? "創意文化、教育培訓" : baziInfo.dayMaster.includes("金") ? "技術服務、精密製造" : baziInfo.dayMaster.includes("火") ? "傳媒娛樂、能源化工" : baziInfo.dayMaster.includes("水") ? "流通貿易、餐飲服務" : "房地產建築、農業土地"}等專業技能生財，但受制於${lifeStage}階段的${lifeStage === "青年" ? "經驗不足" : lifeStage === "中年" ? "責任繁重" : "體力精神有限"}`,
-				破财之源: `${baziInfo.dayMaster}日主最怕${baziInfo.dayMaster.includes("木") ? "金克太重" : baziInfo.dayMaster.includes("金") ? "火克太旺" : baziInfo.dayMaster.includes("火") ? "水克太盛" : baziInfo.dayMaster.includes("水") ? "土克太實" : "木克太猛"}，體現在同輩競爭、衝動決策、${gender}特有的理財盲點`,
-				调候关键: `根據${baziInfo.element}命格，需要${baziInfo.lucky}調候，具體為${baziInfo.lucky.includes("水") ? "理性規劃" : ""}${baziInfo.lucky.includes("木") ? "成長學習" : ""}${baziInfo.lucky.includes("火") ? "積極行動" : ""}${baziInfo.lucky.includes("土") ? "穩健基礎" : ""}${baziInfo.lucky.includes("金") ? "精準執行" : ""}雙重平衡`,
+			核心論述: {
+				財星本體: `${gender}${lifeStage}，${baziInfo.year}年${baziInfo.element}命，日主${baziInfo.dayMaster}，財星以金為主體`,
+				財星狀態: `財星如同${baziInfo.dayMaster.includes("木") ? "樹木需要修剪才能結果" : baziInfo.dayMaster.includes("金") ? "金屬需要錘鍊才能成器" : baziInfo.dayMaster.includes("火") ? "火焰需要燃料才能旺盛" : baziInfo.dayMaster.includes("水") ? "流水需要河道才能奔騰" : "土地需要耕耘才能豐收"}，${gender}在${lifeStage}階段理財特質為${baziInfo.strength === "偏強" ? "積極進取但需控制風險" : baziInfo.strength === "偏弱" ? "保守穩健需要助力" : "平衡發展穩中求進"}`,
+				財源: `透過${baziInfo.dayMaster.includes("木") ? "創意文化、教育培訓" : baziInfo.dayMaster.includes("金") ? "技術服務、精密製造" : baziInfo.dayMaster.includes("火") ? "傳媒娛樂、能源化工" : baziInfo.dayMaster.includes("水") ? "流通貿易、餐飲服務" : "房地產建築、農業土地"}等專業技能生財，但受制於${lifeStage}階段的${lifeStage === "青年" ? "經驗不足" : lifeStage === "中年" ? "責任繁重" : "體力精神有限"}`,
+				破財之源: `${baziInfo.dayMaster}日主最怕${baziInfo.dayMaster.includes("木") ? "金克太重" : baziInfo.dayMaster.includes("金") ? "火克太旺" : baziInfo.dayMaster.includes("火") ? "水克太盛" : baziInfo.dayMaster.includes("水") ? "土克太實" : "木克太猛"}，體現在同輩競爭、衝動決策、${gender}特有的理財盲點`,
+				調候關鍵: `根據${baziInfo.element}命格，需要${baziInfo.lucky}調候，具體為${baziInfo.lucky.includes("水") ? "理性規劃" : ""}${baziInfo.lucky.includes("木") ? "成長學習" : ""}${baziInfo.lucky.includes("火") ? "積極行動" : ""}${baziInfo.lucky.includes("土") ? "穩健基礎" : ""}${baziInfo.lucky.includes("金") ? "精準執行" : ""}雙重平衡`,
 			},
-			财运特质: {
-				总体特征: `${gender}${lifeStage}，${baziInfo.dayMaster}日主${baziInfo.strength}，財運偏向${baziInfo.strength === "偏強" ? "主動進取型，適合創業投資" : baziInfo.strength === "偏弱" ? "穩健保守型，適合儲蓄理財" : "平衡發展型，適合多元配置"}`,
-				特质列表: [
+			財運特質: {
+				總體特徵: `${gender}${lifeStage}，${baziInfo.dayMaster}日主${baziInfo.strength}，財運偏向${baziInfo.strength === "偏強" ? "主動進取型，適合創業投資" : baziInfo.strength === "偏弱" ? "穩健保守型，適合儲蓄理財" : "平衡發展型，適合多元配置"}`,
+				特質列表: [
 					{
-						标题: `${baziInfo.dayMaster}日主理財特質`,
-						说明: `${baziInfo.dayMaster.includes("木") ? "成長性投資，重視長期價值" : baziInfo.dayMaster.includes("金") ? "精準投資，重視技術分析" : baziInfo.dayMaster.includes("火") ? "積極投資，重視趨勢把握" : baziInfo.dayMaster.includes("水") ? "靈活投資，重視資金流動" : "穩健投資，重視資產配置"}，${baziInfo.strength === "偏強" ? "有魄力但需控制" : "謹慎穩重需要信心"}`,
+						標題: `${baziInfo.dayMaster}日主理財特質`,
+						說明: `${baziInfo.dayMaster.includes("木") ? "成長性投資，重視長期價值" : baziInfo.dayMaster.includes("金") ? "精準投資，重視技術分析" : baziInfo.dayMaster.includes("火") ? "積極投資，重視趨勢把握" : baziInfo.dayMaster.includes("水") ? "靈活投資，重視資金流動" : "穩健投資，重視資產配置"}，${baziInfo.strength === "偏強" ? "有魄力但需控制" : "謹慎穩重需要信心"}`,
 					},
 					{
-						标题: `${lifeStage}階段收入特色`,
-						说明: `${gender}在${lifeStage}期，收入來源以${lifeStage === "青年" ? "學習成長為主，重視技能累積" : lifeStage === "中年" ? "專業發揮為主，重視事業發展" : "經驗傳承為主，重視穩定保值"}，配合${baziInfo.element}命格特質`,
+						標題: `${lifeStage}階段收入特色`,
+						說明: `${gender}在${lifeStage}期，收入來源以${lifeStage === "青年" ? "學習成長為主，重視技能累積" : lifeStage === "中年" ? "專業發揮為主，重視事業發展" : "經驗傳承為主，重視穩定保值"}，配合${baziInfo.element}命格特質`,
 					},
 					{
-						标题: "支出管理風格",
-						说明: `根據${baziInfo.dayMaster}特質，在生活品質與儲蓄之間${baziInfo.strength === "偏強" ? "敢於消費享受但需要節制" : baziInfo.strength === "偏弱" ? "注重節約但不要過度節省" : "尋求平衡適度消費"}，重視實用性投資`,
+						標題: "支出管理風格",
+						說明: `根據${baziInfo.dayMaster}特質，在生活品質與儲蓄之間${baziInfo.strength === "偏強" ? "敢於消費享受但需要節制" : baziInfo.strength === "偏弱" ? "注重節約但不要過度節省" : "尋求平衡適度消費"}，重視實用性投資`,
 					},
 					{
-						标题: `${baziInfo.element}命格投資建議`,
-						说明: `${lifeStage}階段適合${baziInfo.lucky.includes("水") ? "流動性較高的投資" : ""}${baziInfo.lucky.includes("木") ? "成長型股票或基金" : ""}${baziInfo.lucky.includes("火") ? "積極型投資組合" : ""}${baziInfo.lucky.includes("土") ? "不動產或穩健型投資" : ""}${baziInfo.lucky.includes("金") ? "定存或貴金屬投資" : ""}，配合${gender}特質${baziInfo.strength === "偏強" ? "可承擔中高風險" : "宜選擇低風險標的"}`,
+						標題: `${baziInfo.element}命格投資建議`,
+						說明: `${lifeStage}階段適合${baziInfo.lucky.includes("水") ? "流動性較高的投資" : ""}${baziInfo.lucky.includes("木") ? "成長型股票或基金" : ""}${baziInfo.lucky.includes("火") ? "積極型投資組合" : ""}${baziInfo.lucky.includes("土") ? "不動產或穩健型投資" : ""}${baziInfo.lucky.includes("金") ? "定存或貴金屬投資" : ""}，配合${gender}特質${baziInfo.strength === "偏強" ? "可承擔中高風險" : "宜選擇低風險標的"}`,
 					},
 				],
 			},
@@ -627,31 +775,31 @@ function generatePersonalizedRight(
 	// Add similar BaZi-enhanced content for other concerns...
 	else if (normalizeConcern(concern) === "事業") {
 		return JSON.stringify({
-			核心论述: {
-				事业本质: `${gender}${lifeStage}，${baziInfo.year}年${baziInfo.element}命，日主${baziInfo.dayMaster}特質決定事業本質`,
-				事业状态: `事業如同${baziInfo.dayMaster.includes("木") ? "大樹成長需要時間培育" : baziInfo.dayMaster.includes("金") ? "精工製作需要技術琢磨" : "專業發展需要持續精進"}，${gender}在${lifeStage}階段需要${baziInfo.strength === "偏強" ? "積極主導開創新局" : baziInfo.strength === "偏弱" ? "團隊合作穩健發展" : "平衡推進多元發展"}`,
-				发展途径: `透過${baziInfo.dayMaster.includes("木") ? "教育文化、環保創新" : baziInfo.dayMaster.includes("金") ? "科技製造、金融服務" : baziInfo.dayMaster.includes("火") ? "傳媒娛樂、新能源" : baziInfo.dayMaster.includes("水") ? "運輸物流、服務業" : "建築房地產、農業"}相關專業發展，但需注意${lifeStage}階段特有挑戰`,
-				阻碍之源: `${baziInfo.dayMaster}日主在事業發展中最大阻礙是${baziInfo.strength === "偏強" ? "過於自信獨斷，不善合作" : baziInfo.strength === "偏弱" ? "缺乏自信魄力，錯失機會" : "猶豫不決，難以抉擇"}，加上${lifeStage}階段的特殊壓力`,
-				调候关键: `根據${baziInfo.element}納音，事業發展需要${baziInfo.lucky}五行調候，重點是${baziInfo.lucky.includes("水") ? "理性規劃" : ""}${baziInfo.lucky.includes("木") ? "持續學習" : ""}${baziInfo.lucky.includes("火") ? "積極行動" : ""}${baziInfo.lucky.includes("土") ? "穩固基礎" : ""}${baziInfo.lucky.includes("金") ? "精準執行" : ""}的平衡發展`,
+			核心論述: {
+				事業本質: `${gender}${lifeStage}，${baziInfo.year}年${baziInfo.element}命，日主${baziInfo.dayMaster}特質決定事業本質`,
+				事業狀態: `事業如同${baziInfo.dayMaster.includes("木") ? "大樹成長需要時間培育" : baziInfo.dayMaster.includes("金") ? "精工製作需要技術琢磨" : "專業發展需要持續精進"}，${gender}在${lifeStage}階段需要${baziInfo.strength === "偏強" ? "積極主導開創新局" : baziInfo.strength === "偏弱" ? "團隊合作穩健發展" : "平衡推進多元發展"}`,
+				發展途徑: `透過${baziInfo.dayMaster.includes("木") ? "教育文化、環保創新" : baziInfo.dayMaster.includes("金") ? "科技製造、金融服務" : baziInfo.dayMaster.includes("火") ? "傳媒娛樂、新能源" : baziInfo.dayMaster.includes("水") ? "運輸物流、服務業" : "建築房地產、農業"}相關專業發展，但需注意${lifeStage}階段特有挑戰`,
+				阻礙之源: `${baziInfo.dayMaster}日主在事業發展中最大阻礙是${baziInfo.strength === "偏強" ? "過於自信獨斷，不善合作" : baziInfo.strength === "偏弱" ? "缺乏自信魄力，錯失機會" : "猶豫不決，難以抉擇"}，加上${lifeStage}階段的特殊壓力`,
+				調候關鍵: `根據${baziInfo.element}納音，事業發展需要${baziInfo.lucky}五行調候，重點是${baziInfo.lucky.includes("水") ? "理性規劃" : ""}${baziInfo.lucky.includes("木") ? "持續學習" : ""}${baziInfo.lucky.includes("火") ? "積極行動" : ""}${baziInfo.lucky.includes("土") ? "穩固基礎" : ""}${baziInfo.lucky.includes("金") ? "精準執行" : ""}的平衡發展`,
 			},
-			事业特质: {
-				总体特征: `${gender}${lifeStage}，${baziInfo.dayMaster}日主事業運特徵為${baziInfo.strength === "偏強" ? "領導型，適合管理創業" : baziInfo.strength === "偏弱" ? "專業型，適合技術深耕" : "平衡型，適合團隊協作"}發展模式`,
-				特质列表: [
+			事業特質: {
+				總體特徵: `${gender}${lifeStage}，${baziInfo.dayMaster}日主事業運特徵為${baziInfo.strength === "偏強" ? "領導型，適合管理創業" : baziInfo.strength === "偏弱" ? "專業型，適合技術深耕" : "平衡型，適合團隊協作"}發展模式`,
+				特質列表: [
 					{
-						标题: `${baziInfo.dayMaster}日主職場特質`,
-						说明: `${baziInfo.dayMaster.includes("木") ? "成長學習能力強，適應性佳" : baziInfo.dayMaster.includes("金") ? "執行力強，注重效率" : baziInfo.dayMaster.includes("火") ? "創新熱情，表達能力佳" : baziInfo.dayMaster.includes("水") ? "靈活變通，人際關係好" : "穩重可靠，組織能力強"}，${baziInfo.strength === "偏強" ? "領導潛質突出" : "專業能力扎實"}`,
+						標題: `${baziInfo.dayMaster}日主職場特質`,
+						說明: `${baziInfo.dayMaster.includes("木") ? "成長學習能力強，適應性佳" : baziInfo.dayMaster.includes("金") ? "執行力強，注重效率" : baziInfo.dayMaster.includes("火") ? "創新熱情，表達能力佳" : baziInfo.dayMaster.includes("水") ? "靈活變通，人際關係好" : "穩重可靠，組織能力強"}，${baziInfo.strength === "偏強" ? "領導潛質突出" : "專業能力扎實"}`,
 					},
 					{
-						标题: `${lifeStage}發展方向`,
-						说明: `${gender}在${lifeStage}期，適合往${baziInfo.dayMaster.includes("木") ? "創新成長" : baziInfo.dayMaster.includes("金") ? "技術精進" : baziInfo.dayMaster.includes("火") ? "表現創意" : baziInfo.dayMaster.includes("水") ? "服務流通" : "管理建設"}方向發展，配合${baziInfo.element}命格優勢`,
+						標題: `${lifeStage}發展方向`,
+						說明: `${gender}在${lifeStage}期，適合往${baziInfo.dayMaster.includes("木") ? "創新成長" : baziInfo.dayMaster.includes("金") ? "技術精進" : baziInfo.dayMaster.includes("火") ? "表現創意" : baziInfo.dayMaster.includes("水") ? "服務流通" : "管理建設"}方向發展，配合${baziInfo.element}命格優勢`,
 					},
 					{
-						标题: "團隊合作模式",
-						说明: `根據${baziInfo.dayMaster}特質，在團隊中適合扮演${baziInfo.strength === "偏強" ? "領導主導" : baziInfo.strength === "偏弱" ? "專業支援" : "協調平衡"}角色，重視${gender}特有的溝通優勢`,
+						標題: "團隊合作模式",
+						說明: `根據${baziInfo.dayMaster}特質，在團隊中適合扮演${baziInfo.strength === "偏強" ? "領導主導" : baziInfo.strength === "偏弱" ? "專業支援" : "協調平衡"}角色，重視${gender}特有的溝通優勢`,
 					},
 					{
-						标题: `${baziInfo.element}命格發展策略`,
-						说明: `${lifeStage}階段事業策略宜${baziInfo.lucky.includes("水") ? "靈活應變保持學習" : ""}${baziInfo.lucky.includes("木") ? "持續成長擴大影響" : ""}${baziInfo.lucky.includes("火") ? "積極表現爭取機會" : ""}${baziInfo.lucky.includes("土") ? "穩健經營建立基礎" : ""}${baziInfo.lucky.includes("金") ? "精準定位發揮專長" : ""}，配合${baziInfo.strength}特質發展`,
+						標題: `${baziInfo.element}命格發展策略`,
+						說明: `${lifeStage}階段事業策略宜${baziInfo.lucky.includes("水") ? "靈活應變保持學習" : ""}${baziInfo.lucky.includes("木") ? "持續成長擴大影響" : ""}${baziInfo.lucky.includes("火") ? "積極表現爭取機會" : ""}${baziInfo.lucky.includes("土") ? "穩健經營建立基礎" : ""}${baziInfo.lucky.includes("金") ? "精準定位發揮專長" : ""}，配合${baziInfo.strength}特質發展`,
 					},
 				],
 			},
@@ -666,87 +814,430 @@ function generatePersonalizedRight(
 function createAIPrompt(concern, tab, userInfo) {
 	const { birthDateTime, gender, problem } = userInfo;
 
+	// Calculate current year's GanZhi for dynamic year references
+	const currentYearInfo = getCurrentYearGanZhi();
+	const yearText = `${currentYearInfo.year}年流年${currentYearInfo.ganZhi}`;
+
+	// Get consistent birth chart data for AI analysis
+	const birthYear = birthDateTime
+		? new Date(birthDateTime).getFullYear()
+		: 2000;
+	const yearElements = {
+		1999: {
+			year: "己卯",
+			element: "城頭土",
+			dayMaster: "己土",
+			strength: "偏弱",
+			characteristics: "穩重溫和，包容性強",
+			strengths: "待人溫和、包容力強",
+			weaknesses: "有時過於被動、需要主動",
+		},
+		2000: {
+			year: "庚辰",
+			element: "白蠟金",
+			dayMaster: "庚金",
+			strength: "中等",
+			characteristics: "堅毅果斷，執行力強",
+			strengths: "決策果斷、執行力強",
+			weaknesses: "有時過於剛硬、需要柔和",
+		},
+		// Add more years as needed
+	};
+
+	const baziInfo = yearElements[birthYear] || {
+		year: "庚子",
+		element: "壁上土",
+		dayMaster: "庚金",
+		strength: "中等",
+		characteristics: "穩重務實，循序漸進",
+		strengths: "穩重可靠、務實進取",
+		weaknesses: "有時過於保守、需要創新",
+	};
+
 	const baseContext = `用戶生辰：${birthDateTime}，性別：${gender}，關注領域：${concern}，具體問題：${problem}
 
-【重要指示】你是專業的八字命理大師，必須提供具體、準確、有說服力的分析。避免模糊用詞，要給出明確的判斷和建議。請使用繁體中文回應。`;
+【八字基礎資料】
+- 出生年份：${baziInfo.year}年
+- 納音五行：${baziInfo.element}命
+- 日主：${baziInfo.dayMaster}
+- 日主強弱：${baziInfo.strength}
+- 性格特質：${baziInfo.characteristics}
+
+【重要指示】你是專業的八字命理大師，必須基於上述準確的八字資料進行分析。不得自行編造或推測八字信息，必須以提供的日主和五行資料為準。避免模糊用詞，要給出明確的判斷和建議。請使用繁體中文回應。`;
 
 	if (tab === "日主特性") {
-		return `${baseContext}
+		// Generate concern-specific prompt for 日主特性
+		if (concern === "健康") {
+			return `${baseContext}
 
-請必須按照以下格式提供具體分析（不要用模糊詞彙）：
+請提供詳細的日主特性健康分析，內容必須針對健康養生且具有實用價值：
 
-分析用戶的日主特性，必須包含：
-1. 明確指出日干五行和月令的具體關係
-2. 具體列出2個明確優勢（用事實說話）
-3. 具體列出2個明確劣勢（不要模糊）
-4. 提供具體的調候方案（說出具體五行）
-5. 給出針對${concern}的具體長期策略
+【健康分析要求】
+1. 流年與命局對健康的影響 - 詳細解釋${yearText}如何影響用戶的身體狀況
+2. 日主五行體質分析 - 包含先天體質特點、易患疾病、身體弱點
+3. 具體的養生調理建議 - 包含時辰養生、飲食宜忌、運動方式
+4. 季節養生重點 - 針對不同季節提供具體的保健方法
+5. 長期健康管理體系 - 建立完整的日常養生方案
 
-格式要求：
-[具體日干]生於[具體月令]，[明確坐支分析]，賦予[具體優勢1、具體優勢2]；然[具體劣勢1、具體劣勢2]。全局[具體調候需求]，[具體長期策略]
+內容約400-500字，必須100%專注於健康養生，不涉及事業、財運等其他領域。`;
+		} else if (
+			concern === "感情" ||
+			concern === "關係" ||
+			concern === "戀愛"
+		) {
+			return `${baseContext}
 
-必須約250字，用專業術語配合具體建議，避免空泛描述。`;
+請提供詳細的日主特性感情分析，內容必須針對感情關係且具有實用價值：
+
+【感情分析要求】
+1. 流年與命局對感情的影響 - 詳細解釋${yearText}如何影響用戶的感情運勢
+2. 日主五行戀愛特質分析 - 包含感情模式、愛情觀、親密關係特點
+3. 具體的感情指導建議 - 包含如何吸引理想對象、改善現有關係
+4. 理想伴侶特質分析 - 根據五行匹配原理推薦適合的伴侶類型
+5. 長期感情經營策略 - 建立和諧穩定的感情關係方法
+
+內容約400-500字，必須100%專注於感情關係，不涉及健康、事業等其他領域。`;
+		} else if (
+			concern === "事業" ||
+			concern === "工作" ||
+			concern === "career"
+		) {
+			return `${baseContext}
+
+請提供詳細的日主特性事業分析，內容必須針對事業發展且具有實用價值：
+
+【事業分析要求】
+1. 流年與命局對事業的影響 - 詳細解釋${yearText}如何影響用戶的職涯發展
+2. 日主五行職場特質分析 - 包含工作風格、職業天賦、領導能力
+3. 具體的職業發展建議 - 包含適合的行業、晉升策略、創業指導
+4. 職場人際關係處理 - 如何與上司、同事、下屬相處
+5. 長期職業規劃 - 建立穩定成功的事業發展路徑
+
+內容約400-500字，必須100%專注於事業職場，不涉及健康、感情等其他領域。`;
+		} else if (concern === "財運") {
+			return `${baseContext}
+
+請提供詳細的日主特性財運分析，內容必須針對財富管理且具有實用價值：
+
+【財運分析要求】
+1. 流年與命局對財運的影響 - 詳細解釋${yearText}如何影響用戶的財富狀況
+2. 日主五行理財特質分析 - 包含賺錢能力、投資傾向、消費模式
+3. 具體的理財建議 - 包含投資策略、風險控制、增收方法
+4. 財富積累方式 - 根據命理特點推薦適合的理財工具
+5. 長期財富規劃 - 建立穩定增長的財富管理體系
+
+內容約400-500字，必須100%專注於財運理財，不涉及健康、感情等其他領域。`;
+		} else {
+			return `${baseContext}
+
+請提供詳細的日主特性分析，內容必須豐富易懂且具有實用價值：
+
+【分析要求】
+1. 流年與命局的具體互動關係
+2. 日主五行特性深度分析
+3. 性格特質與人際關係
+4. 針對個人成長的指導建議
+5. 長期自我提升方案
+
+內容約400-500字，既專業又白話易懂。`;
+		}
 	} else if (tab === "middle") {
 		if (normalizeConcern(concern) === "財運") {
 			return `${baseContext}
       
-你必須嚴格按照以下JSON格式回應，提供財運相關的關鍵詞分析：
+你必須嚴格按照以下JSON格式回應，基於${baziInfo.dayMaster}日主提供詳細的財運十神分析：
 
 {
-  "keywords": [
-    {"id": 1, "text": "財星狀態", "description": "明確指出正財或偏財的具體位置和強弱狀態，如正財庚金透於時干得月令生扶"},
-    {"id": 2, "text": "生財之源", "description": "具體分析食傷位置、強弱及生財能力，說明是什麼類型的才華技能"},
-    {"id": 3, "text": "十神互動", "description": "分析關鍵十神如何影響財運，包含具體的生克制化關係"}
-  ],
-  "analysis": "綜合分析用戶的財運格局，包含財星狀態、生財能力、十神互動等關鍵要素。要給出具體而非模糊的判斷，說明財運發展的優勢與限制，提供明確的調候建議。內容約250字，使用專業術語配合具體建議。"
-}
-
-【強制要求】：  
-- 必須提供具體的天干地支分析
-- 不允許使用"可能"、"或許"、"一般來說"等模糊詞彙
-- 每個關鍵詞描述要有具體的命理依據
-- analysis部分要給出明確的綜合判斷`;
-		} else if (normalizeConcern(concern) === "事業") {
-			return `${baseContext}
-      
-你必須嚴格按照以下JSON格式回應，提供事業相關的關鍵詞分析：
-
-{
-  "keywords": [
-    {"id": 1, "text": "事業根基", "description": "明確分析事業宮位置和十神配置，說出具體的事業發展根基和潛力"},
-    {"id": 2, "text": "發展方向", "description": "具體分析適合的事業方向和發展模式，包含職業選擇和晉升策略"},
-    {"id": 3, "text": "十神影響", "description": "分析關鍵十神對事業的具體影響，包含競爭優勢和發展障礙"}
-  ],
-  "analysis": "綜合分析用戶的事業運勢格局，包含事業根基、發展潛力、適合方向、競爭優勢等關鍵要素。要給出具體的職業建議和發展策略，說明事業成功的條件與限制，提供明確的調候建議。內容約250字，避免空泛描述，要有實用性。"
+  "sections": [
+    {
+      "title": "【財星核心】",
+      "content": "基於${baziInfo.dayMaster}日主分析財星（正財、偏財）在命局中的配置。詳細說明財星的天干地支位置、強弱狀態、以及受到的生克制化關係。評估財源的穩定性和發展潛力。",
+      "keyPoints": [
+        "財星位置：具體分析正財或偏財在年月日時的配置",
+        "強弱評估：說明財星得令、得勢、得根的情況",
+        "制約因素：分析影響財運的不利因素和化解方法"
+      ],
+      "conclusion": "基於財星分析給出財運根基的總結判斷"
+    },
+    {
+      "title": "【生財之源】", 
+      "content": "深入分析食神傷官（才華技能）如何生財，以及比肩劫財（競爭合作）對財運的影響。重點說明${baziInfo.dayMaster}日主的生財能力和最適合的賺錢方式。",
+      "highlights": [
+        {
+          "subtitle": "食傷生財力",
+          "description": "分析食神傷官的旺衰和生財能力，說明通過才華技能獲取財富的途徑"
+        },
+        {
+          "subtitle": "比劫奪財險",
+          "description": "分析比肩劫財對財運的威脅，說明防範破財和合作理財的策略"
+        }
+      ]
+    },
+    {
+      "title": "【十神財運互動】",
+      "content": "分析關鍵十神與財星的互動關係如何影響財運發展。重點說明${yearText}的影響下，各十神與財運的生克制化關係。",
+      "interactions": [
+        "官殺護財：說明正官偏官如何保護財星，避免比劫奪財",
+        "印星耗財：說明正印偏印對財運的消耗作用和平衡方法", 
+        "食傷生財：說明食神傷官生財的最佳時機和方式",
+        "比劫爭財：說明防範財務糾紛和合作投資的注意事項"
+      ]
+    }
+  ]
 }
 
 【強制要求】：
-- 必須提供具體的職業建議和發展策略
-- 不允許使用模糊詞彙，要給出明確判斷  
-- 每個關鍵詞描述要有具體的命理依據
-- analysis部分要提供實用的事業指導`;
+- 必須基於${baziInfo.dayMaster}日主和具體十神進行分析
+- 必須使用正確的財運十神術語（正財、偏財、食神、傷官、比肩、劫財等）
+- 每個section的content要有150-200字的詳細分析
+- keyPoints和interactions要有具體的命理依據
+- 分析要專業且具體，避免空泛描述
+- **重要：請全部使用繁體中文輸出**`;
+		} else if (normalizeConcern(concern) === "事業") {
+			return `${baseContext}
+      
+你必須嚴格按照以下JSON格式回應，基於${baziInfo.dayMaster}日主提供詳細的事業十神分析。
+
+**重要：請盡量返回完整的3個sections以提供全面分析。**
+
+{
+  "sections": [
+    {
+      "title": "【事業根基】",
+      "content": "基於${baziInfo.dayMaster}日主分析事業宮配置和十神組合。詳細說明事業宮位的天干地支構成、藏干分析、以及對應的十神關係。包含事業根基的強弱、發展潛力評估。",
+      "keyPoints": [
+        "事業宮位：具體分析事業宮的天干地支配置",
+        "十神組合：說明相關的十神（正官、偏官、正印、偏印等）如何影響事業",
+        "根基評估：評估事業發展的穩定性和潛力"
+      ],
+      "conclusion": "基於十神分析給出事業根基的總結判斷"
+    },
+    {
+      "title": "【十神解析】",
+      "content": "深入分析影響事業的關鍵十神配置。重點說明正官、偏官（事業管制）、正印偏印（技能學習）、食神傷官（才華展現）、比肩劫財（競爭合作）等十神在事業中的具體作用。",
+      "highlights": [
+        {
+          "subtitle": "官殺系統（管制力）",
+          "description": "分析正官偏官在命局中的作用，說明上司關係、職場制度對事業的影響"
+        },
+        {
+          "subtitle": "印星系統（學習力）", 
+          "description": "分析正印偏印的配置，說明學習能力、專業技能對事業的助力"
+        }
+      ]
+    },
+    {
+      "title": "【十神互動關鍵】",
+      "content": "分析關鍵十神之間的生克制化關係如何影響事業發展。重點說明${yearText}的天干地支如何與命局十神互動，形成有利或不利的事業運勢。",
+      "interactions": [
+        "官殺（管制）：說明事業中的管制因素和應對策略",
+        "印星（生助）：說明貴人助力和學習機會的把握",
+        "食傷（才華）：說明個人才能的發揮和變現方式",
+        "比劫（競爭）：說明同行競爭和團隊合作的平衡"
+      ]
+    }
+  ]
+}
+
+【強制要求】：
+- **盡量返回完整的3個sections：【事業根基】、【十神解析】、【十神互動關鍵】以提供完整分析**
+- **如無法提供3個完整sections，至少提供【十神互動關鍵】section**
+- 必須嚴格按照上述JSON格式，包含所有sections數組中的3個完整section
+- 必須基於${baziInfo.dayMaster}日主和具體十神進行分析
+- 必須使用正確的十神術語（正官、偏官、正印、偏印、食神、傷官、比肩、劫財、正財、偏財）
+- 每個section的content要有150-200字的詳細分析
+- keyPoints和interactions要有具體的命理依據
+- 分析要專業且具體，避免空泛描述
+- **重要：請全部使用繁體中文輸出，並確保返回完整的sections數組**`;
+		} else if (normalizeConcern(concern) === "健康") {
+			return `${baseContext}
+      
+你必須嚴格按照以下JSON格式回應，基於${baziInfo.dayMaster}日主提供詳細的健康五行分析：
+
+{
+  "sections": [
+    {
+      "title": "【體質根基】",
+      "content": "基於${baziInfo.dayMaster}日主和${baziInfo.element}命分析先天體質特點。詳細說明日主五行對應的臟腑系統、體質強弱、以及易患疾病的傾向。結合命局五行配置評估整體健康狀況。",
+      "keyPoints": [
+        "五行體質：${baziInfo.dayMaster}對應的臟腑系統和體質特點",
+        "強弱分析：日主旺衰對健康的具體影響",
+        "疾病傾向：根據五行失衡可能出現的健康問題"
+      ],
+      "conclusion": "基於五行體質給出健康根基的總結評估"
+    },
+    {
+      "title": "【五行調理】",
+      "content": "深入分析${baziInfo.dayMaster}日主需要的五行補益和調理方法。重點說明飲食、運動、作息、環境等方面的養生原則，以及如何通過五行相生相剋的原理來調理體質。",
+      "highlights": [
+        {
+          "subtitle": "飲食調理法",
+          "description": "根據${baziInfo.dayMaster}五行特性，說明適宜和禁忌的食物類型，以及最佳進食時間"
+        },
+        {
+          "subtitle": "運動養生法",
+          "description": "基於日主特質推薦適合的運動方式和強度，以及最佳鍛煉時間"
+        }
+      ]
+    },
+    {
+      "title": "【流年健康】",
+      "content": "分析${yearText}對${baziInfo.dayMaster}日主健康的具體影響。說明流年天干地支與命局的互動如何影響健康狀況，提供當年的預防保健重點。",
+      "interactions": [
+        "流年生克：說明流年五行對日主健康的有利或不利影響",
+        "季節調養：說明四季養生的重點和注意事項",
+        "疾病預防：說明當年需要特別預防的健康問題",
+        "調理時機：說明最佳的調理和治療時間點"
+      ]
+    }
+  ]
+}
+
+【強制要求】：
+- 必須基於${baziInfo.dayMaster}日主和五行醫理進行分析
+- 必須結合${baziInfo.element}命的健康特質
+- 每個section的content要有150-200字的詳細分析
+- keyPoints和interactions要有具體的五行醫理依據
+- 分析要專業且具實用性，避免空泛描述
+- **重要：請全部使用繁體中文輸出**`;
+		} else if (normalizeConcern(concern) === "感情") {
+			return `${baseContext}
+      
+你必須嚴格按照以下JSON格式回應，基於${baziInfo.dayMaster}日主提供詳細的感情桃花分析。
+
+**重要：請盡量返回完整的3個sections以提供全面分析。**
+
+{
+  "sections": [
+    {
+      "title": "【感情根基】",
+      "content": "基於${baziInfo.dayMaster}日主分析先天感情特質和愛情觀。詳細說明日主五行對應的情感模式、表達方式、以及在親密關係中的行為特點。包含感情的優勢和需要注意的盲點。",
+      "keyPoints": [
+        "情感特質：${baziInfo.dayMaster}日主的五行感情表現模式",
+        "愛情觀念：對伴侶關係的期待和處理方式",
+        "互動模式：在親密關係中的溝通和相處特點"
+      ],
+      "conclusion": "基於日主特質給出感情根基的總結評估"
+    },
+    {
+      "title": "【桃花運勢】",
+      "content": "深入分析${baziInfo.dayMaster}日主的桃花星配置和感情機會。重點說明正桃花、偏桃花的出現時機，以及如何把握良緣。結合${yearText}的流年影響分析當年的感情運勢。",
+      "highlights": [
+        {
+          "subtitle": "桃花星配置",
+          "description": "分析命局中的桃花星位置和強弱，說明感情機會的來源和特點"
+        },
+        {
+          "subtitle": "流年桃花運",
+          "description": "說明${yearText}對感情運勢的具體影響，包含遇到對象的時機和地點"
+        }
+      ]
+    },
+    {
+      "title": "【關係經營】",
+      "content": "分析${baziInfo.dayMaster}日主在感情關係中的經營策略和注意事項。重點說明如何發揮感情優勢、化解關係危機、以及維持長久關係的要訣。",
+      "interactions": [
+        "溝通模式：說明最適合的溝通方式和表達技巧",
+        "相處之道：說明在關係中的角色定位和互動策略", 
+        "危機化解：說明容易出現的感情問題和預防方法",
+        "長久經營：說明維持穩定關係的關鍵要素"
+      ]
+    }
+  ]
+}
+
+【強制要求】：
+- **盡量返回完整的3個sections：【感情根基】、【桃花運勢】、【關係經營】以提供完整分析**
+- **如無法提供3個完整sections，至少提供【關係經營】section**
+- 必須基於${baziInfo.dayMaster}日主和五行感情特質進行分析
+- 必須結合${baziInfo.element}命的情感特質
+- 每個section的content要有150-200字的詳細分析
+- keyPoints和interactions要有具體的命理和桃花依據
+- 分析要專業且具實用性，避免空泛描述
+- **重要：請全部使用繁體中文輸出，並確保返回完整的sections數組**`;
 		}
 		// Add similar enhanced prompts for other concerns...
 	} else if (tab === "right") {
 		if (normalizeConcern(concern) === "財運") {
 			return `${baseContext}
       
-你必須嚴格按照以下JSON格式回應，提供財運定位的關鍵詞分析：
+你必須嚴格按照以下JSON格式回應，基於${baziInfo.dayMaster}日主提供財運定位的關鍵詞分析：
 
 {
   "keywords": [
-    {"id": 1, "text": "財星配置", "description": "明確說明正財偏財的具體位置、強弱狀態和特質表現"},
-    {"id": 2, "text": "生財途徑", "description": "具體說明主要的生財方式、制約因素和發展潛力"},
-    {"id": 3, "text": "財運特質", "description": "概括財運的核心特徵，包含優勢、風險和調候關鍵"}
+    {"id": 1, "text": "財星配置", "description": "基於${baziInfo.dayMaster}日主和${baziInfo.element}命格，說明財星的具體配置和強弱特質"},
+    {"id": 2, "text": "生財途徑", "description": "針對${baziInfo.dayMaster}日主特質，說明最適合的生財方式和理財策略"},
+    {"id": 3, "text": "財富格局", "description": "基於${baziInfo.dayMaster}的五行屬性，概括財運的核心特徵和發展潛力"}
   ],
-  "analysis": "綜合分析用戶的財運定位和發展方向，包含財星配置、生財能力、破財風險、調候方法等關鍵要素。要提供可執行的理財建議，說明財運發展的具體路徑和注意事項。內容約300字，要實用性為主，避免理論空談。"
+  "analysis": "綜合分析${baziInfo.dayMaster}日主的財運定位，結合${baziInfo.element}命的理財特點，包含財星配置、生財能力、財富策略等要素。要提供針對${baziInfo.dayMaster}日主的專屬理財建議，說明財運發展的具體路徑。內容約300字，實用性為主。"
 }
 
 【強制要求】：
-- 必須提供可執行的理財建議
-- 不允許模糊或空泛的描述
-- 每個關鍵詞描述要有具體的操作方向
-- analysis部分要提供實用的財運指導`;
+- 必須基於${baziInfo.dayMaster}日主和${baziInfo.element}命進行分析
+- 不允許使用其他日主或命格信息
+- 每個關鍵詞描述要符合${baziInfo.dayMaster}的理財特質
+- analysis部分要針對${baziInfo.dayMaster}提供專屬財運指導
+- **重要：請全部使用繁體中文輸出**`;
+		} else if (normalizeConcern(concern) === "事業") {
+			return `${baseContext}
+      
+你必須嚴格按照以下JSON格式回應，基於${baziInfo.dayMaster}日主提供事業定位的關鍵詞分析：
+
+{
+  "keywords": [
+    {"id": 1, "text": "事業配置", "description": "基於${baziInfo.dayMaster}日主和${baziInfo.element}命格，說明事業宮位的基本配置和職業天賦"},
+    {"id": 2, "text": "發展路徑", "description": "針對${baziInfo.dayMaster}日主特質，說明最適合的事業發展方向和職業選擇策略"},
+    {"id": 3, "text": "成功密碼", "description": "基於${baziInfo.dayMaster}的五行屬性，概括事業成功的核心要素和競爭優勢"}
+  ],
+  "analysis": "綜合分析${baziInfo.dayMaster}日主的事業定位，結合${baziInfo.element}命的職業特點，包含事業根基、發展路徑、成功策略等要素。要提供針對${baziInfo.dayMaster}日主的專屬職業建議，說明事業成功的具體條件。內容約300字，實用性為主。"
+}
+
+【強制要求】：
+- 必須基於${baziInfo.dayMaster}日主和${baziInfo.element}命進行分析
+- 不允許使用其他日主或命格信息
+- 每個關鍵詞描述要符合${baziInfo.dayMaster}的職業特質
+- analysis部分要針對${baziInfo.dayMaster}提供專屬事業指導
+- **重要：請全部使用繁體中文輸出**`;
+		} else if (normalizeConcern(concern) === "健康") {
+			return `${baseContext}
+      
+你必須嚴格按照以下JSON格式回應，基於${baziInfo.dayMaster}日主提供健康定位的關鍵詞分析：
+
+{
+  "keywords": [
+    {"id": 1, "text": "健康根基", "description": "基於${baziInfo.dayMaster}日主和${baziInfo.element}命格，說明先天體質的根本特點，包含五行配置的健康優勢和潛在弱點"},
+    {"id": 2, "text": "調理方向", "description": "針對${baziInfo.dayMaster}日主特質，說明最重要的養生調理重點，包含適合的飲食類型、運動方式和作息規律"},
+    {"id": 3, "text": "長壽之道", "description": "基於${baziInfo.dayMaster}的五行屬性，概括健康管理的核心原則和延年益壽的關鍵要點"}
+  ],
+  "analysis": "綜合分析${baziInfo.dayMaster}日主的健康定位，結合${baziInfo.element}命的養生特點，包含體質根基、調理策略、保健重點等要素。要提供針對${baziInfo.dayMaster}日主的專屬養生建議，說明健康維護的具體方法。內容約300字，實用性為主。"
+}
+
+【強制要求】：
+- 必須基於${baziInfo.dayMaster}日主和${baziInfo.element}命進行分析
+- 不允許使用其他日主或命格信息
+- 每個關鍵詞描述要符合${baziInfo.dayMaster}的五行特質
+- analysis部分要針對${baziInfo.dayMaster}提供專屬健康指導
+- **重要：請全部使用繁體中文輸出**`;
+		} else if (normalizeConcern(concern) === "感情") {
+			return `${baseContext}
+      
+你必須嚴格按照以下JSON格式回應，基於${baziInfo.dayMaster}日主提供感情定位的關鍵詞分析：
+
+{
+  "keywords": [
+    {"id": 1, "text": "感情本質", "description": "基於${baziInfo.dayMaster}日主和${baziInfo.element}命格，說明感情宮位的基本特質和愛情觀念"},
+    {"id": 2, "text": "緣分走向", "description": "結合${baziInfo.dayMaster}日主特質，說明感情發展的主要方向和遇到真愛的時機模式"},
+    {"id": 3, "text": "幸福密碼", "description": "基於${baziInfo.dayMaster}的五行屬性，概括感情成功的核心要素和長久幸福的關鍵"}
+  ],
+  "analysis": "綜合分析${baziInfo.dayMaster}日主的感情定位，結合${baziInfo.element}命的情感特點，包含愛情本質、緣分模式、幸福策略等要素。要提供針對${baziInfo.dayMaster}日主的專屬感情建議，說明愛情成功的具體條件。內容約300字，實用性為主。"
+}
+
+【強制要求】：
+- 必須基於${baziInfo.dayMaster}日主和${baziInfo.element}命進行分析
+- 不允許使用其他日主或命格信息
+- 每個關鍵詞描述要符合${baziInfo.dayMaster}的感情特質
+- analysis部分要針對${baziInfo.dayMaster}提供專屬感情指導
+- **重要：請全部使用繁體中文輸出**`;
 		}
 		// Add other concerns for right tab...
 	}
@@ -776,354 +1267,278 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 
 	// Try to parse AI JSON response
 	let parsedContent = null;
+	console.log("🔍 renderStructuredContent called with:", {
+		concernArea,
+		tab,
+		aiContentType: typeof aiContent,
+		aiContentLength: aiContent?.length,
+		aiContentPreview:
+			typeof aiContent === "string"
+				? aiContent.substring(0, 100) + "..."
+				: aiContent,
+		startsWithBrace:
+			typeof aiContent === "string"
+				? aiContent.trim().startsWith("{")
+				: false,
+	});
+
 	try {
 		if (typeof aiContent === "string" && aiContent.trim().startsWith("{")) {
 			parsedContent = JSON.parse(aiContent);
-			console.log("Successfully parsed JSON content:", parsedContent);
+			console.log("✅ Successfully parsed JSON content:", parsedContent);
+		} else {
+			console.log(
+				"❌ AI content is not JSON format - type:",
+				typeof aiContent,
+				"starts with {:",
+				typeof aiContent === "string"
+					? aiContent.trim().startsWith("{")
+					: false
+			);
 		}
 	} catch (error) {
-		console.log("Failed to parse JSON, using text content as-is");
+		console.log(
+			"❌ Failed to parse JSON:",
+			error.message,
+			"Content:",
+			aiContent?.substring(0, 200)
+		);
 	}
 
-	if (tab === "middle") {
-		// Always render structured layout - use parsed AI content or fallback structure
-		if (parsedContent) {
-			// Use AI JSON content
-			const firstKey = Object.keys(parsedContent)[0];
-			const secondKey = Object.keys(parsedContent)[1];
-			const thirdKey = Object.keys(parsedContent)[2];
+	// If we have valid AI JSON content, render it
+	if (parsedContent && (parsedContent.keywords || parsedContent.sections)) {
+		console.log("🎯 Rendering AI JSON content for", tab, concernArea);
 
-			const sectionTitles = {
-				財運: {
-					first: "財星核心",
-					second: "生財之源",
-					third: "十神互動關鍵",
-				},
-				事業: {
-					first: "事業根基",
-					second: "十神解析",
-					third: "十神互動關鍵",
-				},
-				健康: {
-					first: "健康根基",
-					second: "病源分析",
-					third: "十神互動關鍵",
-				},
-				感情: {
-					first: "感情根基",
-					second: "感情分析",
-					third: "十神互動關鍵",
-				},
-			};
-
-			const titles = sectionTitles[concernArea];
-
+		// Handle new rich structure format (with sections)
+		if (parsedContent.sections) {
 			return (
 				<div className="space-y-4">
-					{/* First Section */}
-					<div style={containerStyle}>
-						<div
-							className="flex items-center justify-center mb-3 font-bold text-white"
-							style={{
-								backgroundColor: "#D09900",
-								width: "300px",
-								height: "40px",
-								borderRadius: "20px",
-							}}
-						>
-							{titles.first}
-						</div>
-						<div className="leading-relaxed text-gray-800">
-							<p className="mb-2">
-								{parsedContent[firstKey]?.主要内容}
-							</p>
-							{parsedContent[firstKey]?.状态列表 && (
-								<ul className="ml-2 space-y-1 list-none">
-									{parsedContent[firstKey].状态列表.map(
-										(item, index) => {
-											// Split the item by colon to get the title and description
-											const parts = item.split("：");
-											const title = parts[0];
-											const description = parts
-												.slice(1)
-												.join("：");
-
-											return (
-												<li
-													key={index}
-													className="mb-2"
-												>
-													<span
-														style={{
-															color: "#D09900",
-															fontWeight: "bold",
-														}}
-													>
-														{title}
-													</span>
-													{description && (
-														<span className="text-black">
-															：{description}
-														</span>
-													)}
-												</li>
-											);
-										}
-									)}
-								</ul>
-							)}
-							<p className="mt-3 font-semibold">
-								<span style={{ color: "#D09900" }}>結論</span>
-								<span className="text-black">
-									{parsedContent[firstKey]?.结论}
-								</span>
-							</p>
-						</div>
-					</div>
-
-					{/* Second Section */}
-					<div style={containerStyle}>
-						<div
-							className="flex items-center justify-center mb-3 font-bold text-white"
-							style={{
-								backgroundColor: "#D09900",
-								width: "300px",
-								height: "40px",
-								borderRadius: "20px",
-							}}
-						>
-							{titles.second}
-						</div>
-						<div className="leading-relaxed text-black">
-							<p className="mb-3">
-								{parsedContent[secondKey]?.主要分析}
-							</p>
-
-							{parsedContent[secondKey]?.关键问题 &&
-								Object.entries(
-									parsedContent[secondKey].关键问题
-								).map(([key, problem], index) => (
-									<div key={index} className="mb-4">
-										<div
-											className="flex items-center justify-center mb-2 font-semibold"
-											style={{
-												border: "3px solid #D09900",
-												color: "#D09900",
-												width: "200px",
-												height: "40px",
-												borderRadius: "20px",
-											}}
-										>
-											{problem.名称}
-										</div>
-										<p
-											className="text-black"
-											style={{ fontSize: "15px" }}
-										>
-											{problem.解释}
-										</p>
-									</div>
-								))}
-						</div>
-					</div>
-
-					{/* Third Section */}
-					<div style={containerStyle}>
-						<div
-							className="flex items-center justify-center mb-3 font-bold text-white"
-							style={{
-								backgroundColor: "#D09900",
-								width: "300px",
-								height: "40px",
-								borderRadius: "20px",
-							}}
-						>
-							{titles.third}
-						</div>
-						<div className="space-y-2 leading-relaxed text-gray-800">
-							{parsedContent[thirdKey]?.十神列表?.map(
-								(item, index) => (
-									<div
-										key={index}
-										className="flex items-start"
-									>
-										<span
-											className="mr-2 font-semibold"
-											style={{ color: colors.accent }}
-										>
-											•
-										</span>
-										<span>
-											<strong
-												style={{ color: "#D09900" }}
-											>
-												{item.名称}
-											</strong>
-											：
-											<span
-												className="text-black"
-												style={{ fontSize: "15px" }}
-											>
-												{item.作用}
-											</span>
-										</span>
-									</div>
-								)
-							)}
-							<p
-								className="p-2 mt-3 font-semibold "
+					{parsedContent.sections.map((section, sectionIndex) => (
+						<div key={sectionIndex} style={containerStyle}>
+							<h3
+								className="mb-3 text-lg font-bold"
 								style={{ color: colors.secondary }}
 							>
-								格局核心{parsedContent[thirdKey]?.格局核心}
-							</p>
-						</div>
-					</div>
-				</div>
-			);
-		} else {
-			// Use structured fallback for middle tab
-			return renderStructuredFallbackMiddle(
-				concernArea,
-				colors,
-				containerStyle
-			);
-		}
-	}
+								{section.title}
+							</h3>
+							<div className="leading-relaxed text-gray-800">
+								<p className="mb-3">{section.content}</p>
 
-	if (tab === "right") {
-		if (parsedContent) {
-			// Use AI JSON content
-			const coreKey = Object.keys(parsedContent)[0];
-			const traitsKey = Object.keys(parsedContent)[1];
+								{/* Render key points if available */}
+								{section.keyPoints && (
+									<ul className="mb-3 ml-2 space-y-1 list-disc list-inside">
+										{section.keyPoints.map(
+											(point, pointIndex) => (
+												<li key={pointIndex}>
+													{point}
+												</li>
+											)
+										)}
+									</ul>
+								)}
 
-			const sectionTitles = {
-				財運: { first: "核心論述", second: "財運特質" },
-				事業: { first: "核心論述", second: "事業特質" },
-				健康: { first: "核心論述", second: "健康特質" },
-				感情: { first: "核心論述", second: "感情特質" },
-			};
-
-			const titles = sectionTitles[concernArea];
-
-			return (
-				<div className="space-y-4">
-					{/* Core Analysis Section */}
-					<div style={containerStyle}>
-						<div
-							className="flex items-center justify-center mb-3 font-bold text-white"
-							style={{
-								backgroundColor: "#D09900",
-								width: "300px",
-								height: "40px",
-								borderRadius: "20px",
-							}}
-						>
-							{titles.first}
-						</div>
-						<div className="space-y-3 leading-relaxed text-gray-800">
-							{Object.entries(parsedContent[coreKey] || {}).map(
-								([key, value], index) => (
-									<div
-										key={index}
-										className="flex items-start gap-4"
-									>
-										<h4
-											className="mb-1 font-bold"
-											style={{
-												color: colors.primary,
-												fontSize: "15px",
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												minWidth: "120px",
-											}}
-										>
-											【
-											{key
-												.replace(
-													/([a-z])([A-Z])/g,
-													"$1$2"
-												)
-												.replace(/[_]/g, "")}
-											】
-										</h4>
-										<p
-											style={{
-												fontSize: "15px",
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontWeight: "bold",
-											}}
-										>
-											{value}
-										</p>
-									</div>
-								)
-							)}
-						</div>
-					</div>
-
-					{/* Traits Section */}
-					<div style={containerStyle}>
-						<div
-							className="flex items-center justify-center mb-3 font-bold text-white"
-							style={{
-								backgroundColor: "#D09900",
-								width: "300px",
-								height: "40px",
-								borderRadius: "20px",
-							}}
-						>
-							{titles.second}
-						</div>
-						<div className="leading-relaxed text-gray-800">
-							{parsedContent[traitsKey]?.总体特征 && (
-								<div className="p-3 mb-3 bg-white rounded-lg">
-									<p
-										className="mb-2 text-black"
-										style={{
-											fontSize: "15px",
-										}}
-									>
-										總體特徵：
-										{parsedContent[traitsKey].总体特征}
-									</p>
-								</div>
-							)}
-							<div className="space-y-2">
-								{parsedContent[traitsKey]?.特质列表?.map(
-									(trait, index) => (
-										<div
-											key={index}
-											className="flex items-start"
-										>
-											<span
-												className="mr-2 font-semibold"
-												style={{
-													color: colors.primary,
-												}}
+								{/* Render highlights if available */}
+								{section.highlights &&
+									section.highlights.map(
+										(highlight, highlightIndex) => (
+											<div
+												key={highlightIndex}
+												className="p-3 mb-2 bg-white rounded-lg"
 											>
-												•
-											</span>
-											<span>
-												<strong>{trait.标题}</strong>：
-												{trait.说明}
-											</span>
-										</div>
-									)
+												<h4
+													className="mb-2 font-semibold"
+													style={{
+														color: colors.primary,
+													}}
+												>
+													{highlight.subtitle}
+												</h4>
+												<p className="text-sm text-gray-700">
+													{highlight.description}
+												</p>
+											</div>
+										)
+									)}
+
+								{/* Render interactions if available */}
+								{section.interactions && (
+									<div className="space-y-2">
+										{section.interactions.map(
+											(interaction, interactionIndex) => (
+												<div
+													key={interactionIndex}
+													className="flex items-start"
+												>
+													<span
+														className="mr-2 font-semibold"
+														style={{
+															color: colors.accent,
+														}}
+													>
+														•
+													</span>
+													<span>{interaction}</span>
+												</div>
+											)
+										)}
+									</div>
+								)}
+
+								{/* Render conclusion if available */}
+								{section.conclusion && (
+									<p
+										className="mt-3 font-semibold"
+										style={{ color: colors.secondary }}
+									>
+										【結論】{section.conclusion}
+									</p>
 								)}
 							</div>
 						</div>
-					</div>
+					))}
 				</div>
 			);
-		} else {
-			// Use structured fallback for right tab
-			return renderStructuredFallbackRight(
-				concernArea,
-				colors,
-				containerStyle
-			);
 		}
+
+		// Handle legacy keywords format
+		const sectionTitles = {
+			財運: {
+				middle: {
+					first: "財星解析",
+					second: "關鍵要點",
+					third: "綜合分析",
+				},
+				right: {
+					first: "財運核心",
+					second: "詳細解析",
+					third: "總結建議",
+				},
+			},
+			事業: {
+				middle: {
+					first: "事業解析",
+					second: "關鍵要點",
+					third: "綜合分析",
+				},
+				right: {
+					first: "事業核心",
+					second: "詳細解析",
+					third: "總結建議",
+				},
+			},
+			健康: {
+				middle: {
+					first: "健康解析",
+					second: "關鍵要點",
+					third: "綜合分析",
+				},
+				right: {
+					first: "健康核心",
+					second: "詳細解析",
+					third: "總結建議",
+				},
+			},
+			感情: {
+				middle: {
+					first: "感情解析",
+					second: "關鍵要點",
+					third: "綜合分析",
+				},
+				right: {
+					first: "感情核心",
+					second: "詳細解析",
+					third: "總結建議",
+				},
+			},
+		};
+
+		const titles = sectionTitles[concernArea]?.[tab] ||
+			sectionTitles["財運"][tab] || {
+				first: "關鍵解析",
+				second: "詳細分析",
+				third: "綜合分析",
+			};
+
+		return (
+			<div className="space-y-4">
+				{/* Keywords Section */}
+				<div style={containerStyle}>
+					<div
+						className="flex items-center justify-center mb-3 font-bold text-white"
+						style={{
+							backgroundColor: colors.primary,
+							width: "300px",
+							height: "40px",
+							borderRadius: "20px",
+						}}
+					>
+						{titles.first}
+					</div>
+					<div className="space-y-3 leading-relaxed text-gray-800">
+						{parsedContent.keywords.map((keyword, index) => (
+							<div key={index} className="flex items-start gap-2">
+								<span
+									className="flex-shrink-0 mr-2 font-semibold"
+									style={{ color: colors.primary }}
+								>
+									•
+								</span>
+								<div>
+									<span
+										className="font-bold"
+										style={{ color: colors.primary }}
+									>
+										{keyword.text}
+									</span>
+									<span className="text-black">
+										：{keyword.description}
+									</span>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+
+				{/* Analysis Section */}
+				<div style={containerStyle}>
+					<div
+						className="flex items-center justify-center mb-3 font-bold text-white"
+						style={{
+							backgroundColor: colors.secondary,
+							width: "300px",
+							height: "40px",
+							borderRadius: "20px",
+						}}
+					>
+						{titles.third}
+					</div>
+					<div className="leading-relaxed text-gray-800">
+						<p style={{ fontSize: "15px", lineHeight: "1.6" }}>
+							{parsedContent.analysis}
+						</p>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	// For middle and right tabs, use the AI content if available, otherwise use fallback
+	if (tab === "middle") {
+		// Use structured fallback for middle tab
+		return renderStructuredFallbackMiddle(
+			concernArea,
+			colors,
+			containerStyle
+		);
+	}
+
+	if (tab === "right") {
+		// Use structured fallback for right tab
+		return renderStructuredFallbackRight(
+			concernArea,
+			colors,
+			containerStyle
+		);
 	}
 
 	// Return fallback content for other tabs/concerns
@@ -2443,6 +2858,18 @@ export function MingJu({ userInfo, currentYear }) {
 
 			if (contentCache[cacheKey]) {
 				console.log(`📋 Displaying cached content for ${selectedTab}`);
+				console.log(`🔍 Cache content preview:`, {
+					type: typeof contentCache[cacheKey],
+					length: contentCache[cacheKey]?.length,
+					preview:
+						typeof contentCache[cacheKey] === "string"
+							? contentCache[cacheKey].substring(0, 150) + "..."
+							: contentCache[cacheKey],
+					isJSON:
+						typeof contentCache[cacheKey] === "string"
+							? contentCache[cacheKey].trim().startsWith("{")
+							: false,
+				});
 				setTabContent(contentCache[cacheKey]);
 				setAiContent(contentCache[cacheKey]);
 				setLoading(false);

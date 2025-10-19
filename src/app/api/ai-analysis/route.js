@@ -1,5 +1,47 @@
 import { NextResponse } from "next/server";
 
+// Function to clean markdown formatting from AI responses
+function cleanMarkdownFormatting(content) {
+	return (
+		content
+			// Remove markdown headers (###, ##, #)
+			.replace(/#{1,6}\s*/g, "")
+			// Remove markdown bold (**text**)
+			.replace(/\*\*(.*?)\*\*/g, "$1")
+			// Remove markdown italic (*text*)
+			.replace(/\*(.*?)\*/g, "$1")
+			// Remove markdown bullet points (- item)
+			.replace(/^[\s]*-[\s]+/gm, "")
+			// Remove numbered lists (1. item)
+			.replace(/^[\s]*\d+\.[\s]+/gm, "")
+			// Remove extra empty lines (more than 2 consecutive)
+			.replace(/\n{3,}/g, "\n\n")
+			// Clean up any remaining markdown artifacts
+			.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1") // Remove links [text](url)
+			.trim()
+	);
+}
+
+// Function to remove biographical introduction paragraph
+function removeBiographicalIntro(content) {
+	// Remove first paragraph that starts with birth info
+	const lines = content.split("\n");
+	const firstParagraphEnd = lines.findIndex(
+		(line, index) =>
+			index > 0 && line.trim() === "" && lines[index - 1].includes("詳細")
+	);
+
+	if (firstParagraphEnd > 0) {
+		// Remove first paragraph and its trailing empty line
+		return lines
+			.slice(firstParagraphEnd + 1)
+			.join("\n")
+			.trim();
+	}
+
+	return content;
+}
+
 export async function POST(request) {
 	console.log("🔥 AI Analysis API called at:", new Date().toISOString());
 
@@ -18,10 +60,13 @@ export async function POST(request) {
 		);
 	}
 
-	const { prompt, userInfo, concern, problem } = requestData;
+	const { prompt, userInfo, concern, problem, analysisType } = requestData;
 
 	// Extract concern from userInfo if not provided at top level
 	const finalConcern = concern || userInfo?.concern;
+
+	// Check if this is a 日主特性 request (should return plain text)
+	const isRiZhuTeXing = analysisType && analysisType.includes("日主特性");
 
 	console.log("📝 Request data:", {
 		concern: finalConcern,
@@ -47,34 +92,46 @@ export async function POST(request) {
 					messages: [
 						{
 							role: "system",
-							content: `你是一位资深八字命理师，精通流年分析与十神互动。请严格按照用户要求的JSON格式生成流年关键词报告。
+							content: `你是一位资深八字命理师，精通流年分析与命理調候。
 
-重要要求：
-1. 必须基于用户的实际出生时间计算八字
-2. 必须根据用户选择的关注领域（${finalConcern}）生成相应内容  
-3. 必须返回严格的JSON格式，包含keywords数组和analysis字符串
-4. 关键词要专业且具体，描述要包含专业术语
-5. 分析要结合2025年流年特点
-6. 所有字符串都必须用双引号包围，确保JSON格式正确
-7. 描述文字中不能有未转义的引号或特殊字符
-8. 禁止使用其他格式如"核心论述"等，只能使用keywords和analysis结构
+重要指示：
+1. 如果用戶要求日主特性分析，請提供詳細的白話分析文章（400-500字），不要JSON格式，不要markdown標記
+2. 如果用戶要求其他分析類型，請嚴格按JSON格式回應，不要任何markdown標記或詩詞引用
+3. 必须基于用户的实际出生时间和2025年流年特点
+4. 内容要既专业又通俗易懂，多用生活化的比喻和解释
+5. 提供具体的时间安排、饮食建议、生活指导
+6. 解释命理原理，让普通人也能理解
+7. 請使用繁體中文回應
 
-严格返回格式（不要添加任何额外文字或markdown标记）：
+對於日主特性：請寫成完整文章，包含：
+- 流年與命局互動分析
+- 性格特質深度解讀  
+- 具体生活調理建議
+- 時辰養生方案
+- 長期調候體系
+
+對於其他分析：必須嚴格返回純淨JSON格式，不要任何額外文字、標記或詩句：
 {
   "keywords": [
-    {"id": 1, "text": "关键词1", "description": "专业描述内容"},
-    {"id": 2, "text": "关键词2", "description": "专业描述内容"},
-    {"id": 3, "text": "关键词3", "description": "专业描述内容"}
+    {"id": 1, "text": "關鍵詞1", "description": "專業描述內容"},
+    {"id": 2, "text": "關鍵詞2", "description": "專業描述內容"},
+    {"id": 3, "text": "關鍵詞3", "description": "專業描述內容"}
   ],
-  "analysis": "流年分析总结"
-}`,
+  "analysis": "綜合分析總結"
+}
+
+禁止事項：
+- 不要使用 > 引用標記
+- 不要使用 ** 或 # 等markdown標記  
+- 不要添加詩詞或文學性開頭
+- JSON回應必須直接以 { 開始`,
 						},
 						{
 							role: "user",
 							content: prompt,
 						},
 					],
-					max_tokens: 1000,
+					max_tokens: 1500,
 					temperature: 0.7,
 					stream: false,
 				}),
@@ -96,57 +153,206 @@ export async function POST(request) {
 		console.log("✅ AI Content received, length:", aiContent.length);
 		console.log("📋 Raw AI content:", aiContent.substring(0, 200) + "...");
 
-		// Try to validate and clean the JSON response
+		// Handle validation based on analysis type
 		try {
-			// Extract JSON from the response (in case there's extra text)
-			const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
-			if (jsonMatch) {
-				aiContent = jsonMatch[0];
-			}
-
-			// Test parse to validate JSON
-			const testParse = JSON.parse(aiContent);
-			console.log("✅ JSON validation successful");
-
-			// Ensure proper structure - must have keywords array and analysis string
-			if (
-				testParse.keywords &&
-				Array.isArray(testParse.keywords) &&
-				testParse.analysis &&
-				typeof testParse.analysis === "string" &&
-				testParse.keywords.length > 0
-			) {
-				// Validate each keyword has required fields
-				const validKeywords = testParse.keywords.every(
-					(keyword) =>
-						keyword.text &&
-						keyword.description &&
-						typeof keyword.text === "string" &&
-						typeof keyword.description === "string"
-				);
-
-				if (validKeywords) {
-					console.log("✅ JSON structure validated");
-				} else {
-					throw new Error(
-						"Invalid keyword structure - missing text or description fields"
+			if (isRiZhuTeXing) {
+				// For 日主特性, validate as plain text
+				if (
+					aiContent &&
+					typeof aiContent === "string" &&
+					aiContent.length > 200
+				) {
+					console.log(
+						"✅ 日主特性 plain text validation successful, length:",
+						aiContent.length
 					);
+
+					// Clean markdown formatting and remove biographical intro for 日主特性
+					aiContent = cleanMarkdownFormatting(aiContent);
+					aiContent = removeBiographicalIntro(aiContent);
+					console.log(
+						"🧹 Cleaned markdown formatting and removed biographical intro"
+					);
+				} else {
+					throw new Error("日主特性 content too short or invalid");
 				}
 			} else {
-				throw new Error(
-					"Invalid JSON structure - missing keywords array or analysis string"
-				);
+				// For other tabs, validate as JSON
+				// Clean the content first - remove markdown headers and poetic quotes
+				let cleanedContent = aiContent
+					.replace(/^>\s*.*$/gm, "") // Remove lines starting with >
+					.replace(/^\*\*.*\*\*$/gm, "") // Remove markdown headers
+					.replace(/^#{1,6}\s.*$/gm, "") // Remove # headers
+					.replace(/^---.*$/gm, "") // Remove horizontal rules
+					.trim();
+
+				// Extract JSON from the cleaned response
+				const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
+				if (jsonMatch) {
+					// Get the largest/last JSON object if multiple exist
+					const allMatches = cleanedContent.match(
+						/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g
+					);
+					if (allMatches && allMatches.length > 0) {
+						aiContent = allMatches[allMatches.length - 1];
+					} else {
+						aiContent = jsonMatch[0];
+					}
+				} else {
+					// If no JSON found, try to find it in the original content
+					const originalJsonMatch = aiContent.match(/\{[\s\S]*\}/);
+					if (originalJsonMatch) {
+						aiContent = originalJsonMatch[0];
+					} else {
+						throw new Error(
+							"No JSON structure found in AI response"
+						);
+					}
+				}
+
+				// Test parse to validate JSON
+				const testParse = JSON.parse(aiContent);
+				console.log("✅ JSON validation successful");
+
+				// Support both old (keywords) and new (sections) format
+				const hasOldFormat =
+					testParse.keywords &&
+					Array.isArray(testParse.keywords) &&
+					testParse.analysis;
+				const hasNewFormat =
+					testParse.sections && Array.isArray(testParse.sections);
+				const hasSingleSection = testParse.title && testParse.content; // AI returned single section instead of sections array
+
+				if (hasOldFormat) {
+					// Validate old format - keywords array and analysis string
+					if (
+						typeof testParse.analysis === "string" &&
+						testParse.keywords.length > 0
+					) {
+						// Validate each keyword has required fields
+						const validKeywords = testParse.keywords.every(
+							(keyword) =>
+								keyword.text &&
+								keyword.description &&
+								typeof keyword.text === "string" &&
+								typeof keyword.description === "string"
+						);
+
+						if (validKeywords) {
+							console.log(
+								"✅ Old JSON structure validated (keywords format)"
+							);
+						} else {
+							throw new Error(
+								"Invalid keyword structure - missing text or description fields"
+							);
+						}
+					} else {
+						throw new Error(
+							"Invalid old format - missing analysis string or empty keywords"
+						);
+					}
+				} else if (hasNewFormat) {
+					// Validate new format - sections array
+					if (testParse.sections.length > 0) {
+						// Validate each section has required fields
+						const validSections = testParse.sections.every(
+							(section) =>
+								section.title &&
+								section.content &&
+								typeof section.title === "string" &&
+								typeof section.content === "string"
+						);
+
+						if (validSections) {
+							console.log(
+								`✅ New JSON structure validated (sections format) - ${testParse.sections.length} sections found`
+							);
+
+							// Encourage complete 3-section structure but accept what we get
+							if (testParse.sections.length < 3) {
+								console.log(
+									`⚠️ Received ${testParse.sections.length} section(s), preferably would have 3 complete sections for richer analysis`
+								);
+							} else {
+								console.log(
+									"🎉 Complete 3-section structure received!"
+								);
+							}
+						} else {
+							throw new Error(
+								"Invalid section structure - missing title or content fields"
+							);
+						}
+					} else {
+						throw new Error(
+							"Invalid new format - empty sections array"
+						);
+					}
+				} else if (hasSingleSection) {
+					// Handle case where AI returns single section instead of sections array
+					console.log(
+						"🔧 Converting single section to sections array format"
+					);
+
+					// Wrap single section in sections array
+					const wrappedContent = {
+						sections: [testParse],
+					};
+
+					aiContent = JSON.stringify(wrappedContent);
+					console.log(
+						"✅ Single section converted to sections array format"
+					);
+				} else {
+					throw new Error(
+						"Invalid JSON structure - missing both keywords/analysis and sections format"
+					);
+				}
 			}
 		} catch (jsonError) {
 			console.error("❌ JSON validation failed:", jsonError.message);
-			console.log("🔄 Falling back to personalized content...");
-
-			// Generate fallback content using already parsed request data
-			const fallbackContent = generatePersonalizedFallback(
-				finalConcern,
-				userInfo
+			console.log(
+				"� Raw AI content that failed parsing:",
+				aiContent.substring(0, 500)
 			);
-			aiContent = JSON.stringify(fallbackContent);
+
+			// Try one more aggressive cleaning attempt
+			try {
+				console.log("🔧 Attempting aggressive content cleaning...");
+				let aggressiveClean = aiContent
+					// Remove everything before first {
+					.substring(aiContent.indexOf("{"))
+					// Remove everything after last }
+					.substring(0, aiContent.lastIndexOf("}") + 1)
+					// Clean any remaining problematic characters
+					.replace(/[\u201C\u201D]/g, '"') // Replace smart quotes
+					.replace(/[\u2018\u2019]/g, "'") // Replace smart apostrophes
+					.trim();
+
+				console.log(
+					"🧪 Testing aggressively cleaned content:",
+					aggressiveClean.substring(0, 200)
+				);
+				const testParse = JSON.parse(aggressiveClean);
+
+				// If successful, use the cleaned content
+				aiContent = aggressiveClean;
+				console.log("✅ Aggressive cleaning successful!");
+			} catch (secondError) {
+				console.error(
+					"❌ Aggressive cleaning also failed:",
+					secondError.message
+				);
+				console.log("�🔄 Falling back to personalized content...");
+
+				// Generate fallback content using already parsed request data
+				const fallbackContent = generatePersonalizedFallback(
+					finalConcern,
+					userInfo
+				);
+				aiContent = JSON.stringify(fallbackContent);
+			}
 		}
 
 		console.log("📤 Sending response...");
