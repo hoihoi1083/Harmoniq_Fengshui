@@ -142,7 +142,9 @@ export class EnhancedInitialAnalysis {
 		birthday1,
 		birthday2,
 		specificQuestion = "",
-		region = "hongkong"
+		region = "hongkong",
+		userGender = "female",
+		partnerGender = "unknown"
 	) {
 		const year1 = birthday1.getFullYear();
 		const year2 = birthday2.getFullYear();
@@ -157,8 +159,26 @@ export class EnhancedInitialAnalysis {
 		const zodiacAnimal1 = this.getChineseZodiac(year1);
 		const zodiacAnimal2 = this.getChineseZodiac(year2);
 
+		// 根據實際性別確定顯示標籤
+		let userLabel, partnerLabel;
+		if (userGender === "female") {
+			userLabel = "👩 您（女方）";
+		} else if (userGender === "male") {
+			userLabel = "👨 您（男方）";
+		} else {
+			userLabel = "👤 您";
+		}
+
+		if (partnerGender === "male") {
+			partnerLabel = "👨 對方（男方）";
+		} else if (partnerGender === "female") {
+			partnerLabel = "👩 對方（女方）";
+		} else {
+			partnerLabel = "👤 對方";
+		}
+
 		// 1. 雙方基礎分析（類似個人分析的基礎部分）
-		const basicAnalysis = `**📊 你們的命理基礎分析**\n👨 男方：${year1}年${month1}月，生肖屬相：${zodiacAnimal1}\n👩 女方：${year2}年${month2}月，生肖屬相：${zodiacAnimal2}\n配對類型：${this.getCoupleType(element1, element2)}\n緣分指數：${this.getCompatibilityScore(element1, element2)}%`;
+		const basicAnalysis = `**📊 你們的命理基礎分析**\n${userLabel}：${year1}年${month1}月，生肖屬相：${zodiacAnimal1}\n${partnerLabel}：${year2}年${month2}月，生肖屬相：${zodiacAnimal2}\n配對類型：${this.getCoupleType(element1, element2)}\n緣分指數：${this.getCompatibilityScore(element1, element2)}%`;
 
 		// 2. 針對具體問題回應 - 合婚分析不需要單獨的問題回應區段
 		let problemResponse = "";
@@ -299,21 +319,26 @@ export class EnhancedInitialAnalysis {
 		const prompt = `你是專業的風水師「風鈴」，請根據以下信息生成個人化的${category}分析：
 
 用戶信息：
-- 出生日期：${year}年${month}月${day}日
+- 出生日期：${year}年${month}月${day}日（西曆/公曆日期）
 - 五行屬性：${element}命
 - 當前年齡：${age}歲
-- 當前時間：${currentYear}年${currentMonth}月
+- 當前時間：${currentYear}年${currentMonth}月（當前是2025年）
 - 具體問題：${specificQuestion || "無特定問題"}
+
+⚠️ 重要提醒：
+- 用戶生日是西曆日期，請據此進行命理分析
+- 當前時間是2025年，請基於2025年時間軸進行分析
+- 絕對不可使用農曆、陰曆相關詞彙
 
 請生成以下三個部分的內容，要求個人化、具體、實用：
 
 **2. 年度預警**
-根據${element}命在${currentYear}年的${category}運勢，提供：
+根據${element}命在${currentYear}年的${category}運勢，並結合出生日期${year}年${month}月${day}日的特質，提供：
 - 成就星：${categoryConfig.achievementGuide}
 - 小人煞：${categoryConfig.obstacleGuide}
 
 **3. ${categoryConfig.analysisTitle}**
-根據${element}命特質，分析用戶最近${category}狀況和未來3-6個月趨勢，要具體描述：
+根據${element}命特質和完整出生日期${year}年${month}月${day}日，分析用戶最近${category}狀況和未來3-6個月趨勢，要具體描述：
 - ${categoryConfig.recentSituation}
 - ${categoryConfig.futureTrend}
 - ${categoryConfig.personalAdvantage}
@@ -342,7 +367,7 @@ ${
 要求：
 1. 使用風鈴可愛親切的語調
 2. 內容要具體實用，不要空泛
-3. 根據五行特質個人化
+3. 根據五行特質和完整出生日期（${year}年${month}月${day}日）進行個人化分析
 4. 考慮當前時間因素
 5. 每部分控制在2-3行內
 6. 使用emoji增加親和力
@@ -352,7 +377,7 @@ ${
 			{
 				role: "system",
 				content:
-					"你是風鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。",
+					"你是風鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。\n\n⚠️ 重要指示：\n1. 當前是2025年10月19日，請確保分析基於2025年時間軸\n2. 所有日期必須使用西曆（公曆），絕對不可使用農曆用詞\n3. 用戶提供的生日是西曆日期，請據此分析\n4. 不可提及2024年或過去年份",
 			},
 			{
 				role: "user",

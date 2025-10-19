@@ -70,10 +70,12 @@ function parseFlexibleDate(dateString) {
 				parseInt(day)
 			);
 
+			// Dynamic year validation - allow up to current year + 1 for future planning
+			const currentYear = new Date().getFullYear();
 			if (
 				!isNaN(date.getTime()) &&
 				date.getFullYear() >= 1900 &&
-				date.getFullYear() <= 2024
+				date.getFullYear() <= currentYear + 1
 			) {
 				return date;
 			}
@@ -232,28 +234,85 @@ function parseCouplesBirthdays(message) {
 		return null;
 	}
 
-	// 檢測包含兩個生日的格式：支持所有性別組合
+	// 檢測包含兩個生日的格式：支持所有性別組合，並識別性別
 	const couplePatterns = [
 		// 我XXX，她XXX (female user, female partner)
-		/我\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*她\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
+		{
+			pattern:
+				/我\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*她\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
+			userGender: "female",
+			partnerGender: "female",
+		},
 		// 我XXX，他XXX (female user, male partner)
-		/我\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*他\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
-		// 我XXX，對方XXX (gender neutral)
-		/我\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*對方\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
-		// 我的生日是XXX，他的生日是XXX (more natural format)
-		/我的生日是\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*他的生日是\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
-		// 我的生日是XXX，她的生日是XXX
-		/我的生日是\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*她的生日是\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
-		// Standard date formats
-		/我\s*(\d{4}\-\d{1,2}\-\d{1,2})[，,\s]*[他她對方]\s*(\d{4}\-\d{1,2}\-\d{1,2})/,
-		/我\s*(\d{1,2}\/\d{1,2}\/\d{4})[，,\s]*[他她對方]\s*(\d{1,2}\/\d{1,2}\/\d{4})/,
-		// Fallback: any two dates in one message
-		/(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
-		/(\d{4}\-\d{1,2}\-\d{1,2})[，,\s]*(\d{4}\-\d{1,2}\-\d{1,2})/,
+		{
+			pattern:
+				/我\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*他\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
+			userGender: "female",
+			partnerGender: "male",
+		},
+		// 我的生日是XXX，他的生日是XXX (female user, male partner)
+		{
+			pattern:
+				/我的生日是\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*他的生日是\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
+			userGender: "female",
+			partnerGender: "male",
+		},
+		// 我的生日是XXX，她的生日是XXX (female user, female partner)
+		{
+			pattern:
+				/我的生日是\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*她的生日是\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
+			userGender: "female",
+			partnerGender: "female",
+		},
+		// 我XXX，對方XXX (gender neutral - assume female user)
+		{
+			pattern:
+				/我\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*對方\s*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
+			userGender: "female",
+			partnerGender: "unknown",
+		},
+		// Standard date formats with gender detection
+		{
+			pattern:
+				/我\s*(\d{4}\-\d{1,2}\-\d{1,2})[，,\s]*他\s*(\d{4}\-\d{1,2}\-\d{1,2})/,
+			userGender: "female",
+			partnerGender: "male",
+		},
+		{
+			pattern:
+				/我\s*(\d{4}\-\d{1,2}\-\d{1,2})[，,\s]*她\s*(\d{4}\-\d{1,2}\-\d{1,2})/,
+			userGender: "female",
+			partnerGender: "female",
+		},
+		{
+			pattern:
+				/我\s*(\d{1,2}\/\d{1,2}\/\d{4})[，,\s]*他\s*(\d{1,2}\/\d{1,2}\/\d{4})/,
+			userGender: "female",
+			partnerGender: "male",
+		},
+		{
+			pattern:
+				/我\s*(\d{1,2}\/\d{1,2}\/\d{4})[，,\s]*她\s*(\d{1,2}\/\d{1,2}\/\d{4})/,
+			userGender: "female",
+			partnerGender: "female",
+		},
+		// Fallback: any two dates in one message (assume female user, unknown partner)
+		{
+			pattern:
+				/(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)[，,\s]*(\d{4}[年\-\/]\d{1,2}[月\-\/]\d{1,2}[日]?)/,
+			userGender: "female",
+			partnerGender: "unknown",
+		},
+		{
+			pattern:
+				/(\d{4}\-\d{1,2}\-\d{1,2})[，,\s]*(\d{4}\-\d{1,2}\-\d{1,2})/,
+			userGender: "female",
+			partnerGender: "unknown",
+		},
 	];
 
-	for (const pattern of couplePatterns) {
-		const match = message.match(pattern);
+	for (const patternObj of couplePatterns) {
+		const match = message.match(patternObj.pattern);
 		if (match) {
 			const userBirthday = parseFlexibleDate(match[1]);
 			const partnerBirthday = parseFlexibleDate(match[2]);
@@ -263,6 +322,8 @@ function parseCouplesBirthdays(message) {
 					hasCouplesBirthdays: true,
 					userBirthday: userBirthday,
 					partnerBirthday: partnerBirthday,
+					userGender: patternObj.userGender,
+					partnerGender: patternObj.partnerGender,
 					rawText: match[0],
 				};
 			}
@@ -627,7 +688,7 @@ class AITopicClassifier {
 		return null;
 	}
 
-	// 🎯 生成具體服務選擇引導
+	// 🎯 測算具體服務選擇引導
 	generateSpecificServiceGuide(serviceName, detectedTopic) {
 		const serviceGuides = {
 			命理: `太好了！風鈴最擅長命理分析呢～✨
@@ -747,7 +808,7 @@ class AITopicClassifier {
 		return this.conversationMemory.get(sessionId);
 	}
 
-	// 🎯 生成帶有分析額度信息的生日收集模板
+	// 🎯 測算帶有分析額度信息的生日收集模板
 	async generateBirthdayTemplate(userEmail, userId, topicText = "運勢") {
 		let rateLimitInfo = "";
 
@@ -921,10 +982,10 @@ ${baseServices}
 		}
 	}
 
-	// 💼 工作分析流程 - 使用AI生成contextual回應
+	// 💼 工作分析流程 - 使用AI測算contextual回應
 	async generateCareerFlow(analysis, originalMessage) {
 		try {
-			// 🤖 總是生成新的詳細AI回應，提供更好的用戶體驗
+			// 🤖 總是測算新的詳細AI回應，提供更好的用戶體驗
 			const specificProblem = analysis.specificProblem || originalMessage;
 
 			const aiResponse = await this.generateAIResponse(
@@ -971,7 +1032,7 @@ ${baseServices}
 風鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`
 			);
 		} catch (error) {
-			console.error("AI生成工作回應失敗:", error);
+			console.error("AI測算工作回應失敗:", error);
 
 			// 備用回應 - 根據關鍵詞判斷
 			const lowerProblem = specificProblem.toLowerCase();
@@ -1027,10 +1088,10 @@ ${baseServices}
 		}
 	}
 
-	// 💰 財運分析流程 - 使用AI生成contextual回應
+	// 💰 財運分析流程 - 使用AI測算contextual回應
 	async generateWealthFlow(analysis, originalMessage) {
 		try {
-			// 🤖 總是生成新的詳細AI回應，提供更好的用戶體驗
+			// 🤖 總是測算新的詳細AI回應，提供更好的用戶體驗
 			const specificProblem = analysis.specificProblem || originalMessage;
 
 			const aiResponse = await this.generateAIResponse(
@@ -1078,7 +1139,7 @@ ${baseServices}
 風鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`
 			);
 		} catch (error) {
-			console.error("AI生成財運回應失敗:", error);
+			console.error("AI測算財運回應失敗:", error);
 			return `哇～你想了解財運呀！風鈴最喜歡幫人解決問題啦！✨
 
 每個人的運勢都不一樣呢，就像每個人的生日不一樣一樣！
@@ -1094,10 +1155,10 @@ ${baseServices}
 		}
 	}
 
-	// 🌿 健康分析流程 - 使用AI生成contextual回應
+	// 🌿 健康分析流程 - 使用AI測算contextual回應
 	async generateHealthFlow(analysis, originalMessage) {
 		try {
-			// 🤖 總是生成新的詳細AI回應，提供更好的用戶體驗
+			// 🤖 總是測算新的詳細AI回應，提供更好的用戶體驗
 			const specificProblem = analysis.specificProblem || originalMessage;
 
 			const aiResponse = await this.generateAIResponse(
@@ -1145,7 +1206,7 @@ ${baseServices}
 風鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`
 			);
 		} catch (error) {
-			console.error("AI生成健康回應失敗:", error);
+			console.error("AI測算健康回應失敗:", error);
 			return `哇～你想了解健康呀！風鈴最喜歡幫人解決問題啦！✨
 
 每個人的運勢都不一樣呢，就像每個人的生日不一樣一樣！
@@ -1212,7 +1273,7 @@ ${baseServices}
 風鈴會先給你一個簡單的命理分析，如果你覺得有幫助，還可以做更詳細的完整八字報告哦～🔮💕`
 			);
 		} catch (error) {
-			console.error("AI生成命理回應失敗:", error);
+			console.error("AI測算命理回應失敗:", error);
 			return `哇～你想了解命理呀！風鈴最喜歡幫人解析運勢啦！🔮✨
 
 每個人的命理格局都不一樣呢，就像每顆星星的位置都獨一無二！
@@ -1324,7 +1385,7 @@ ${baseServices}
 	// 風鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`;
 	// }
 
-	// 🔄 預設流程 - 使用AI生成詳細回應
+	// 🔄 預設流程 - 使用AI測算詳細回應
 	async generateDefaultFlow(analysis, originalMessage) {
 		try {
 			// 🤖 總是生成新的詳細AI回應，提供更好的用戶體驗
@@ -1371,7 +1432,7 @@ ${baseServices}
 風鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`
 			);
 		} catch (error) {
-			console.error("AI生成默認回應失敗:", error);
+			console.error("AI測算默認回應失敗:", error);
 			// 備用模板回應
 			return `哇～你想了解${analysis.detectedTopic}呀！風鈴最喜歡幫人解決問題啦！✨
 
@@ -1388,7 +1449,7 @@ ${baseServices}
 		}
 	}
 
-	// 🎯 生成服務選單
+	// 🎯 測算服務選單
 	generateServiceMenu() {
 		return `
 
@@ -1490,7 +1551,7 @@ ${baseServices}
 		return greetingPatterns.some((pattern) => pattern.test(message.trim()));
 	}
 
-	// 🎯 生成問候回應
+	// 🎯 測算問候回應
 	generateGreetingResponse() {
 		return {
 			isWithinScope: true,
@@ -1682,7 +1743,7 @@ ${baseServices}
 		return await response.json();
 	}
 
-	// 🎯 生成AI回應（用於動態回應生成）
+	// 🎯 測算AI回應（用於動態回應測算）
 	async generateAIResponse(prompt) {
 		try {
 			// Get current date for context
@@ -1717,7 +1778,7 @@ ${baseServices}
 
 			return response.choices[0].message.content.trim();
 		} catch (error) {
-			console.error("🚨 AI回應生成失敗:", error);
+			console.error("🚨 AI回應測算失敗:", error);
 			throw error;
 		}
 	}
@@ -1855,7 +1916,7 @@ ${baseServices}
 		}
 
 		console.log("❌ 未匹配到任何話題");
-		// 不在服務範圍內 - 讓 AI 生成動態回應而不是使用靜態回應
+		// 不在服務範圍內 - 讓 AI 測算動態回應而不是使用靜態回應
 		return {
 			isWithinScope: false,
 			detectedTopic: "其他",
@@ -1866,7 +1927,7 @@ ${baseServices}
 		};
 	}
 
-	// 🎯 生成服務引導回應
+	// 🎯 測算服務引導回應
 
 	async generateServiceGuidance(analysis, originalMessage, sessionId = null) {
 		if (analysis.isWithinScope) {
@@ -1884,7 +1945,7 @@ ${baseServices}
 		}
 	}
 
-	// 🎯 生成範圍內問題的回應
+	// 🎯 測算範圍內問題的回應
 	async generateScopeResponse(analysis, originalMessage, sessionId = null) {
 		const topic = analysis.detectedTopic;
 
@@ -2011,8 +2072,8 @@ ${analysis.aiResponse}
 你想要哪種分析呢？回覆「個人分析」或「合婚分析」即可～`;
 	}
 
-	// 🎯 生成範圍外問題的回應
-	// 🎯 生成範圍外問題的智能回應
+	// 🎯 測算範圍外問題的回應
+	// 🎯 測算範圍外問題的智能回應
 	async generateOutOfScopeResponse(
 		analysis,
 		originalMessage = "",
@@ -2034,7 +2095,7 @@ ${analysis.aiResponse}
 		// 🎯 For irrelevant questions, always use DeepSeek backup for consistent helpful responses
 		// Skip the direct AI response to ensure consistent engaging tone
 
-		// 🤖 備用：使用 DeepSeek 生成回應
+		// 🤖 備用：使用 DeepSeek 測算回應
 		try {
 			// Customize prompt based on redirect level
 			const answerPrompt = this.buildRedirectPrompt(
@@ -2043,13 +2104,13 @@ ${analysis.aiResponse}
 				context
 			);
 
-			console.log("🚀 準備調用 DeepSeek API 生成備用回應...");
+			console.log("🚀 準備調用 DeepSeek API 測算備用回應...");
 
 			const aiAnswer = await this.callDeepSeekAPI([
 				{
 					role: "system",
 					content:
-						"你是親切可愛的風鈴，善於先回答用戶問題再自然地介紹自己的專業服務。你只提供風水命理相關服務，不要推薦不存在的服務。重要指示：1. 必須使用繁體中文回應，不可使用簡體中文 2. 所有日期和月份都必須使用新歷（西曆/公曆），不要使用農歷 3. 不要在回應中包含字數統計標記 4. 保持風鈴親切可愛的語氣風格",
+						"你是親切可愛的風鈴，善於先回答用戶問題再自然地介紹自己的專業服務。你只提供風水命理相關服務，不要推薦不存在的服務。\n\n⚠️ 重要指示：\n1. 必須使用繁體中文回應，不可使用簡體中文\n2. 所有日期和月份都必須嚴格使用西曆（公曆），絕對不可使用農曆用詞\n3. 當前是2025年10月19日，請確保回應基於2025年，不可提及2024年\n4. 用戶提供的生日是西曆日期，請據此分析\n5. 不要在回應中包含字數統計標記\n6. 保持風鈴親切可愛的語氣風格",
 				},
 				{
 					role: "user",
@@ -2088,7 +2149,7 @@ ${analysis.aiResponse}
 				console.log("⚠️ 回應為空，使用默認回應");
 			}
 		} catch (error) {
-			console.error("🔥 生成智能回應失敗:", error);
+			console.error("🔥 測算智能回應失敗:", error);
 		}
 
 		// 🔄 最終備用回應
@@ -2566,7 +2627,7 @@ ${selectedEnding}`;
 具體問題：${specificProblem}
 原始訊息：${originalMessage}
 
-請以風鈴的身份，按照以下格式生成詳細的八字分析報告：
+請以風鈴的身份，按照以下格式測算詳細的八字分析報告：
 
 🔮 風鈴看了你的八字，發現你有很特別的${displayTopic}潛質呢！💼
 
@@ -2585,7 +2646,11 @@ ${displayTopic}宮主星：[分析對應主星，如：天府星（穩重權威�
 ✨【成就星】[時間範圍]「[吉星名稱]」發威！[具體建議和機會]～  
 ⚠️【小人煞】小心屬「[生肖]」的[相關人士][注意事項]，[具體防範建議]喔！  
 
-注意：所有月份時間都使用新歷（西曆），例如：1月、2月、3月等，不要使用農歷。
+⚠️ 關鍵指示：
+1. 所有日期和月份必須嚴格使用西曆（公曆），例如：1月、2月、3月等
+2. 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等表達
+3. 當前是2025年10月，分析需基於2025年時間軸
+4. 用戶生日是西曆格式，請據此進行命理分析
 
 **3. ${displayTopic}分析**  
 [針對用戶具體問題的分析，約100-150字，要具體實用]
@@ -2609,7 +2674,9 @@ ${displayTopic}宮主星：[分析對應主星，如：天府星（穩重權威�
 3. 重點分析用戶關注的${displayTopic}領域
 4. 總長度約400-500字
 5. 格式要完整，包含所有必要部分
-6. 所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，不要使用農歷`;
+6. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等，絕對不可使用農曆用詞
+7. 當前日期是2025年10月19日，請確保分析基於2025年時間軸，不可提及2024年
+8. 特別注意：用戶的生日是西曆日期，不是農曆，請據此分析命理特質`;
 
 		try {
 			const classifier = new AITopicClassifier();
@@ -2617,7 +2684,7 @@ ${displayTopic}宮主星：[分析對應主星，如：天府星（穩重權威�
 				{
 					role: "system",
 					content:
-						"你是專業的風水命理顧問，擅長八字分析和運勢預測。請按照指定格式生成詳細且實用的分析報告。重要指示：1. 必須使用繁體中文回應，不可使用簡體中文 2. 所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，避免使用農歷表達方式 3. 不要在回應中包含字數統計標記 4. 保持專業且親切的語氣",
+						"你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。請按照指定格式測算詳細且實用的分析報告。\n\n⚠️ 重要指示：\n1. 必須使用繁體中文回應，不可使用簡體中文\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如：1月、2月、3月等\n3. 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n5. 用戶提供的生日是西曆日期，請據此進行命理分析\n6. 不要在回應中包含字數統計標記\n7. 保持風鈴專業且親切的語氣",
 				},
 				{
 					role: "user",
@@ -3226,7 +3293,9 @@ export async function POST(request) {
 						couplesBirthdayData.userBirthday,
 						couplesBirthdayData.partnerBirthday,
 						specificQuestionForAnalysis,
-						region
+						region,
+						couplesBirthdayData.userGender,
+						couplesBirthdayData.partnerGender
 					);
 
 				// 🔧 轉換結構化對象為格式化字符串
@@ -3903,7 +3972,7 @@ export async function POST(request) {
 
 稍等一下，讓我為你準備專業的分析報告... ✨
 
-(請等待系統為你生成詳細的${userIntent.primaryConcern}分析報告)`;
+(請等待系統為你測算詳細的${userIntent.primaryConcern}分析報告)`;
 			}
 
 			analysis = {
@@ -4908,7 +4977,7 @@ export async function POST(request) {
 						{
 							role: "system",
 							content:
-								"你是專業的風水命理顧問，擅長用簡潔易懂的方式解釋傳統概念。重要指示：1. 必須使用繁體中文回應，不可使用簡體中文 2. 所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，不要使用農歷 3. 不要在回應中包含字數統計標記 4. 保持專業且親切的語氣",
+								"你是專業的風水命理顧問風鈴，擅長用簡潔易懂的方式解釋傳統概念。\n\n⚠️ 重要指示：\n1. 必須使用繁體中文回應，不可使用簡體中文\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n5. 用戶提供的生日是西曆日期，請據此分析\n6. 不要在回應中包含字數統計標記\n7. 保持專業且親切的語氣",
 						},
 						{
 							role: "user",
@@ -5433,7 +5502,7 @@ export async function POST(request) {
 									{
 										role: "system",
 										content:
-											"你是專業的風水命理顧問，擅長八字分析和運勢預測。重要指示：1. 必須使用繁體中文回應，不可使用簡體中文 2. 所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，避免使用農歷表達方式 3. 不要在回應中包含字數統計標記 4. 保持專業且親切的語氣",
+											"你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。\n\n⚠️ 重要指示：\n1. 必須使用繁體中文回應，不可使用簡體中文\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n5. 用戶提供的生日是西曆日期，請據此分析\n6. 不要在回應中包含字數統計標記\n7. 保持專業且親切的語氣",
 									},
 									{
 										role: "user",
