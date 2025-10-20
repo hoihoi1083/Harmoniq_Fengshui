@@ -338,7 +338,7 @@ export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
 	return (
 		<ComponentErrorBoundary componentName="CoupleSeason">
 			<section
-				className="relative mx-auto bg-white shadow-[0_4px_5.3px_rgba(0,0,0,0.25)] mb-4 sm:mb-6 lg:mb-10"
+				className="relative mx-auto mt-10  bg-white shadow-[0_4px_5.3px_rgba(0,0,0,0.25)] mb-4 sm:mb-6 lg:mb-10"
 				style={{
 					width: "100%",
 					borderRadius: "clamp(15px, 4vw, 26px)",

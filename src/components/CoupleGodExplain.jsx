@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { Download, Share2, Headphones, ArrowRight } from "lucide-react";
 import { useCoupleAnalysis } from "@/contexts/CoupleAnalysisContext";
 import { getCoupleComponentData } from "@/utils/coupleComponentDataStore";
@@ -91,11 +90,20 @@ const CoupleGodExplain = ({ user1, user2 }) => {
 
 	const fetchGodInteractionAnalysis = async (user1, user2, coupleData) => {
 		try {
+			console.log("🎯 Fetching Ten Gods interaction analysis...");
+
+			// Generate unique cache key to ensure fresh content
+			const timestamp = Date.now();
+			const randomSeed = Math.random().toString(36).substring(7);
+			const cacheKey = `${timestamp}_${randomSeed}`;
+
 			const response = await fetch("/api/couple-god-analysis", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					"Cache-Control": "no-cache",
+					"Cache-Control": "no-cache, no-store, must-revalidate",
+					Pragma: "no-cache",
+					Expires: "0",
 				},
 				body: JSON.stringify({
 					user1Birthday: user1.birthDateTime,
@@ -104,18 +112,27 @@ const CoupleGodExplain = ({ user1, user2 }) => {
 					user2Name: user2.name || "女方",
 					compatibilityData: coupleData,
 					analysisType: "ten_gods_interaction",
-					timestamp: Date.now(), // Cache buster
+					cacheKey: cacheKey, // Add unique cache key
+					timestamp: timestamp, // Cache buster
 				}),
 			});
 
 			if (!response.ok) {
-				throw new Error("API request failed");
+				throw new Error(
+					`API request failed: ${response.status} ${response.statusText}`
+				);
 			}
 
 			const result = await response.json();
+			console.log("📊 Ten Gods API response:", result);
+
+			if (result.warning) {
+				console.warn("⚠️ API Warning:", result.warning);
+			}
+
 			return result.godExplanations || [];
 		} catch (error) {
-			console.error("API call failed:", error);
+			console.error("❌ Ten Gods API call failed:", error);
 			throw error;
 		}
 	};
@@ -124,44 +141,20 @@ const CoupleGodExplain = ({ user1, user2 }) => {
 		return (
 			<div className="min-h-screen p-3 sm:p-4 lg:p-6 bg-gray-50">
 				<div className="max-w-full mx-auto sm:max-w-4xl">
-					<div className="flex flex-col items-center justify-center py-12 space-y-4">
-						{/* Loading spinner */}
-						<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
-
-						{/* 風水妹 loading image */}
-						<div className="flex items-center justify-center">
-							<Image
-								src="/images/風水妹/風水妹-loading.png"
-								alt="風水妹運算中"
-								width={120}
-								height={120}
-								className="object-contain"
-							/>
-						</div>
-
-						{/* Loading text */}
-						<div className="space-y-2 text-center">
-							<div
-								className="text-gray-700"
-								style={{
-									fontFamily: "Noto Sans HK, sans-serif",
-									fontSize: "clamp(0.875rem, 2.5vw, 1rem)",
-									fontWeight: 500,
-								}}
-							>
-								風水妹正在生成十神互動精微解讀
-							</div>
-							<div
-								className="text-gray-500"
-								style={{
-									fontFamily: "Noto Sans HK, sans-serif",
-									fontSize: "clamp(0.75rem, 2vw, 0.875rem)",
-									fontWeight: 400,
-								}}
-							>
-								請稍候，正在深度分析命盤配對
-							</div>
-						</div>
+					<div className="flex items-center justify-center py-12 sm:py-16 lg:py-20">
+						<div
+							className="border-b-2 border-pink-500 rounded-full animate-spin"
+							style={{
+								width: "clamp(24px, 6vw, 32px)",
+								height: "clamp(24px, 6vw, 32px)",
+							}}
+						></div>
+						<span
+							className="ml-2 text-gray-600 sm:ml-3"
+							style={{ fontSize: "clamp(14px, 3.5vw, 16px)" }}
+						>
+							正在生成十神互動精微解讀...
+						</span>
 					</div>
 				</div>
 			</div>

@@ -15,82 +15,146 @@ export async function POST(request) {
 			}
 		};
 
-		// BaZi calculation functions
+		// Use the fixed BaziCalculator directly to ensure consistency
 		const calculateBaZi = (birthDateTime) => {
-			const date = new Date(birthDateTime);
-			const year = date.getFullYear();
-			const month = date.getMonth() + 1;
-			const day = date.getDate();
-			const hour = date.getHours();
+			try {
+				console.log(`🧪 calculateBaZi called for: ${birthDateTime}`);
 
-			// Heavenly Stems (天干)
-			const heavenlyStems = [
-				"甲",
-				"乙",
-				"丙",
-				"丁",
-				"戊",
-				"己",
-				"庚",
-				"辛",
-				"壬",
-				"癸",
-			];
-			// Earthly Branches (地支)
-			const earthlyBranches = [
-				"子",
-				"丑",
-				"寅",
-				"卯",
-				"辰",
-				"巳",
-				"午",
-				"未",
-				"申",
-				"酉",
-				"戌",
-				"亥",
-			];
+				// Import BaziCalculator that we know works correctly
+				const {
+					BaziCalculator,
+				} = require("../../../lib/baziCalculator.js");
 
-			// Calculate year pillar (年柱)
-			const yearStemIndex = (year - 4) % 10;
-			const yearBranchIndex = (year - 4) % 12;
-			const yearPillar =
-				heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex];
+				const date = new Date(birthDateTime);
+				const year = date.getFullYear();
 
-			// Calculate month pillar (月柱) - simplified calculation
-			const monthStemIndex = ((year - 4) * 12 + month - 1) % 10;
-			const monthBranchIndex = (month + 1) % 12;
-			const monthPillar =
-				heavenlyStems[monthStemIndex] +
-				earthlyBranches[monthBranchIndex];
+				// Use the fixed BaziCalculator methods
+				const yearPillar = BaziCalculator.getYearPillar(year);
+				const dayPillar = BaziCalculator.getDayPillar(date);
 
-			// Calculate day pillar (日柱) - simplified calculation
-			const daysSinceReference = Math.floor(
-				(date - new Date("1900-01-01")) / (1000 * 60 * 60 * 24)
-			);
-			const dayStemIndex = (daysSinceReference + 9) % 10;
-			const dayBranchIndex = (daysSinceReference + 11) % 12;
-			const dayPillar =
-				heavenlyStems[dayStemIndex] + earthlyBranches[dayBranchIndex];
+				// Calculate month and hour using the same approach as EnhancedInitialAnalysis
+				const month = date.getMonth() + 1;
+				const hour = date.getHours();
 
-			// Calculate hour pillar (時柱)
-			const hourBranchIndex = Math.floor((hour + 1) / 2) % 12;
-			const hourStemIndex = (dayStemIndex * 12 + hourBranchIndex) % 10;
-			const hourPillar =
-				heavenlyStems[hourStemIndex] + earthlyBranches[hourBranchIndex];
+				// Calculate month using traditional 五虎遁法
+				const monthPillarResult = BaziCalculator.getMonthPillar(
+					year,
+					month
+				);
+				const monthPillar = monthPillarResult.combined;
 
-			return {
-				year: yearPillar,
-				month: monthPillar,
-				day: dayPillar,
-				hour: hourPillar,
-				dayStem: heavenlyStems[dayStemIndex],
-				dayBranch: earthlyBranches[dayBranchIndex],
-			};
-		};
+				// Simplified hour pillar calculation
+				const hourBranchIndex = Math.floor((hour + 1) / 2) % 12;
+				const dayStemIndex = BaziCalculator.tianGan.indexOf(
+					dayPillar.tianGan
+				);
+				const hourStemIndex =
+					(dayStemIndex * 12 + hourBranchIndex) % 10;
+				const hourPillar =
+					BaziCalculator.tianGan[hourStemIndex] +
+					BaziCalculator.diZhi[hourBranchIndex];
 
-		// Generate BaZi analysis based on actual birth date
+				const result = {
+					year: `${yearPillar.tianGan}${yearPillar.diZhi}`,
+					month: monthPillar,
+					day: `${dayPillar.tianGan}${dayPillar.diZhi}`,
+					hour: hourPillar,
+					dayStem: dayPillar.tianGan,
+					dayBranch: dayPillar.diZhi,
+				};
+
+				console.log(
+					`✅ BaziCalculator result for ${birthDateTime}:`,
+					result
+				);
+				return result;
+			} catch (error) {
+				console.error("BaziCalculator import failed:", error);
+
+				// Fallback to manual calculation if import fails
+				const date = new Date(birthDateTime);
+				const year = date.getFullYear();
+				const month = date.getMonth() + 1;
+				const day = date.getDate();
+				const hour = date.getHours();
+
+				// Heavenly Stems (天干)
+				const heavenlyStems = [
+					"甲",
+					"乙",
+					"丙",
+					"丁",
+					"戊",
+					"己",
+					"庚",
+					"辛",
+					"壬",
+					"癸",
+				];
+				// Earthly Branches (地支)
+				const earthlyBranches = [
+					"子",
+					"丑",
+					"寅",
+					"卯",
+					"辰",
+					"巳",
+					"午",
+					"未",
+					"申",
+					"酉",
+					"戌",
+					"亥",
+				];
+
+				// Calculate year pillar (年柱)
+				const yearStemIndex = (year - 4) % 10;
+				const yearBranchIndex = (year - 4) % 12;
+				const yearPillar =
+					heavenlyStems[yearStemIndex] +
+					earthlyBranches[yearBranchIndex];
+
+				// Calculate month pillar (月柱) - simplified calculation
+				const monthStemIndex = ((year - 4) * 12 + month - 1) % 10;
+				const monthBranchIndex = (month + 1) % 12;
+				const monthPillar =
+					heavenlyStems[monthStemIndex] +
+					earthlyBranches[monthBranchIndex];
+
+				// Calculate day pillar (日柱) - simplified calculation
+				const daysSinceReference = Math.floor(
+					(date - new Date("1900-01-01")) / (1000 * 60 * 60 * 24)
+				);
+				const dayStemIndex = (daysSinceReference + 9) % 10;
+				const dayBranchIndex = (daysSinceReference + 11) % 12;
+				const dayPillar =
+					heavenlyStems[dayStemIndex] +
+					earthlyBranches[dayBranchIndex];
+
+				// Calculate hour pillar (時柱)
+				const hourBranchIndex = Math.floor((hour + 1) / 2) % 12;
+				const hourStemIndex =
+					(dayStemIndex * 12 + hourBranchIndex) % 10;
+				const hourPillar =
+					heavenlyStems[hourStemIndex] +
+					earthlyBranches[hourBranchIndex];
+
+				const fallbackResult = {
+					year: yearPillar,
+					month: monthPillar,
+					day: dayPillar,
+					hour: hourPillar,
+					dayStem: heavenlyStems[dayStemIndex],
+					dayBranch: earthlyBranches[dayBranchIndex],
+				};
+
+				console.log(
+					`⚠️ Fallback calculation result for ${birthDateTime}:`,
+					fallbackResult
+				);
+				return fallbackResult;
+			}
+		}; // Generate BaZi analysis based on actual birth date
 		const generateBaZiAnalysis = (birthDateTime, gender) => {
 			const baziData = calculateBaZi(birthDateTime);
 			const formattedDate = formatBirthDate(birthDateTime);

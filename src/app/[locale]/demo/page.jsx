@@ -136,43 +136,43 @@ export default function DemoPage() {
 		{
 			id: "fengshui",
 			name: t("tags.fengshui.name"),
-			image: "/images/demo/fengshui.png",
+			image: "/images/demo/fengshui-demo.png",
 			description: t("tags.fengshui.description"),
 		},
 		{
 			id: "life",
 			name: t("tags.life.name"),
-			image: "/images/demo/life.png",
+			image: "/images/demo/life-demo.png",
 			description: t("tags.life.description"),
 		},
 		{
 			id: "wealth",
 			name: t("tags.wealth.name"),
-			image: "/images/demo/wealth.png",
+			image: "/images/demo/wealth-demo.png",
 			description: t("tags.wealth.description"),
 		},
 		{
 			id: "relationship",
 			name: t("tags.relationship.name"),
-			image: "/images/demo/relationship.png",
+			image: "/images/demo/relationship-demo.png",
 			description: t("tags.relationship.description"),
 		},
 		{
 			id: "couple",
 			name: t("tags.couple.name"),
-			image: "/images/demo/couple2.png",
+			image: "/images/demo/couple-demo.png",
 			description: t("tags.couple.description"),
 		},
 		{
 			id: "health",
 			name: t("tags.health.name"),
-			image: "/images/demo/health.png",
+			image: "/images/demo/health-demo.png",
 			description: t("tags.health.description"),
 		},
 		{
 			id: "career",
 			name: t("tags.career.name"),
-			image: "/images/demo/career.png",
+			image: "/images/demo/career-demo.png",
 			description: t("tags.career.description"),
 		},
 	];
@@ -792,209 +792,216 @@ export default function DemoPage() {
 						if (content.isSpecial) {
 							return (
 								<div className="space-y-12">
-									{/* Section 1: 流年測算 with buttons */}
-									<div className="text-center">
-										<div className="mb-8">
-											<h2
-												className="relative inline-block text-center text-[32px] md:text-[64px] font-extrabold text-[#635D3B] leading-[40px] md:leading-[90px]"
-												style={{
-													fontFamily:
-														"Noto Serif TC,serif",
-													WebkitTextStroke:
-														"1px #635D3B",
-												}}
-											>
-												{content.mainTitle}
-												<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-400 mt-2"></div>
-											</h2>
-										</div>
-										<div className="flex justify-center px-1 space-x-2 sm:space-x-4 md:px-4 md:space-x-10">
-											{/* Overlapping Cards Container */}
-											<div className="relative flex items-center justify-center w-full max-w-[280px] sm:max-w-sm mb-4 mr-4 sm:mr-8 sm:max-w-md md:max-w-lg lg:max-w-lg md:mb-0 md:mr-20">
-												{/* Top Card - 限時優惠 (Green Discount) */}
-												<div
-													className="relative z-20 flex items-center w-full h-16 gap-2 px-2 sm:h-20 sm:gap-3 sm:px-3 md:h-28 md:px-7 rounded-xl"
+									{/* Section 1: 流年測算 with buttons - Hidden for fengshui */}
+									{activeTag !== "fengshui" && (
+										<div className="text-center">
+											<div className="mb-8">
+												<h2
+													className="relative inline-block text-center text-[32px] md:text-[64px] font-extrabold text-[#635D3B] leading-[40px] md:leading-[90px]"
 													style={{
-														background:
-															"linear-gradient(to right, #E8F37A, #A6B41B)",
-														boxShadow:
-															"3px 6px 11.4px rgba(0, 0, 0, 0.25)",
+														fontFamily:
+															"Noto Serif TC,serif",
+														WebkitTextStroke:
+															"1px #635D3B",
 													}}
 												>
-													<div className="flex flex-col">
-														<div
-															className="px-0 py-1 text-xs sm:text-sm md:text-3xl md:px-3 md:py-2 xl:text-[30px]"
-															style={{
-																fontFamily:
-																	"Noto Serif TC, serif",
-																WebkitTextStroke:
-																	"0.5px #635D3B sm:1.5px #635D3B",
-															}}
-														>
-															{t(
-																"ui.limitedOffer"
-															)}
-														</div>
-														{/* Right Side Button */}
-														<div className="flex items-center mb-1 sm:mb-2">
-															<button
-																className="bg-white text-[#A3B116] px-1 sm:px-4 md:px-10 py-1 rounded-full text-xs sm:text-sm md:text-base font-extrabold hover:bg-gray-100 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-																style={{
-																	background:
-																		"linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-																	boxShadow:
-																		"0 4px 4px rgba(0, 0, 0, 0.25)",
-																	color: "#A1B00E",
-																	fontFamily:
-																		"Noto Sans HK",
-																}}
-																onClick={
-																	handleDiscountPayment
-																}
-																disabled={
-																	isProcessingPayment &&
-																	currentCardType ===
-																		"discount"
-																}
-															>
-																{isProcessingPayment &&
-																currentCardType ===
-																	"discount"
-																	? t(
-																			"ui.processing"
-																		)
-																	: t(
-																			"ui.paymentCalculation"
-																		)}
-															</button>
-														</div>
-													</div>
-
-													{/* Centered Price */}
-													<div className="flex flex-row justify-center flex-1">
-														<span className="relative inline-block">
-															{/* Background stroke layer */}
-															<span
-																className="absolute inset-0 font-noto-sans-hk text-stroke-white"
-																style={{
-																	fontSize:
-																		"clamp(1.5rem, 6vw, 4rem)",
-																	fontWeight:
-																		"900",
-																	WebkitTextFillColor:
-																		"transparent",
-																	WebkitTextStroke:
-																		"8px white", // Slightly thinner for small screens
-																}}
-																aria-hidden="true"
-															>
-																{
-																	getPricing()
-																		.discountPrice
-																}
-															</span>
-															{/* Foreground gradient text */}
-															<span
-																className="relative bg-gradient-to-r from-[#99A800] to-[#5D6600] font-noto-sans-hk bg-clip-text text-transparent"
-																style={{
-																	fontSize:
-																		"clamp(1.5rem, 6vw, 4rem)",
-																	fontWeight:
-																		"900",
-																	backgroundImage:
-																		"linear-gradient(to right, #99A800, #5D6600)",
-																	WebkitBackgroundClip:
-																		"text",
-																}}
-															>
-																{
-																	getPricing()
-																		.discountPrice
-																}
-															</span>
-														</span>
-
-														<div
-															className="text-[8px] sm:text-[10px] text-white md:text-sm font-noto-sans-hk xl:text-base"
-															style={{
-																marginTop:
-																	"auto",
-																marginBottom:
-																	"6px",
-																marginLeft:
-																	"2px",
-																fontWeight:
-																	"bold",
-															}}
-														>
-															{getPricing().unit}
-														</div>
-													</div>
-												</div>
-
-												{/* Bottom Card - 專享版 (White Premium) - Partially Visible */}
-												<div
-													className="absolute z-10 flex items-center justify-between w-full h-10 px-1 py-1 bg-white border-2 border-gray-300 sm:h-12 sm:px-2 sm:py-2 left-4 sm:left-8 top-15 sm:top-18 md:left-48 md:top-24 md:h-24 md:px-6 md:py-4 rounded-xl"
-													style={{
-														boxShadow:
-															"0 4px 8px rgba(0, 0, 0, 0.25)",
-													}}
-												>
+													{content.mainTitle}
+													<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-400 mt-2"></div>
+												</h2>
+											</div>
+											<div className="flex justify-center px-1 space-x-2 sm:space-x-4 md:px-4 md:space-x-10">
+												{/* Overlapping Cards Container */}
+												<div className="relative flex items-center justify-center w-full max-w-[280px] sm:max-w-sm mb-4 mr-4 sm:mr-8 sm:max-w-md md:max-w-lg lg:max-w-lg md:mb-0 md:mr-20">
+													{/* Top Card - 限時優惠 (Green Discount) */}
 													<div
-														className="px-1 sm:px-2 py-1 text-sm sm:text-lg md:text-[36px] font-bold text-[#A1A1A1]"
+														className="relative z-20 flex items-center w-full h-16 gap-2 px-2 sm:h-20 sm:gap-3 sm:px-3 md:h-28 md:px-7 rounded-xl"
 														style={{
-															fontFamily:
-																"Noto Serif TC, serif",
-															WebkitTextStroke:
-																"0.5px #A1A1A1 sm:1.0px #A1A1A1",
+															background:
+																"linear-gradient(to right, #E8F37A, #A6B41B)",
+															boxShadow:
+																"3px 6px 11.4px rgba(0, 0, 0, 0.25)",
 														}}
 													>
-														{t("ui.premiumVersion")}
-													</div>
-													<div className="flex flex-col items-center">
-														<div
-															className="text-lg font-extrabold text-center sm:text-2xl md:text-4xl xl:text-5xl"
-															style={{
-																fontFamily:
-																	"Noto Sans HK",
-																color: "#A1A1A1",
-															}}
-														>
-															<span
+														<div className="flex flex-col">
+															<div
+																className="px-0 py-1 text-xs sm:text-sm md:text-3xl md:px-3 md:py-2 xl:text-[30px]"
 																style={{
-																	textDecoration:
-																		"line-through",
-																	textDecorationColor:
-																		"#ef4444",
-																	textDecorationThickness:
-																		"2px",
+																	fontFamily:
+																		"Noto Serif TC, serif",
+																	WebkitTextStroke:
+																		"0.5px #635D3B sm:1.5px #635D3B",
 																}}
 															>
-																{
-																	getPricing()
-																		.originalPrice
-																}
+																{t(
+																	"ui.limitedOffer"
+																)}
+															</div>
+															{/* Right Side Button */}
+															<div className="flex items-center mb-1 sm:mb-2">
+																<button
+																	className="bg-white text-[#A3B116] px-1 sm:px-4 md:px-10 py-1 rounded-full text-xs sm:text-sm md:text-base font-extrabold hover:bg-gray-100 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+																	style={{
+																		background:
+																			"linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+																		boxShadow:
+																			"0 4px 4px rgba(0, 0, 0, 0.25)",
+																		color: "#A1B00E",
+																		fontFamily:
+																			"Noto Sans HK",
+																	}}
+																	onClick={
+																		handleDiscountPayment
+																	}
+																	disabled={
+																		isProcessingPayment &&
+																		currentCardType ===
+																			"discount"
+																	}
+																>
+																	{isProcessingPayment &&
+																	currentCardType ===
+																		"discount"
+																		? t(
+																				"ui.processing"
+																			)
+																		: t(
+																				"ui.paymentCalculation"
+																			)}
+																</button>
+															</div>
+														</div>
+
+														{/* Centered Price */}
+														<div className="flex flex-row justify-center flex-1">
+															<span className="relative inline-block">
+																{/* Background stroke layer */}
+																<span
+																	className="absolute inset-0 font-noto-sans-hk text-stroke-white"
+																	style={{
+																		fontSize:
+																			"clamp(1.5rem, 6vw, 4rem)",
+																		fontWeight:
+																			"900",
+																		WebkitTextFillColor:
+																			"transparent",
+																		WebkitTextStroke:
+																			"8px white", // Slightly thinner for small screens
+																	}}
+																	aria-hidden="true"
+																>
+																	{
+																		getPricing()
+																			.discountPrice
+																	}
+																</span>
+																{/* Foreground gradient text */}
+																<span
+																	className="relative bg-gradient-to-r from-[#99A800] to-[#5D6600] font-noto-sans-hk bg-clip-text text-transparent"
+																	style={{
+																		fontSize:
+																			"clamp(1.5rem, 6vw, 4rem)",
+																		fontWeight:
+																			"900",
+																		backgroundImage:
+																			"linear-gradient(to right, #99A800, #5D6600)",
+																		WebkitBackgroundClip:
+																			"text",
+																	}}
+																>
+																	{
+																		getPricing()
+																			.discountPrice
+																	}
+																</span>
 															</span>
-															<span
-																className="text-[10px] sm:text-xs font-normal md:text-sm xl:text-base"
+
+															<div
+																className="text-[8px] sm:text-[10px] text-white md:text-sm font-noto-sans-hk xl:text-base"
 																style={{
-																	textDecoration:
-																		"none !important",
-																	textDecorationLine:
-																		"none",
+																	marginTop:
+																		"auto",
+																	marginBottom:
+																		"6px",
+																	marginLeft:
+																		"2px",
+																	fontWeight:
+																		"bold",
 																}}
 															>
 																{
 																	getPricing()
 																		.unit
 																}
-															</span>
+															</div>
+														</div>
+													</div>
+
+													{/* Bottom Card - 專享版 (White Premium) - Partially Visible */}
+													<div
+														className="absolute z-10 flex items-center justify-between w-full h-10 px-1 py-1 bg-white border-2 border-gray-300 sm:h-12 sm:px-2 sm:py-2 left-4 sm:left-8 top-15 sm:top-18 md:left-48 md:top-24 md:h-24 md:px-6 md:py-4 rounded-xl"
+														style={{
+															boxShadow:
+																"0 4px 8px rgba(0, 0, 0, 0.25)",
+														}}
+													>
+														<div
+															className="px-1 sm:px-2 py-1 text-sm sm:text-lg md:text-[36px] font-bold text-[#A1A1A1]"
+															style={{
+																fontFamily:
+																	"Noto Serif TC, serif",
+																WebkitTextStroke:
+																	"0.5px #A1A1A1 sm:1.0px #A1A1A1",
+															}}
+														>
+															{t(
+																"ui.premiumVersion"
+															)}
+														</div>
+														<div className="flex flex-col items-center">
+															<div
+																className="text-lg font-extrabold text-center sm:text-2xl md:text-4xl xl:text-5xl"
+																style={{
+																	fontFamily:
+																		"Noto Sans HK",
+																	color: "#A1A1A1",
+																}}
+															>
+																<span
+																	style={{
+																		textDecoration:
+																			"line-through",
+																		textDecorationColor:
+																			"#ef4444",
+																		textDecorationThickness:
+																			"2px",
+																	}}
+																>
+																	{
+																		getPricing()
+																			.originalPrice
+																	}
+																</span>
+																<span
+																	className="text-[10px] sm:text-xs font-normal md:text-sm xl:text-base"
+																	style={{
+																		textDecoration:
+																			"none !important",
+																		textDecorationLine:
+																			"none",
+																	}}
+																>
+																	{
+																		getPricing()
+																			.unit
+																	}
+																</span>
+															</div>
 														</div>
 													</div>
 												</div>
 											</div>
 										</div>
-									</div>
+									)}
 
 									{/* Section 2: 所需材料 */}
 									<div className="relative text-start">

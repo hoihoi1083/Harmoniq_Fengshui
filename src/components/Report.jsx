@@ -5060,7 +5060,8 @@ export default function ReportPage({
 																				"clamp(14px, 1.5vw, 16px)",
 																		}}
 																	>
-																		總量(包括藏干)
+																		數值
+																		(包括藏干)
 																	</div>
 																	<div
 																		className="py-2 font-bold text-white"
@@ -6300,7 +6301,7 @@ export default function ReportPage({
 										marginBottom: "clamp(32px, 5vw, 88px)",
 									}}
 								>
-									<span>綜合調理与人生建議</span>
+									<span>綜合調理與人生建議</span>
 								</h3>
 
 								{isLoadingComprehensiveLifeAdvice ? (
@@ -6384,7 +6385,7 @@ export default function ReportPage({
 																		alt={
 																			tab.key
 																		}
-																		className="object-contain w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20"
+																		className="object-contain w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 xl:w-12 xl:h-12"
 																		style={{
 																			filter: isSelected
 																				? "brightness(0) invert(1)"

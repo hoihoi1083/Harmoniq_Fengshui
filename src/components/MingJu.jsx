@@ -4,6 +4,7 @@ import {
 	getComponentData,
 	storeComponentData,
 } from "../utils/componentDataStore";
+import getWuxingData from "../lib/nayin";
 
 // Helper function to normalize concern characters (simplified to traditional)
 const normalizeConcern = (concern) => {
@@ -55,6 +56,98 @@ const getCurrentYearGanZhi = () => {
 		year: currentYear,
 		ganZhi: ganList[ganIndex] + zhiList[zhiIndex],
 	};
+};
+
+// Helper function to get accurate Ba Zi data using nayin.js
+const getAccurateBaziInfo = (birthDateTime, gender = "male") => {
+	try {
+		// Use nayin.js to get accurate Ba Zi data
+		const wuxingData = getWuxingData(birthDateTime, gender);
+
+		// Extract day master and strength analysis
+		const dayMaster = wuxingData.dayStem + wuxingData.dayStemWuxing;
+		const yearPillar = wuxingData.yearStem + wuxingData.yearBranch;
+		const nayin = wuxingData.nayin;
+
+		// Analyze day master strength based on the wuxing scale
+		const wuxingScale = wuxingData.wuxingScale || "";
+		const dayElement = wuxingData.dayStemWuxing;
+
+		// Parse wuxing scale to determine strength
+		let strength = "中等";
+		if (wuxingScale) {
+			const elementMatch = wuxingScale.match(
+				new RegExp(`${dayElement}:(\\d+\\.?\\d*)%`)
+			);
+			if (elementMatch) {
+				const percentage = parseFloat(elementMatch[1]);
+				if (percentage >= 35) {
+					strength = "偏強";
+				} else if (percentage <= 15) {
+					strength = "偏弱";
+				} else {
+					strength = "中等";
+				}
+			}
+		}
+
+		// Generate characteristics based on day master element
+		const elementCharacteristics = {
+			木: {
+				characteristics: "柔韌堅毅，成長向上",
+				strengths: "創造力強、適應性佳、成長學習能力好",
+				weaknesses: "有時過於理想化、需要更多實際執行力",
+			},
+			火: {
+				characteristics: "熱情活力，光明磊落",
+				strengths: "領導能力強、創意豐富、熱情主動",
+				weaknesses: "有時過於急躁、需要更多耐心和冷靜",
+			},
+			土: {
+				characteristics: "穩重包容，厚德載物",
+				strengths: "穩重可靠、包容力強、執行力佳",
+				weaknesses: "有時過於保守、需要更多創新突破",
+			},
+			金: {
+				characteristics: "剛正果決，精準高效",
+				strengths: "決斷力強、執行力佳、分析能力好",
+				weaknesses: "有時過於剛硬、需要更多靈活變通",
+			},
+			水: {
+				characteristics: "智慧靈活，深謀遠慮",
+				strengths: "智慧深邃、靈活變通、直覺敏銳",
+				weaknesses: "有時過於多變、需要更多堅持專注",
+			},
+		};
+
+		const elementInfo =
+			elementCharacteristics[dayElement] || elementCharacteristics["土"];
+
+		return {
+			year: yearPillar,
+			element: nayin,
+			dayMaster: dayMaster,
+			strength: strength,
+			characteristics: elementInfo.characteristics,
+			strengths: elementInfo.strengths,
+			weaknesses: elementInfo.weaknesses,
+			// Additional data from nayin.js for more detailed analysis
+			wuxingData: wuxingData,
+		};
+	} catch (error) {
+		console.error("Error getting accurate Ba Zi info:", error);
+		// Fallback to default data if nayin.js fails
+		return {
+			year: "庚子",
+			element: "壁上土",
+			dayMaster: "庚金",
+			strength: "中等",
+			characteristics: "穩重務實，循序漸進",
+			strengths: "穩重可靠、務實進取",
+			weaknesses: "有時過於保守、需要創新",
+			wuxingData: null,
+		};
+	}
 };
 
 const TAB_CONFIG = {
@@ -356,7 +449,7 @@ function generatePersonalizedContent(concernArea, tab, userInfo) {
 			genderRef,
 			lifeStage,
 			problem,
-			birthYear
+			birthDateTime
 		);
 	} else if (tab === "middle") {
 		return generatePersonalizedMiddle(
@@ -364,7 +457,7 @@ function generatePersonalizedContent(concernArea, tab, userInfo) {
 			genderRef,
 			lifeStage,
 			problem,
-			birthYear
+			birthDateTime
 		);
 	} else if (tab === "right") {
 		return generatePersonalizedRight(
@@ -372,7 +465,7 @@ function generatePersonalizedContent(concernArea, tab, userInfo) {
 			genderRef,
 			lifeStage,
 			problem,
-			birthYear
+			birthDateTime
 		);
 	}
 
@@ -385,66 +478,10 @@ function generatePersonalizedDayMaster(
 	gender,
 	lifeStage,
 	problem,
-	birthYear
+	birthDateTime
 ) {
-	// Extract real BaZi elements based on birth year
-	const yearElements = {
-		1984: {
-			year: "甲子",
-			element: "海中金",
-			dayMaster: "甲木",
-			strength: "偏弱",
-			characteristics: "創新活力，但需要支撐",
-			strengths: "創造力強、適應性佳",
-			weaknesses: "容易波動、需要穩定",
-		},
-		1985: {
-			year: "乙丑",
-			element: "海中金",
-			dayMaster: "乙木",
-			strength: "中等",
-			characteristics: "柔韌堅毅，溫和而有力",
-			strengths: "溫和堅韌、善於協調",
-			weaknesses: "有時過於謙讓、需要自信",
-		},
-		1990: {
-			year: "庚午",
-			element: "路旁土",
-			dayMaster: "庚金",
-			strength: "中等",
-			characteristics: "剛正果決，具領導特質",
-			strengths: "決斷力強、執行力佳",
-			weaknesses: "有時過於剛硬、需要靈活",
-		},
-		1995: {
-			year: "乙亥",
-			element: "山頭火",
-			dayMaster: "乙木",
-			strength: "偏弱",
-			characteristics: "柔韌智慧，需要滋養",
-			strengths: "智慧深遂、直覺敏銳",
-			weaknesses: "容易消耗、需要充電",
-		},
-		2000: {
-			year: "庚辰",
-			element: "白臘金",
-			dayMaster: "庚金",
-			strength: "偏強",
-			characteristics: "剛強有力，具開拓精神",
-			strengths: "意志堅定、開拓能力強",
-			weaknesses: "有時過於直接、需要圓融",
-		},
-	};
-
-	const baziInfo = yearElements[birthYear] || {
-		year: "庚子",
-		element: "壁上土",
-		dayMaster: "庚金",
-		strength: "中等",
-		characteristics: "穩重務實，循序漸進",
-		strengths: "穩重可靠、務實進取",
-		weaknesses: "有時過於保守、需要創新",
-	};
+	// Get accurate BaZi data using nayin.js instead of hardcoded year lookup
+	const baziInfo = getAccurateBaziInfo(birthDateTime, gender);
 
 	const stageAdvice = {
 		青年: "正值奮鬥期，宜積極開拓",
@@ -548,48 +585,10 @@ function generatePersonalizedMiddle(
 	gender,
 	lifeStage,
 	problem,
-	birthYear
+	birthDateTime
 ) {
-	// Extract BaZi elements based on birth year
-	const yearElements = {
-		1984: {
-			year: "甲子",
-			element: "海中金",
-			dayMaster: "甲木",
-			strength: "偏弱",
-		},
-		1985: {
-			year: "乙丑",
-			element: "海中金",
-			dayMaster: "乙木",
-			strength: "中等",
-		},
-		2000: {
-			year: "庚辰",
-			element: "白臘金",
-			dayMaster: "庚金",
-			strength: "偏強",
-		},
-		1990: {
-			year: "庚午",
-			element: "路旁土",
-			dayMaster: "庚金",
-			strength: "中等",
-		},
-		1995: {
-			year: "乙亥",
-			element: "山頭火",
-			dayMaster: "乙木",
-			strength: "偏弱",
-		},
-	};
-
-	const baziInfo = yearElements[birthYear] || {
-		year: "庚子",
-		element: "壁上土",
-		dayMaster: "庚金",
-		strength: "中等",
-	};
+	// Get accurate BaZi data using nayin.js instead of hardcoded year lookup
+	const baziInfo = getAccurateBaziInfo(birthDateTime, gender);
 
 	if (normalizeConcern(concern) === "財運") {
 		return JSON.stringify({
@@ -690,54 +689,36 @@ function generatePersonalizedRight(
 	gender,
 	lifeStage,
 	problem,
-	birthYear
+	birthDateTime
 ) {
-	// Extract BaZi elements based on birth year
-	const yearElements = {
-		1984: {
-			year: "甲子",
-			element: "海中金",
-			dayMaster: "甲木",
-			strength: "偏弱",
-			lucky: "水木",
-		},
-		1985: {
-			year: "乙丑",
-			element: "海中金",
-			dayMaster: "乙木",
-			strength: "中等",
-			lucky: "水木",
-		},
-		2000: {
-			year: "庚辰",
-			element: "白臘金",
-			dayMaster: "庚金",
-			strength: "偏強",
-			lucky: "土金",
-		},
-		1990: {
-			year: "庚午",
-			element: "路旁土",
-			dayMaster: "庚金",
-			strength: "中等",
-			lucky: "土火",
-		},
-		1995: {
-			year: "乙亥",
-			element: "山頭火",
-			dayMaster: "乙木",
-			strength: "偏弱",
-			lucky: "木火",
-		},
-	};
+	// Get accurate BaZi data using nayin.js instead of hardcoded year lookup
+	const baziInfo = getAccurateBaziInfo(birthDateTime, gender);
 
-	const baziInfo = yearElements[birthYear] || {
-		year: "庚子",
-		element: "壁上土",
-		dayMaster: "庚金",
-		strength: "中等",
-		lucky: "土金",
-	};
+	// Determine lucky elements based on day master strength and five elements balance
+	const dayElement = baziInfo.wuxingData?.dayStemWuxing || "土";
+	let lucky = "水木"; // default
+
+	if (baziInfo.wuxingData) {
+		// Analyze wuxing balance to determine what elements are needed
+		const scale = baziInfo.wuxingData.wuxingScale || "";
+		const elementOrder = ["金", "木", "水", "火", "土"];
+		const elementPercentages = {};
+
+		elementOrder.forEach((element) => {
+			const match = scale.match(new RegExp(`${element}:(\\d+\\.?\\d*)%`));
+			if (match) {
+				elementPercentages[element] = parseFloat(match[1]);
+			}
+		});
+
+		// Determine lucky elements based on what's lacking
+		const sortedElements = Object.entries(elementPercentages)
+			.sort((a, b) => a[1] - b[1]) // Sort by percentage, ascending
+			.slice(0, 2) // Take the two least represented elements
+			.map(([element]) => element);
+
+		lucky = sortedElements.join("") || "水木";
+	}
 
 	if (normalizeConcern(concern) === "財運") {
 		return JSON.stringify({
@@ -818,41 +799,8 @@ function createAIPrompt(concern, tab, userInfo) {
 	const currentYearInfo = getCurrentYearGanZhi();
 	const yearText = `${currentYearInfo.year}年流年${currentYearInfo.ganZhi}`;
 
-	// Get consistent birth chart data for AI analysis
-	const birthYear = birthDateTime
-		? new Date(birthDateTime).getFullYear()
-		: 2000;
-	const yearElements = {
-		1999: {
-			year: "己卯",
-			element: "城頭土",
-			dayMaster: "己土",
-			strength: "偏弱",
-			characteristics: "穩重溫和，包容性強",
-			strengths: "待人溫和、包容力強",
-			weaknesses: "有時過於被動、需要主動",
-		},
-		2000: {
-			year: "庚辰",
-			element: "白蠟金",
-			dayMaster: "庚金",
-			strength: "中等",
-			characteristics: "堅毅果斷，執行力強",
-			strengths: "決策果斷、執行力強",
-			weaknesses: "有時過於剛硬、需要柔和",
-		},
-		// Add more years as needed
-	};
-
-	const baziInfo = yearElements[birthYear] || {
-		year: "庚子",
-		element: "壁上土",
-		dayMaster: "庚金",
-		strength: "中等",
-		characteristics: "穩重務實，循序漸進",
-		strengths: "穩重可靠、務實進取",
-		weaknesses: "有時過於保守、需要創新",
-	};
+	// Get accurate Ba Zi data for AI analysis using nayin.js
+	const baziInfo = getAccurateBaziInfo(birthDateTime, gender);
 
 	const baseContext = `用戶生辰：${birthDateTime}，性別：${gender}，關注領域：${concern}，具體問題：${problem}
 

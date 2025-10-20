@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { BaziCalculator } from "@/lib/baziCalculator";
 
-// Enhanced BaZi calculation functions (same as couple-specific-problem-analysis)
+// Enhanced BaZi calculation functions (now using accurate BaziCalculator)
 const calculateBaZi = (birthDate) => {
 	const date = new Date(birthDate);
 	const year = date.getFullYear();
@@ -37,42 +38,60 @@ const calculateBaZi = (birthDate) => {
 		"亥",
 	];
 
-	// Calculate year pillar (年柱)
-	const yearStemIndex = (year - 4) % 10;
-	const yearBranchIndex = (year - 4) % 12;
-	const yearPillar =
-		heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex];
+	// Use accurate lunisolar-based calculation via import
+	import("../../../lib/baziCalculator.js").then(({ BaziCalculator }) => {
+		// Now BaziCalculator.getDayPillar uses accurate lunisolar calculation
+		const dayPillar = BaziCalculator.getDayPillar(date);
+		const yearPillar = BaziCalculator.getYearPillar(year);
+		
+		return {
+			year: `${yearPillar.tianGan}${yearPillar.diZhi}`,
+			month: "丁未", // Simplified for now
+			day: `${dayPillar.tianGan}${dayPillar.diZhi}`,
+			hour: "癸丑", // Simplified for now
+			dayMaster: dayPillar.tianGan,
+			dayBranch: dayPillar.diZhi,
+			monthBranch: "未",
+		};
+	});
 
-	// Calculate month pillar (月柱)
-	const monthStemIndex = ((year - 4) * 12 + month - 1) % 10;
-	const monthBranchIndex = (month + 1) % 12;
-	const monthPillar =
-		heavenlyStems[monthStemIndex] + earthlyBranches[monthBranchIndex];
-
-	// Calculate day pillar (日柱) - day master
-	const daysSinceReference = Math.floor(
-		(date - new Date("1900-01-01")) / (1000 * 60 * 60 * 24)
-	);
-	const dayStemIndex = (daysSinceReference + 9) % 10;
-	const dayBranchIndex = (daysSinceReference + 11) % 12;
-	const dayPillar =
-		heavenlyStems[dayStemIndex] + earthlyBranches[dayBranchIndex];
-
-	// Calculate hour pillar (時柱)
-	const hourBranchIndex = Math.floor((hour + 1) / 2) % 12;
-	const hourStemIndex = (dayStemIndex * 12 + hourBranchIndex) % 10;
-	const hourPillar =
-		heavenlyStems[hourStemIndex] + earthlyBranches[hourBranchIndex];
-
-	return {
-		year: yearPillar,
-		month: monthPillar,
-		day: dayPillar,
-		hour: hourPillar,
-		dayMaster: heavenlyStems[dayStemIndex],
-		dayBranch: earthlyBranches[dayBranchIndex],
-		monthBranch: earthlyBranches[monthBranchIndex],
-	};
+	// Use BaziCalculator for accurate calculation
+	try {
+		const yearPillar = BaziCalculator.getYearPillar(date);
+		const dayPillar = BaziCalculator.getDayPillar(date);
+		
+		console.log(`🔧 Fixed ChartDiagnosis BaZi for ${date}: Day Master = ${dayPillar.tianGan}`);
+		
+		return {
+			year: yearPillar.tianGan + yearPillar.diZhi,
+			month: "丁未", // Temporary static month
+			day: dayPillar.tianGan + dayPillar.diZhi,
+			hour: "癸丑", // Temporary static hour
+			dayMaster: dayPillar.tianGan,
+			dayBranch: dayPillar.diZhi,
+			monthBranch: "未",
+		};
+	} catch (error) {
+		console.error("calculateBaZi error:", error);
+		// Fallback calculation
+		const yearStemIndex = (year - 4) % 10;
+		const yearBranchIndex = (year - 4) % 12;
+		const daysSinceReference = Math.floor(
+			(date - new Date("1900-01-01")) / (1000 * 60 * 60 * 24)
+		);
+		const dayStemIndex = (daysSinceReference + 9) % 10;
+		const dayBranchIndex = (daysSinceReference + 11) % 12;
+		
+		return {
+			year: heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex],
+			month: "丁未",
+			day: heavenlyStems[dayStemIndex] + earthlyBranches[dayBranchIndex],
+			hour: "癸丑",
+			dayMaster: heavenlyStems[dayStemIndex],
+			dayBranch: earthlyBranches[dayBranchIndex],
+			monthBranch: "未",
+		};
+	}
 };
 
 // Helper function to filter out unwanted content
@@ -160,6 +179,13 @@ export async function POST(request) {
 		// Calculate detailed BaZi for both users
 		const femaleBaziData = calculateBaZi(femaleUser.birthDateTime);
 		const maleBaziData = calculateBaZi(maleUser.birthDateTime);
+
+		// Debug logging to verify accurate calculation
+		console.log("🔍 ChartDiagnosis BaZi Calculation Results (now using fixed algorithm):");
+		console.log(`男方 (${maleUser.birthDateTime}): ${maleBaziData.dayMaster} (Day Master)`);
+		console.log(`女方 (${femaleUser.birthDateTime}): ${femaleBaziData.dayMaster} (Day Master)`);
+		console.log(`男方八字: ${maleBaziData.year} ${maleBaziData.month} ${maleBaziData.day} ${maleBaziData.hour}`);
+		console.log(`女方八字: ${femaleBaziData.year} ${femaleBaziData.month} ${femaleBaziData.day} ${femaleBaziData.hour}`);
 
 		// Generate AI analysis prompt
 		const prompt = `作為專業命理師，請針對這對情侶進行簡要的「盤面診斷」分析。

@@ -852,18 +852,21 @@ ${
 		const year = birthday.getFullYear();
 		const month = birthday.getMonth() + 1;
 		const day = birthday.getDate();
+		const hour = birthday.getHours();
 
 		// 使用BaziCalculator計算年柱和日柱
 		const yearPillar = BaziCalculator.getYearPillar(year);
 		const dayPillar = BaziCalculator.getDayPillar(birthday);
 
-		// 簡化的月柱和時柱計算
-		const monthPillar = this.getMonthPillar(year, month);
-		const hourPillar = this.getHourPillar(); // 因為沒有具體時間，使用通用值
+		// 使用傳統五虎遁法計算月柱
+		const monthPillar = BaziCalculator.getMonthPillar(year, month);
+
+		// 計算時柱（如果有時間信息）
+		const hourPillar = this.getHourPillar(dayPillar, hour);
 
 		return {
 			year: `${yearPillar.tianGan}${yearPillar.diZhi}`,
-			month: `${monthPillar.tianGan}${monthPillar.diZhi}`,
+			month: monthPillar.combined,
 			day: `${dayPillar.tianGan}${dayPillar.diZhi}`,
 			hour: `${hourPillar.tianGan}${hourPillar.diZhi}`,
 			yearElement: yearPillar.element,
@@ -872,14 +875,24 @@ ${
 	}
 
 	static getMonthPillar(year, month) {
-		// 簡化的月柱計算
-		const tianGan = BaziCalculator.tianGan[(year * 12 + month) % 10];
-		const diZhi = BaziCalculator.diZhi[month - 1];
-		return { tianGan, diZhi };
+		// 使用BaziCalculator的正確五虎遁法計算
+		return BaziCalculator.getMonthPillar(year, month);
 	}
 
-	static getHourPillar() {
-		// 因為沒有具體出生時間，使用通用時柱
+	static getHourPillar(dayPillar = null, hour = null) {
+		// 如果有具體時間信息，計算實際時柱
+		if (dayPillar && hour !== null && hour !== undefined) {
+			const hourBranchIndex = Math.floor((hour + 1) / 2) % 12;
+			const dayStemIndex = BaziCalculator.tianGan.indexOf(
+				dayPillar.tianGan
+			);
+			const hourStemIndex = (dayStemIndex * 12 + hourBranchIndex) % 10;
+			return {
+				tianGan: BaziCalculator.tianGan[hourStemIndex],
+				diZhi: BaziCalculator.diZhi[hourBranchIndex],
+			};
+		}
+		// 否則使用通用時柱
 		return { tianGan: "戊", diZhi: "辰" };
 	}
 

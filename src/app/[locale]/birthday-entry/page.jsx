@@ -169,7 +169,7 @@ export default function BirthdayEntryPage() {
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A3B116]"
 							/>
 							<p className="mt-1 text-xs text-gray-500">
-								提供出生時間可以獲得更準確的分析
+								提供出生時間可以獲得更準確的分析。如沒有出生時間提供，報告會以12pm作測算。
 							</p>
 						</div>
 

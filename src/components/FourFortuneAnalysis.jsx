@@ -413,7 +413,7 @@ export default function FourFortuneAnalysis({
 							zodiacAnimals[(birthYear - 1900) % 12];
 
 						return (
-							<div className="flex flex-col items-center justify-center gap-0 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+							<div className="flex flex-col items-center justify-center gap-0 p-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
 								{/* Left Side - Zodiac Animal */}
 								<div className="w-full lg:w-[22%] flex items-center justify-center mb-4 lg:mb-0">
 									<div className="text-center">

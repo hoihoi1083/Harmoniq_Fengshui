@@ -21,6 +21,13 @@ export async function POST(request) {
 			);
 		}
 
+		console.log("🔍 Starting Ten Gods analysis for:", {
+			user1Birthday,
+			user2Birthday,
+			user1Name,
+			user2Name,
+		});
+
 		// Generate AI-powered Ten Gods interaction analysis
 		const godExplanations = await generateTenGodsInteractionAnalysis(
 			user1Birthday,
@@ -30,20 +37,34 @@ export async function POST(request) {
 			compatibilityData
 		);
 
+		console.log(
+			"✅ Generated Ten Gods explanations:",
+			godExplanations.length,
+			"items"
+		);
+
 		return NextResponse.json({
 			success: true,
 			godExplanations,
 			timestamp: new Date().toISOString(),
 		});
 	} catch (error) {
-		console.error("Error in couple god analysis:", error);
-		return NextResponse.json(
-			{
-				error: "Failed to generate god analysis",
-				details: error.message,
-			},
-			{ status: 500 }
+		console.error("❌ Error in couple god analysis:", error);
+
+		// Return fallback content with real bazi data
+		const fallbackExplanations = await generateFallbackGodAnalysis(
+			user1Birthday,
+			user2Birthday,
+			user1Name,
+			user2Name
 		);
+
+		return NextResponse.json({
+			success: true,
+			godExplanations: fallbackExplanations,
+			timestamp: new Date().toISOString(),
+			warning: "Using fallback analysis due to error: " + error.message,
+		});
 	}
 }
 
@@ -55,6 +76,8 @@ async function generateTenGodsInteractionAnalysis(
 	compatibilityData
 ) {
 	try {
+		console.log("🎯 Generating AI-powered Ten Gods analysis...");
+
 		// Get detailed bazi analysis for both users using unified element calculation
 		const user1Elements = calculateUnifiedElements(user1Birthday, "male");
 		const user2Elements = calculateUnifiedElements(user2Birthday, "female");
@@ -85,6 +108,41 @@ async function generateTenGodsInteractionAnalysis(
 		console.log(`男方 Ten Gods:`, user1TenGods.primaryGods);
 		console.log(`女方 Ten Gods:`, user2TenGods.primaryGods);
 
+		// CRITICAL: Verify day master accuracy
+		console.log("⚠️ Day Master Verification:");
+		console.log(
+			`男方實際日主: ${user1Elements.dayMasterStem}${user1Elements.dayMasterElement}`
+		);
+		console.log(
+			`女方實際日主: ${user2Elements.dayMasterStem}${user2Elements.dayMasterElement}`
+		);
+
+		// Generate accurate Ten Gods interactions between the two people
+		const maleDayMaster =
+			user1Elements.dayMasterStem + user1Elements.dayMasterElement;
+		const femaleDayMaster =
+			user2Elements.dayMasterStem + user2Elements.dayMasterElement;
+
+		// Calculate how each person's day master affects the other
+		const maleToFemaleGod = getTenGodName(
+			user2Elements.dayMasterStem,
+			user1Elements.dayMasterStem,
+			user2Elements.dayMasterElement
+		);
+		const femaleToMaleGod = getTenGodName(
+			user1Elements.dayMasterStem,
+			user2Elements.dayMasterStem,
+			user1Elements.dayMasterElement
+		);
+
+		console.log("🎭 Cross Ten Gods Analysis:");
+		console.log(
+			`男方${maleDayMaster} 對 女方${femaleDayMaster} = ${maleToFemaleGod}`
+		);
+		console.log(
+			`女方${femaleDayMaster} 對 男方${maleDayMaster} = ${femaleToMaleGod}`
+		);
+
 		// Create comprehensive prompt with actual Ten Gods data
 		const prompt = `作為頂尖的八字命理分析師，請根據以下雙方八字信息，進行深度的「十神互動精微解讀」分析：
 
@@ -94,30 +152,37 @@ async function generateTenGodsInteractionAnalysis(
 - 男方八字：${user1BaziData.yearStem}${user1BaziData.yearBranch} ${user1BaziData.monthStem}${user1BaziData.monthBranch} ${user1BaziData.dayStem}${user1BaziData.dayBranch} ${user1BaziData.hourStem}${user1BaziData.hourBranch}
 - 女方八字：${user2BaziData.yearStem}${user2BaziData.yearBranch} ${user2BaziData.monthStem}${user2BaziData.monthBranch} ${user2BaziData.dayStem}${user2BaziData.dayBranch} ${user2BaziData.hourStem}${user2BaziData.hourBranch}
 
-**實際十神分析：**
-- 男方主要十神：${user1TenGods.primaryGods.join("、")}
-- 女方主要十神：${user2TenGods.primaryGods.join("、")}
-- 男方日主：${user1BaziData.dayStem}${user1BaziData.dayStemWuxing}
-- 女方日主：${user2BaziData.dayStem}${user2BaziData.dayStemWuxing}
+**正確的日主與十神關係：**
+- 男方日主：${maleDayMaster}
+- 女方日主：${femaleDayMaster}
+- 男方對女方的十神：${user1Name}${maleDayMaster}${maleToFemaleGod}
+- 女方對男方的十神：${user2Name}${femaleDayMaster}${femaleToMaleGod}
 
 **分析要求：**
-請基於實際的八字十神配置，提供2-3個關鍵的十神互動分析：
+請基於正確的日主和十神配置，提供2個關鍵的十神互動分析：
 
 **第一個分析（女方→男方）：**
-請分析女方的主要十神（${user2TenGods.primaryGods[0] || "偏印"}）如何影響男方的十神（${user1TenGods.primaryGods[0] || "食神"}）
+請分析${user2Name}${femaleDayMaster}對${user1Name}${maleDayMaster}的${femaleToMaleGod}關係
 
 **第二個分析（男方→女方）：**
-請分析男方的主要十神（${user1TenGods.primaryGods[0] || "正官"}）如何影響女方的十神（${user2TenGods.primaryGods[0] || "七殺"}）
+請分析${user1Name}${maleDayMaster}對${user2Name}${femaleDayMaster}的${maleToFemaleGod}關係
+
+每個分析請包含：
+1. 具體的互動機制（150-200字）
+2. 關鍵要點和注意事項（100-150字）
+3. 實用的化解建議（100-150字）
 
 **格式要求：**
-1. 使用實際的天干地支和十神名稱
-2. 格式：女方[天干][十神] → 男方[天干][十神]
-3. 例如：女方庚金偏印 → 男方己土食神
+1. 使用正確的日主天干地支和十神名稱
+2. 格式：${user2Name}${femaleDayMaster}${femaleToMaleGod} → ${user1Name}${maleDayMaster}
+3. 格式：${user1Name}${maleDayMaster}${maleToFemaleGod} → ${user2Name}${femaleDayMaster}
 4. 說明組合的核心機制和化解建議
 
-**根據實際八字數據進行分析，不要使用假設數據。**
+**重要：必須使用正確的日主（${maleDayMaster}和${femaleDayMaster}），不要使用其他柱的天干。**
 
 請用繁體中文回答。`;
+
+		console.log("🤖 Calling AI API with prompt...");
 
 		// Call AI service for Ten Gods analysis
 		const aiResponse =
@@ -128,6 +193,15 @@ async function generateTenGodsInteractionAnalysis(
 				user2BaziData.dayStemWuxing || "土",
 				prompt
 			);
+
+		console.log(
+			"🎉 AI Response received:",
+			aiResponse ? "Success" : "Failed"
+		);
+
+		if (!aiResponse) {
+			throw new Error("AI response is empty");
+		}
 
 		// Parse and structure the AI response
 		const structuredExplanations = parseGodInteractionResponse(
@@ -140,31 +214,24 @@ async function generateTenGodsInteractionAnalysis(
 			user2TenGods
 		);
 
+		console.log(
+			"📊 Parsed explanations:",
+			structuredExplanations.length,
+			"items"
+		);
+
+		if (structuredExplanations.length === 0) {
+			throw new Error("Failed to parse AI response into structured data");
+		}
+
 		return structuredExplanations;
 	} catch (error) {
-		console.error("Error generating AI god analysis:", error);
+		console.error("❌ Error generating AI god analysis:", error);
 
-		// Even fallback should use real bazi data with unified element calculation
-		const user1Elements = calculateUnifiedElements(user1Birthday, "male");
-		const user2Elements = calculateUnifiedElements(user2Birthday, "female");
-
-		const user1BaziData = getWuxingData(user1Birthday, "male");
-		const user2BaziData = getWuxingData(user2Birthday, "female");
-
-		// Override with correct day master elements
-		user1BaziData.dayStem = user1Elements.dayMasterStem;
-		user1BaziData.dayStemWuxing = user1Elements.dayMasterElement;
-		user2BaziData.dayStem = user2Elements.dayMasterStem;
-		user2BaziData.dayStemWuxing = user2Elements.dayMasterElement;
-
-		const user1TenGods = calculateTenGodsFromBazi(user1BaziData);
-		const user2TenGods = calculateTenGodsFromBazi(user2BaziData);
-
-		return generateRealBaziFallback(
-			user1BaziData,
-			user2BaziData,
-			user1TenGods,
-			user2TenGods,
+		// Generate fallback content with real bazi data
+		return await generateFallbackGodAnalysis(
+			user1Birthday,
+			user2Birthday,
 			user1Name,
 			user2Name
 		);
@@ -560,4 +627,40 @@ function generateRealBaziFallback(
 	}
 
 	return explanations;
+}
+
+async function generateFallbackGodAnalysis(
+	user1Birthday,
+	user2Birthday,
+	user1Name,
+	user2Name
+) {
+	console.log(
+		"🔄 Generating fallback Ten Gods analysis with real bazi data..."
+	);
+
+	// Generate real bazi data for fallback
+	const user1Elements = calculateUnifiedElements(user1Birthday, "male");
+	const user2Elements = calculateUnifiedElements(user2Birthday, "female");
+
+	const user1BaziData = getWuxingData(user1Birthday, "male");
+	const user2BaziData = getWuxingData(user2Birthday, "female");
+
+	// Override with correct day master elements
+	user1BaziData.dayStem = user1Elements.dayMasterStem;
+	user1BaziData.dayStemWuxing = user1Elements.dayMasterElement;
+	user2BaziData.dayStem = user2Elements.dayMasterStem;
+	user2BaziData.dayStemWuxing = user2Elements.dayMasterElement;
+
+	const user1TenGods = calculateTenGodsFromBazi(user1BaziData);
+	const user2TenGods = calculateTenGodsFromBazi(user2BaziData);
+
+	return generateRealBaziFallback(
+		user1BaziData,
+		user2BaziData,
+		user1TenGods,
+		user2TenGods,
+		user1Name,
+		user2Name
+	);
 }

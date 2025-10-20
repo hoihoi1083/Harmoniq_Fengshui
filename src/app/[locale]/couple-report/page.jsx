@@ -373,8 +373,10 @@ export default function CoupleReportPage() {
 				const birthday2 = searchParams.get("birthday2");
 				const gender = searchParams.get("gender");
 				const gender2 = searchParams.get("gender2");
-				const time = searchParams.get("time");
-				const time2 = searchParams.get("time2");
+				const time =
+					searchParams.get("time") || searchParams.get("birthTime1");
+				const time2 =
+					searchParams.get("time2") || searchParams.get("birthTime2");
 				const problem = searchParams.get("problem");
 
 				// If we have fresh birthday data from URL parameters, use that first
@@ -827,7 +829,7 @@ export default function CoupleReportPage() {
 											}}
 											currentYear={new Date().getFullYear()}
 										/>
-										<CoupleGodExplain
+										{/* <CoupleGodExplain
 											user1={{
 												birthDateTime:
 													reportData.birthday,
@@ -842,7 +844,7 @@ export default function CoupleReportPage() {
 													reportData.name2 || "女方",
 											}}
 										/>
-
+ */}
 										<CoupleSeason
 											user1={{
 												birthDateTime:

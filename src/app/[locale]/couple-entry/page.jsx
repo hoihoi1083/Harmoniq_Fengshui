@@ -30,6 +30,18 @@ export default function CoupleEntryPage({ params }) {
 	const [paymentVerified, setPaymentVerified] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState("");
+	const [genderError, setGenderError] = useState("");
+
+	// Check for same gender validation
+	const checkGenderValidation = (gender1, gender2) => {
+		if (gender1 === gender2) {
+			setGenderError("暫時只支持異性感情合盤");
+			return false;
+		} else {
+			setGenderError("");
+			return true;
+		}
+	};
 
 	// Pre-fill specific problem from chat context
 	useEffect(() => {
@@ -89,6 +101,13 @@ export default function CoupleEntryPage({ params }) {
 			setError(t("fillBothPersonsData"));
 			return;
 		}
+
+		// Check gender validation
+		if (!checkGenderValidation(formData.gender1, formData.gender2)) {
+			setError("");
+			return;
+		}
+
 		setError("");
 		setStep(2);
 	};
@@ -259,12 +278,17 @@ export default function CoupleEntryPage({ params }) {
 										</label>
 										<div className="flex justify-center gap-4">
 											<div
-												onClick={() =>
+												onClick={() => {
+													const newGender = "male";
 													setFormData((prev) => ({
 														...prev,
-														gender1: "male",
-													}))
-												}
+														gender1: newGender,
+													}));
+													checkGenderValidation(
+														newGender,
+														formData.gender2
+													);
+												}}
 												className={`flex flex-col items-center p-4 cursor-pointer transition-all ${
 													formData.gender1 === "male"
 														? "border-[#A3B116] bg-[#A3B116]/10"
@@ -281,12 +305,17 @@ export default function CoupleEntryPage({ params }) {
 												</span>
 											</div>
 											<div
-												onClick={() =>
+												onClick={() => {
+													const newGender = "female";
 													setFormData((prev) => ({
 														...prev,
-														gender1: "female",
-													}))
-												}
+														gender1: newGender,
+													}));
+													checkGenderValidation(
+														newGender,
+														formData.gender2
+													);
+												}}
 												className={`flex flex-col items-center p-4 cursor-pointer transition-all  ${
 													formData.gender1 ===
 													"female"
@@ -349,6 +378,7 @@ export default function CoupleEntryPage({ params }) {
 										/>
 										<p className="mt-1 text-xs text-gray-500">
 											{t("birthTimeHelp")}
+											，如沒有出生時間提供，報告會以12pm作測算。
 										</p>
 									</div>
 								</div>
@@ -369,12 +399,17 @@ export default function CoupleEntryPage({ params }) {
 										</label>
 										<div className="flex justify-center gap-4">
 											<div
-												onClick={() =>
+												onClick={() => {
+													const newGender = "male";
 													setFormData((prev) => ({
 														...prev,
-														gender2: "male",
-													}))
-												}
+														gender2: newGender,
+													}));
+													checkGenderValidation(
+														formData.gender1,
+														newGender
+													);
+												}}
 												className={`flex flex-col items-center p-4 cursor-pointer transition-all border rounded-lg ${
 													formData.gender2 === "male"
 														? "border-[#A3B116] bg-[#A3B116]/10"
@@ -391,12 +426,17 @@ export default function CoupleEntryPage({ params }) {
 												</span>
 											</div>
 											<div
-												onClick={() =>
+												onClick={() => {
+													const newGender = "female";
 													setFormData((prev) => ({
 														...prev,
-														gender2: "female",
-													}))
-												}
+														gender2: newGender,
+													}));
+													checkGenderValidation(
+														formData.gender1,
+														newGender
+													);
+												}}
 												className={`flex flex-col items-center p-4 cursor-pointer transition-all border rounded-lg ${
 													formData.gender2 ===
 													"female"
@@ -459,6 +499,7 @@ export default function CoupleEntryPage({ params }) {
 										/>
 										<p className="mt-1 text-xs text-gray-500">
 											{t("birthTimeHelp")}
+											，如沒有出生時間提供，報告會以12pm作測算。
 										</p>
 									</div>
 								</div>
@@ -519,6 +560,15 @@ export default function CoupleEntryPage({ params }) {
 									</p>
 								</div>
 							</>
+						)}
+
+						{/* Gender Error Message */}
+						{genderError && (
+							<div className="p-4 border border-red-200 rounded-lg bg-red-50">
+								<p className="text-sm font-medium text-red-600">
+									{genderError}
+								</p>
+							</div>
 						)}
 
 						{error && (

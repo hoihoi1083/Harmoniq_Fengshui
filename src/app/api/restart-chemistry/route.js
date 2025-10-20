@@ -3,68 +3,27 @@ import { NextResponse } from "next/server";
 // Calculate BaZi data from birth info
 function calculateBaZi(birthDate) {
 	try {
+		// Import BaziCalculator for accurate calculations
+		const { BaziCalculator } = require("../../../lib/baziCalculator.js");
+
 		const date = new Date(birthDate);
 		const year = date.getFullYear();
 		const month = date.getMonth() + 1;
-		const day = date.getDate();
 
-		// Heavenly Stems (天干)
-		const heavenlyStems = [
-			"甲",
-			"乙",
-			"丙",
-			"丁",
-			"戊",
-			"己",
-			"庚",
-			"辛",
-			"壬",
-			"癸",
-		];
-		// Earthly Branches (地支)
-		const earthlyBranches = [
-			"子",
-			"丑",
-			"寅",
-			"卯",
-			"辰",
-			"巳",
-			"午",
-			"未",
-			"申",
-			"酉",
-			"戌",
-			"亥",
-		];
+		// Use BaziCalculator for accurate year and day pillars
+		const yearPillar = BaziCalculator.getYearPillar(year);
+		const dayPillar = BaziCalculator.getDayPillar(date);
 
-		// Calculate year pillar
-		const yearStemIndex = (year - 4) % 10;
-		const yearBranchIndex = (year - 4) % 12;
-		const yearPillar =
-			heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex];
-
-		// Calculate month pillar (simplified)
-		const monthStemIndex = (yearStemIndex * 2 + month) % 10;
-		const monthBranchIndex = (month + 1) % 12;
-		const monthPillar =
-			heavenlyStems[monthStemIndex] + earthlyBranches[monthBranchIndex];
-
-		// Calculate day pillar (simplified - using days since epoch)
-		const daysSinceEpoch = Math.floor(
-			date.getTime() / (1000 * 60 * 60 * 24)
-		);
-		const dayStemIndex = (daysSinceEpoch + 4) % 10;
-		const dayBranchIndex = (daysSinceEpoch + 4) % 12;
-		const dayPillar =
-			heavenlyStems[dayStemIndex] + earthlyBranches[dayBranchIndex];
+		// Use traditional 五虎遁法 for month pillar
+		const monthPillarResult = BaziCalculator.getMonthPillar(year, month);
 
 		// Hour pillar would need actual birth hour
 		const hourPillar = "甲子"; // Default for now
 
 		return {
-			year: yearPillar,
-			month: monthPillar,
-			day: dayPillar,
+			year: `${yearPillar.tianGan}${yearPillar.diZhi}`,
+			month: monthPillarResult.combined,
+			day: `${dayPillar.tianGan}${dayPillar.diZhi}`,
 			hour: hourPillar,
 		};
 	} catch (error) {

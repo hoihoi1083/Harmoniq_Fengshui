@@ -232,16 +232,25 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		stableScore,
 	]);
 
-	// Detect when context data has stabilized (give it time to load properly)
+	// Detect when context data has stabilized (check immediately and on updates)
 	useEffect(() => {
 		if (contextAnalysisData?.compatibility?.score && !contextDataStable) {
-			// Add a small delay to ensure the context data is fully stable
-			const stabilityTimer = setTimeout(() => {
+			// Check if data is immediately available (synchronous case)
+			if (contextAnalysisData.compatibility.score) {
 				console.log(
-					"📊 EnhancedCoupleSpecificProblemSolution - Context data marked as STABLE"
+					"📊 EnhancedCoupleSpecificProblemSolution - Context data IMMEDIATELY stable"
 				);
 				setContextDataStable(true);
-			}, 1000); // 1 second stability buffer
+				return;
+			}
+
+			// Fallback minimal delay for edge cases
+			const stabilityTimer = setTimeout(() => {
+				console.log(
+					"📊 EnhancedCoupleSpecificProblemSolution - Context data marked as STABLE (delayed)"
+				);
+				setContextDataStable(true);
+			}, 50); // Minimal 50ms delay for edge cases
 
 			return () => clearTimeout(stabilityTimer);
 		}
@@ -337,7 +346,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		}
 	}, [specificProblem]);
 
-	// Load saved data from database first (highest priority)
+	// Load saved data from database first (highest priority) - TEMPORARILY DISABLED for Ba Zi fix
 	useEffect(() => {
 		console.log(
 			"🐛 DEBUG: useEffect triggered - user1:",
@@ -420,6 +429,9 @@ const EnhancedCoupleSpecificProblemSolution = ({
 						error
 					);
 				}
+
+				// Mark as loaded even if no data found, so fresh generation can proceed
+				setDatabaseDataLoaded(true);
 			};
 
 			loadSavedData();

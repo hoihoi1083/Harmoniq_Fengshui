@@ -536,19 +536,29 @@ const RelationshipFortuneAnalysis = ({
 					)}
 
 					{activeTab === "三大情劫週期" && (
-						<div>
+						<div className="bg-gradient-to-r from-[#C74772] to-[#A03A5A] rounded-xl p-4 sm:p-6 text-white mb-4 sm:mb-6">
+							<h4
+								className="mb-4 font-bold sm:mb-6"
+								style={{
+									fontFamily: "Noto Serif TC, serif",
+									fontSize: "clamp(18px, 4vw, 24px)",
+								}}
+							>
+								情劫週期
+							</h4>
+
 							{/* Mobile Card Layout */}
-							<div className="block space-y-4 md:hidden">
+							<div className="block space-y-3 sm:hidden">
 								{Object.entries(
 									relationshipAnalysis.romanticCycles
 								).map(([key, cycle], index) => (
 									<div
 										key={key}
-										className="p-3 bg-white rounded-lg shadow-sm"
+										className="p-3 rounded-lg bg-white/20"
 									>
-										<div className="mb-3">
-											<h5
-												className="font-bold text-[#C74772] mb-1"
+										<div className="mb-2">
+											<span
+												className="font-bold"
 												style={{
 													fontFamily:
 														"Noto Serif TC, serif",
@@ -557,9 +567,9 @@ const RelationshipFortuneAnalysis = ({
 												}}
 											>
 												{cycle.period}
-											</h5>
-											<p
-												className="text-[#374A37]"
+											</span>
+											<span
+												className="ml-2 text-white/80"
 												style={{
 													fontFamily:
 														"Noto Sans HK, sans-serif",
@@ -568,35 +578,126 @@ const RelationshipFortuneAnalysis = ({
 												}}
 											>
 												{cycle.fortune}
-											</p>
+											</span>
 										</div>
-										<div className="mb-2">
-											<p
-												className="font-medium text-[#374A37] mb-1"
+										<div
+											className="mb-1"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(12px, 2.5vw, 14px)",
+												lineHeight: 1.4,
+											}}
+										>
+											<strong>關鍵流年：</strong>
+											{cycle.dangerousYear}
+											{cycle.crisis && (
+												<span className="block mt-1">
+													{cycle.crisis}
+												</span>
+											)}
+										</div>
+										<div
+											className="text-white/80"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(12px, 2.5vw, 14px)",
+												lineHeight: 1.4,
+											}}
+										>
+											<strong>解決方案：</strong>
+											{cycle.solution}
+										</div>
+									</div>
+								))}
+							</div>
+
+							{/* Desktop Table Layout */}
+							<div className="hidden overflow-x-auto sm:block">
+								<table className="w-full rounded-lg bg-white/10">
+									<thead>
+										<tr className="border-b border-white/20">
+											<th
+												className="w-1/6 p-3 text-left lg:p-4"
 												style={{
 													fontFamily:
 														"Noto Serif TC, serif",
 													fontSize:
-														"clamp(12px, 2.5vw, 14px)",
+														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												關鍵流年：
-											</p>
-											<p
-												className="text-[#374A37] mb-1"
+												時期
+											</th>
+											<th
+												className="w-1/5 p-3 text-left lg:p-4"
 												style={{
 													fontFamily:
-														"Noto Sans HK, sans-serif",
+														"Noto Serif TC, serif",
 													fontSize:
-														"clamp(12px, 2.5vw, 14px)",
-													lineHeight: 1.4,
+														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												{cycle.dangerousYear}
-											</p>
-											{cycle.crisis && (
-												<p
-													className="text-[#374A37]"
+												大運
+											</th>
+											<th
+												className="w-1/3 p-3 text-left lg:p-4"
+												style={{
+													fontFamily:
+														"Noto Serif TC, serif",
+													fontSize:
+														"clamp(14px, 2.5vw, 16px)",
+												}}
+											>
+												關鍵流年
+											</th>
+											<th
+												className="w-1/3 p-3 text-left lg:p-4"
+												style={{
+													fontFamily:
+														"Noto Serif TC, serif",
+													fontSize:
+														"clamp(14px, 2.5vw, 16px)",
+												}}
+											>
+												解決方案
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{Object.entries(
+											relationshipAnalysis.romanticCycles
+										).map(([key, cycle], index) => (
+											<tr
+												key={key}
+												className="border-b border-white/10"
+											>
+												<td
+													className="p-3 lg:p-4"
+													style={{
+														fontFamily:
+															"Noto Sans HK, sans-serif",
+														fontSize:
+															"clamp(12px, 2.5vw, 14px)",
+													}}
+												>
+													{cycle.period}
+												</td>
+												<td
+													className="p-3 lg:p-4"
+													style={{
+														fontFamily:
+															"Noto Sans HK, sans-serif",
+														fontSize:
+															"clamp(12px, 2.5vw, 14px)",
+													}}
+												>
+													{cycle.fortune}
+												</td>
+												<td
+													className="p-3 lg:p-4"
 													style={{
 														fontFamily:
 															"Noto Sans HK, sans-serif",
@@ -605,324 +706,29 @@ const RelationshipFortuneAnalysis = ({
 														lineHeight: 1.4,
 													}}
 												>
-													{cycle.crisis}
-												</p>
-											)}
-										</div>
-										<div className="p-2 rounded-lg bg-red-50">
-											<p
-												className="text-red-700"
-												style={{
-													fontFamily:
-														"Noto Sans HK, sans-serif",
-													fontSize:
-														"clamp(12px, 2.5vw, 14px)",
-													lineHeight: 1.4,
-												}}
-											>
-												<strong>解決方案：</strong>
-												{cycle.solution}
-											</p>
-										</div>
-									</div>
-								))}
-							</div>
-
-							{/* Desktop Table Layout */}
-							<div className="hidden space-y-4 md:block sm:space-y-6">
-								{/* Table Header */}
-								<div className="grid grid-cols-4 gap-3 mb-3 sm:gap-4 sm:mb-4">
-									<div className="bg-[#C74772] text-white p-2 sm:p-3 rounded-lg text-center">
-										<h5
-											className="font-bold"
-											style={{
-												fontFamily:
-													"Noto Serif TC, serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											時期
-										</h5>
-									</div>
-									<div className="bg-[#C74772] text-white p-2 sm:p-3 rounded-lg text-center">
-										<h5
-											className="font-bold"
-											style={{
-												fontFamily:
-													"Noto Serif TC, serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											大運
-										</h5>
-									</div>
-									<div className="bg-[#C74772] text-white p-2 sm:p-3 rounded-lg text-center">
-										<h5
-											className="font-bold"
-											style={{
-												fontFamily:
-													"Noto Serif TC, serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											關鍵流年
-										</h5>
-									</div>
-									<div className="bg-[#C74772] text-white p-2 sm:p-3 rounded-lg text-center">
-										<h5
-											className="font-bold"
-											style={{
-												fontFamily:
-													"Noto Serif TC, serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											風險預警
-										</h5>
-									</div>
-								</div>
-
-								{/* 25歲前 */}
-								<div className="grid items-start grid-cols-4 gap-3 sm:gap-4">
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<h5
-											className="font-bold text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Serif TC, serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["25歲前"]
-													.period
-											}
-										</h5>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["25歲前"]
-													.fortune
-											}
-										</p>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37] mb-1 sm:mb-2"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-												lineHeight: 1.4,
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["25歲前"]
-													.dangerousYear
-											}
-										</p>
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-												lineHeight: 1.4,
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["25歲前"]
-													.crisis
-											}
-										</p>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-												lineHeight: 1.4,
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["25歲前"]
-													.solution
-											}
-										</p>
-									</div>
-								</div>
-
-								{/* 35歲危機 */}
-								<div className="grid items-start grid-cols-4 gap-3 sm:gap-4">
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<h5
-											className="font-bold text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Serif TC, serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["35歲危機"]
-													.period
-											}
-										</h5>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["35歲危機"]
-													.fortune
-											}
-										</p>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-												lineHeight: 1.4,
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["35歲危機"]
-													.dangerousYear
-											}
-										</p>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-												lineHeight: 1.4,
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["35歲危機"]
-													.solution
-											}
-										</p>
-									</div>
-								</div>
-
-								{/* 45歲波動 */}
-								<div className="grid items-start grid-cols-4 gap-3 sm:gap-4">
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<h5
-											className="font-bold text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Serif TC, serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["45歲波動"]
-													.period
-											}
-										</h5>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["45歲波動"]
-													.fortune
-											}
-										</p>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-												lineHeight: 1.4,
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["45歲波動"]
-													.dangerousYear
-											}
-										</p>
-									</div>
-									<div className="p-2 bg-white rounded-lg sm:p-3">
-										<p
-											className="text-[#374A37]"
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-												fontSize:
-													"clamp(12px, 2.5vw, 14px)",
-												lineHeight: 1.4,
-											}}
-										>
-											{
-												relationshipAnalysis
-													.romanticCycles["45歲波動"]
-													.solution
-											}
-										</p>
-									</div>
-								</div>
+													{cycle.dangerousYear}
+													{cycle.crisis && (
+														<div className="mt-1 text-white/80">
+															{cycle.crisis}
+														</div>
+													)}
+												</td>
+												<td
+													className="p-3 lg:p-4"
+													style={{
+														fontFamily:
+															"Noto Sans HK, sans-serif",
+														fontSize:
+															"clamp(12px, 2.5vw, 14px)",
+														lineHeight: 1.4,
+													}}
+												>
+													{cycle.solution}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
 							</div>
 						</div>
 					)}

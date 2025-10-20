@@ -25,6 +25,21 @@ export default function CoupleCoreSuggestion({
 	// Generate couple core suggestion analysis using both partners' birth info
 	const generateCoupleCoreSuggestionAnalysis = async (user1, user2, year) => {
 		try {
+			console.log("📤 API Request Data:", {
+				user1Info: {
+					birthday: user1?.birthDateTime || "",
+					gender: user1?.gender || "male",
+					name: user1?.name || "男方",
+				},
+				user2Info: {
+					birthday: user2?.birthDateTime || "",
+					gender: user2?.gender || "female",
+					name: user2?.name || "女方",
+				},
+				currentYear: year,
+				concern: "感情",
+			});
+
 			const response = await fetch(
 				"/api/couple-core-suggestion-analysis",
 				{
@@ -55,6 +70,16 @@ export default function CoupleCoreSuggestion({
 
 			const result = await response.json();
 
+			console.log("📥 API Response:", result);
+			console.log("📥 API Success:", result.success);
+			console.log("📥 API Analysis:", result.analysis);
+			if (result.analysis?.content) {
+				console.log(
+					"📥 API Content Preview:",
+					result.analysis.content.substring(0, 500) + "..."
+				);
+			}
+
 			if (!result.success) {
 				throw new Error(
 					result.error || "Couple core suggestion analysis failed"
@@ -69,7 +94,13 @@ export default function CoupleCoreSuggestion({
 				year
 			);
 		} catch (error) {
-			console.error("Couple core suggestion AI analysis error:", error);
+			console.error(
+				"🚨 Couple core suggestion AI analysis error:",
+				error
+			);
+			console.error("🚨 Error details:", error.message);
+			console.error("🚨 Stack trace:", error.stack);
+			console.error("🚨 Triggering fallback due to API failure");
 			// Return minimal fallback structure when AI fails
 			return getCoupleFallbackComponentData(year, user1, user2);
 		}
@@ -186,6 +217,13 @@ export default function CoupleCoreSuggestion({
 		user2,
 		year
 	) => {
+		console.log("🔄 Transforming AI response to component data...");
+		console.log("🔄 Analysis data:", analysisData);
+		console.log(
+			"🔄 Content preview:",
+			analysisData?.content?.substring(0, 300) + "..."
+		);
+
 		// Create category structure for couple analysis
 		const coupleCategories = [
 			{
@@ -377,7 +415,69 @@ export default function CoupleCoreSuggestion({
 							: null,
 					};
 				}
-				return { male: null, female: null };
+
+				// If no specific strategies found, generate based on elemental analysis
+				return generateElementalStrategies(type, content);
+			};
+
+			// Generate strategies based on elemental characteristics from content
+			const generateElementalStrategies = (conflictType, content) => {
+				// Extract elemental characteristics from content
+				const isMaleEarth = /男方.*土|土性.*男方|己土.*男方/.test(
+					content
+				);
+				const isFemaleGold = /女方.*金|金性.*女方|辛金.*女方/.test(
+					content
+				);
+
+				// Default to detected elemental types
+				const maleElement = isMaleEarth ? "土" : "土"; // Default to Earth
+				const femaleElement = isFemaleGold ? "金" : "金"; // Default to Metal
+
+				const strategies = {
+					衝突類型: {
+						male:
+							maleElement === "土"
+								? "穩定包容，先聽後說：「我理解你的想法，讓我們一起想辦法」"
+								: "以土性包容力化解衝突，避免直接對抗",
+						female:
+							femaleElement === "金"
+								? "理性分析，提出方案：「這個問題的關鍵是...我建議我們可以...」"
+								: "發揮金性邏輯思維，提出具體解決方案",
+					},
+					意見不合: {
+						male:
+							maleElement === "土"
+								? "土性穩重，求同存異：「雖然看法不同，但我們的目標是一致的」"
+								: "以穩重態度尋找共同點",
+						female:
+							femaleElement === "金"
+								? "金性精準，數據說話：「我們用事實和數據來分析這個問題」"
+								: "以事實和邏輯為基礎進行討論",
+					},
+					情緒低落: {
+						male:
+							maleElement === "土"
+								? "土性溫厚，行動支持：默默陪伴，提供實際幫助（準備溫食、安排休息）"
+								: "以實際行動提供支持和安慰",
+						female:
+							femaleElement === "金"
+								? "金性理性，溫和引導：「我知道你現在很難受，我們可以談談嗎？」"
+								: "理性分析問題原因，提供解決思路",
+					},
+					親友干涉問題: {
+						male:
+							maleElement === "土"
+								? "土性擔當，明確界線：「這是我們的事，我會處理好」"
+								: "承擔責任，明確立場和界線",
+						female:
+							femaleElement === "金"
+								? "金性果斷，建立原則：「我們需要設立清楚的界線和原則」"
+								: "制定明確規則，堅持原則性立場",
+					},
+				};
+
+				return strategies[conflictType] || { male: null, female: null };
 			};
 
 			// Extract strategies for different conflict types
@@ -465,91 +565,133 @@ export default function CoupleCoreSuggestion({
 
 	// Helper functions to extract content dynamically from AI-generated text
 	const extractActionAdvice = (content, gender) => {
+		console.log(`🔍 Extracting action advice for ${gender}`);
+
 		// Try multiple patterns to handle different formats
 		const patterns = [
-			// Pattern 1: With ** markers
-			`${gender}提升建議[：]*\\*\\*[^：]*行動建議[：]*([\\s\\S]*?)(?=開運物|${gender === "男方" ? "女方" : "共同"}|$)`,
-			// Pattern 2: Without ** markers
-			`${gender}提升建議[\\s\\S]*?行動建議[\\s\\S]*?([\\s\\S]*?)(?=開運物|${gender === "男方" ? "女方" : "共同"}|$)`,
+			// Pattern 1: API format with ** markers - FIXED for actual API response
+			`\\*\\*${gender}提升建議[：]*\\*\\*[\\s\\S]*?行動建議[：]*([\\s\\S]*?)(?=開運物|\\*\\*女方|\\*\\*共同|$)`,
+			// Pattern 2: Direct search in the content
+			`${gender}提升建議[\\s\\S]*?行動建議[：]*([\\s\\S]*?)(?=開運物|${gender === "男方" ? "女方" : "共同"}|$)`,
 		];
 
 		for (let pattern of patterns) {
 			const regex = new RegExp(pattern, "i");
 			const match = content.match(regex);
 
+			console.log(`🔍 Pattern: ${pattern}`);
+			console.log(`🔍 Match result:`, match);
+
 			if (match && match[1]) {
+				console.log(
+					`✅ Found action advice match for ${gender}:`,
+					match[1]
+				);
 				const actionText = match[1].trim();
 
-				// Handle numbered lists (1. 2. 3.)
-				let actionItems = actionText.match(
-					/\d+\.\s*([^0-9]*?)(?=\d+\.|$)/g
+				// Handle bullet points (•) - primary format in API
+				let actionItems = actionText
+					.split(/•|\n/)
+					.map((item) => cleanContent(item.trim()))
+					.filter(
+						(item) =>
+							item.length > 5 &&
+							!item.includes("開運物") &&
+							!item.includes("女方") &&
+							!item.includes("共同")
+					); // Filter out unwanted content
+
+				console.log(
+					`📋 Processed action items for ${gender}:`,
+					actionItems
 				);
 
-				// If no numbered lists, try bullet points (•)
-				if (!actionItems) {
-					actionItems = actionText
-						.split("•")
-						.map((item) => cleanContent(item.trim()))
-						.filter((item) => item.length > 0);
-				}
-
 				if (actionItems && actionItems.length > 0) {
-					return actionItems
-						.map((item) =>
-							cleanContent(item.replace(/^\d+\.\s*/, "").trim())
-						)
-						.slice(0, 3);
+					return actionItems.slice(0, 3);
 				}
 			}
 		}
 
-		// Fallback: look for any action-related content for this gender
-		const fallbackPattern = new RegExp(
-			`${gender}[^。]*([^。]*運動[^。]*|[^。]*冥想[^。]*|[^。]*學習[^。]*|[^。]*創作[^。]*)`,
-			"g"
+		console.log(`❌ No action advice found for ${gender}, trying fallback`);
+
+		// Direct pattern matching based on current API format
+		const directPattern = new RegExp(
+			`\\*\\*${gender}提升建議[：]*\\*\\*[\\s\\S]*?•([^•]*?)•([^•]*?)(?=開運物|\\*\\*|$)`,
+			"i"
 		);
-		const fallbackMatches = content.match(fallbackPattern);
-		if (fallbackMatches && fallbackMatches.length > 0) {
-			return fallbackMatches
-				.map((match) => cleanContent(match.trim()))
-				.slice(0, 2);
+		const directMatch = content.match(directPattern);
+		if (directMatch) {
+			const items = [];
+			if (directMatch[1]) items.push(cleanContent(directMatch[1].trim()));
+			if (directMatch[2]) items.push(cleanContent(directMatch[2].trim()));
+			console.log(`✅ Direct pattern found items for ${gender}:`, items);
+			return items;
 		}
 
 		return [];
 	};
 
 	const extractAccessories = (content, gender) => {
+		console.log(`🔍 Extracting accessories for ${gender}`);
+
 		// Try multiple patterns to handle different formats
 		const patterns = [
-			// Pattern 1: With ** markers
-			`${gender}提升建議[\\s\\S]*?\\*\\* 開運物[：]*([^*]*?)(?=\\*\\*|${gender === "男方" ? "女方" : "共同"}|$)`,
+			// Pattern 1: API format with ** markers - FIXED for actual response
+			`\\*\\*${gender}提升建議[：]*\\*\\*[\\s\\S]*?開運物[：]*([\\s\\S]*?)(?=\\*\\*女方|\\*\\*共同|\\*\\*|$)`,
 			// Pattern 2: Without ** markers
-			`${gender}提升建議[\\s\\S]*?開運物[\\s\\S]*?([\\s\\S]*?)(?=${gender === "男方" ? "女方" : "共同"}|$)`,
+			`${gender}提升建議[\\s\\S]*?開運物[：]*([\\s\\S]*?)(?=${gender === "男方" ? "女方" : "共同"}|$)`,
 		];
 
 		for (let pattern of patterns) {
 			const regex = new RegExp(pattern, "i");
 			const match = content.match(regex);
 
+			console.log(`🔍 Accessories pattern: ${pattern}`);
+			console.log(`🔍 Accessories match:`, match);
+
 			if (match && match[1]) {
+				console.log(
+					`✅ Found accessories match for ${gender}:`,
+					match[1]
+				);
 				const accessoryText = cleanContent(
 					match[1].trim().replace(/^\s*：\s*/, "")
 				);
-				// Split by common separators and clean up
+				// Split by common separators and clean up - handle API format "item1、item2、item3"
 				const accessories = accessoryText
 					.split(/[、，,]/)
 					.map((item) => cleanContent(item.trim()))
-					.filter((item) => item.length > 0);
-				return accessories.length > 0 ? accessories : accessoryText;
+					.filter(
+						(item) =>
+							item.length > 0 &&
+							!item.includes("女方") &&
+							!item.includes("共同") &&
+							!item.includes("建議")
+					);
+
+				console.log(
+					`📋 Processed accessories for ${gender}:`,
+					accessories
+				);
+				return accessories.length > 0 ? accessories : [accessoryText];
 			}
 		}
 
-		// Fallback pattern for direct "gender適合" mentions
-		const fallbackPattern = new RegExp(`${gender}適合[^。]*`, "g");
-		const fallbackMatch = content.match(fallbackPattern);
-		return fallbackMatch
-			? cleanContent(fallbackMatch[0].replace(`${gender}適合`, "").trim())
-			: "";
+		console.log(`❌ No accessories found for ${gender}, trying fallback`);
+
+		// Enhanced fallback: look for specific accessory mentions
+		const fallbackPattern = new RegExp(
+			`${gender}[\\s\\S]*?([^。]*(?:水晶|項鍊|手鍊|茶具|腕錶|石英)[^。]*。?)`,
+			"g"
+		);
+		const fallbackMatches = content.match(fallbackPattern);
+		if (fallbackMatches && fallbackMatches.length > 0) {
+			return fallbackMatches
+				.map((match) => cleanContent(match.trim()))
+				.slice(0, 3);
+		}
+
+		return [];
 	};
 
 	const extractWeeklyRitual = (content) => {
@@ -780,7 +922,27 @@ export default function CoupleCoreSuggestion({
 					},
 					situations: extractSituationTable(content),
 				},
-			}; // Add feng shui analysis if available
+			};
+
+			console.log("⚡ Energy structure created:", energyStructure);
+			console.log(
+				"⚡ Male action advice:",
+				energyStructure.maleSection.actionAdvice
+			);
+			console.log(
+				"⚡ Male accessories:",
+				energyStructure.maleSection.accessories
+			);
+			console.log(
+				"⚡ Female action advice:",
+				energyStructure.femaleSection.actionAdvice
+			);
+			console.log(
+				"⚡ Female accessories:",
+				energyStructure.femaleSection.accessories
+			);
+
+			// Add feng shui analysis if available
 			if (energyAnalysisMatch) {
 				energyStructure.analysis = energyAnalysisMatch[0];
 			}
@@ -1022,88 +1184,113 @@ export default function CoupleCoreSuggestion({
 				notes: noteMatch ? noteMatch[1].trim() : "",
 			};
 
-			// Create seasonal subsections based on the content
+			// Create subsections based on the actual content patterns
 			const subsections = [];
 
-			// Spring section - Focus on planning and new beginnings
-			if (
-				structuredContent.actions.includes("立春") ||
-				structuredContent.actions.includes("年度") ||
-				content.includes("立春")
-			) {
-				const springContent =
-					extractSeasonalContent(
-						cleanedContent,
-						"立春|年度|計劃|規劃|计划|规划"
-					) ||
-					cleanContent(structuredContent.actions) ||
-					"避免重大關係決策（如同居、購房），優先經營日常溫情。";
-				subsections.push({
-					title: "春季-黃月",
-					color: "bg-yellow-500",
-					content: springContent,
-				});
+			// Extract action advice (行動建議) - highest priority
+			const actionPattern =
+				/行動建議[：:]?([\s\S]*?)(?=時機與方法|注意事項|具体分析|###|$)/i;
+			const actionContentMatch = content.match(actionPattern);
+			if (actionContentMatch && actionContentMatch[1]) {
+				const actionContent = cleanContent(
+					actionContentMatch[1].trim()
+				);
+				if (actionContent.length > 20) {
+					subsections.push({
+						title: "行動建議",
+						color: "bg-yellow-500",
+						content: actionContent,
+					});
+				}
 			}
 
-			// Summer section - Focus on relationship development
-			if (
-				structuredContent.timing.includes("夏季") ||
-				structuredContent.timing.includes("四月") ||
-				content.includes("巳火")
-			) {
-				const summerContent =
-					extractSeasonalContent(
-						cleanedContent,
-						"夏季|夏|四月|五月|六月|巳|午|未|升溫|升温|慶典|庆典"
-					) ||
-					cleanContent(structuredContent.timing) ||
-					"每月安排一次「無目的約會」（如深夜散步、看星星），脫離現實壓力場景。最佳感情升溫期，適合見家長或舉辦慶典。";
-				subsections.push({
-					title: "立夏至處暑",
-					color: "bg-yellow-500",
-					content: summerContent,
-				});
+			// Extract timing content (時機與方法) - second priority
+			const timingPattern =
+				/時機與方法[：:]?([\s\S]*?)(?=注意事項|行動建議|具体分析|###|$)/i;
+			const timingContentMatch = content.match(timingPattern);
+			if (timingContentMatch && timingContentMatch[1]) {
+				const timingContent = cleanContent(
+					timingContentMatch[1].trim()
+				);
+				if (timingContent.length > 20) {
+					subsections.push({
+						title: "最佳時機",
+						color: "bg-yellow-500",
+						content: timingContent,
+					});
+				}
 			}
 
-			// Autumn section - Focus on challenges and precautions
-			if (
-				structuredContent.notes.includes("申") ||
-				structuredContent.notes.includes("七月") ||
-				content.includes("注意")
-			) {
-				const autumnContent =
-					extractSeasonalContent(
-						cleanedContent,
-						"申|七月|八月|九月|注意|避免|分歧|分岐"
-					) ||
-					cleanContent(structuredContent.notes) ||
-					"男方主動策劃驚喜（丁火需木火激發熱情），例如親手製作禮物。需注意避免翻舊賬，加強溝通。";
-				subsections.push({
-					title: "白露後",
-					color: "bg-yellow-500",
-					content: autumnContent,
-				});
+			// Extract precautions (注意事項) - third priority
+			const notesPattern =
+				/注意事項[：:]?([\s\S]*?)(?=行動建議|時機與方法|具体分析|###|$)/i;
+			const notesContentMatch = content.match(notesPattern);
+			if (notesContentMatch && notesContentMatch[1]) {
+				const notesContent = cleanContent(notesContentMatch[1].trim());
+				if (notesContent.length > 20) {
+					subsections.push({
+						title: "注意事項",
+						color: "bg-yellow-500",
+						content: notesContent,
+					});
+				}
+			}
+
+			// Only use analysis content if we have fewer than 2 sections
+			if (subsections.length < 2) {
+				const analysisPattern =
+					/具体分析[：:]?([\s\S]*?)(?=行動建議|時機與方法|注意事項|###|$)/i;
+				const analysisContentMatch = content.match(analysisPattern);
+				if (analysisContentMatch && analysisContentMatch[1]) {
+					let analysisContent = analysisContentMatch[1].trim();
+
+					// Only include if it contains actionable elements, not just technical analysis
+					if (
+						/建議|方法|時機|注意|避免|適合|宜|應該/.test(
+							analysisContent
+						)
+					) {
+						// Extract only the practical guidance sentences
+						const practicalSentences = analysisContent
+							.split(/[。！？]/)
+							.filter((sentence) =>
+								/建議|方法|時機|注意|避免|適合|宜|應該|最佳/.test(
+									sentence
+								)
+							)
+							.map((sentence) => sentence.trim() + "。")
+							.join("");
+
+						if (practicalSentences.length > 20) {
+							subsections.push({
+								title: "命理指導建議",
+								color: "bg-yellow-500",
+								content: cleanContent(practicalSentences),
+							});
+						}
+					}
+				}
 			}
 
 			// If no specific seasonal content found, create general subsections from the structured content
 			if (subsections.length === 0) {
 				subsections.push(
 					{
-						title: "春季-黃月",
+						title: "行動建議",
 						color: "bg-yellow-500",
 						content:
 							structuredContent.actions ||
 							"避免重大關係決策（如同居、購房），優先經營日常溫情。",
 					},
 					{
-						title: "立夏至處暑",
+						title: "最佳時機",
 						color: "bg-yellow-500",
 						content:
 							structuredContent.timing ||
 							"每月安排一次「無目的約會」（如深夜散步、看星星），脫離現實壓力場景。",
 					},
 					{
-						title: "白露後",
+						title: "注意事項",
 						color: "bg-yellow-500",
 						content:
 							structuredContent.notes ||
@@ -1237,6 +1424,11 @@ export default function CoupleCoreSuggestion({
 
 	// Minimal fallback when AI completely fails
 	const getCoupleFallbackComponentData = (year, user1, user2) => {
+		console.log(
+			"🚨 FALLBACK TRIGGERED: Using fallback couple component data"
+		);
+		console.log("🚨 Fallback reasons: API failed or returned invalid data");
+
 		return {
 			title: "夫妻開運建議",
 			subtitle: `${user1?.name || "男方"} & ${user2?.name || "女方"} 感情指南`,
@@ -1311,9 +1503,13 @@ export default function CoupleCoreSuggestion({
 		};
 	};
 
-	// Create cache key for couple core suggestion analysis
+	// Create cache key for couple core suggestion analysis with more specificity
 	const getCacheKey = (user1, user2, year) => {
-		return `couple_core_suggestion_${user1.birthDateTime}_${user2.birthDateTime}_${year}`;
+		const user1Date = user1.birthDateTime || user1.birthday;
+		const user2Date = user2.birthDateTime || user2.birthday;
+		const concern = "感情"; // Default concern for couple core suggestion analysis
+		// Use stable cache key for normal caching behavior
+		return `couple_core_suggestion_${user1Date}_${user2Date}_${concern}_${year}`;
 	};
 
 	useEffect(() => {
@@ -1331,6 +1527,11 @@ export default function CoupleCoreSuggestion({
 		}
 
 		const cacheKey = getCacheKey(user1, user2, currentYear);
+		console.log("🔑 CoupleCoreSuggestion cache key:", cacheKey);
+		console.log("🔍 Current birth dates:", {
+			user1: user1.birthDateTime,
+			user2: user2.birthDateTime,
+		});
 
 		// Check cache first
 		if (coupleCoreSuggestionCache && coupleCoreSuggestionCache[cacheKey]) {
@@ -1340,6 +1541,7 @@ export default function CoupleCoreSuggestion({
 			return;
 		}
 
+		console.log("🚀 Generating fresh couple core suggestion analysis...");
 		setIsLoading(true);
 		setError(null);
 
@@ -1389,11 +1591,11 @@ export default function CoupleCoreSuggestion({
 				setIsLoading(false);
 			});
 	}, [
-		user1,
-		user2,
+		user1?.birthDateTime,
+		user2?.birthDateTime,
+		user1?.birthday,
+		user2?.birthday,
 		currentYear,
-		coupleCoreSuggestionCache,
-		setCoupleCoreSuggestionCache,
 	]);
 
 	if (isLoading) {

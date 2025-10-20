@@ -35,9 +35,6 @@ const getRegionSpecificImage = (category, region) => {
 	// Handle special cases - removed together handling since we now use couple
 
 	// Special case: wealth-hkd.png doesn't exist, so fall back to original for HKD
-	if (category === "wealth" && regionSuffix === "hkd") {
-		return `/images/price/wealth.png`; // Use original for HKD wealth
-	}
 
 	return `/images/price/${category}-${regionSuffix}.png`;
 };

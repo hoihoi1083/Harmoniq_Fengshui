@@ -122,7 +122,7 @@ const useEnhancedAnnualAnalysis = (user1, user2, analysisData) => {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({
-			birthday: user1.birthDateTime,
+			birthDateTime: user1.birthDateTime,
 			gender: user1.gender,
 		}),
 	});
@@ -136,7 +136,7 @@ const useEnhancedAnnualAnalysis = (user1, user2, analysisData) => {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({
-			birthday: user2.birthDateTime,
+			birthDateTime: user2.birthDateTime,
 			gender: user2.gender,
 		}),
 	});

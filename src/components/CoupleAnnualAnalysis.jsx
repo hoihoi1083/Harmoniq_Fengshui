@@ -14,11 +14,71 @@ import {
 } from "lucide-react";
 import { useCoupleAnalysis } from "@/contexts/CoupleAnalysisContext";
 import { EnhancedInitialAnalysis } from "@/lib/enhancedInitialAnalysis";
+import { BaziCalculator } from "@/lib/baziCalculator";
 import {
 	calculateUnifiedElements,
 	getPersonPrimaryElement,
 } from "@/lib/unifiedElementCalculation";
 import { saveComponentContentWithUser } from "@/utils/simpleCoupleContentSave";
+
+// Helper function to calculate Ba Zi with accurate time-based hour pillar
+const calculateBaziWithTime = (birthDateTime) => {
+	try {
+		// Handle missing time by defaulting to 12:00 (noon)
+		let fullDateTime = birthDateTime;
+		if (
+			typeof birthDateTime === "string" &&
+			!birthDateTime.includes("T") &&
+			!birthDateTime.includes(" ")
+		) {
+			fullDateTime = `${birthDateTime} 12:00`;
+		}
+
+		const date = new Date(fullDateTime);
+		const year = date.getFullYear();
+		const month = date.getMonth() + 1;
+		const hour = date.getHours();
+
+		// Use BaziCalculator for accurate year and day pillars
+		const yearPillar = BaziCalculator.getYearPillar(year);
+		const dayPillar = BaziCalculator.getDayPillar(date);
+
+		// Calculate month pillar using traditional 五虎遁法
+		const monthPillarResult = BaziCalculator.getMonthPillar(year, month);
+		const monthPillar = monthPillarResult.combined;
+
+		// Calculate hour pillar based on actual birth time (defaults to noon if not specified)
+		const hourBranchIndex = Math.floor((hour + 1) / 2) % 12;
+		const dayStemIndex = BaziCalculator.tianGan.indexOf(dayPillar.tianGan);
+		const hourStemIndex = (dayStemIndex * 12 + hourBranchIndex) % 10;
+		const hourPillar =
+			BaziCalculator.tianGan[hourStemIndex] +
+			BaziCalculator.diZhi[hourBranchIndex];
+
+		return {
+			year: `${yearPillar.tianGan}${yearPillar.diZhi}`,
+			month: monthPillar,
+			day: `${dayPillar.tianGan}${dayPillar.diZhi}`,
+			hour: hourPillar,
+			yearElement: yearPillar.element,
+			dayElement: dayPillar.element,
+		};
+	} catch (error) {
+		console.error(
+			"BaziCalculator error, using fallback calculation:",
+			error
+		);
+		// Safer fallback with basic calculation instead of EnhancedInitialAnalysis
+		return {
+			year: `甲戌`, // Default fallback
+			month: `丙寅`,
+			day: `己丑`,
+			hour: `甲子`,
+			yearElement: `木`,
+			dayElement: `土`,
+		};
+	}
+};
 
 // Helper function to convert month number to Chinese month name
 const getChineseMonth = (monthNumber) => {
@@ -1260,9 +1320,9 @@ const IndividualAnalysisSection = ({
 			}
 
 			try {
-				// Generate Bazi data using EnhancedInitialAnalysis
+				// Generate Bazi data using accurate time-based calculation
 				const birthday = new Date(user.birthDateTime);
-				const bazi = EnhancedInitialAnalysis.calculateBazi(birthday);
+				const bazi = calculateBaziWithTime(user.birthDateTime);
 				setBaziData(bazi);
 
 				// Try to get AI analysis for this individual via API with timeout

@@ -117,15 +117,17 @@ export default function DemoSection() {
 
 	// Combined mouse move handler for both desktop and mobile
 	const handleContainerMouseMove = (e) => {
-		if (isMobile) {
-			handleMouseMoveOnMobile(e);
-		} else {
+		if (isDragging) {
+			// If dragging, handle drag movement for both desktop and mobile
+			handleMouseMoveOnDesktopAndMobile(e);
+		} else if (!isMobile) {
+			// If not dragging and on desktop, handle auto-scroll
 			handleMouseMove(e);
 		}
 	};
 
 	const handleMouseMove = (e) => {
-		if (!scrollContainerRef.current || isMobile) return; // Skip auto-scroll on mobile
+		if (!scrollContainerRef.current || isMobile || isDragging) return; // Skip auto-scroll when dragging
 
 		const container = scrollContainerRef.current;
 		const rect = container.getBoundingClientRect();
@@ -150,8 +152,8 @@ export default function DemoSection() {
 	};
 
 	const handleImageClick = (e, tagId) => {
-		// Prevent navigation only if user actually dragged on mobile
-		if (isMobile && hasDragged) {
+		// Prevent navigation if user actually dragged (both desktop and mobile)
+		if (hasDragged) {
 			e.preventDefault();
 			return;
 		}
@@ -160,9 +162,12 @@ export default function DemoSection() {
 		window.location.href = `/demo?category=${tagId}`;
 	};
 
-	// Mobile drag handlers
+	// Universal drag handlers for both desktop and mobile
 	const handleMouseDown = (e) => {
-		if (!isMobile || !scrollContainerRef.current) return;
+		if (!scrollContainerRef.current) return;
+
+		// Stop any auto-scrolling when starting to drag
+		stopAutoScroll();
 
 		setIsDragging(true);
 		setHasDragged(false); // Reset drag state
@@ -172,8 +177,8 @@ export default function DemoSection() {
 		});
 	};
 
-	const handleMouseMoveOnMobile = (e) => {
-		if (!isMobile || !isDragging || !scrollContainerRef.current) return;
+	const handleMouseMoveOnDesktopAndMobile = (e) => {
+		if (!isDragging || !scrollContainerRef.current) return;
 
 		e.preventDefault();
 		const x = e.pageX - scrollContainerRef.current.offsetLeft;
@@ -188,8 +193,6 @@ export default function DemoSection() {
 	};
 
 	const handleMouseUp = () => {
-		if (!isMobile) return;
-
 		setIsDragging(false);
 		// Reset drag state after a short delay to allow click events
 		setTimeout(() => setHasDragged(false), 100);
@@ -254,20 +257,20 @@ export default function DemoSection() {
 						style={{
 							scrollbarWidth: "none",
 							msOverflowStyle: "none",
-							cursor: isMobile
-								? isDragging
-									? "grabbing"
-									: "grab"
-								: "default",
+							cursor: isDragging ? "grabbing" : "grab",
 						}}
 						// Combined mouse move handler
 						onMouseMove={handleContainerMouseMove}
-						onMouseLeave={
-							!isMobile ? stopAutoScroll : handleMouseUp
-						}
-						// Mobile-specific drag events
-						onMouseDown={isMobile ? handleMouseDown : undefined}
-						onMouseUp={isMobile ? handleMouseUp : undefined}
+						onMouseLeave={() => {
+							if (!isMobile && !isDragging) {
+								stopAutoScroll();
+							} else if (isDragging) {
+								handleMouseUp();
+							}
+						}}
+						// Universal drag events for both desktop and mobile
+						onMouseDown={handleMouseDown}
+						onMouseUp={handleMouseUp}
 						// Touch events for mobile
 						onTouchStart={isMobile ? handleTouchStart : undefined}
 						onTouchMove={isMobile ? handleTouchMove : undefined}

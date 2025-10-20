@@ -874,28 +874,72 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			setIsLoading(true);
 			try {
 				// Check if data already exists in component data store (for historical reports)
+				// BUT validate that it matches current user's birth parameters
 				if (
 					typeof window !== "undefined" &&
 					window.componentDataStore?.ganZhiAnalysis
 				) {
-					console.log(
-						"📖 Using existing GanZhi data from component store"
-					);
-					setAnalysisData(window.componentDataStore.ganZhiAnalysis);
-					setActiveSection("tianGan");
-					setIsLoading(false);
-					return;
+					const cachedData = window.componentDataStore.ganZhiAnalysis;
+
+					// Validate that cached data matches current user parameters
+					const cachedBirthDateTime = cachedData?.userBirthDateTime;
+					const cachedGender = cachedData?.userGender;
+					const cachedConcern = cachedData?.userConcern;
+
+					const currentBirthDateTime = userInfo?.birthDateTime;
+					const currentGender = userInfo?.gender;
+					const currentConcern = userInfo?.concern;
+
+					const cacheMatches =
+						cachedBirthDateTime === currentBirthDateTime &&
+						cachedGender === currentGender &&
+						cachedConcern === currentConcern;
+
+					console.log("🔍 GanZhi cache validation:", {
+						cachedBirthDateTime,
+						currentBirthDateTime,
+						cachedGender,
+						currentGender,
+						cachedConcern,
+						currentConcern,
+						cacheMatches,
+					});
+
+					if (cacheMatches) {
+						console.log(
+							"📖 Using existing GanZhi data from component store (validated)"
+						);
+						setAnalysisData(cachedData);
+						setActiveSection("tianGan");
+						setIsLoading(false);
+						return;
+					} else {
+						console.log(
+							"🔄 Cache exists but doesn't match current user, generating fresh data"
+						);
+						// Clear invalid cache
+						delete window.componentDataStore.ganZhiAnalysis;
+					}
 				}
 
 				console.log("� GanZhi generating fresh AI analysis");
 
 				const aiData = await generateAIAnalysis(userInfo, currentYear);
+
+				// Add user parameters to the data for cache validation
+				aiData.userBirthDateTime = userInfo?.birthDateTime;
+				aiData.userGender = userInfo?.gender;
+				aiData.userConcern = userInfo?.concern;
+
 				setAnalysisData(aiData);
 				// Store data globally for database saving
 				if (typeof window !== "undefined") {
 					window.componentDataStore = window.componentDataStore || {};
 					window.componentDataStore.ganZhiAnalysis = aiData;
-					console.log("📊 Stored GanZhi data:", "SUCCESS");
+					console.log(
+						"📊 Stored GanZhi data with user params:",
+						"SUCCESS"
+					);
 				}
 				// Set the active section to the first toggle option
 				setActiveSection("tianGan");
@@ -983,7 +1027,25 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 						branch: currentYear === 2025 ? "巳" : "午",
 					},
 				};
+
+				// Add user parameters to the fallback data for cache validation
+				structuredMockData.userBirthDateTime = userInfo?.birthDateTime;
+				structuredMockData.userGender = userInfo?.gender;
+				structuredMockData.userConcern = userInfo?.concern;
+
 				setAnalysisData(structuredMockData);
+
+				// Store fallback data globally for database saving
+				if (typeof window !== "undefined") {
+					window.componentDataStore = window.componentDataStore || {};
+					window.componentDataStore.ganZhiAnalysis =
+						structuredMockData;
+					console.log(
+						"📊 Stored GanZhi fallback data with user params:",
+						"SUCCESS"
+					);
+				}
+
 				setActiveSection("tianGan");
 			} finally {
 				setIsLoading(false);
@@ -1083,6 +1145,9 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 					>
 						流年干支作用
 					</h2>
+					<p className="mb-4 text-lg">
+						流年干支的變化對個人運勢有著深遠的影響，以該年屬性為主軸解析
+					</p>
 
 					{/* Description */}
 					<p
