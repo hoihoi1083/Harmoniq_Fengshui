@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { getConcernColor } from "../utils/colorTheme";
 import { storeComponentData } from "../utils/componentDataStore";
 import getWuxingData from "@/lib/nayin.js";
@@ -154,12 +155,34 @@ export default function QuestionFocus({ userInfo }) {
 	if (loading) {
 		return (
 			<section className="w-full sm:w-[95%] lg:w-[95%] mx-auto mb-6 sm:mb-10 space-y-6 flex flex-col items-center">
-				<div className="bg-white rounded-[25px] w-[90%] p-6 sm:p-8 lg:p-10 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)] border-2 border-gray-200">
-					<div className="flex items-center justify-center py-8">
-						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B4513]"></div>
-						<span className="ml-3 text-gray-600">
-							正在分析中...
-						</span>
+				<div className="w-full max-w-full sm:w-[97%] mx-auto bg-white rounded-[20px] sm:rounded-[36px] lg:rounded-[48px] shadow-[0_4px_4px_rgba(0,0,0,0.18)] p-4 sm:p-8 lg:p-12">
+					<div className="flex flex-col items-center justify-center py-12 space-y-4">
+						{/* Loading spinner */}
+						<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
+
+						{/* 風水妹 loading image */}
+						<div className="flex items-center justify-center">
+							<Image
+								src="/images/風水妹/風水妹-loading.png"
+								alt="風水妹運算中"
+								width={120}
+								height={120}
+								className="object-contain"
+							/>
+						</div>
+
+						{/* Loading text */}
+						<div className="space-y-2 text-center">
+							<div
+								className="text-gray-700"
+								style={{
+									fontFamily: "Noto Sans HK, sans-serif",
+									fontSize: "clamp(14px, 3.5vw, 16px)",
+								}}
+							>
+								風水妹已經在分析您的疑問重點，請稍候
+							</div>
+						</div>
 					</div>
 				</div>
 			</section>

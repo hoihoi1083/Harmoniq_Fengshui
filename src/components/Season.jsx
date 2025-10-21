@@ -760,7 +760,7 @@ export default function Season({ userInfo, currentYear = 2025 }) {
 											.replace(/^：\s*/gm, "")
 											.replace(/\n--\s*$/gm, "")
 											.replace(/--$/gm, "")
-											.replace(/###.*$/gms, "")
+											.replace(/^###\s*/gm, "") // Remove ### markdown headers but keep the content
 											.replace(/^\s*###\s*$/gm, "")
 											.trim();
 

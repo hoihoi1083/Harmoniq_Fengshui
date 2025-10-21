@@ -299,27 +299,27 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 			const patterns = [
 				// Pattern 1: 【春季（寅卯辰月，木旺）】：
 				new RegExp(
-					`【${originalSeasonName}[^】]*】[：:]?\\s*([\\s\\S]*?)(?=【|####|$)`,
+					`【${originalSeasonName}[^】]*】[：:]?\\s*([\\s\\S]*?)(?=【(?:春季|夏季|秋季|冬季)|####(?:(?:春季|夏季|秋季|冬季))|$)`,
 					"g"
 				),
 				// Pattern 2: **春季（寅卯辰月，木旺）**：
 				new RegExp(
-					`\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=\\*\\*|####|$)`,
+					`\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=\\*\\*(?:春季|夏季|秋季|冬季)|####\\s*\\*\\*(?:春季|夏季|秋季|冬季)|$)`,
 					"g"
 				),
 				// Pattern 3: #### **春季（寅卯辰月，木旺）**：
 				new RegExp(
-					`####\\s*\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=####|$)`,
+					`####\\s*\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=####\\s*\\*\\*(?:春季|夏季|秋季|冬季)|$)`,
 					"g"
 				),
 				// Pattern 4: 春季（寅卯辰月，木旺）：
 				new RegExp(
-					`${originalSeasonName}（[^）]*）[：:]?\\s*([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)（|####|$)`,
+					`${originalSeasonName}（[^）]*）[：:]?\\s*([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)（|####\\s*(?:春季|夏季|秋季|冬季)|$)`,
 					"g"
 				),
-				// Pattern 5: More flexible - season name followed by content
+				// Pattern 5: More flexible - season name followed by content (allow ### subsections)
 				new RegExp(
-					`${originalSeasonName}[^\\n]*[：:]([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)|###|$)`,
+					`${originalSeasonName}[^\\n]*[：:]([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)【|(?:春季|夏季|秋季|冬季)（|####\\s*(?:春季|夏季|秋季|冬季)|$)`,
 					"g"
 				),
 			];
@@ -376,10 +376,11 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 					.replace(/^[。．]\s*/, "") // Remove leading period
 					.replace(/【[^】]*】/g, "") // Remove bracketed headers
 					.replace(/\*\*/g, "") // Remove bold markers
-					.replace(/####/g, "") // Remove markdown headers
+					.replace(/^####\s*/gm, "") // Remove markdown header markers but keep content
+					.replace(/^###\s*/gm, "") // Remove markdown header markers but keep content
 					.replace(/^\s*[-•]\s*/gm, "") // Remove bullet points at line start
 					.replace(/\s*。\s*(?=。)/g, "") // Remove duplicate periods
-					.replace(/\n\s*\n/g, "\n") // Collapse multiple newlines
+					.replace(/\n\s*\n\s*\n/g, "\n\n") // Collapse triple+ newlines to double
 					.trim();
 
 				// Keep detailed AI-generated content for comprehensive analysis
