@@ -18,12 +18,25 @@ import {
 import { Badge } from "@/components/ui/badge";
 import BirthdayModal from "@/components/BirthdayModal";
 import Navbar from "@/components/Navbar";
+import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
 
 export default function Home() {
 	const { data: session } = useSession();
 	const router = useRouter();
 	const pathname = usePathname();
 	const currentLocale = pathname?.split("/")[1] || "zh-TW"; // Extract locale from URL
+	const { region } = useRegionDetection();
+
+	// Helper function to get region-specific chatbox image
+	const getChatboxImage = (imageName: string) => {
+		if (region === "china") {
+			// For china region, add -china suffix before file extension
+			const nameWithoutExtension = imageName.replace(".png", "");
+			return `url(/images/chatbox/${nameWithoutExtension}-china.png)`;
+		}
+		return `url(/images/chatbox/${imageName})`;
+	};
+
 	// 定義消息類型
 	interface Message {
 		role: string;
@@ -1385,7 +1398,7 @@ export default function Home() {
 								className="bg-[#768976] rounded-lg py-7 mb-3 cursor-pointer hover:bg-[#6b7d6b] transition-colors relative overflow-hidden"
 								style={{
 									backgroundImage:
-										"url(/images/chatbox/life.png)",
+										getChatboxImage("life.png"),
 									backgroundSize: "cover",
 									backgroundPosition: "center",
 									backgroundRepeat: "no-repeat",
@@ -1399,7 +1412,7 @@ export default function Home() {
 								className="bg-[#768976] rounded-lg py-7 mb-3 cursor-pointer hover:bg-[#6b7d6b] transition-colors relative overflow-hidden"
 								style={{
 									backgroundImage:
-										"url(/images/chatbox/house.png)",
+										getChatboxImage("house.png"),
 									backgroundSize: "cover",
 									backgroundPosition: "center",
 									backgroundRepeat: "no-repeat",
@@ -1422,7 +1435,7 @@ export default function Home() {
 								className="bg-[#768976] rounded-lg py-7 mb-3 cursor-pointer hover:bg-[#6b7d6b] transition-colors relative overflow-hidden"
 								style={{
 									backgroundImage:
-										"url(/images/chatbox/relationship.png)",
+										getChatboxImage("relationship.png"),
 									backgroundSize: "cover",
 									backgroundPosition: "center",
 									backgroundRepeat: "no-repeat",
@@ -1436,7 +1449,7 @@ export default function Home() {
 								className="bg-[#768976] rounded-lg py-7 mb-3 cursor-pointer hover:bg-[#6b7d6b] transition-colors relative overflow-hidden"
 								style={{
 									backgroundImage:
-										"url(/images/chatbox/career.png)",
+										getChatboxImage("career.png"),
 									backgroundSize: "cover",
 									backgroundPosition: "center",
 									backgroundRepeat: "no-repeat",
@@ -1450,7 +1463,7 @@ export default function Home() {
 								className="bg-[#768976] rounded-lg py-7 mb-3 cursor-pointer hover:bg-[#6b7d6b] transition-colors relative overflow-hidden"
 								style={{
 									backgroundImage:
-										"url(/images/chatbox/wealth.png)",
+										getChatboxImage("wealth.png"),
 									backgroundSize: "cover",
 									backgroundPosition: "center",
 									backgroundRepeat: "no-repeat",
@@ -1464,7 +1477,7 @@ export default function Home() {
 								className="bg-[#768976] rounded-lg py-7 mb-3 cursor-pointer hover:bg-[#6b7d6b] transition-colors relative overflow-hidden"
 								style={{
 									backgroundImage:
-										"url(/images/chatbox/health.png)",
+										getChatboxImage("health.png"),
 									backgroundSize: "cover",
 									backgroundPosition: "center",
 									backgroundRepeat: "no-repeat",

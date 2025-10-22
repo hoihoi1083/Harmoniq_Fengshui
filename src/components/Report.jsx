@@ -1698,6 +1698,18 @@ export default function ReportPage({
 						}
 
 						if (fortuneData) {
+							console.log(
+								"📜 Setting fourFortuneData with:",
+								fortuneData
+							);
+							console.log(
+								"📜 fortuneData keys:",
+								Object.keys(fortuneData)
+							);
+							console.log(
+								"📜 fortuneData.healthFortuneData exists:",
+								!!fortuneData.healthFortuneData
+							);
 							setFourFortuneData(fortuneData);
 						}
 

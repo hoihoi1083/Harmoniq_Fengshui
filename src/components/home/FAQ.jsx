@@ -17,7 +17,7 @@ export default function FAQ() {
 		<section className="relative py-8 md:py-20 -mt-10 md:-mt-20 -mb-10 md:-mb-20 bg-[#EFEFEF] rounded-2xl md:rounded-[60px] z-50 w-screen md:max-full mx-auto">
 			<div className="container px-4 mx-auto">
 				<h3 className="mb-6 md:mb-9 font-extrabold text-center text-[32px] md:text-[56px] text-[#073E31] font-serif">
-					常見問題
+					{t("title")}
 				</h3>
 				<div className="flex flex-col items-center max-w-full mx-auto md:max-w-6xl">
 					<Accordion

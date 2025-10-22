@@ -1443,7 +1443,11 @@ export default function YourPage() {
 
 									<div className="relative max-w-[600px] w-full">
 										<img
-											src="/images/hero/button-5.png"
+											src={
+												region === "china"
+													? "/images/hero/button-5-china.png"
+													: "/images/hero/button-5.png"
+											}
 											alt={t("destinyCalculation")}
 											className="object-contain w-full h-auto rounded-lg"
 										/>

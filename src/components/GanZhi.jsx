@@ -874,14 +874,29 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			setIsLoading(true);
 			try {
 				// Check if data already exists in component data store (for historical reports)
-				// BUT validate that it matches current user's birth parameters
 				if (
 					typeof window !== "undefined" &&
 					window.componentDataStore?.ganZhiAnalysis
 				) {
 					const cachedData = window.componentDataStore.ganZhiAnalysis;
 
-					// Validate that cached data matches current user parameters
+					// For historical reports, always use cached data if it exists
+					// Historical reports are flagged when displaySavedReport populates the store
+					const isHistoricalReport =
+						window.componentDataStore?._isHistoricalReport ||
+						(cachedData && !cachedData.userBirthDateTime);
+
+					if (isHistoricalReport) {
+						console.log(
+							"📖 Using existing GanZhi data from component store (historical report)"
+						);
+						setAnalysisData(cachedData);
+						setActiveSection("tianGan");
+						setIsLoading(false);
+						return;
+					}
+
+					// For fresh reports, validate that cached data matches current user parameters
 					const cachedBirthDateTime = cachedData?.userBirthDateTime;
 					const cachedGender = cachedData?.userGender;
 					const cachedConcern = cachedData?.userConcern;

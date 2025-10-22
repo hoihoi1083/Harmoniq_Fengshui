@@ -376,6 +376,12 @@ export default function FengShuiReportPage() {
 			// Clear any existing data
 			clearComponentData();
 
+			// Set flag to indicate this is a historical report (so components won't generate fresh data)
+			if (typeof window !== "undefined") {
+				window.componentDataStore = window.componentDataStore || {};
+				window.componentDataStore._isHistoricalReport = true;
+			}
+
 			// Pre-populate component data store with saved content
 			console.log(
 				"📥 Pre-populating component data store with saved content..."
@@ -498,6 +504,11 @@ export default function FengShuiReportPage() {
 
 	const generateNewReport = async (sessionId, userInputs) => {
 		try {
+			// Clear historical report flag for fresh generation
+			if (typeof window !== "undefined" && window.componentDataStore) {
+				window.componentDataStore._isHistoricalReport = false;
+			}
+
 			// Get parameters from URL or use stored user inputs
 			const birthday =
 				searchParams.get("birthday") || userInputs.birthday;
@@ -927,7 +938,7 @@ export default function FengShuiReportPage() {
 								<strong>注意：</strong>
 								您正在查看已保存的歷史報告內容。
 								<a
-									href={`${window.location.pathname}${window.location.search.replace("showHistorical=true", "").replace("&showHistorical=true", "").replace("?showHistorical=true&", "?")}`}
+									href="/price"
 									className="ml-2 text-blue-600 underline hover:text-blue-800"
 								>
 									點擊這裡生成新的報告

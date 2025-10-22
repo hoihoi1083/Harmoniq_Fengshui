@@ -92,10 +92,31 @@ export default function FourFortuneAnalysis({
 			!loadedHistoricalRef.current
 		) {
 			console.log("🎯 FourFortuneAnalysis - Loading historical data");
-			console.log("🎯 propFortuneDataState:", propFortuneDataState);
 			console.log(
-				"🎯 propFortuneDataState keys:",
-				Object.keys(propFortuneDataState)
+				"🎯 DEBUG - Full propFortuneDataState object:",
+				propFortuneDataState
+			);
+			console.log(
+				"🎯 DEBUG - propFortuneDataState keys:",
+				Object.keys(propFortuneDataState || {})
+			);
+
+			// ✅ Check if any of the fortune data exists before loading
+			const hasAnyData =
+				propFortuneDataState.healthFortuneData ||
+				propFortuneDataState.careerFortuneData ||
+				propFortuneDataState.wealthFortuneData ||
+				propFortuneDataState.relationshipFortuneData;
+
+			if (!hasAnyData) {
+				console.log(
+					"⏳ No fortune data available yet, waiting for parent state update..."
+				);
+				return;
+			}
+
+			console.log(
+				"✅ Fortune data available, loading historical data..."
 			);
 
 			const newState = {
@@ -106,16 +127,12 @@ export default function FourFortuneAnalysis({
 					propFortuneDataState.relationshipFortuneData || null,
 			};
 
-			console.log("🎯 newState:", newState);
-			console.log("🎯 newState.health:", newState.health);
-			console.log(
-				"🎯 DEBUG - propFortuneDataState.healthFortuneData:",
-				propFortuneDataState.healthFortuneData
-			);
-			console.log(
-				"🎯 DEBUG - propFortuneDataState structure:",
-				Object.keys(propFortuneDataState)
-			);
+			console.log("🎯 newState:", {
+				health: !!newState.health,
+				career: !!newState.career,
+				wealth: !!newState.wealth,
+				relationship: !!newState.relationship,
+			});
 
 			setFortuneDataState(newState);
 			loadedHistoricalRef.current = true;

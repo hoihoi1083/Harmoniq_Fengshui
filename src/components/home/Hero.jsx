@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useResponsiveScale } from "../../hooks/useResponsiveScale";
+import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
 
 export default function Hero() {
 	const t = useTranslations("home.hero");
 	const isMobile = useMobile();
 	const { scaleRatio, isMobileLayout } = useResponsiveScale();
+	const { region } = useRegionDetection();
 	const [isClient, setIsClient] = useState(false);
 
 	const [timeLeft, setTimeLeft] = useState({
@@ -380,7 +382,11 @@ export default function Hero() {
 					style={{ width: `${100 / scaleRatio}%` }}
 				>
 					<Image
-						src="/images/hero/hero-bg.png"
+						src={
+							region === "china"
+								? "/images/hero/hero-bg-china.png"
+								: "/images/hero/hero-bg.png"
+						}
 						alt="Hero background"
 						fill
 						className="object-cover  scale-110 sm:object-left-top md:object-[left_top] lg:object-[left_top]"

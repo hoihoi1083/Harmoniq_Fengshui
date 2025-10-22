@@ -383,7 +383,7 @@ const ReportHistoryPage = () => {
 										尚無合盤報告記錄
 									</p>
 									<p className="mt-2 text-sm text-gray-400">
-										完成合盤分析後，報告將顯示在這裡
+										完成合盤測算後，報告將顯示在這裡
 									</p>
 								</div>
 							</div>
@@ -402,57 +402,58 @@ const ReportHistoryPage = () => {
 													alt="合盤分析"
 													className="object-cover object-top w-full h-full"
 												/>
-												<div className="absolute bottom-4 left-4">
-													<p className="text-lg font-bold text-white drop-shadow-lg">
-														合盤分析
-													</p>
-												</div>
 											</div>
 
 											{/* Report Info */}
 											<div className="p-4">
 												<div className="space-y-3">
+													{/* Title */}
+													<div className="text-center">
+														<h3 className="mb-1 text-lg font-bold text-gray-900">
+															合盤分析報告
+														</h3>
+													</div>
+
 													{/* Two People Info */}
 													<div className="text-center">
-														<h4 className="mb-2 text-sm font-semibold text-gray-900">
-															命主資訊：
+														<h4 className="mb-1 text-lg font-semibold text-gray-900">
+															對象一(
+															{getGenderLabel(
+																report
+																	.userInputs
+																	?.gender
+															)}
+															)：
 														</h4>
-														<div className="space-y-1">
-															<p className="font-medium text-gray-700">
-																對象一(
-																{getGenderLabel(
-																	report
-																		.userInputs
-																		?.gender
-																)}
-																):{" "}
-																{formatBirthday(
-																	report
-																		.userInputs
-																		?.birthday
-																)}
-															</p>
-															<p className="font-medium text-gray-700">
-																對象二(
-																{getGenderLabel(
-																	report
-																		.userInputs
-																		?.gender2
-																)}
-																):{" "}
-																{formatBirthday(
-																	report
-																		.userInputs
-																		?.birthday2
-																)}
-															</p>
-														</div>
+														<p className="font-medium text-gray-700">
+															{formatBirthday(
+																report
+																	.userInputs
+																	?.birthday
+															)}
+														</p>
+														<h4 className="mt-2 mb-1 text-lg font-semibold text-gray-900">
+															對象二(
+															{getGenderLabel(
+																report
+																	.userInputs
+																	?.gender2
+															)}
+															)：
+														</h4>
+														<p className="font-medium text-gray-700">
+															{formatBirthday(
+																report
+																	.userInputs
+																	?.birthday2
+															)}
+														</p>
 													</div>
 
 													{/* Generation Date */}
 													<div className="pt-2 text-center border-t border-gray-100">
 														<p className="text-sm font-medium text-gray-700">
-															生成日期:{" "}
+															測算日期:{" "}
 															{formatDate(
 																report.reportGeneratedAt ||
 																	report.createdAt
@@ -471,7 +472,7 @@ const ReportHistoryPage = () => {
 														>
 															{report.reportGenerated
 																? "✓ 已完成"
-																: "⏳ 生成中"}
+																: "⏳ 測算中"}
 														</span>
 													</div>
 												</div>
@@ -564,7 +565,7 @@ const ReportHistoryPage = () => {
 										尚無人生報告記錄
 									</p>
 									<p className="mt-2 text-sm text-gray-400">
-										完成人生分析後，報告將顯示在這裡
+										完成人生測算後，報告將顯示在這裡
 									</p>
 								</div>
 							</div>
@@ -583,11 +584,6 @@ const ReportHistoryPage = () => {
 													alt="人生分析"
 													className="object-cover object-top w-full h-full"
 												/>
-												<div className="absolute bottom-4 left-4">
-													<p className="text-lg font-bold text-white drop-shadow-lg">
-														人生分析
-													</p>
-												</div>
 											</div>
 
 											{/* Report Info */}
@@ -626,7 +622,7 @@ const ReportHistoryPage = () => {
 													{/* Generation Date */}
 													<div className="pt-2 text-center border-t border-gray-100">
 														<p className="text-sm font-medium text-gray-700">
-															生成日期:{" "}
+															測算日期:{" "}
 															{formatDate(
 																report.reportGeneratedAt ||
 																	report.updatedAt
@@ -645,7 +641,7 @@ const ReportHistoryPage = () => {
 														>
 															{report.reportGenerated
 																? "✓ 已完成"
-																: "⏳ 生成中"}
+																: "⏳ 測算中"}
 														</span>
 													</div>
 												</div>
@@ -767,7 +763,7 @@ const ReportHistoryPage = () => {
 								暫無報告記錄
 							</h3>
 							<p className="mb-4 text-gray-500">
-								您還沒有生成任何命理報告
+								您還沒有測算任何命理報告
 							</p>
 							<Link
 								href="/zh-TW/fortune-entry"
@@ -793,28 +789,30 @@ const ReportHistoryPage = () => {
 												alt={`${getConcernLabel(report.userInputs?.concern)}分析`}
 												className="object-cover object-top w-full h-full"
 											/>
-											<div className="absolute bottom-4 left-4">
-												<h3 className="text-lg font-bold text-white drop-shadow-lg">
-													{getReportTypeLabel(
-														report.reportType
-													)}
-												</h3>
-												<p className="text-sm font-medium text-white drop-shadow-lg opacity-90">
-													{getConcernLabel(
-														report.userInputs
-															?.concern
-													)}
-													分析
-												</p>
-											</div>
 										</div>{" "}
 										{/* Report Info */}
 										<div className="p-4">
 											<div className="space-y-3">
+												{/* Title */}
+												<div className="text-center">
+													<h3 className="mb-1 text-lg font-bold text-gray-900">
+														{getConcernLabel(
+															report.userInputs
+																?.concern
+														)}
+														分析報告
+													</h3>
+												</div>
+
 												{/* Birthday and Gender */}
 												<div className="text-center">
 													<h4 className="mb-1 text-lg font-semibold text-gray-900">
-														命主：
+														命主(
+														{getGenderLabel(
+															report.userInputs
+																?.gender
+														)}
+														)：
 													</h4>
 													<p className="font-medium text-gray-700">
 														{formatBirthday(
@@ -822,20 +820,12 @@ const ReportHistoryPage = () => {
 																?.birthday
 														)}
 													</p>
-													<p className="text-sm text-gray-600">
-														{getGenderLabel(
-															report.userInputs
-																?.gender
-														)}
-													</p>
 												</div>
 
 												{/* Generation Date */}
 												<div className="pt-2 text-center border-t border-gray-100">
-													<p className="mb-1 text-xs text-gray-500">
-														生成日期
-													</p>
 													<p className="text-sm font-medium text-gray-700">
+														測算日期:{" "}
 														{formatDate(
 															report.reportGeneratedAt ||
 																report.createdAt
@@ -854,7 +844,7 @@ const ReportHistoryPage = () => {
 													>
 														{report.reportGenerated
 															? "✓ 已完成"
-															: "⏳ 生成中"}
+															: "⏳ 測算中"}
 													</span>
 												</div>
 											</div>

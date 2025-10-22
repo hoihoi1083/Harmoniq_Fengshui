@@ -710,7 +710,7 @@ export default function CoupleReportPage() {
 							<p className="text-yellow-800">
 								<strong>注意：</strong>
 								您正在查看已保存的夫妻合婚歷史報告內容
-								(生成時間:{" "}
+								(測算時間:{" "}
 								{reportData.reportGeneratedAt
 									? new Date(
 											reportData.reportGeneratedAt
@@ -718,7 +718,7 @@ export default function CoupleReportPage() {
 									: "N/A"}
 								)。
 								<a
-									href="/zh-TW/couple-report"
+									href="/price"
 									className="ml-2 text-blue-600 underline hover:text-blue-800"
 								>
 									點擊生成新報告

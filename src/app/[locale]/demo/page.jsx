@@ -45,6 +45,16 @@ export default function DemoPage() {
 	}, [existingReport, activeTag]);
 	const scrollContainerRef = useRef(null);
 
+	// Helper function to get region-specific demo image
+	const getDemoImagePath = (baseName) => {
+		if (currentRegion === "china") {
+			// For china region, add -china suffix before file extension
+			const nameWithoutExtension = baseName.replace("-demo.png", "");
+			return `/images/demo/${nameWithoutExtension}-demo-china.png`;
+		}
+		return `/images/demo/${baseName}`;
+	};
+
 	// 🌍 Detect region changes for dynamic pricing
 	useEffect(() => {
 		const updateRegion = () => {
@@ -136,43 +146,43 @@ export default function DemoPage() {
 		{
 			id: "fengshui",
 			name: t("tags.fengshui.name"),
-			image: "/images/demo/fengshui-demo.png",
+			image: getDemoImagePath("fengshui-demo.png"),
 			description: t("tags.fengshui.description"),
 		},
 		{
 			id: "life",
 			name: t("tags.life.name"),
-			image: "/images/demo/life-demo.png",
+			image: getDemoImagePath("life-demo.png"),
 			description: t("tags.life.description"),
 		},
 		{
 			id: "wealth",
 			name: t("tags.wealth.name"),
-			image: "/images/demo/wealth-demo.png",
+			image: getDemoImagePath("wealth-demo.png"),
 			description: t("tags.wealth.description"),
 		},
 		{
 			id: "relationship",
 			name: t("tags.relationship.name"),
-			image: "/images/demo/relationship-demo.png",
+			image: getDemoImagePath("relationship-demo.png"),
 			description: t("tags.relationship.description"),
 		},
 		{
 			id: "couple",
 			name: t("tags.couple.name"),
-			image: "/images/demo/couple-demo.png",
+			image: getDemoImagePath("couple-demo.png"),
 			description: t("tags.couple.description"),
 		},
 		{
 			id: "health",
 			name: t("tags.health.name"),
-			image: "/images/demo/health-demo.png",
+			image: getDemoImagePath("health-demo.png"),
 			description: t("tags.health.description"),
 		},
 		{
 			id: "career",
 			name: t("tags.career.name"),
-			image: "/images/demo/career-demo.png",
+			image: getDemoImagePath("career-demo.png"),
 			description: t("tags.career.description"),
 		},
 	];

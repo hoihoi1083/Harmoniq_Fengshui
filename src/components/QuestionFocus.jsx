@@ -23,6 +23,31 @@ export default function QuestionFocus({ userInfo }) {
 				setLoading(true);
 				setError(null);
 
+				// Check if data already exists in component data store (for historical reports)
+				if (
+					typeof window !== "undefined" &&
+					window.componentDataStore?.questionFocusAnalysis
+				) {
+					const cachedData =
+						window.componentDataStore.questionFocusAnalysis;
+
+					// For historical reports, always use cached data
+					const isHistoricalReport =
+						window.componentDataStore?._isHistoricalReport ||
+						(cachedData &&
+							typeof cachedData === "object" &&
+							cachedData.title);
+
+					if (isHistoricalReport) {
+						console.log(
+							"📖 Using existing QuestionFocus data from component store (historical report)"
+						);
+						setSolution(cachedData);
+						setLoading(false);
+						return;
+					}
+				}
+
 				// Calculate correct Ba Zi with error handling
 				let baziData = null;
 				try {

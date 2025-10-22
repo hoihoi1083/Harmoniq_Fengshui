@@ -4,11 +4,13 @@ import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useMobile } from "../../hooks/useMobile";
+import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
 
 export default function DemoSection() {
 	const t = useTranslations("home.demo");
 	const scrollContainerRef = useRef(null);
 	const isMobile = useMobile();
+	const { region } = useRegionDetection();
 	const [isClient, setIsClient] = useState(false);
 	const [isAutoScrolling, setIsAutoScrolling] = useState(false);
 	const autoScrollRef = useRef(null);
@@ -31,47 +33,57 @@ export default function DemoSection() {
 		setIsClient(true);
 	}, []);
 
+	// Helper function to get region-specific image
+	const getImagePath = (baseName) => {
+		if (region === "china") {
+			// For china region, use -china suffix
+			const nameWithoutExtension = baseName.replace(".png", "");
+			return `/images/demo/${nameWithoutExtension}-china.png`;
+		}
+		return `/images/demo/${baseName}`;
+	};
+
 	const tags = [
 		{
 			id: "fengshui",
 			name: t("tags.fengshui.name"),
-			image: "/images/demo/fengshui.png",
+			image: getImagePath("fengshui.png"),
 			description: t("tags.fengshui.description"),
 		},
 		{
 			id: "life",
 			name: t("tags.life.name"),
-			image: "/images/demo/life.png",
+			image: getImagePath("life.png"),
 			description: t("tags.life.description"),
 		},
 		{
 			id: "relationship",
 			name: t("tags.relationship.name"),
-			image: "/images/demo/couple.png",
+			image: getImagePath("couple.png"),
 			description: t("tags.relationship.description"),
 		},
 		{
 			id: "couple",
 			name: t("tags.couple.name"),
-			image: "/images/demo/couple2.png",
+			image: getImagePath("couple2.png"),
 			description: t("tags.couple.description"),
 		},
 		{
 			id: "career",
 			name: t("tags.career.name"),
-			image: "/images/demo/career.png",
+			image: getImagePath("career.png"),
 			description: t("tags.career.description"),
 		},
 		{
 			id: "health",
 			name: t("tags.health.name"),
-			image: "/images/demo/health.png",
+			image: getImagePath("health.png"),
 			description: t("tags.health.description"),
 		},
 		{
 			id: "wealth",
 			name: t("tags.wealth.name"),
-			image: "/images/demo/wealth.png",
+			image: getImagePath("wealth.png"),
 			description: t("tags.wealth.description"),
 		},
 	];
@@ -317,7 +329,7 @@ export default function DemoSection() {
 											lineHeight: "0.9",
 										}}
 									>
-										立即
+										{t("instantText")}
 									</span>
 									{/* 測算 - Larger text */}
 									<span
@@ -329,7 +341,7 @@ export default function DemoSection() {
 											lineHeight: "0.8",
 										}}
 									>
-										測算
+										{t("analyzeText")}
 									</span>
 								</h3>
 							</div>
