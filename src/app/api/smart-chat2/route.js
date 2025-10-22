@@ -136,7 +136,7 @@ async function detectTopicAndBirthday(message) {
 	// 🤖 使用AI分析主題 - 更準確的理解用戶意圖
 	try {
 		// 創建臨時的AI分析器實例
-		const tempClassifier = new AITopicClassifier();
+		const tempClassifier = new AITopicClassifier(locale);
 		const aiAnalysis = await tempClassifier.analyzeMessage(message);
 
 		// 如果AI檢測到有效主題且在服務範圍內
@@ -431,11 +431,12 @@ function formatCoupleAnalysisResponse(analysisResult) {
 
 // 🤖 AI 話題分類和問題檢測系統
 class AITopicClassifier {
-	constructor() {
+	constructor(locale = "zh-TW") {
 		// AI 話題分類初始化
 		this.DEEPSEEK_API_KEY =
 			process.env.DEEPSEEK_API_KEY || process.env.API_KEY;
 		this.DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
+		this.locale = locale; // 🌐 Store locale for AI response language
 
 		console.log("🔧 AITopicClassifier 初始化");
 		console.log(
@@ -443,6 +444,7 @@ class AITopicClassifier {
 			this.DEEPSEEK_API_KEY ? "已設置" : "未設置"
 		);
 		console.log("🌐 DEEPSEEK_API_URL:", this.DEEPSEEK_API_URL);
+		console.log("🌐 Locale:", this.locale);
 
 		// 🧠 MINIMAL ENHANCEMENT: Add conversation memory and emotional detection
 		this.conversationMemory = new Map();
@@ -879,6 +881,12 @@ class AITopicClassifier {
 			weekday: "long",
 		});
 
+		// 🌐 Determine language instruction based on locale
+		const languageInstruction =
+			this.locale === "zh-CN"
+				? "必須使用簡體中文回應，不可使用繁體中文"
+				: "必須使用繁體中文回應，不可使用簡體中文";
+
 		const baseServices = `現有服務範圍：
 - 感情運勢分析（桃花運、合婚配對）
 - 工作事業分析（職場運勢、事業發展）  
@@ -894,7 +902,7 @@ class AITopicClassifier {
 
 你是風鈴，用戶已經連續問了多個與風水命理無關的問題。需要友善但堅定地引導用戶使用你的專業服務。
 
-重要指示：必須使用繁體中文回應，不可使用簡體中文，不要包含字數統計標記。如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間。只在真正需要時間背景的情況下才提及日期。
+重要指示：${languageInstruction}，不要包含字數統計標記。如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間。只在真正需要時間背景的情況下才提及日期。
 
 回應風格：
 - 先簡短回答問題，然後自然地說明風水命理分析能解決更深層的問題
@@ -924,7 +932,7 @@ ${baseServices}
 
 你是風鈴，用戶問了一些與風水命理無關的問題。需要在回答的同時積極推薦你的專業服務。
 
-重要指示：必須使用繁體中文回應，不可使用簡體中文，不要包含字數統計標記。如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間。只在真正需要時間背景的情況下才提及日期。
+重要指示：${languageInstruction}，不要包含字數統計標記。如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間。只在真正需要時間背景的情況下才提及日期。
 
 回應風格：
 - 先給出實用答案，然後自然地連結問題與運勢命理的關係
@@ -954,7 +962,7 @@ ${baseServices}
 
 你是友善的風鈴，用戶問了一個與風水命理無關的問題。請給用戶實用回答，然後積極引導他們了解你的專業服務。
 
-重要指示：必須使用繁體中文回應，不可使用簡體中文，不要包含字數統計標記。如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間。只在真正需要時間背景的情況下才提及日期，不要強制在每個回應中都包含。
+重要指示：${languageInstruction}，不要包含字數統計標記。如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間。只在真正需要時間背景的情況下才提及日期，不要強制在每個回應中都包含。
 
 回應風格：
 - 先給出實用的答案或建議（要具體有用），然後巧妙連結問題與命理運勢的關係
@@ -1613,11 +1621,17 @@ ${baseServices}
 			weekday: "long",
 		});
 
+		// 🌐 Determine language instruction based on locale
+		const languageInstruction =
+			this.locale === "zh-CN"
+				? "必須使用簡體中文回應，不可使用繁體中文"
+				: "必須使用繁體中文回應，不可使用簡體中文";
+
 		return `你是專業的風水命理分析師，請分析用戶的問題並分類。
 
 當前日期：${currentDateStr}（僅作為內部參考，不需要在每個回應中都提及具體日期）
 
-重要指示：1. 必須使用繁體中文回應，不可使用簡體中文 2. 在回應中所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，不要使用農歷 3. 不要在回應中包含字數統計標記 4. 如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間 5. 只在真正需要時間背景的情況下才提及日期，不要強制在每個回應中都包含。
+重要指示：1. ${languageInstruction} 2. 在回應中所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，不要使用農歷 3. 不要在回應中包含字數統計標記 4. 如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間 5. 只在真正需要時間背景的情況下才提及日期，不要強制在每個回應中都包含。
 
 我們提供的服務領域：
 - 感情：戀愛、分手、復合、合婚、桃花運、婚姻
@@ -1659,11 +1673,17 @@ ${baseServices}
 			weekday: "long",
 		});
 
+		// 🌐 Determine language instruction based on locale
+		const languageInstruction =
+			this.locale === "zh-CN"
+				? "必須使用簡體中文回應，不可使用繁體中文"
+				: "必須使用繁體中文回應，不可使用簡體中文";
+
 		const basePrompt = `你是專業的風水命理分析師，請分析用戶的問題並分類。
 
 當前日期：${currentDateStr}（僅作為內部參考，不需要在每個回應中都提及具體日期）
 
-重要指示：1. 必須使用繁體中文回應，不可使用簡體中文 2. 在回應中所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，不要使用農歷 3. 不要在回應中包含字數統計標記 4. 如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間 5. 只在真正需要時間背景的情況下才提及日期，不要強制在每個回應中都包含。
+重要指示：1. ${languageInstruction} 2. 在回應中所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，不要使用農歷 3. 不要在回應中包含字數統計標記 4. 如果需要提及時間，請確保是當前的2025年，避免提及2024年或過去的時間 5. 只在真正需要時間背景的情況下才提及日期，不要強制在每個回應中都包含。
 
 我們提供的服務領域：
 - 感情：戀愛、分手、復合、合婚、桃花運、婚姻、感情問題、約會、結婚
@@ -1786,6 +1806,12 @@ ${baseServices}
 				weekday: "long",
 			});
 
+			// 🌐 Determine language instruction based on locale
+			const languageInstruction =
+				this.locale === "zh-CN"
+					? "必須使用簡體中文回應，不可使用繁體中文"
+					: "必須使用繁體中文回應，不可使用簡體中文";
+
 			const response = await this.callDeepSeekAPI(
 				[
 					{
@@ -1794,7 +1820,7 @@ ${baseServices}
 
 當前日期：${currentDateStr}（請在回應中使用這個準確的日期作為參考，不要提及過時的年份如2024年等）
 
-重要指示：1. 必須使用繁體中文回應，不可使用簡體中文 2. 所有日期和月份都必須使用新歷（西曆/公曆），不要使用農歷。例如：1月、2月、3月等，避免使用農曆1月、農曆8月等表達方式 3. 🚫 嚴格禁止任何農曆用詞：農曆九月、農曆十月、農曆初七、農曆十五等 4. ✅ 正確用法：9月出生、10月出生、每月7日、15日等 5. 不要在回應中包含字數統計如（72字）等標記 6. 保持風鈴親切可愛的語氣風格 7. 請確保所有時間相關的回應都基於當前日期${currentDateStr}，避免提及2024年或過去的時間。`,
+重要指示：1. ${languageInstruction} 2. 所有日期和月份都必須使用新歷（西曆/公曆），不要使用農歷。例如：1月、2月、3月等，避免使用農曆1月、農曆8月等表達方式 3. 🚫 嚴格禁止任何農曆用詞：農曆九月、農曆十月、農曆初七、農曆十五等 4. ✅ 正確用法：9月出生、10月出生、每月7日、15日等 5. 不要在回應中包含字數統計如（72字）等標記 6. 保持風鈴親切可愛的語氣風格 7. 請確保所有時間相關的回應都基於當前日期${currentDateStr}，避免提及2024年或過去的時間。`,
 					},
 					{
 						role: "user",
@@ -2112,7 +2138,13 @@ ${analysis.aiResponse}
 		originalMessage = "",
 		sessionId = null
 	) {
-		// 🎯 檢測是否為八字輸入
+		// � Determine language instruction based on locale
+		const languageInstruction =
+			this.locale === "zh-CN"
+				? "必須使用簡體中文回應，不可使用繁體中文"
+				: "必須使用繁體中文回應，不可使用簡體中文";
+
+		// �🎯 檢測是否為八字輸入
 		const isBaziInput = this.detectBaziInput(
 			originalMessage || analysis.specificProblem || ""
 		);
@@ -2143,7 +2175,7 @@ ${analysis.aiResponse}
 				{
 					role: "system",
 					content:
-						"你是親切可愛的風鈴，善於先回答用戶問題再自然地介紹自己的專業服務。你只提供風水命理相關服務，不要推薦不存在的服務。\n\n⚠️ 重要指示：\n1. 必須使用繁體中文回應，不可使用簡體中文\n2. 所有日期和月份都必須嚴格使用西曆（公曆），絕對不可使用農曆用詞\n3. 🚫 禁止用詞：「農曆十月」「陰曆八月」「農曆四月」等\n4. ✅ 正確用法：「10月出生者」「十月份」「8月」等\n5. 當前是2025年10月19日，請確保回應基於2025年，不可提及2024年\n6. 用戶提供的生日是西曆日期，請據此分析\n7. 不要在回應中包含字數統計標記\n8. 保持風鈴親切可愛的語氣風格",
+						"你是親切可愛的風鈴，善於先回答用戶問題再自然地介紹自己的專業服務。你只提供風水命理相關服務，不要推薦不存在的服務。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），絕對不可使用農曆用詞\n3. 🚫 禁止用詞：「農曆十月」「陰曆八月」「農曆四月」等\n4. ✅ 正確用法：「10月出生者」「十月份」「8月」等\n5. 當前是2025年10月19日，請確保回應基於2025年，不可提及2024年\n6. 用戶提供的生日是西曆日期，請據此分析\n7. 不要在回應中包含字數統計標記\n8. 保持風鈴親切可愛的語氣風格",
 				},
 				{
 					role: "user",
@@ -2581,7 +2613,7 @@ ${selectedEnding}`;
 
 		// 使用AI分析主題
 		try {
-			const classifier = new AITopicClassifier();
+			const classifier = new AITopicClassifier(locale);
 			const topicAnalysis = await classifier.analyzeMessage(
 				message,
 				sessionId
@@ -2645,6 +2677,11 @@ ${selectedEnding}`;
 		specificProblem,
 		originalMessage
 	) {
+		// 🌐 Determine language instruction based on locale
+		const languageInstruction =
+			this.locale === "zh-CN"
+				? "必須使用簡體中文回應，不可使用繁體中文"
+				: "必須使用繁體中文回應，不可使用簡體中文";
 		const topicMap = {
 			感情: "感情運勢",
 			工作: "工作運勢",
@@ -2714,12 +2751,12 @@ ${displayTopic}宮主星：[分析對應主星，如：天府星（穩重權威�
 8. 特別注意：用戶的生日是西曆日期，不是農曆，請據此分析命理特質`;
 
 		try {
-			const classifier = new AITopicClassifier();
+			const classifier = new AITopicClassifier(locale);
 			const aiResponse = await classifier.callDeepSeekAPI([
 				{
 					role: "system",
 					content:
-						"你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。請按照指定格式測算詳細且實用的分析報告。\n\n⚠️ 重要指示：\n1. 必須使用繁體中文回應，不可使用簡體中文\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如：1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月出生」「10月份」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」「農曆四月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此進行命理分析\n8. 不要在回應中包含字數統計標記\n9. 保持風鈴專業且親切的語氣\n10. 如果需要提及月份，直接說「10月」「八月」等，不要加「農曆」「陰曆」前綴",
+						"你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。請按照指定格式測算詳細且實用的分析報告。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如：1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月出生」「10月份」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」「農曆四月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此進行命理分析\n8. 不要在回應中包含字數統計標記\n9. 保持風鈴專業且親切的語氣\n10. 如果需要提及月份，直接說「10月」「八月」等，不要加「農曆」「陰曆」前綴",
 				},
 				{
 					role: "user",
@@ -2768,7 +2805,7 @@ async function getLastBaziFromSession(sessionId) {
 		);
 
 		if (recentHistory && recentHistory.length > 0) {
-			const classifier = new AITopicClassifier();
+			const classifier = new AITopicClassifier(locale);
 
 			for (const msg of recentHistory) {
 				if (
@@ -2795,7 +2832,7 @@ async function getLastBaziFromSession(sessionId) {
 		});
 
 		if (chatHistory && chatHistory.messages) {
-			const classifier = new AITopicClassifier();
+			const classifier = new AITopicClassifier(locale);
 
 			for (const message of chatHistory.messages) {
 				if (
@@ -2845,8 +2882,8 @@ export async function POST(request) {
 			partnerGender,
 			reportType,
 			region: clientRegion, // 🌍 新增：從前端傳來的區域設定
+			locale: clientLocale, // 🌐 新增：從前端傳來的語言設定 (zh-CN 或 zh-TW)
 		} = await request.json();
-
 		console.log("📥 Smart-Chat2 收到的請求數據:", {
 			message: message,
 			messageType: typeof message,
@@ -2860,23 +2897,31 @@ export async function POST(request) {
 		});
 
 		// 🌍 檢測用戶區域以支援動態定價顯示
-		// 優先使用前端傳來的區域設定，否則從請求標頭檢測
+		// 🌐 優先使用前端傳來的 locale 設定（用於AI回應語言），然後是區域設定，最後從請求標頭檢測
 		let region, locale;
 		if (
 			clientRegion &&
 			["china", "hongkong", "taiwan"].includes(clientRegion)
 		) {
 			region = clientRegion;
-			// 根據區域設定對應的語言環境
-			const regionToLocale = {
-				china: "zh-CN",
-				hongkong: "zh-TW",
-				taiwan: "zh-TW",
-			};
-			locale = regionToLocale[region];
-			console.log(
-				`🌍 Smart-Chat2 - 使用前端區域: ${region} (locale: ${locale})`
-			);
+			// 🌐 優先使用前端傳來的 locale，否則根據區域映射
+			if (clientLocale && ["zh-CN", "zh-TW"].includes(clientLocale)) {
+				locale = clientLocale;
+				console.log(
+					`🌐 Smart-Chat2 - 使用前端 locale: ${locale} (AI將使用此語言回應)`
+				);
+			} else {
+				// 根據區域設定對應的語言環境
+				const regionToLocale = {
+					china: "zh-CN",
+					hongkong: "zh-TW",
+					taiwan: "zh-TW",
+				};
+				locale = regionToLocale[region];
+				console.log(
+					`🌍 Smart-Chat2 - 使用前端區域: ${region} (locale: ${locale})`
+				);
+			}
 		} else {
 			// 從請求標頭檢測
 			const detected = getLocaleAndRegionFromRequest(request);
@@ -2886,7 +2931,6 @@ export async function POST(request) {
 				`🌍 Smart-Chat2 - 從標頭檢測區域: ${region} (locale: ${locale})`
 			);
 		}
-
 		if (!message?.trim() && !userBirthday && !reportType) {
 			return NextResponse.json(
 				{ error: "訊息不能為空" },
@@ -3125,7 +3169,7 @@ export async function POST(request) {
 			: false;
 
 		// 🎯 檢查是否為具體服務要求
-		const classifier = new AITopicClassifier();
+		const classifier = new AITopicClassifier(locale);
 		const conversationContext =
 			classifier.getConversationContext(sessionId);
 		const specificServiceRequest = message
@@ -3332,10 +3376,9 @@ export async function POST(request) {
 						specificQuestionForAnalysis,
 						region,
 						couplesBirthdayData.userGender,
-						couplesBirthdayData.partnerGender
-					);
-
-				// 🔧 轉換結構化對象為格式化字符串
+						couplesBirthdayData.partnerGender,
+						locale
+					); // 🔧 轉換結構化對象為格式化字符串
 				if (
 					typeof coupleAnalysisResult === "object" &&
 					coupleAnalysisResult.basicAnalysis
@@ -3535,7 +3578,8 @@ export async function POST(request) {
 					response =
 						await EnhancedInitialAnalysis.generateLoveAnalysis(
 							topicAndBirthdayData.birthday.parsed,
-							specificQuestionForAnalysis
+							specificQuestionForAnalysis,
+							locale
 						);
 				} else if (topicAndBirthdayData.topic === "財運") {
 					response =
@@ -3544,7 +3588,8 @@ export async function POST(request) {
 							userIntent.originalSpecificProblem ||
 								userIntent.specificQuestion ||
 								topicAndBirthdayData.originalMessage ||
-								"財運諮詢"
+								"財運諮詢",
+							locale
 						);
 				} else if (topicAndBirthdayData.topic === "工作") {
 					response =
@@ -3553,7 +3598,8 @@ export async function POST(request) {
 							userIntent.originalSpecificProblem ||
 								userIntent.specificQuestion ||
 								topicAndBirthdayData.originalMessage ||
-								"工作運勢"
+								"工作運勢",
+							locale
 						);
 				} else if (topicAndBirthdayData.topic === "健康") {
 					response =
@@ -3562,7 +3608,8 @@ export async function POST(request) {
 							userIntent.originalSpecificProblem ||
 								userIntent.specificQuestion ||
 								topicAndBirthdayData.originalMessage ||
-								"健康運勢"
+								"健康運勢",
+							locale
 						);
 				} else {
 					// 其他領域使用通用分析
@@ -3573,7 +3620,8 @@ export async function POST(request) {
 							userIntent.originalSpecificProblem ||
 								userIntent.specificQuestion ||
 								topicAndBirthdayData.originalMessage ||
-								`${topicAndBirthdayData.topic}諮詢`
+								`${topicAndBirthdayData.topic}諮詢`,
+							locale
 						);
 				}
 
@@ -3919,7 +3967,8 @@ export async function POST(request) {
 						response =
 							await EnhancedInitialAnalysis.generateLoveAnalysis(
 								new Date(standardDate),
-								specificQuestionForAnalysis
+								specificQuestionForAnalysis,
+								locale
 							);
 					} else if (
 						userIntent.relationshipAnalysisType === "couple"
@@ -3934,7 +3983,8 @@ export async function POST(request) {
 						response =
 							await EnhancedInitialAnalysis.generateLoveAnalysis(
 								new Date(standardDate),
-								specificQuestionForAnalysis
+								specificQuestionForAnalysis,
+								locale
 							);
 						// 為合婚分析添加對方生日選項
 						response += `\n\n💕 想做完整合婚分析嗎？\n如果你有伴侶，可以提供對方的生日，我可以為你們做八字配對分析，看看感情相容度哦！`;
@@ -3949,20 +3999,23 @@ export async function POST(request) {
 						response =
 							await EnhancedInitialAnalysis.generateLoveAnalysis(
 								new Date(standardDate),
-								specificQuestionForAnalysis
+								specificQuestionForAnalysis,
+								locale
 							);
 					}
 				} else if (userIntent.primaryConcern === "財運") {
 					response =
 						await EnhancedInitialAnalysis.generateFinanceAnalysis(
 							new Date(standardDate),
-							userIntent.specificQuestion || "財運諮詢"
+							userIntent.specificQuestion || "財運諮詢",
+							locale
 						);
 				} else if (userIntent.primaryConcern === "工作") {
 					response =
 						await EnhancedInitialAnalysis.generateWorkAnalysis(
 							new Date(standardDate),
-							userIntent.specificQuestion || "工作運勢"
+							userIntent.specificQuestion || "工作運勢",
+							locale
 						);
 				} else {
 					// 其他領域使用通用分析
@@ -3971,7 +4024,8 @@ export async function POST(request) {
 							new Date(standardDate),
 							userIntent.primaryConcern,
 							userIntent.specificQuestion ||
-								`${userIntent.primaryConcern}諮詢`
+								`${userIntent.primaryConcern}諮詢`,
+							locale
 						);
 				}
 
@@ -4699,7 +4753,7 @@ export async function POST(request) {
 
 				try {
 					console.log("🤖 使用AI分析獲取具體問題描述");
-					const classifier = new AITopicClassifier();
+					const classifier = new AITopicClassifier(locale);
 					const aiAnalysis = await classifier.analyzeMessage(
 						message,
 						sessionId
@@ -4791,7 +4845,7 @@ export async function POST(request) {
 			if (!detectedTopic) {
 				console.log("🤖 關鍵詞匹配失敗，使用AI分析檢測主題切換");
 				try {
-					const classifier = new AITopicClassifier();
+					const classifier = new AITopicClassifier(locale);
 					const aiTopicAnalysis = await classifier.analyzeMessage(
 						message,
 						sessionId
@@ -4948,7 +5002,7 @@ export async function POST(request) {
 					);
 
 					// 使用 AI Topic Classifier 進行分析
-					const classifier = new AITopicClassifier();
+					const classifier = new AITopicClassifier(locale);
 					let topicAnalysis = await classifier.analyzeMessage(
 						message,
 						sessionId
@@ -4998,7 +5052,7 @@ export async function POST(request) {
 					console.log("🧠 在報告選擇狀態下檢測到知識詢問，優先處理");
 
 					// 生成AI回應
-					const classifier = new AITopicClassifier();
+					const classifier = new AITopicClassifier(locale);
 					const knowledgePrompt = `用戶詢問：${message}
 
 請作為專業的風水命理老師，用不超過200字簡潔專業地解釋這個概念。要求：
@@ -5014,7 +5068,7 @@ export async function POST(request) {
 						{
 							role: "system",
 							content:
-								"你是專業的風水命理顧問風鈴，擅長用簡潔易懂的方式解釋傳統概念。\n\n⚠️ 重要指示：\n1. 必須使用繁體中文回應，不可使用簡體中文\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月份」「8月生人」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此分析\n8. 不要在回應中包含字數統計標記\n9. 保持專業且親切的語氣",
+								"你是專業的風水命理顧問風鈴，擅長用簡潔易懂的方式解釋傳統概念。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月份」「8月生人」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此分析\n8. 不要在回應中包含字數統計標記\n9. 保持專業且親切的語氣",
 						},
 						{
 							role: "user",
@@ -5217,7 +5271,7 @@ export async function POST(request) {
 			// 🔮 處理八字主題選擇狀態
 			console.log("🔮 用戶在八字主題選擇狀態，分析主題選擇:", message);
 
-			const classifier = new AITopicClassifier();
+			const classifier = new AITopicClassifier(locale);
 			const topicAnalysis = await classifier.analyzeMessage(
 				message,
 				sessionId
@@ -5319,7 +5373,7 @@ export async function POST(request) {
 			});
 		} else {
 			// � 優先檢測八字+主題組合分析 (新增功能)
-			const classifier = new AITopicClassifier();
+			const classifier = new AITopicClassifier(locale);
 			const baziTopicResult =
 				await classifier.detectBaziWithTopicAnalysis(
 					message,
@@ -5480,7 +5534,7 @@ export async function POST(request) {
 					) {
 						// 新的八字分析，需要AI處理
 						console.log("🔮 八字分析需要 AI 處理");
-						const classifier = new AITopicClassifier();
+						const classifier = new AITopicClassifier(locale);
 
 						// 為八字分析生成專門的AI回應
 						const baziPrompt = `用戶提供八字：${message}
@@ -5539,7 +5593,7 @@ export async function POST(request) {
 									{
 										role: "system",
 										content:
-											"你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。\n\n⚠️ 重要指示：\n1. 必須使用繁體中文回應，不可使用簡體中文\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月份」「8月生人」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此分析\n8. 不要在回應中包含字數統計標記\n9. 保持專業且親切的語氣",
+											"你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月份」「8月生人」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此分析\n8. 不要在回應中包含字數統計標記\n9. 保持專業且親切的語氣",
 									},
 									{
 										role: "user",
@@ -5622,7 +5676,7 @@ export async function POST(request) {
 					) {
 						// 知識詢問使用AI分析，不使用硬編碼回應
 						console.log("🧠 知識詢問使用 AI 分析");
-						const classifier = new AITopicClassifier();
+						const classifier = new AITopicClassifier(locale);
 
 						// 生成專門針對知識詢問的AI回應
 						const knowledgePrompt = `用戶詢問：${message}
@@ -5640,7 +5694,7 @@ export async function POST(request) {
 							{
 								role: "system",
 								content:
-									"你是專業的風水命理顧問，擅長用簡潔易懂的方式解釋傳統概念。重要指示：1. 必須使用繁體中文回應，不可使用簡體中文 2. 不要在回應中包含字數統計標記 3. 保持專業且親切的語氣",
+									"你是專業的風水命理顧問，擅長用簡潔易懂的方式解釋傳統概念。重要指示：1. ${languageInstruction} 2. 不要在回應中包含字數統計標記 3. 保持專業且親切的語氣",
 							},
 							{
 								role: "user",
@@ -5677,7 +5731,7 @@ export async function POST(request) {
 				} else {
 					// 使用 AI 分析進行精準的話題檢測和問題理解
 					console.log("⚡ 使用 AI 分析進行話題檢測");
-					const classifier = new AITopicClassifier();
+					const classifier = new AITopicClassifier(locale);
 					analysis = await classifier.analyzeMessage(
 						message,
 						sessionId
@@ -5723,7 +5777,7 @@ export async function POST(request) {
 					enhancedError
 				);
 				// 使用 AI 分析作為主要方法
-				const classifier = new AITopicClassifier();
+				const classifier = new AITopicClassifier(locale);
 				try {
 					analysis = await classifier.analyzeMessage(
 						message,

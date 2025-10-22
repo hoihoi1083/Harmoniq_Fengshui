@@ -19,8 +19,10 @@ import { Badge } from "@/components/ui/badge";
 import BirthdayModal from "@/components/BirthdayModal";
 import Navbar from "@/components/Navbar";
 import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
+import { useTranslations } from "next-intl";
 
 export default function Home() {
+	const t = useTranslations("chatPage");
 	const { data: session } = useSession();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -488,6 +490,18 @@ export default function Home() {
 				localStorage.getItem("userRegion") || "hongkong";
 			console.log("🌍 Sending region to smart-chat2:", currentRegion);
 
+			// Map region to locale for AI response language
+			const regionToLocaleMap = {
+				china: "zh-CN",
+				hongkong: "zh-TW",
+				taiwan: "zh-TW",
+			};
+			const aiLocale =
+				regionToLocaleMap[
+					currentRegion as keyof typeof regionToLocaleMap
+				] || currentLocale;
+			console.log("🌐 AI response locale:", aiLocale);
+
 			const response = await fetch("/api/smart-chat2", {
 				method: "POST",
 				headers: {
@@ -498,6 +512,7 @@ export default function Home() {
 					sessionId: sessionId,
 					userId: currentUserId,
 					region: currentRegion, // 🌍 Add current region for accurate pricing display
+					locale: aiLocale, // 🌐 Add locale for AI response language (zh-CN for China, zh-TW for HK/TW)
 				}),
 			});
 
@@ -1233,7 +1248,7 @@ export default function Home() {
 			});
 		} else if (diffInHours < 24 * 7) {
 			const days = Math.floor(diffInHours / 24);
-			return `${days}天前`;
+			return `${days}${t("daysAgo")}`;
 		} else {
 			return date.toLocaleDateString("zh-TW", {
 				month: "short",
@@ -1299,7 +1314,7 @@ export default function Home() {
 							/>
 							<div className="flex-1">
 								<span className="font-medium text-gray-800">
-									建立新的對話
+									{t("newConversation")}
 								</span>
 							</div>
 							<div className="text-xl text-gray-800">+</div>
@@ -1310,7 +1325,7 @@ export default function Home() {
 					<div className="bg-[#E0E0E0] rounded-lg mx-4 mb-4">
 						<div className="p-4 border-b border-[#d0d0d0]">
 							<h3 className="flex items-center justify-between font-medium text-gray-800">
-								歷史對話
+								{t("historyTitle")}
 								{isLoadingHistory && (
 									<div className="w-4 h-4 border-b-2 border-gray-800 rounded-full animate-spin"></div>
 								)}
@@ -1320,8 +1335,8 @@ export default function Home() {
 							{conversationHistory.length === 0 ? (
 								<div className="p-3 text-sm text-center text-gray-600">
 									{isLoadingHistory
-										? "載入中..."
-										: "尚無歷史對話"}
+										? t("loading")
+										: t("noHistory")}
 								</div>
 							) : (
 								conversationHistory.map((conversation) => (
@@ -1336,7 +1351,8 @@ export default function Home() {
 										}}
 									>
 										<div className="text-sm font-medium text-gray-800 truncate">
-											{conversation.title || "未命名對話"}
+											{conversation.title ||
+												t("untitledConversation")}
 										</div>
 										<div className="flex items-center justify-between mt-1 text-xs text-gray-600">
 											<span>
@@ -1423,7 +1439,7 @@ export default function Home() {
 								<div className="absolute inset-0 bg-black/20 backdrop-blur-[1px] rounded-lg z-10 flex items-center justify-center">
 									<div className="bg-gradient-to-r from-[#E8F37A] to-[#A3B116] px-3 py-1 rounded-lg shadow-lg">
 										<div className="text-sm font-bold text-[#374A37]">
-											Coming Soon
+											{t("comingSoon")}
 										</div>
 									</div>
 								</div>
@@ -1559,7 +1575,7 @@ export default function Home() {
 												padding: "4px",
 											}}
 										>
-											風鈴聊天室
+											{t("title")}
 										</div>
 									</div>
 
@@ -1574,7 +1590,7 @@ export default function Home() {
 													)
 												}
 												onKeyPress={handleKeyPress}
-												placeholder="有任何疑問嗎？請隨時與我分享～"
+												placeholder={t("placeholder")}
 												className="flex-1 px-3 py-2.5 text-sm text-black placeholder-gray-500 bg-transparent resize-none focus:outline-none sm:px-4 sm:py-3 md:px-6 md:py-4 md:text-base"
 												rows={1}
 												disabled={isLoading}
@@ -1611,7 +1627,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想增強財運"
+														t("shortcuts.wealth")
 													)
 												}
 												className="flex items-center px-2 py-1.5 space-x-1 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap sm:px-3 sm:py-2 sm:space-x-2 md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1621,12 +1637,14 @@ export default function Home() {
 														💰
 													</span>
 												</div>
-												<span>我想增多財運</span>
+												<span>
+													{t("shortcuts.wealth")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"如何更健康"
+														t("shortcuts.health")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1636,12 +1654,14 @@ export default function Home() {
 														🍃
 													</span>
 												</div>
-												<span>如何更健康</span>
+												<span>
+													{t("shortcuts.health")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想中六合彩"
+														t("shortcuts.lottery")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1651,12 +1671,14 @@ export default function Home() {
 														🎰
 													</span>
 												</div>
-												<span>我想中六合彩</span>
+												<span>
+													{t("shortcuts.lottery")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想加人工"
+														t("shortcuts.raise")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1666,12 +1688,14 @@ export default function Home() {
 														💼
 													</span>
 												</div>
-												<span>我想加人工</span>
+												<span>
+													{t("shortcuts.raise")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"如何可以升職"
+														t("shortcuts.promotion")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1681,12 +1705,14 @@ export default function Home() {
 														📈
 													</span>
 												</div>
-												<span>如何可以升職</span>
+												<span>
+													{t("shortcuts.promotion")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想拍拖"
+														t("shortcuts.dating")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1696,12 +1722,14 @@ export default function Home() {
 														💕
 													</span>
 												</div>
-												<span>我想拍拖</span>
+												<span>
+													{t("shortcuts.dating")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想增強桃花運"
+														t("shortcuts.loveLife")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1711,12 +1739,16 @@ export default function Home() {
 														🌸
 													</span>
 												</div>
-												<span>我想增強桃花運</span>
+												<span>
+													{t("shortcuts.loveLife")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我身體會有隱患嗎"
+														t(
+															"shortcuts.healthConcern"
+														)
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1726,14 +1758,18 @@ export default function Home() {
 														⚕️
 													</span>
 												</div>
-												<span>我身體會有隱患嗎</span>
+												<span>
+													{t(
+														"shortcuts.healthConcern"
+													)}
+												</span>
 											</button>
 
 											{/* 重複第一組標籤以實現無縫循環 */}
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想增多財運"
+														t("shortcuts.wealth")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1743,12 +1779,14 @@ export default function Home() {
 														💰
 													</span>
 												</div>
-												<span>我想增多財運</span>
+												<span>
+													{t("shortcuts.wealth")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"如何更健康"
+														t("shortcuts.health")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1758,12 +1796,14 @@ export default function Home() {
 														🍃
 													</span>
 												</div>
-												<span>如何更健康</span>
+												<span>
+													{t("shortcuts.health")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想中六合彩"
+														t("shortcuts.lottery")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1773,12 +1813,14 @@ export default function Home() {
 														🎰
 													</span>
 												</div>
-												<span>我想中六合彩</span>
+												<span>
+													{t("shortcuts.lottery")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想加人工"
+														t("shortcuts.raise")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1788,12 +1830,14 @@ export default function Home() {
 														💼
 													</span>
 												</div>
-												<span>我想加人工</span>
+												<span>
+													{t("shortcuts.raise")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"如何可以升職"
+														t("shortcuts.promotion")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1803,12 +1847,14 @@ export default function Home() {
 														📈
 													</span>
 												</div>
-												<span>如何可以升職</span>
+												<span>
+													{t("shortcuts.promotion")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想拍拖"
+														t("shortcuts.dating")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1818,12 +1864,14 @@ export default function Home() {
 														💕
 													</span>
 												</div>
-												<span>我想拍拖</span>
+												<span>
+													{t("shortcuts.dating")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我想增強桃花運"
+														t("shortcuts.loveLife")
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1833,12 +1881,16 @@ export default function Home() {
 														🌸
 													</span>
 												</div>
-												<span>我想增強桃花運</span>
+												<span>
+													{t("shortcuts.loveLife")}
+												</span>
 											</button>
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														"我身體會有隱患嗎"
+														t(
+															"shortcuts.healthConcern"
+														)
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -1848,7 +1900,11 @@ export default function Home() {
 														⚕️
 													</span>
 												</div>
-												<span>我身體會有隱患嗎</span>
+												<span>
+													{t(
+														"shortcuts.healthConcern"
+													)}
+												</span>
 											</button>
 										</div>
 									</div>

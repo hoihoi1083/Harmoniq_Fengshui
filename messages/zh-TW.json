@@ -1182,5 +1182,26 @@
 			"premium": "高級",
 			"default": "專屬"
 		}
+	},
+	"chatPage": {
+		"comingSoon": "Coming Soon",
+		"newConversation": "建立新的對話",
+		"historyTitle": "歷史對話",
+		"loading": "載入中...",
+		"noHistory": "尚無歷史對話",
+		"untitledConversation": "未命名對話",
+		"daysAgo": "天前",
+		"title": "風鈴聊天室",
+		"placeholder": "有任何疑問嗎？請隨時與我分享～",
+		"shortcuts": {
+			"wealth": "我想增多財運",
+			"health": "如何更健康",
+			"lottery": "我想中六合彩",
+			"raise": "我想加人工",
+			"promotion": "如何可以升職",
+			"dating": "我想拍拖",
+			"loveLife": "我想增強桃花運",
+			"healthConcern": "我身體會有隱患嗎"
+		}
 	}
 }

@@ -55,47 +55,76 @@ export class EnhancedInitialAnalysis {
 	// 🎯 主要分析生成方法 (集成AI)
 	// ==========================================
 
-	static async generateWorkAnalysis(birthday, specificQuestion = "") {
+	static async generateWorkAnalysis(
+		birthday,
+		specificQuestion = "",
+		locale = "zh-TW"
+	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
 			"工作",
-			specificQuestion
+			specificQuestion,
+			locale
 		);
 	}
 
-	static async generateFinanceAnalysis(birthday, specificQuestion = "") {
+	static async generateFinanceAnalysis(
+		birthday,
+		specificQuestion = "",
+		locale = "zh-TW"
+	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
 			"財運",
-			specificQuestion
+			specificQuestion,
+			locale
 		);
 	}
 
-	static async generateHealthAnalysis(birthday, specificQuestion = "") {
+	static async generateHealthAnalysis(
+		birthday,
+		specificQuestion = "",
+		locale = "zh-TW"
+	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
 			"健康",
-			specificQuestion
+			specificQuestion,
+			locale
 		);
 	}
 
-	static async generateRelationshipAnalysis(birthday, specificQuestion = "") {
+	static async generateRelationshipAnalysis(
+		birthday,
+		specificQuestion = "",
+		locale = "zh-TW"
+	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
 			"人際關係",
-			specificQuestion
+			specificQuestion,
+			locale
 		);
 	}
 
-	static async generateChildrenAnalysis(birthday, specificQuestion = "") {
+	static async generateChildrenAnalysis(
+		birthday,
+		specificQuestion = "",
+		locale = "zh-TW"
+	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
 			"子女",
-			specificQuestion
+			specificQuestion,
+			locale
 		);
 	}
 
-	static async generateFateAnalysis(birthday, specificQuestion = "") {
+	static async generateFateAnalysis(
+		birthday,
+		specificQuestion = "",
+		locale = "zh-TW"
+	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
 			"因緣",
@@ -103,11 +132,16 @@ export class EnhancedInitialAnalysis {
 		);
 	}
 
-	static async generateLoveAnalysis(birthday, specificQuestion = "") {
+	static async generateLoveAnalysis(
+		birthday,
+		specificQuestion = "",
+		locale = "zh-TW"
+	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
 			"感情",
-			specificQuestion
+			specificQuestion,
+			locale
 		);
 	}
 
@@ -144,7 +178,8 @@ export class EnhancedInitialAnalysis {
 		specificQuestion = "",
 		region = "hongkong",
 		userGender = "female",
-		partnerGender = "unknown"
+		partnerGender = "unknown",
+		locale = "zh-TW"
 	) {
 		const year1 = birthday1.getFullYear();
 		const year2 = birthday2.getFullYear();
@@ -191,7 +226,8 @@ export class EnhancedInitialAnalysis {
 				birthday2,
 				element1,
 				element2,
-				specificQuestion
+				specificQuestion,
+				locale
 			);
 
 			if (aiAnalysis) {
@@ -240,7 +276,8 @@ export class EnhancedInitialAnalysis {
 	static async generatePersonalAnalysis(
 		birthday,
 		category,
-		specificQuestion = ""
+		specificQuestion = "",
+		locale = "zh-TW"
 	) {
 		const year = birthday.getFullYear();
 		const month = birthday.getMonth() + 1;
@@ -272,7 +309,8 @@ export class EnhancedInitialAnalysis {
 				element,
 				category,
 				specificQuestion,
-				birthday
+				birthday,
+				locale // 🌐 Pass locale to AI generation
 			);
 
 			if (practicalSolutions) {
@@ -312,6 +350,7 @@ export class EnhancedInitialAnalysis {
 		const day = birthday.getDate();
 		const currentYear = new Date().getFullYear();
 		const currentMonth = new Date().getMonth() + 1;
+		const currentDay = new Date().getDate();
 		const age = currentYear - year;
 
 		const categoryConfig = this.getCategoryConfig(category);
@@ -322,13 +361,14 @@ export class EnhancedInitialAnalysis {
 - 出生日期：${year}年${month}月${day}日（西曆/公曆日期）
 - 五行屬性：${element}命
 - 當前年齡：${age}歲
-- 當前時間：${currentYear}年${currentMonth}月（當前是2025年）
+- 當前時間：${currentYear}年${currentMonth}月${currentDay}日
 - 具體問題：${specificQuestion || "無特定問題"}
 
 ⚠️ 重要提醒：
 - 用戶生日是西曆日期，請據此進行命理分析
-- 當前時間是2025年，請基於2025年時間軸進行分析
+- 當前時間是${currentYear}年${currentMonth}月，請基於${currentYear}年時間軸進行分析
 - 絕對不可使用農曆、陰曆相關詞彙
+- 不要提及${currentYear - 1}年或更早的年份
 
 請生成以下三個部分的內容，要求個人化、具體、實用：
 
@@ -376,8 +416,7 @@ ${
 		const messages = [
 			{
 				role: "system",
-				content:
-					"你是風鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。\n\n⚠️ 重要指示：\n1. 當前是2025年10月19日，請確保分析基於2025年時間軸\n2. 所有日期必須使用西曆（公曆），絕對不可使用農曆用詞\n3. 用戶提供的生日是西曆日期，請據此分析\n4. 不可提及2024年或過去年份",
+				content: `你是風鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。\n\n⚠️ 重要指示：\n1. 當前是${currentYear}年${currentMonth}月${currentDay}日，請確保分析基於${currentYear}年時間軸\n2. 所有日期必須使用西曆（公曆），絕對不可使用農曆用詞\n3. 用戶提供的生日是西曆日期，請據此分析\n4. 不可提及${currentYear - 1}年或過去年份`,
 			},
 			{
 				role: "user",
@@ -398,7 +437,8 @@ ${
 		birthday2,
 		element1,
 		element2,
-		specificQuestion
+		specificQuestion,
+		locale = "zh-TW"
 	) {
 		const year1 = birthday1.getFullYear();
 		const year2 = birthday2.getFullYear();
@@ -411,9 +451,14 @@ ${
 		const age1 = currentYear - year1;
 		const age2 = currentYear - year2;
 
+		const languageInstruction =
+			locale === "zh-CN"
+				? "必須使用簡體中文回應，絕對不可使用繁體中文！"
+				: "必須使用繁體中文回應，絕對不可使用簡體中文！";
+
 		const prompt = `你是專業的風水師「風鈴」，請根據以下信息生成個人化的合婚配對分析：
 
-**重要語言要求：必須使用繁體中文回應，絕對不可使用簡體中文！**
+**重要語言要求：${languageInstruction}**
 
 雙方信息：
 - 男方：${year1}年${month1}月${day1}日，${element1}命，${age1}歲
@@ -447,7 +492,7 @@ ${
 }
 
 要求：
-- 必須使用繁體中文，絕對不可使用簡體中文
+- ${languageInstruction}
 - 內容適中，約500-700字即可
 - 語言要親切專業，像風鈴在一對一指導
 - 重點強調需要完整出生時辰才能提供更精確分析`;
@@ -2315,20 +2360,30 @@ ${currentMonth === birthMonth ? "生日月份是感情運勢的黃金期，適�
 		element,
 		category,
 		specificQuestion,
-		birthday
+		birthday,
+		locale = "zh-TW"
 	) {
 		const currentMonth = new Date().getMonth() + 1;
 		const birthYear = birthday.getFullYear();
 		const birthMonth = birthday.getMonth() + 1;
+		const currentYear = new Date().getFullYear(); // 🔥 Get current year
+
+		// 🌐 Determine language instruction based on locale
+		const languageInstruction =
+			locale === "zh-CN"
+				? "必須使用簡體中文回應，絕對不可使用繁體中文！"
+				: "必須使用繁體中文回應，絕對不可使用簡體中文！";
 
 		const prompt = `你是專業的命理師風鈴，為用戶提供詳細實用的${category}分析和解決方案。
 
-**重要語言要求：必須使用繁體中文回應，絕對不可使用簡體中文！**
+**重要語言要求：${languageInstruction}**
+**當前時間：${currentYear}年${currentMonth}月 - 請基於${currentYear}年進行所有分析，不要提及過去的年份如2024年或2023年**
 
 用戶資料：
 - 出生年份：${birthYear}年
 - 出生月份：${birthMonth}月  
 - 當前月份：${currentMonth}月
+- 當前年份：${currentYear}年
 - 關注領域：${category}
 - 具體問題：${specificQuestion || "想改善" + category + "運勢"}
 
@@ -2360,11 +2415,12 @@ ${currentMonth === birthMonth ? "生日月份是感情運勢的黃金期，適�
 ${category}運勢如風，需知風向與風力。若你希望進一步掌握更多專業建議和個人化策略，歡迎提供詳細出生時辰，風鈴會為你製作專屬${category}報告！🌟
 
 要求：
-- 必須使用繁體中文，絕對不可使用簡體中文
+- ${languageInstruction}
 - 內容適中，約400-600字即可
 - 語言要親切專業，像風鈴在一對一指導
 - 重點強調需要完整出生時辰才能提供更精確分析
 - 不要加入問候語如"親愛的朋友，你好！我是風鈴"，直接進入分析內容
+- 當前是${currentYear}年，所有時間分析必須基於${currentYear}年，絕對不要提及2024年、2023年等過去年份
 - 自然引導用戶考慮詳細報告`;
 
 		try {

@@ -1175,5 +1175,26 @@
 			"premium": "高级",
 			"default": "专属"
 		}
+	},
+	"chatPage": {
+		"comingSoon": "Coming Soon",
+		"newConversation": "建立新的对话",
+		"historyTitle": "历史对话",
+		"loading": "载入中...",
+		"noHistory": "尚无历史对话",
+		"untitledConversation": "未命名对话",
+		"daysAgo": "天前",
+		"title": "风铃聊天室",
+		"placeholder": "有任何疑问吗？请随时与我分享～",
+		"shortcuts": {
+			"wealth": "我想增多财运",
+			"health": "如何更健康",
+			"lottery": "我想中六合彩",
+			"raise": "我想加人工",
+			"promotion": "如何可以升职",
+			"dating": "我想拍拖",
+			"loveLife": "我想增强桃花运",
+			"healthConcern": "我身体会有隐患吗"
+		}
 	}
 }
