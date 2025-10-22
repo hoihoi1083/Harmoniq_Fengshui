@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { getConcernColor } from "../utils/colorTheme";
 import {
@@ -10,11 +11,13 @@ import {
 } from "../utils/componentDataStore";
 
 export default function Season({ userInfo, currentYear = 2025 }) {
+	const locale = useLocale();
+	const t = useTranslations("fengShuiReport.components.season");
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [activeSeasonIndex, setActiveSeasonIndex] = useState(0);
 	const [error, setError] = useState(null);
-	const [loadingMessage, setLoadingMessage] = useState("正在分析關鍵季節...");
+	const [loadingMessage, setLoadingMessage] = useState(t("analyzingSeasons"));
 	const [requestInProgress, setRequestInProgress] = useState(false);
 
 	// Get current date and determine current season
@@ -114,6 +117,7 @@ export default function Season({ userInfo, currentYear = 2025 }) {
 						relevantSeasons: seasonInfo.relevantSeasons,
 						isLatePart: seasonInfo.isLatePart,
 					},
+					locale: locale, // Pass locale for language-aware AI generation
 				}),
 			});
 
@@ -400,7 +404,7 @@ export default function Season({ userInfo, currentYear = 2025 }) {
 								fontSize: "clamp(14px, 3.5vw, 16px)",
 							}}
 						>
-							風水妹已經在運算四季分析中，請稍候
+							{t("loading")}
 						</div>
 					</div>
 				</div>
@@ -419,7 +423,7 @@ export default function Season({ userInfo, currentYear = 2025 }) {
 						className="text-gray-500"
 						style={{ fontSize: "clamp(0.875rem, 2.5vw, 1rem)" }}
 					>
-						無法載入季節分析資料
+						{t("noData")}
 					</p>
 				</div>
 			</section>
@@ -445,7 +449,7 @@ export default function Season({ userInfo, currentYear = 2025 }) {
 								lineHeight: 1.2,
 							}}
 						>
-							關鍵季節
+							{t("title")}
 						</h2>
 						{/* Current Season Indicator */}
 						{analysisData?.currentSeason && (
@@ -468,7 +472,8 @@ export default function Season({ userInfo, currentYear = 2025 }) {
 										})(),
 									}}
 								>
-									當前：{analysisData.currentSeason} (
+									{t("current")}
+									{analysisData.currentSeason} (
 									{analysisData.currentMonth}月)
 								</span>
 							</div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, memo } from "react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 
 const JiXiong = memo(function JiXiong({
@@ -11,6 +12,8 @@ const JiXiong = memo(function JiXiong({
 	determineUsefulGods,
 	setGlobalReportData,
 }) {
+	const locale = useLocale();
+	const t = useTranslations("fengShuiReport.components.jiXiong");
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -74,6 +77,7 @@ const JiXiong = memo(function JiXiong({
 							time: userInfo.time || "00:00:00", // Default time if not provided
 							concern: userInfo.concern || "財運",
 						},
+						locale: locale, // Pass locale for language-aware AI generation
 					}),
 				});
 
@@ -359,7 +363,7 @@ const JiXiong = memo(function JiXiong({
 									fontSize: "clamp(14px, 3.5vw, 16px)",
 								}}
 							>
-								風水妹已經在運算吉凶分析中，請稍候
+								{t("loading")}
 							</div>
 						</div>
 					</div>
@@ -377,7 +381,8 @@ const JiXiong = memo(function JiXiong({
 							className="mb-3 text-red-600 sm:mb-4"
 							style={{ fontSize: "clamp(0.875rem, 2.5vw, 1rem)" }}
 						>
-							分析出現問題：{error}
+							{t("error")}
+							{error}
 						</p>
 						<p
 							className="text-gray-600"
@@ -385,7 +390,7 @@ const JiXiong = memo(function JiXiong({
 								fontSize: "clamp(0.875rem, 2.5vw, 0.875rem)",
 							}}
 						>
-							顯示基礎分析結果
+							{t("showingBasicAnalysis")}
 						</p>
 					</div>
 				</div>
@@ -423,9 +428,8 @@ const JiXiong = memo(function JiXiong({
 												lineHeight: 1.2,
 											}}
 										>
-											吉象
-										</h2>
-
+											{t("auspicious")}
+										</h2>{" "}
 										<div className="space-y-4 sm:space-y-6">
 											{analysisData.jixiang.map(
 												(item, index) => (
@@ -488,9 +492,8 @@ const JiXiong = memo(function JiXiong({
 												lineHeight: 1.2,
 											}}
 										>
-											凶象
-										</h2>
-
+											{t("inauspicious")}
+										</h2>{" "}
 										<div className="space-y-4 sm:space-y-6">
 											{analysisData.xiongxiang.map(
 												(item, index) => (
@@ -553,7 +556,7 @@ const JiXiong = memo(function JiXiong({
 									fontSize: "clamp(0.875rem, 2.5vw, 1rem)",
 								}}
 							>
-								暫無吉凶分析數據
+								{t("noData")}
 							</p>
 						</div>
 					)}

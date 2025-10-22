@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import {
 	getComponentData,
@@ -26,6 +27,7 @@ const FiveElement = ({
 	analyzeWuxingStrength,
 	determineUsefulGods,
 }) => {
+	const t = useTranslations("fengShuiReport.components.fiveElement");
 	const [loading, setLoading] = useState(true);
 	const [elementCounts, setElementCounts] = useState(null);
 	const [missingElements, setMissingElements] = useState([]);
@@ -97,7 +99,7 @@ const FiveElement = ({
 						<div className="flex items-center justify-center">
 							<Image
 								src="/images/風水妹/風水妹-loading.png"
-								alt="風水妹運算中"
+								alt={t("loadingAlt")}
 								width={120}
 								height={120}
 								className="object-contain"
@@ -113,7 +115,7 @@ const FiveElement = ({
 									fontSize: "clamp(14px, 3.5vw, 16px)",
 								}}
 							>
-								風水妹已經在運算五行配置中，請稍候
+								{t("loadingText")}
 							</div>
 						</div>
 					</div>
@@ -198,7 +200,7 @@ const FiveElement = ({
 												color: "#A3B116",
 											}}
 										>
-											五行齊全
+											{t("allElementsPresent")}
 										</span>
 										<span
 											style={{
@@ -210,7 +212,7 @@ const FiveElement = ({
 												color: "#515151",
 											}}
 										>
-											- 沒有嚴重缺失某一元素
+											{t("noSevereMissing")}
 										</span>
 									</div>
 								) : (
@@ -259,7 +261,7 @@ const FiveElement = ({
 												color: "#515151",
 											}}
 										>
-											缺失
+											{t("needsSupport")}
 										</span>
 									</div>
 								)}

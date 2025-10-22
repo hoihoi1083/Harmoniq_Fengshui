@@ -3,7 +3,13 @@ import { NextResponse } from "next/server";
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || process.env.API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
 
-async function callAI(prompt) {
+async function callAI(prompt, locale = "zh-TW") {
+	// Determine language instruction based on locale
+	const languageInstruction =
+		locale === "zh-CN"
+			? "你是专业的命理师，请根据用户的八字信息、关注领域和具体问题，提供简要的分析和建议。**必须使用简体中文**，绝对禁止繁体字。语气温和专业。"
+			: "你是專業的命理師，請根據用戶的八字信息、關注領域和具體問題，提供簡要的分析和建議。**必須使用繁體中文**，絕對禁止簡體字。語氣溫和專業。";
+
 	try {
 		const response = await fetch(DEEPSEEK_API_URL, {
 			method: "POST",
@@ -16,8 +22,7 @@ async function callAI(prompt) {
 				messages: [
 					{
 						role: "system",
-						content:
-							"你是專業的命理師，請根據用戶的八字信息、關注領域和具體問題，提供簡要的分析和建議。**必須使用繁體中文**，絕對禁止簡體字。語氣溫和專業。",
+						content: languageInstruction,
 					},
 					{
 						role: "user",
@@ -43,19 +48,73 @@ async function callAI(prompt) {
 
 export async function POST(request) {
 	try {
-		const { baziData, concern, problem } = await request.json();
+		const {
+			baziData,
+			concern,
+			problem,
+			locale = "zh-TW",
+		} = await request.json();
 
 		if (!baziData || !concern || !problem) {
-			return NextResponse.json(
-				{ error: "缺少必要參數" },
-				{ status: 400 }
-			);
+			const errorMsg =
+				locale === "zh-CN" ? "缺少必要参数" : "缺少必要參數";
+			return NextResponse.json({ error: errorMsg }, { status: 400 });
 		}
 
 		console.log("📊 Processing request:", { concern, problem, baziData });
 
-		// Create simple, clear prompt
-		const prompt = `請基於以下信息提供簡要分析：
+		// Create language-specific prompt
+		const languageRequirement =
+			locale === "zh-CN"
+				? "**必须使用简体中文**，绝对禁止繁体字"
+				: "**必須使用繁體中文**，絕對禁止簡體字";
+
+		const closingNote =
+			locale === "zh-CN"
+				? "💡 更详细分析，基于流年，十神，可参阅报告中的其他相关章节"
+				: "💡 更詳細分析，基於流年，十神，可參閱報告中的其他相關章節";
+
+		// Create simple, clear prompt with locale-specific text
+		const prompt =
+			locale === "zh-CN"
+				? `请基于以下信息提供简要分析：
+
+八字信息：
+年柱：${baziData.year}
+月柱：${baziData.month}  
+日柱：${baziData.day}
+时柱：${baziData.hour}
+日主：${baziData.dayMaster}${baziData.dayElement}
+
+关注领域：${concern}
+具体问题：${problem}
+
+请提供：
+1. 基于八字的简要分析（2-3句话）
+2. 针对问题的建议（2-3句话）  
+3. 最后必须加上「${closingNote}」
+
+重要要求：
+1. ${languageRequirement}
+2. 必须准确引用上述八字四柱数据
+3. 必须基于实际的五行统计进行分析
+4. 针对用户的具体问题，从命理角度解释原因和背景
+5. 当涉及时机分析时，必须提供具体年份（例如：2026年丙午火年、2027年丁未火土年等）
+6. 给出1-2个简要的方向性建议（不要太详细）
+7. 最后加上备注，说明更详细的分析和解决方案在其他章节中，不要指明具体章节名称
+8. 语调要个人化，直接对用户说话
+9. 内容要具体，避免空泛的通用建议
+10. 时机预测要基于五行流年循环，给出准确年份范围
+11. ⚠️ 绝对禁止在分析内容中出现：乙巳、丙戌、壬戌、丙午、壬水等错误信息
+12. 结尾必须使用：「${closingNote}」
+
+格式要求：
+- ${languageRequirement}
+- 必须使用提供的八字信息（${baziData.year}、${baziData.month}、${baziData.day}、${baziData.hour}，日主${baziData.dayMaster}${baziData.dayElement}）
+- 内容简洁实用，约150-200字
+- 语气亲和专业
+- 结尾统一使用指定文案`
+				: `請基於以下信息提供簡要分析：
 
 八字信息：
 年柱：${baziData.year}
@@ -70,10 +129,10 @@ export async function POST(request) {
 請提供：
 1. 基於八字的簡要分析（2-3句話）
 2. 針對問題的建議（2-3句話）  
-3. 最後必須加上「💡 更詳細分析，基於流年，十神，可參閱報告中的其他相關章節」
+3. 最後必須加上「${closingNote}」
 
 重要要求：
-1. **必須使用繁體中文**，絕對禁止簡體字
+1. ${languageRequirement}
 2. 必須準確引用上述八字四柱數據
 3. 必須基於實際的五行統計進行分析
 4. 針對用戶的具體問題，從命理角度解釋原因和背景
@@ -84,21 +143,22 @@ export async function POST(request) {
 9. 內容要具體，避免空泛的通用建議
 10. 時機預測要基於五行流年循環，給出準確年份範圍
 11. ⚠️ 絕對禁止在分析內容中出現：乙巳、丙戌、壬戌、丙午、壬水等錯誤信息
-12. 結尾必須使用：「💡 更詳細分析，基於流年，十神，可參閱報告中的其他相關章節」
+12. 結尾必須使用：「${closingNote}」
 
 格式要求：
-- **必須使用繁體中文**，禁止任何簡體字
+- ${languageRequirement}
 - 必須使用提供的八字信息（${baziData.year}、${baziData.month}、${baziData.day}、${baziData.hour}，日主${baziData.dayMaster}${baziData.dayElement}）
 - 內容簡潔實用，約150-200字
 - 語氣親和專業
 - 結尾統一使用指定文案`;
 
-		const aiResponse = await callAI(prompt);
+		const aiResponse = await callAI(prompt, locale);
 
 		console.log("✅ AI response received:", aiResponse.substring(0, 200));
 
+		const titleSuffix = locale === "zh-CN" ? "分析指导" : "分析指導";
 		const solution = {
-			title: `${concern}分析指導`,
+			title: `${concern}${titleSuffix}`,
 			content: aiResponse.trim(),
 		};
 
@@ -108,6 +168,8 @@ export async function POST(request) {
 		});
 	} catch (error) {
 		console.error("API Error:", error);
-		return NextResponse.json({ error: "服務暫時不可用" }, { status: 500 });
+		const errorMsg =
+			error.locale === "zh-CN" ? "服务暂时不可用" : "服務暫時不可用";
+		return NextResponse.json({ error: errorMsg }, { status: 500 });
 	}
 }

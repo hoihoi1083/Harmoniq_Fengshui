@@ -60,7 +60,14 @@ export async function POST(request) {
 		);
 	}
 
-	const { prompt, userInfo, concern, problem, analysisType } = requestData;
+	const {
+		prompt,
+		userInfo,
+		concern,
+		problem,
+		analysisType,
+		locale = "zh-TW",
+	} = requestData;
 
 	// Extract concern from userInfo if not provided at top level
 	const finalConcern = concern || userInfo?.concern;
@@ -79,6 +86,15 @@ export async function POST(request) {
 		console.log("🚀 Calling DeepSeek API for LiuNian analysis...");
 		const startTime = Date.now();
 
+		// Locale-aware language instruction
+		const languageInstruction =
+			locale === "zh-CN" ? "请使用简体中文回应" : "請使用繁體中文回應";
+
+		const systemPromptBase =
+			locale === "zh-CN"
+				? "你是一位资深八字命理师，精通流年分析与命理调候。"
+				: "你是一位資深八字命理師，精通流年分析與命理調候。";
+
 		const deepseekResponse = await fetch(
 			"https://api.deepseek.com/chat/completions",
 			{
@@ -92,7 +108,7 @@ export async function POST(request) {
 					messages: [
 						{
 							role: "system",
-							content: `你是一位资深八字命理师，精通流年分析与命理調候。
+							content: `${systemPromptBase}
 
 重要指示：
 1. 如果用戶要求日主特性分析，請提供詳細的白話分析文章（400-500字），不要JSON格式，不要markdown標記
@@ -101,7 +117,7 @@ export async function POST(request) {
 4. 内容要既专业又通俗易懂，多用生活化的比喻和解释
 5. 提供具体的时间安排、饮食建议、生活指导
 6. 解释命理原理，让普通人也能理解
-7. 請使用繁體中文回應
+7. ${languageInstruction}
 
 對於日主特性：請寫成完整文章，包含：
 - 流年與命局互動分析

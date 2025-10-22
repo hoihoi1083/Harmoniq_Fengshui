@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { getConcernColor } from "../utils/colorTheme";
 
 export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
+	const locale = useLocale();
+	const t = useTranslations("fengShuiReport.components.coreSuggestion");
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
@@ -26,6 +29,7 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 						time: userInfo?.time || "",
 						concern: userInfo?.concern || "財運",
 					},
+					locale: locale,
 				}),
 			});
 
@@ -372,7 +376,7 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 								fontSize: "clamp(14px, 3.5vw, 16px)",
 							}}
 						>
-							風水妹已經在運算開運建議中，請稍候
+							{t("loading")}
 						</div>
 					</div>
 				</div>
@@ -384,7 +388,7 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 		return (
 			<section className="relative w-full sm:w-[95%] lg:w-[85%] mx-auto bg-white rounded-[20px] sm:rounded-[26px] p-4 sm:p-12 lg:p-20 mb-6 sm:mb-10 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
 				<div className="py-8 text-center text-gray-500">
-					無法載入開運建議資料
+					{t("noData")}
 				</div>
 			</section>
 		);
@@ -408,7 +412,7 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 								lineHeight: 1.2,
 							}}
 						>
-							核心原則
+							{t("title")}
 						</h2>
 						<p
 							className="mt-2 text-sm text-gray-600 sm:text-base"
@@ -417,7 +421,7 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 								lineHeight: 1.5,
 							}}
 						>
-							基於您的八字命理，著重於長期的生活調整和基礎運勢提升。
+							{t("subtitle")}
 						</p>
 					</div>
 				</div>
@@ -431,6 +435,7 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 						{analysisData.coreIconList.map((item, index) => {
 							const getButtonBgColor = (itemLabel, isActive) => {
 								const colorMap = {
+									// Traditional Chinese
 									五行調和: isActive
 										? "bg-[#DEAB20]"
 										: "bg-white",
@@ -443,20 +448,45 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 									擇時而動: isActive
 										? "bg-[#5270AD]"
 										: "bg-white",
+									擇時調養: isActive
+										? "bg-[#5270AD]"
+										: "bg-white",
+									// Simplified Chinese
+									五行调和: isActive
+										? "bg-[#DEAB20]"
+										: "bg-white",
+									行为心性: isActive
+										? "bg-[#D7542D]"
+										: "bg-white",
+									风水辅助: isActive
+										? "bg-[#8FA940]"
+										: "bg-white",
+									择时而动: isActive
+										? "bg-[#5270AD]"
+										: "bg-white",
+									择时调养: isActive
+										? "bg-[#5270AD]"
+										: "bg-white",
 								};
 								return (
 									colorMap[itemLabel] ||
 									(isActive ? "bg-[#DEAB20]" : "bg-white")
 								);
 							};
-
 							const getItemImage = (itemLabel) => {
 								const imageMap = {
+									// Traditional Chinese
 									五行調和: "/images/report/star.png",
 									行為心性: "/images/report/heart.png",
 									風水輔助: "/images/report/fengshui.png",
 									擇時而動: "/images/report/clock.png",
 									擇時調養: "/images/report/clock.png",
+									// Simplified Chinese
+									五行调和: "/images/report/star.png",
+									行为心性: "/images/report/heart.png",
+									风水辅助: "/images/report/fengshui.png",
+									择时而动: "/images/report/clock.png",
+									择时调养: "/images/report/clock.png",
 								};
 								return (
 									imageMap[itemLabel] ||
@@ -517,7 +547,6 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 							);
 						})}
 					</div>
-
 					{/* Active Category Title */}
 					<div className="text-center">
 						<h3
@@ -528,10 +557,18 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 								fontWeight: 700,
 								color: (() => {
 									const colorMap = {
+										// Traditional Chinese
 										五行調和: "#DEAB20",
 										行為心性: "#D7542D",
 										風水輔助: "#8FA940",
 										擇時而動: "#5270AD",
+										擇時調養: "#5270AD",
+										// Simplified Chinese
+										五行调和: "#DEAB20",
+										行为心性: "#D7542D",
+										风水辅助: "#8FA940",
+										择时而动: "#5270AD",
+										择时调养: "#5270AD",
 									};
 									return (
 										colorMap[
@@ -546,8 +583,7 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 						>
 							{activeCategory.title}
 						</h3>
-					</div>
-
+					</div>{" "}
 					{/* Subsection Cards */}
 					<div className="flex flex-wrap justify-center max-w-6xl gap-4 mx-auto mt-6 sm:gap-6 sm:mt-8">
 						{activeCategory.content.subsections &&

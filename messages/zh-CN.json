@@ -1196,5 +1196,126 @@
 			"loveLife": "我想增强桃花运",
 			"healthConcern": "我身体会有隐患吗"
 		}
+	},
+	"fengShuiReport": {
+		"page": {
+			"loadingTitle": "风水妹正在为你准备专属风水分析报告",
+			"loadingAlt": "风水妹运算中",
+			"errorReturn": "返回",
+			"errorMissingSession": "缺少支付会话ID，请重新进行支付",
+			"errorPaymentIncomplete": "支付未完成，请完成支付后再试",
+			"errorCheckReportStatus": "检查报告状态失败：",
+			"errorReportGenerationFailed": "报告生成失败，请联系客服",
+			"errorCheckingReport": "检查报告时出现错误",
+			"errorGeneratingReport": "生成报告时出现错误",
+			"historicalBanner": "注意：",
+			"historicalBannerText": "您正在查看已保存的历史报告内容。",
+			"historicalBannerLink": "点击这里生成新的报告",
+			"sectionBasicAnalysis": "命主基础分析",
+			"sectionCoreAnalysis": "命局核心解析详解",
+			"sectionFlowYear": "2025乙巳流年详解",
+			"sectionFortuneSummary": "流年运势总结",
+			"sectionLuckAdvice": "开运建议",
+			"sectionWealthSummary": "流年财运总结",
+			"sectionRelationshipSummary": "流年感情总结",
+			"sectionHealthSummary": "流年健康总结",
+			"sectionCareerSummary": "流年事业总结"
+		},
+		"components": {
+			"fiveElement": {
+				"loadingText": "风水妹已经在运算五行配置中，请稍候",
+				"loadingAlt": "风水妹运算中",
+				"allElementsPresent": "五行齐全",
+				"noSevereMissing": "- 没有严重缺失某一元素",
+				"missingElements": "命局缺",
+				"needsSupport": "需要后天补充以达到平衡"
+			},
+			"zodiac": {
+				"loadingText": "风水妹已经在运算八字分析中，请稍候",
+				"loadingAlt": "风水妹运算中",
+				"defaultAdvice": "根据五行分析，需要进一步确认用神配置以达到最佳平衡效果。",
+				"adviceTemplate": "根据你的五行配置分析，建议以「{primaryGod}」为首选用神，「{auxiliaryGod}」为辅助用神。透过{strategy}的策略，两者协同作用可有效调节五行能量，达到阴阳平衡，提升整体运势发展。在日常生活中，可通过相应的颜色、方位、职业选择等方式来强化这些有利元素的影响力。",
+				"strategy_補缺": "补足所缺",
+				"strategy_扶弱": "扶助偏弱",
+				"strategy_抑強": "抑制过强",
+				"strategy_瀉強": "化解过旺",
+				"strategy_default": "平衡调和",
+				"yearPillar": "年柱",
+				"monthPillar": "月柱",
+				"dayPillar": "日柱",
+				"hourPillar": "时柱",
+				"wuxingLabel": "五行",
+				"noMissingElements": "五行没有缺失",
+				"missing": "缺",
+				"missingEtc": "等"
+			},
+			"questionFocus": {
+				"sectionTitle": "疑问重点",
+				"loadingText": "风水妹已经在分析您的疑问重点，请稍候",
+				"loadingAlt": "风水妹运算中",
+				"errorText": "分析过程中遇到问题，已显示备用内容",
+				"analysisTitle": "分析指导",
+				"analysisContent": "根据您的关注领域「{concern}」和具体问题「{problem}」，我们将为您提供专业的命理分析和建议。\n\n💡 详细的分析内容请参阅报告中的其他相关章节。"
+			},
+			"mingJu": {
+				"loadingAlt": "风水妹运算中",
+				"loadingText": "风水妹已经在运算命局核心解析中，请稍候",
+				"dayMaster": "日主特性",
+				"tabs": {
+					"health": {
+						"middle": "疾厄宫与十神",
+						"right": "调候与病源关键"
+					},
+					"wealth": {
+						"middle": "财星与十神",
+						"right": "财星定位"
+					},
+					"career": {
+						"middle": "事业宫与十神",
+						"right": "财星定位"
+					},
+					"relationship": {
+						"middle": "感情宫与十神",
+						"right": "感情定位"
+					}
+				}
+			},
+			"ganZhi": {
+				"title": "流年干支作用",
+				"subtitle": "流年干支的变化对个人运势有着深远的影响，以该年属性为主轴解析",
+				"loadingAlt": "风水妹运算中",
+				"loadingText": "风水妹已经在运算流年干支分析中，请稍候",
+				"loadingDataText": "载入流年分析数据中..."
+			},
+			"jiXiong": {
+				"loading": "风水妹已经在运算吉凶分析中，请稍候",
+				"error": "分析出现问题：",
+				"showingBasicAnalysis": "显示基础分析结果",
+				"auspicious": "吉象",
+				"inauspicious": "凶象",
+				"noData": "暂无吉凶分析数据"
+			},
+			"season": {
+				"title": "关键季节",
+				"loading": "风水妹已经在运算四季分析中，请稍候",
+				"noData": "无法载入季节分析数据",
+				"current": "当前：",
+				"analyzingSeasons": "正在分析关键季节..."
+			},
+			"coreSuggestion": {
+				"title": "核心原则",
+				"subtitle": "基于您的八字命理，着重于长期的生活调整和基础运势提升。",
+				"loading": "风水妹已经在运算开运建议中，请稍候",
+				"noData": "无法载入开运建议数据"
+			},
+			"specificSuggestion": {
+				"loading": "风水妹已经在运算针对性建议中，请稍候",
+				"noData": "无法载入针对性建议数据",
+				"subtitle": "针对您当前的具体困扰提供实用解决方案，帮助您应对眼前挑战。",
+				"suggestionsTitle": "建议方案",
+				"taboosTitle": "禁忌行为",
+				"consequence": "后果"
+			}
+		}
 	}
 }

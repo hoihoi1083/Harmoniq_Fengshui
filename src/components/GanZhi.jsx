@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { getConcernColor } from "../utils/colorTheme";
 import getWuxingData from "../lib/nayin";
@@ -113,6 +114,8 @@ const getConcernSpecificContent = (concern, yearStem, yearBranch) => {
 };
 
 export default function GanZhi({ userInfo, currentYear = 2025 }) {
+	const locale = useLocale();
+	const t = useTranslations("fengShuiReport.components.ganZhi");
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [activeSection, setActiveSection] = useState("tianGan"); // Will be set dynamically
@@ -374,6 +377,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 	// Function to call AI API for real content generation
 	const generateAIAnalysis = async (userInfo, year) => {
 		try {
+			console.log("🌐 GanZhi component sending locale to API:", locale);
 			const response = await fetch("/api/ganzhi-analysis", {
 				method: "POST",
 				headers: {
@@ -382,6 +386,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				body: JSON.stringify({
 					userInfo,
 					currentYear: year,
+					locale: locale,
 				}),
 			});
 
@@ -394,10 +399,11 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			if (data.success) {
 				return parseAIResponse(data, userInfo, year);
 			} else {
+				console.error("❌ AI analysis failed - using fallback:", data.message || "AI analysis failed");
 				throw new Error(data.message || "AI analysis failed");
 			}
 		} catch (error) {
-			console.error("AI Analysis Error:", error);
+			console.error("💥 AI Analysis Error - using fallback content:", error);
 			// Fallback to mock data if AI fails
 			const fallbackData = generateGanZhiAnalysis(userInfo, year);
 			const yearGanZhi = getYearlyStems(year);
@@ -482,14 +488,51 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			);
 		}
 
-		// Parse the AI analysis to extract structured content
-		const parseAIContent = (text) => {
-			console.log(
-				"🔍 parseAIContent called with text length:",
-				text?.length
-			);
-
-			const result = {
+	// Parse the AI analysis to extract structured content
+	const parseAIContent = (text) => {
+		console.log(
+			"🔍 parseAIContent called with text length:",
+			text?.length
+		);
+		
+		// DEBUG: Log the last 500 chars to see what's actually there
+		if (text && text.length > 500) {
+			console.log("📄 Last 500 chars of AI response:");
+			console.log(text.substring(text.length - 500));
+		}
+		
+		// Remove duplicate standalone sections that appear AFTER 【注意事項】
+		// Look for the pattern: after section 5 content, there's a newline followed by plain "建議" or "總結："
+		// We want to keep everything UP TO but NOT INCLUDING these duplicate sections
+		
+		// Find where section 5 ends (after the last content of 總結要點)
+		// Then remove everything after that if there's a standalone "建議" or "總結："
+		const duplicatePatterns = [
+			/\n[建議议]\s*\n/,      // Standalone "建議" with newlines
+			/\n[總总][結结][：:]\s*\n/  // Standalone "總結：" with newlines
+		];
+		
+		let cleanedText = text;
+		const section5Index = cleanedText.indexOf('### 5. 【注意事');
+		console.log(`🔍 Section 5 starts at position: ${section5Index}`);
+		
+		for (const pattern of duplicatePatterns) {
+			const match = cleanedText.search(pattern);
+			console.log(`🔍 Pattern ${pattern} match at position: ${match}`);
+			if (match !== -1 && section5Index !== -1 && match > section5Index) {
+				console.log(`🧹 CUTTING at position ${match}, removing ${text.length - match} chars`);
+				cleanedText = cleanedText.substring(0, match);
+				break; // Cut at first match
+			}
+		}
+		
+		if (cleanedText.length < text.length) {
+			console.log(`✂️ Total removed: ${text.length - cleanedText.length} chars of duplicate content`);
+		}
+		
+		text = cleanedText;
+		
+		const result = {
 				description: "",
 				tianGan: {
 					title: `天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-${getTenGodRelation(yearGanZhi?.stem || "乙", actualDayMaster)}`,
@@ -551,17 +594,17 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				console.log("⚠️ No description pattern found");
 			}
 
-			// Extract 天干 effects with better parsing
+			// Extract 天干 effects with better parsing (supports both Traditional and Simplified)
 			const tianGanSection = text.match(
-				/### 2\. 【天干.*?效應】(.*?)(?=### 3\.|---)/s
+				/### 2\. 【天干.*?[效应應]】(.*?)(?=### 3\.|---)/s
 			);
 			if (tianGanSection) {
 				console.log("✅ TianGan section found");
 				const tianGanText = tianGanSection[1];
 
-				// Extract title - look for pattern like "天干乙木為**正官**"
+				// Extract title - look for pattern like "天干乙木為**正官**" or "天干乙为**劫财**"
 				const titleMatch = tianGanText.match(
-					/天干(.+?)為\*\*(.+?)\*\*/
+					/天干(.+?)[為为]\*\*(.+?)\*\*/
 				);
 				if (titleMatch) {
 					result.tianGan.title = `天干${titleMatch[1].trim()}-${titleMatch[2].trim()}`;
@@ -628,15 +671,15 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				console.log("⚠️ TianGan section not found with regex");
 			}
 
-			// Extract 地支 effects with similar logic
+			// Extract 地支 effects with similar logic (supports both Traditional and Simplified)
 			const diZhiSection = text.match(
-				/### 3\. 【地支.*?效應】(.*?)(?=### 4\.|---)/s
+				/### 3\. 【地支.*?[效应應]】(.*?)(?=### 4\.|---)/s
 			);
 			if (diZhiSection) {
 				const diZhiText = diZhiSection[1];
 
-				// Extract title
-				const titleMatch = diZhiText.match(/地支(.+?)為\*\*(.+?)\*\*/);
+				// Extract title - supports both 為 and 为
+				const titleMatch = diZhiText.match(/地支(.+?)[為为]\*\*(.+?)\*\*/);
 				if (titleMatch) {
 					result.diZhi.title = `地支${titleMatch[1].trim()}-${titleMatch[2].trim()}`;
 				} else {
@@ -687,9 +730,9 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				}
 			}
 
-			// Extract key actions from 關鍵作用 or similar sections
+			// Extract key actions from 關鍵作用 or similar sections (supports both Traditional and Simplified)
 			const keyActionsMatch = text.match(
-				/(?:\*\*關鍵作用\*\*|\*\*關鍵影響\*\*)[：:]?(.*?)(?=---|###)/s
+				/(?:\*\*[關关][鍵键]作用\*\*|\*\*[關关][鍵键][影响響]\*\*)[：:]?(.*?)(?=---|###)/s
 			);
 			if (keyActionsMatch) {
 				const actions = keyActionsMatch[1]
@@ -700,87 +743,131 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				result.tianGan.keyActions = actions;
 			}
 
-			// Extract practical results
+			// Extract practical results (supports both Traditional and Simplified)
 			const practicalMatch = text.match(
-				/### 4\. 【實際表現】(.*?)(?=### 5\.|---)/s
+				/### 4\. 【[實实][際际]表[現现]】(.*?)(?=### 5\.|---)/s
 			);
 			if (practicalMatch) {
 				result.practicalResults = practicalMatch[1].trim();
 			}
 
-			// Extract risks and suggestions with improved parsing
-			const noticeMatch = text.match(
-				/### 5\. 【注意事項】(.*?)(?=### |$)/s
-			);
-			if (noticeMatch) {
-				const noticeText = noticeMatch[1];
-
-				// Look for specific subsections
-				const riskMatch = noticeText.match(
-					/\*\*風險提醒\*\*[：:]?(.*?)(?=\*\*建議指引\*\*|\*\*總結要點\*\*|$)/s
-				);
-				if (riskMatch) {
-					result.risks = riskMatch[1]
-						.trim()
-						.replace(/\*\*/g, "")
-						.replace(/^\s*[\-\*]\s*/gm, "")
-						.trim();
+		// Extract risks and suggestions with improved parsing (supports both Traditional and Simplified)
+		const noticeMatch = text.match(
+			/### 5\. 【注意事[項项]】(.*?)(?=### |$)/s
+		);
+		console.log("🔍 Notice section match result:", noticeMatch ? "FOUND" : "NOT FOUND");
+		if (noticeMatch) {
+			console.log("📋 Notice text length:", noticeMatch[1]?.length);
+			console.log("📋 Notice text preview (first 200 chars):", noticeMatch[1]?.substring(0, 200));
+			
+			let noticeText = noticeMatch[1];				// Cut off any standalone duplicate sections
+				// Look for lines that are JUST "建議" or "總結：" without being part of "建议指引" or "总结要点"
+				const cutoffPatterns = [
+					/\n[建議议]\s*\n(?![指引導导])/s,  // Plain "建議" not followed by "指引"
+					/\n[總总][結结][：:]\s*\n/s         // "總結：" as standalone heading
+				];
+				
+				for (const pattern of cutoffPatterns) {
+					const cutIndex = noticeText.search(pattern);
+					if (cutIndex !== -1) {
+						noticeText = noticeText.substring(0, cutIndex);
+						break;
+					}
 				}
 
-				const suggestionMatch = noticeText.match(
-					/\*\*建議指引\*\*[：:]?(.*?)(?=\*\*總結要點\*\*|$)/s
+				// Look for specific subsections (supports both Traditional and Simplified)
+				console.log("🔍 Testing regex patterns against noticeText...");
+				
+				// Risk pattern - handle both Traditional and Simplified
+				const riskMatch = noticeText.match(
+					/\*\*(风险提醒|風險提醒)\*\*[：:]?(.*?)(?=\*\*(建议指引|建議指引|總结要点|總結要點)\*\*)/s
 				);
-				if (suggestionMatch) {
-					result.suggestions = suggestionMatch[1]
+				if (riskMatch) {
+					result.risks = riskMatch[2]
 						.trim()
 						.replace(/\*\*/g, "")
 						.replace(/^\s*[\-\*]\s*/gm, "")
 						.trim();
+					console.log(`✅ Extracted risks (${result.risks.length} chars):`, result.risks.substring(0, 200));
+				} else {
+					console.log(`❌ No risks match found in noticeText`);
+					console.log("🔍 Looking for patterns manually...");
+					if (noticeText.includes("风险提醒")) console.log("✓ Found: 风险提醒");
+					if (noticeText.includes("風險提醒")) console.log("✓ Found: 風險提醒");
+					if (noticeText.includes("建议指引")) console.log("✓ Found: 建议指引");
+					if (noticeText.includes("建議指引")) console.log("✓ Found: 建議指引");
+				}
+
+				// Suggestion pattern - handle both Traditional and Simplified
+				const suggestionMatch = noticeText.match(
+					/\*\*(建议指引|建議指引)\*\*[：:]?(.*?)(?=\*\*(总结要点|總结要点|總結要點)\*\*|$)/s
+				);
+				if (suggestionMatch) {
+					result.suggestions = suggestionMatch[2]
+						.trim()
+						.replace(/\*\*/g, "")
+						.replace(/^\s*[\-\*]\s*/gm, "")
+						.trim();
+					console.log(`✅ Extracted suggestions (${result.suggestions.length} chars):`, result.suggestions.substring(0, 200));
+				} else {
+					console.log(`❌ No suggestions match found in noticeText`);
 				}
 
 				const conclusionMatch = noticeText.match(
-					/\*\*總結要點\*\*[：:]?(.*?)$/s
+					/\*\*(总结|總結)\*\*[：:]?(.*?)$/s
 				);
 				if (conclusionMatch) {
-					result.conclusion = conclusionMatch[1]
+					result.conclusion = conclusionMatch[2]
 						.trim()
 						.replace(/\*\*/g, "")
 						.replace(/^\s*[\-\*]\s*/gm, "")
 						.trim();
+					console.log(`✅ Extracted conclusion (${result.conclusion.length} chars):`, result.conclusion.substring(0, 200));
+				} else {
+					console.log(`❌ No conclusion match found in noticeText`);
 				}
 
 				// Fallback: if no specific subsections found, try to extract risks and suggestions differently
 				if (!result.risks && !result.suggestions) {
+					// Match plain "風險" or "风险" heading until "建议指引" or "建議指引"
 					const riskFallback =
-						noticeText.match(/風險[：:]?(.*?)(?=建議|$)/s);
+						noticeText.match(/[風风][險险]\s*\n(?:.*?[：:]\s*\n)?(.*?)(?=\n[建議议][指引導导][：:])/s);
 					if (riskFallback) {
 						result.risks = riskFallback[1]
 							.trim()
 							.replace(/\*\*/g, "");
 					}
 
+					// Match "建议指引：" or "建議指引：" until "总结要点" or "總結要點"
 					const suggestionFallback =
-						noticeText.match(/建議[：:]?(.*?)(?=總結|$)/s);
+						noticeText.match(/[建議议][指引導导][：:]\s*\n(?:.*?[：:]\s*\n)?(.*?)(?=\n[總总][結结]要点點[：:])/s);
 					if (suggestionFallback) {
 						result.suggestions = suggestionFallback[1]
+							.trim()
+							.replace(/\*\*/g, "");
+					}
+					
+					// Match "总结要点：" or "總結要點：" until end
+					const conclusionFallback =
+						noticeText.match(/[總总][結结]要点點[：:]\s*\n(.*?)$/s);
+					if (conclusionFallback) {
+						result.conclusion = conclusionFallback[1]
 							.trim()
 							.replace(/\*\*/g, "");
 					}
 				}
 			}
 
-			// Extract conclusion
-			const conclusionMatch = text.match(
-				/(?:### 總結|總結)[：:]?(.*?)$/s
-			);
-			if (conclusionMatch) {
-				result.conclusion = conclusionMatch[1].trim();
-			} else {
-				// Fallback conclusion
-				result.conclusion = `2025年為${concern}突破年，雖有壓力卻暗藏機遇，需平衡「官星責任」與「印星自信」，並以金水調候避免過燥。主動爭取機會、強化專業表現，有望獲得實質進展。`;
-			}
-
-			return result;
+		// Extract conclusion
+		const conclusionMatch = text.match(
+			/(?:### [總总][結结]|[總总][結结]要点點)[：:]?(.*?)$/s
+		);
+		if (conclusionMatch) {
+			result.conclusion = conclusionMatch[1].trim();
+		} else {
+			// Fallback conclusion
+			result.conclusion = `2025年為${concern}突破年，雖有壓力卻暗藏機遇，需平衡「官星責任」與「印星自信」，並以金水調候避免過燥。主動爭取機會、強化專業表現，有望獲得實質進展。`;
+		}			return result;
 		};
 
 		const parsedContent = parseAIContent(analysis);
@@ -1088,7 +1175,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
-							alt="風水妹運算中"
+							alt={t("loadingAlt")}
 							width={120}
 							height={120}
 							className="object-contain"
@@ -1104,7 +1191,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 								fontSize: "clamp(14px, 3.5vw, 16px)",
 							}}
 						>
-							風水妹已經在運算流年干支分析中，請稍候
+							{t("loadingText")}
 						</div>
 					</div>
 				</div>
@@ -1131,7 +1218,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 							fontSize: "clamp(1rem, 3vw, 1.125rem)",
 						}}
 					>
-						載入流年分析數據中...
+						{t("loadingDataText")}
 					</p>
 				</div>
 			</div>
@@ -1158,10 +1245,10 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 							lineHeight: 1.1,
 						}}
 					>
-						流年干支作用
+						{t("title")}
 					</h2>
 					<p className="mb-4 text-lg">
-						流年干支的變化對個人運勢有著深遠的影響，以該年屬性為主軸解析
+						{t("subtitle")}
 					</p>
 
 					{/* Description */}
@@ -1544,7 +1631,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 											?.replace(/\n/g, "<br/>") ||
 										analysisData?.aiAnalysis
 											?.match(
-												/\*\*風險\*\*[：:]?(.*?)(?=\*\*建議\*\*|-)/s
+												/\*\*[風风][險险]\*\*[：:]?(.*?)(?=\*\*[建議议]\*\*|-)/s
 											)?.[1]
 											?.replace(
 												/\*\*(.+?)\*\*/g,
@@ -1587,7 +1674,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 											?.replace(/\n/g, "<br/>") ||
 										analysisData?.aiAnalysis
 											?.match(
-												/\*\*建議\*\*[：:]?(.*?)(?=---|###|總結)/s
+												/\*\*[建議议]\*\*[：:]?(.*?)(?=---|###|[總总][結结])/s
 											)?.[1]
 											?.replace(
 												/\*\*(.+?)\*\*/g,

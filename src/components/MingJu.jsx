@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import {
 	getComponentData,
 	storeComponentData,
@@ -249,10 +250,30 @@ function getTabConfig(concern) {
 	return TAB_CONFIG[concern] || TAB_CONFIG["財運"];
 }
 
-function getTabLabel(tab, concern) {
-	if (tab === "日主特性") return "日主特性";
-	if (tab === "middle") return getTabConfig(concern).middle.label;
-	if (tab === "right") return getTabConfig(concern).right.label;
+function getTabLabel(tab, concern, t) {
+	if (tab === "日主特性") return t ? t("dayMaster") : "日主特性";
+
+	// Map concern types to translation keys
+	const concernMap = {
+		健康: "health",
+		財運: "wealth",
+		事業: "career",
+		工作: "career",
+		感情: "relationship",
+	};
+
+	const concernKey = concernMap[concern] || "wealth";
+
+	if (tab === "middle") {
+		return t
+			? t(`tabs.${concernKey}.middle`)
+			: getTabConfig(concern).middle.label;
+	}
+	if (tab === "right") {
+		return t
+			? t(`tabs.${concernKey}.right`)
+			: getTabConfig(concern).right.label;
+	}
 	return "";
 }
 
@@ -292,16 +313,22 @@ function getTabImgColor(tab, concern, selected) {
 // AI analysis function with enhanced confidence and fallback strategy
 async function generateMingJuAnalysis(
 	{ birthDateTime, gender, concern, problem, currentYear },
-	tab
+	tab,
+	locale = "zh-TW"
 ) {
 	const concernArea = concern || "財運";
 
 	// Create AI prompt based on tab and concern
-	const prompt = createAIPrompt(concernArea, tab, {
-		birthDateTime,
-		gender,
-		problem,
-	});
+	const prompt = createAIPrompt(
+		concernArea,
+		tab,
+		{
+			birthDateTime,
+			gender,
+			problem,
+		},
+		locale
+	);
 
 	// Try AI API multiple times for better reliability
 	for (let attempt = 1; attempt <= 3; attempt++) {
@@ -324,6 +351,7 @@ async function generateMingJuAnalysis(
 					attempt,
 					forceDetailed: true, // Request more detailed analysis
 					confidence: "high", // Request high confidence response
+					locale: locale, // Pass locale to API for language selection
 				}),
 			});
 
@@ -792,7 +820,7 @@ function generatePersonalizedRight(
 }
 
 // Create structured prompts for AI with enhanced confidence
-function createAIPrompt(concern, tab, userInfo) {
+function createAIPrompt(concern, tab, userInfo, locale = "zh-TW") {
 	const { birthDateTime, gender, problem } = userInfo;
 
 	// Calculate current year's GanZhi for dynamic year references
@@ -802,7 +830,31 @@ function createAIPrompt(concern, tab, userInfo) {
 	// Get accurate Ba Zi data for AI analysis using nayin.js
 	const baziInfo = getAccurateBaziInfo(birthDateTime, gender);
 
-	const baseContext = `用戶生辰：${birthDateTime}，性別：${gender}，關注領域：${concern}，具體問題：${problem}
+	// Language instruction based on locale
+	const languageInstruction =
+		locale === "zh-CN"
+			? "**重要：无论上述示例使用何种中文字体，你必须将所有输出内容（包括title、content、description等所有字段）转换为简体中文输出**"
+			: "**重要：請全部使用繁體中文輸出**";
+
+	const sectionsNote =
+		locale === "zh-CN"
+			? "并确保返回完整的sections数组"
+			: "並確保返回完整的sections數組";
+
+	// Create locale-specific text
+	const baseContext =
+		locale === "zh-CN"
+			? `用户生辰：${birthDateTime}，性别：${gender}，关注领域：${concern}，具体问题：${problem}
+
+【八字基础资料】
+- 出生年份：${baziInfo.year}年
+- 纳音五行：${baziInfo.element}命
+- 日主：${baziInfo.dayMaster}
+- 日主强弱：${baziInfo.strength}
+- 性格特质：${baziInfo.characteristics}
+
+【重要指示】你是专业的八字命理大师，必须基于上述准确的八字资料进行分析。不得自行编造或推测八字信息，必须以提供的日主和五行资料为准。避免模糊用词，要给出明确的判断和建议。请使用简体中文回应。`
+			: `用戶生辰：${birthDateTime}，性別：${gender}，關注領域：${concern}，具體問題：${problem}
 
 【八字基礎資料】
 - 出生年份：${baziInfo.year}年
@@ -940,7 +992,7 @@ function createAIPrompt(concern, tab, userInfo) {
 - 每個section的content要有150-200字的詳細分析
 - keyPoints和interactions要有具體的命理依據
 - 分析要專業且具體，避免空泛描述
-- **重要：請全部使用繁體中文輸出**`;
+- ${languageInstruction}`;
 		} else if (normalizeConcern(concern) === "事業") {
 			return `${baseContext}
       
@@ -996,7 +1048,7 @@ function createAIPrompt(concern, tab, userInfo) {
 - 每個section的content要有150-200字的詳細分析
 - keyPoints和interactions要有具體的命理依據
 - 分析要專業且具體，避免空泛描述
-- **重要：請全部使用繁體中文輸出，並確保返回完整的sections數組**`;
+- ${languageInstruction}，${sectionsNote}`;
 		} else if (normalizeConcern(concern) === "健康") {
 			return `${baseContext}
       
@@ -1047,7 +1099,7 @@ function createAIPrompt(concern, tab, userInfo) {
 - 每個section的content要有150-200字的詳細分析
 - keyPoints和interactions要有具體的五行醫理依據
 - 分析要專業且具實用性，避免空泛描述
-- **重要：請全部使用繁體中文輸出**`;
+- ${languageInstruction}`;
 		} else if (normalizeConcern(concern) === "感情") {
 			return `${baseContext}
       
@@ -1102,7 +1154,7 @@ function createAIPrompt(concern, tab, userInfo) {
 - 每個section的content要有150-200字的詳細分析
 - keyPoints和interactions要有具體的命理和桃花依據
 - 分析要專業且具實用性，避免空泛描述
-- **重要：請全部使用繁體中文輸出，並確保返回完整的sections數組**`;
+- ${languageInstruction}，${sectionsNote}`;
 		}
 		// Add similar enhanced prompts for other concerns...
 	} else if (tab === "right") {
@@ -1125,7 +1177,7 @@ function createAIPrompt(concern, tab, userInfo) {
 - 不允許使用其他日主或命格信息
 - 每個關鍵詞描述要符合${baziInfo.dayMaster}的理財特質
 - analysis部分要針對${baziInfo.dayMaster}提供專屬財運指導
-- **重要：請全部使用繁體中文輸出**`;
+- ${languageInstruction}`;
 		} else if (normalizeConcern(concern) === "事業") {
 			return `${baseContext}
       
@@ -1145,7 +1197,7 @@ function createAIPrompt(concern, tab, userInfo) {
 - 不允許使用其他日主或命格信息
 - 每個關鍵詞描述要符合${baziInfo.dayMaster}的職業特質
 - analysis部分要針對${baziInfo.dayMaster}提供專屬事業指導
-- **重要：請全部使用繁體中文輸出**`;
+- ${languageInstruction}`;
 		} else if (normalizeConcern(concern) === "健康") {
 			return `${baseContext}
       
@@ -1165,7 +1217,7 @@ function createAIPrompt(concern, tab, userInfo) {
 - 不允許使用其他日主或命格信息
 - 每個關鍵詞描述要符合${baziInfo.dayMaster}的五行特質
 - analysis部分要針對${baziInfo.dayMaster}提供專屬健康指導
-- **重要：請全部使用繁體中文輸出**`;
+- ${languageInstruction}`;
 		} else if (normalizeConcern(concern) === "感情") {
 			return `${baseContext}
       
@@ -1185,7 +1237,7 @@ function createAIPrompt(concern, tab, userInfo) {
 - 不允許使用其他日主或命格信息
 - 每個關鍵詞描述要符合${baziInfo.dayMaster}的感情特質
 - analysis部分要針對${baziInfo.dayMaster}提供專屬感情指導
-- **重要：請全部使用繁體中文輸出**`;
+- ${languageInstruction}`;
 		}
 		// Add other concerns for right tab...
 	}
@@ -2649,6 +2701,8 @@ function getFallbackContent(concernArea, tab) {
 }
 
 export function MingJu({ userInfo, currentYear }) {
+	const locale = useLocale();
+	const t = useTranslations("fengShuiReport.components.mingJu");
 	const [selectedTab, setSelectedTab] = useState("日主特性");
 	const [tabContent, setTabContent] = useState("");
 	const [aiContent, setAiContent] = useState("");
@@ -2732,7 +2786,8 @@ export function MingJu({ userInfo, currentYear }) {
 					);
 					const result = await generateMingJuAnalysis(
 						{ ...userInfo, currentYear },
-						tab
+						tab,
+						locale
 					);
 					console.log(`📋 Result for ${tab}:`, {
 						hasContent: !!result.content,
@@ -2893,7 +2948,7 @@ export function MingJu({ userInfo, currentYear }) {
 				<div className="flex items-center justify-center gap-8 px-2 mt-3 mb-6 sm:px-4 sm:mb-8 sm:gap-8 md:gap-16 lg:gap-70">
 					{TABS.map((tab) => {
 						const isSelected = selectedTab === tab;
-						const label = getTabLabel(tab, concern);
+						const label = getTabLabel(tab, concern, t);
 						const imgSrc = getTabImg(tab, concern);
 						const bgColor = getTabBg(tab, concern, isSelected);
 						const imgColor = getTabImgColor(
@@ -2901,7 +2956,6 @@ export function MingJu({ userInfo, currentYear }) {
 							concern,
 							isSelected
 						);
-
 						return (
 							<div
 								key={tab}
@@ -2996,7 +3050,7 @@ export function MingJu({ userInfo, currentYear }) {
 							fontSize: "clamp(1.5rem, 4vw, 2rem)",
 						}}
 					>
-						{getTabLabel(selectedTab, concern)}
+						{getTabLabel(selectedTab, concern, t)}
 					</h2>
 				</div>
 				{/* Content Area */}
@@ -3019,7 +3073,7 @@ export function MingJu({ userInfo, currentYear }) {
 									<div className="flex items-center justify-center">
 										<Image
 											src="/images/風水妹/風水妹-loading.png"
-											alt="風水妹運算中"
+											alt={t("loadingAlt")}
 											width={120}
 											height={120}
 											className="object-contain"
@@ -3037,7 +3091,7 @@ export function MingJu({ userInfo, currentYear }) {
 													"clamp(14px, 3.5vw, 16px)",
 											}}
 										>
-											風水妹已經在運算命局核心解析中，請稍候
+											{t("loadingText")}
 										</div>
 									</div>
 								</div>
@@ -3071,7 +3125,7 @@ export function MingJu({ userInfo, currentYear }) {
 									<div className="flex items-center justify-center">
 										<Image
 											src="/images/風水妹/風水妹-loading.png"
-											alt="風水妹運算中"
+											alt={t("loadingAlt")}
 											width={120}
 											height={120}
 											className="object-contain"
@@ -3089,7 +3143,7 @@ export function MingJu({ userInfo, currentYear }) {
 													"clamp(14px, 3.5vw, 16px)",
 											}}
 										>
-											風水妹已經在運算命局核心解析中，請稍候
+											{t("loadingText")}
 										</div>
 									</div>
 								</div>

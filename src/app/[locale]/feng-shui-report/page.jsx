@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { BaziAnalysisSystem } from "@/lib/newConversationFlow";
 import { ArrowLeft, Calendar, User, Target, AlertCircle } from "lucide-react";
 import FiveElement from "@/components/FiveElement";
@@ -30,6 +31,7 @@ if (typeof window !== "undefined") {
 }
 
 export default function FengShuiReportPage() {
+	const t = useTranslations("fengShuiReport.page");
 	const [reportData, setReportData] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -61,15 +63,17 @@ export default function FengShuiReportPage() {
 
 	// Helper function to get concern-specific section titles
 	const getSectionTitle = (concern) => {
+		// Normalize concern to handle both simplified and traditional Chinese
+		const normalizedConcern =
+			concern === "财运" ? "財運" : concern === "事业" ? "事業" : concern;
+
 		const titleMap = {
-			財運: "流年財運總結",
-			财运: "流年財運總結", // Simplified Chinese support
-			感情: "流年感情總結",
-			健康: "流年健康總結",
-			事業: "流年事業總結",
-			事业: "流年事業總結", // Simplified Chinese support
+			財運: t("sectionWealthSummary"),
+			感情: t("sectionRelationshipSummary"),
+			健康: t("sectionHealthSummary"),
+			事業: t("sectionCareerSummary"),
 		};
-		return titleMap[concern] || "流年運勢總結";
+		return titleMap[normalizedConcern] || t("sectionFortuneSummary");
 	};
 
 	// Five Elements analysis functions
@@ -238,7 +242,7 @@ export default function FengShuiReportPage() {
 				searchParams.get("sessionId") || searchParams.get("session_id");
 
 			if (!sessionId) {
-				setError("缺少支付會話ID，請重新進行支付");
+				setError(t("errorMissingSession"));
 				setLoading(false);
 				return;
 			}
@@ -287,9 +291,9 @@ export default function FengShuiReportPage() {
 
 			if (checkData.status !== 0) {
 				if (checkData.paymentRequired) {
-					setError("支付未完成，請完成支付後再試");
+					setError(t("errorPaymentIncomplete"));
 				} else {
-					setError("檢查報告狀態失敗：" + checkData.error);
+					setError(t("errorCheckReportStatus") + checkData.error);
 				}
 				setLoading(false);
 				return;
@@ -339,12 +343,12 @@ export default function FengShuiReportPage() {
 					"- Full checkData:",
 					JSON.stringify(checkData, null, 2)
 				);
-				setError("報告生成失敗，請聯繫客服");
+				setError(t("errorReportGenerationFailed"));
 				setLoading(false);
 			}
 		} catch (err) {
 			console.error("Report check error:", err);
-			setError("檢查報告時出現錯誤");
+			setError(t("errorCheckingReport"));
 			setLoading(false);
 		}
 	};
@@ -710,7 +714,7 @@ export default function FengShuiReportPage() {
 			}, 80000); // Wait 80 seconds for all AI components to complete (extended for Season)
 		} catch (err) {
 			console.error("Report generation error:", err);
-			setError("生成報告時出現錯誤");
+			setError(t("errorGeneratingReport"));
 			setLoading(false);
 		}
 	};
@@ -872,7 +876,7 @@ export default function FengShuiReportPage() {
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
-							alt="風水妹運算中"
+							alt={t("loadingAlt")}
 							width={120}
 							height={120}
 							className="object-contain"
@@ -889,7 +893,7 @@ export default function FengShuiReportPage() {
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在為你準備專屬風水分析報告
+							{t("loadingTitle")}
 						</div>
 					</div>
 				</div>
@@ -907,7 +911,7 @@ export default function FengShuiReportPage() {
 						onClick={() => router.back()}
 						className="px-6 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700"
 					>
-						返回
+						{t("errorReturn")}
 					</button>
 				</div>
 			</div>
@@ -935,13 +939,13 @@ export default function FengShuiReportPage() {
 					{showHistoricalBanner && (
 						<div className="p-4 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
 							<p className="text-yellow-800">
-								<strong>注意：</strong>
-								您正在查看已保存的歷史報告內容。
+								<strong>{t("historicalBanner")}</strong>
+								{t("historicalBannerText")}
 								<a
 									href="/price"
 									className="ml-2 text-blue-600 underline hover:text-blue-800"
 								>
-									點擊這裡生成新的報告
+									{t("historicalBannerLink")}
 								</a>
 							</p>
 						</div>
@@ -961,7 +965,7 @@ export default function FengShuiReportPage() {
 								lineHeight: 1.1,
 							}}
 						>
-							命主基礎分析
+							{t("sectionBasicAnalysis")}
 						</h1>
 					</div>
 
@@ -1042,7 +1046,7 @@ export default function FengShuiReportPage() {
 								lineHeight: 1.1,
 							}}
 						>
-							命局核心解析詳解
+							{t("sectionCoreAnalysis")}
 						</h1>
 					</div>
 					{/* Ming Ju Core Analysis */}
@@ -1072,7 +1076,7 @@ export default function FengShuiReportPage() {
 								lineHeight: 1.1,
 							}}
 						>
-							2025乙巳流年詳解
+							{t("sectionFlowYear")}
 						</h1>
 					</div>
 					{/* Gan Zhi Detailed Analysis */}
@@ -1151,7 +1155,7 @@ export default function FengShuiReportPage() {
 								lineHeight: 1.1,
 							}}
 						>
-							開運建議
+							{t("sectionLuckAdvice")}
 						</h1>
 					</div>
 					{/* Core Suggestion Analysis */}

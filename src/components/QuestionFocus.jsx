@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
 import { getConcernColor } from "../utils/colorTheme";
 import { storeComponentData } from "../utils/componentDataStore";
 import getWuxingData from "@/lib/nayin.js";
 
 export default function QuestionFocus({ userInfo }) {
+	const t = useTranslations("fengShuiReport.components.questionFocus");
+	const locale = useLocale();
 	const [solution, setSolution] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -127,9 +130,9 @@ export default function QuestionFocus({ userInfo }) {
 						},
 						concern: userInfo.concern,
 						problem: userInfo.problem,
+						locale: locale, // Pass locale to API for AI language selection
 					}),
 				});
-
 				const data = await response.json();
 
 				if (data.success) {
@@ -142,10 +145,13 @@ export default function QuestionFocus({ userInfo }) {
 				console.error("Error generating solution:", error);
 				setError(error.message);
 
-				// Simple fallback
+				// Simple fallback with i18n
 				const fallback = {
-					title: "分析指導",
-					content: `根據您的關注領域「${userInfo.concern}」和具體問題「${userInfo.problem}」，我們將為您提供專業的命理分析和建議。\n\n💡 詳細的分析內容請參閱報告中的其他相關章節。`,
+					title: t("analysisTitle"),
+					content: t("analysisContent", {
+						concern: userInfo.concern,
+						problem: userInfo.problem,
+					}),
 				};
 				setSolution(fallback);
 				storeComponentData("questionFocusAnalysis", fallback);
@@ -189,7 +195,7 @@ export default function QuestionFocus({ userInfo }) {
 						<div className="flex items-center justify-center">
 							<Image
 								src="/images/風水妹/風水妹-loading.png"
-								alt="風水妹運算中"
+								alt={t("loadingAlt")}
 								width={120}
 								height={120}
 								className="object-contain"
@@ -205,7 +211,7 @@ export default function QuestionFocus({ userInfo }) {
 									fontSize: "clamp(14px, 3.5vw, 16px)",
 								}}
 							>
-								風水妹已經在分析您的疑問重點，請稍候
+								{t("loadingText")}
 							</div>
 						</div>
 					</div>
@@ -228,12 +234,11 @@ export default function QuestionFocus({ userInfo }) {
 						className="mb-2 text-xl font-bold sm:text-2xl"
 						style={{ color: themeColor }}
 					>
-						疑問重點
+						{t("sectionTitle")}
 					</h2>
 					<p className="text-xl text-gray-600">{userInfo.problem}</p>
 				</div>
-			</div>
-
+			</div>{" "}
 			{/* Solution Content Container */}
 			<div
 				className="flex flex-col justify-center bg-white rounded-[40px] w-[90%] p-6 sm:p-8 lg:p-15 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)] border-2"
@@ -253,9 +258,7 @@ export default function QuestionFocus({ userInfo }) {
 
 				{error && (
 					<div className="p-3 mt-4 border border-red-200 rounded-lg bg-red-50">
-						<p className="text-sm text-red-600">
-							分析過程中遇到問題，已顯示備用內容
-						</p>
+						<p className="text-sm text-red-600">{t("errorText")}</p>
 					</div>
 				)}
 			</div>

@@ -2,6 +2,7 @@
 
 import { memo, useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { getConcernColor } from "../utils/colorTheme";
 
 const Zodiac = memo(function Zodiac({
@@ -10,6 +11,7 @@ const Zodiac = memo(function Zodiac({
 	analyzeWuxingStrength,
 	determineUsefulGods,
 }) {
+	const t = useTranslations("fengShuiReport.components.zodiac");
 	const [loading, setLoading] = useState(true);
 	const [analysisData, setAnalysisData] = useState(null);
 
@@ -105,7 +107,7 @@ const Zodiac = memo(function Zodiac({
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
-							alt="風水妹運算中"
+							alt={t("loadingAlt")}
 							width={120}
 							height={120}
 							className="object-contain"
@@ -121,7 +123,7 @@ const Zodiac = memo(function Zodiac({
 								fontSize: "clamp(14px, 3.5vw, 16px)",
 							}}
 						>
-							風水妹已經在運算八字分析中，請稍候
+							{t("loadingText")}
 						</div>
 					</div>
 				</div>
@@ -210,7 +212,7 @@ const Zodiac = memo(function Zodiac({
 									fontSize: "clamp(14px, 3vw, 20px)",
 								}}
 							>
-								年柱-
+								{t("yearPillar")}-
 								<span className="text-[#A3B116]">
 									{analysisData.wuxingData.year}
 								</span>
@@ -226,7 +228,7 @@ const Zodiac = memo(function Zodiac({
 									fontSize: "clamp(14px, 3vw, 20px)",
 								}}
 							>
-								月柱-
+								{t("monthPillar")}-
 								<span className="text-[#A3B116]">
 									{analysisData.wuxingData.month}
 								</span>
@@ -242,7 +244,7 @@ const Zodiac = memo(function Zodiac({
 									fontSize: "clamp(14px, 3vw, 20px)",
 								}}
 							>
-								日柱-
+								{t("dayPillar")}-
 								<span className="text-[#A3B116]">
 									{analysisData.wuxingData.day}
 								</span>
@@ -258,7 +260,7 @@ const Zodiac = memo(function Zodiac({
 									fontSize: "clamp(14px, 3vw, 20px)",
 								}}
 							>
-								時柱-
+								{t("hourPillar")}-
 								<span className="text-[#A3B116]">
 									{analysisData.wuxingData.hour}
 								</span>
@@ -281,7 +283,7 @@ const Zodiac = memo(function Zodiac({
 									fontFamily: "Noto Serif TC, serif",
 								}}
 							>
-								五行-
+								{t("wuxingLabel")}-
 								{analysisData.strengthAnalysis.strengthDesc}
 							</div>
 						</div>
@@ -304,13 +306,13 @@ const Zodiac = memo(function Zodiac({
 										analysisData.strengthAnalysis
 											.weakElements || [];
 									if (missingElements.length === 0) {
-										return "五行沒有缺失";
+										return t("noMissingElements");
 									} else if (missingElements.length === 1) {
-										return `缺${missingElements[0]}`;
+										return `${t("missing")}${missingElements[0]}`;
 									} else if (missingElements.length === 2) {
-										return `缺${missingElements.join("")}`;
+										return `${t("missing")}${missingElements.join("")}`;
 									} else {
-										return `缺${missingElements.slice(0, 2).join("")}等`;
+										return `${t("missing")}${missingElements.slice(0, 2).join("")}${t("missingEtc")}`;
 									}
 								})()}
 							</div>
@@ -332,17 +334,19 @@ const Zodiac = memo(function Zodiac({
 									analysisData.usefulGods || {};
 
 								if (!primaryGod || !auxiliaryGod) {
-									return "根據五行分析，需要進一步確認用神配置以達到最佳平衡效果。";
+									return t("defaultAdvice");
 								}
 
-								const strategyDesc = {
-									補缺: "補足所缺",
-									扶弱: "扶助偏弱",
-									抑強: "抑制過強",
-									瀉強: "化解過旺",
-								};
+								const strategyKey = `strategy_${strategy}`;
+								const strategyText = t(strategyKey, {
+									defaultValue: t("strategy_default"),
+								});
 
-								return `根據你的五行配置分析，建議以「${primaryGod}」為首選用神，「${auxiliaryGod}」為輔助用神。透過${strategyDesc[strategy] || "平衡調和"}的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力。`;
+								return t("adviceTemplate", {
+									primaryGod,
+									auxiliaryGod,
+									strategy: strategyText,
+								});
 							})()}
 						</p>
 					</div>

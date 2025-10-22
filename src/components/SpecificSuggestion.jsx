@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { getConcernColor } from "../utils/colorTheme";
 
 export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
+	const locale = useLocale();
+	const t = useTranslations("fengShuiReport.components.specificSuggestion");
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -21,6 +24,7 @@ export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
 				},
 				body: JSON.stringify({
 					userInfo: userInfo,
+					locale: locale,
 				}),
 			});
 
@@ -205,7 +209,7 @@ export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
 								fontSize: "clamp(14px, 3.5vw, 16px)",
 							}}
 						>
-							風水妹已經在運算針對性建議中，請稍候
+							{t("loading")}
 						</div>
 					</div>
 				</div>
@@ -217,7 +221,7 @@ export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
 		return (
 			<section className="relative w-full sm:w-[95%] lg:w-[85%] mx-auto bg-white rounded-[20px] sm:rounded-[26px] p-4 sm:p-12 lg:p-20 mb-6 sm:mb-10 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
 				<div className="py-8 text-center text-gray-500">
-					無法載入針對性建議資料
+					{t("noData")}
 				</div>
 			</section>
 		);
@@ -248,7 +252,7 @@ export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
 								lineHeight: 1.5,
 							}}
 						>
-							針對您當前的具體問題，提供立即可執行的解決方案和明確的禁忌事項。建議著重於短期內的實際行動和問題解決。
+							{t("subtitle")}
 						</p>
 					</div>
 				</div>
@@ -273,7 +277,7 @@ export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
 							className="font-bold text-green-700"
 							style={{ fontSize: "clamp(1.125rem, 3vw, 2rem)" }}
 						>
-							建議方案
+							{t("suggestionsTitle")}
 						</h3>
 					</div>
 
@@ -330,7 +334,7 @@ export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
 							className="font-bold text-red-700"
 							style={{ fontSize: "clamp(1.125rem, 3vw, 2rem)" }}
 						>
-							禁忌行為
+							{t("taboosTitle")}
 						</h3>
 					</div>
 
@@ -364,7 +368,7 @@ export default function SpecificSuggestion({ userInfo, currentYear = 2025 }) {
 								</p>
 								<div className="p-2 bg-red-100 rounded-lg sm:p-3">
 									<p className="text-xs font-medium text-red-600">
-										⚠️ 後果：{taboo.consequence}
+										⚠️ {t("consequence")}：{taboo.consequence}
 									</p>
 								</div>
 							</div>
