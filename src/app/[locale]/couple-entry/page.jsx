@@ -35,7 +35,7 @@ export default function CoupleEntryPage({ params }) {
 	// Check for same gender validation
 	const checkGenderValidation = (gender1, gender2) => {
 		if (gender1 === gender2) {
-			setGenderError("暫時只支持異性感情合盤");
+			setGenderError(t("sameGenderError"));
 			return false;
 		} else {
 			setGenderError("");
@@ -499,7 +499,7 @@ export default function CoupleEntryPage({ params }) {
 										/>
 										<p className="mt-1 text-xs text-gray-500">
 											{t("birthTimeHelp")}
-											，如沒有出生時間提供，報告會以12pm作測算。
+											{t("birthTimeDefault")}
 										</p>
 									</div>
 								</div>

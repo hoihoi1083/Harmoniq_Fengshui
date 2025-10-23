@@ -346,7 +346,7 @@ export default function FortuneEntryPage({ params }) {
 									/>
 									<p className="mt-1 text-xs text-gray-500">
 										{t("birthTimeHelp")}
-										如沒有出生時間提供，報告會以12pm作測算。
+										{t("birthTimeDefault")}
 									</p>
 								</div>
 							</>

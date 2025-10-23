@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { use } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 
-export default function BirthdayEntryPage() {
+export default function BirthdayEntryPage({ params }) {
+	const { locale } = use(params);
+	const t = useTranslations("birthdayEntry");
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const sessionId = searchParams.get("session_id");
@@ -24,7 +28,7 @@ export default function BirthdayEntryPage() {
 	useEffect(() => {
 		const verifyPayment = async () => {
 			if (!sessionId) {
-				setError("無效的支付會話");
+				setError(t("invalidSession"));
 				setIsVerifying(false);
 				return;
 			}
@@ -46,17 +50,17 @@ export default function BirthdayEntryPage() {
 				if (data.status === 0 && data.data.payment_status === "paid") {
 					setPaymentVerified(true);
 				} else {
-					setError("支付驗證失敗，請聯繫客服");
+					setError(t("paymentFailed"));
 				}
 			} catch (err) {
-				setError("驗證支付時發生錯誤");
+				setError(t("verificationError"));
 			}
 
 			setIsVerifying(false);
 		};
 
 		verifyPayment();
-	}, [sessionId]);
+	}, [sessionId, t]);
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
@@ -70,7 +74,7 @@ export default function BirthdayEntryPage() {
 		e.preventDefault();
 
 		if (!formData.birthDate || !formData.gender) {
-			setError("請填寫生日和性別");
+			setError(t("fillBirthDateAndGender"));
 			return;
 		}
 
@@ -88,7 +92,7 @@ export default function BirthdayEntryPage() {
 				`/report?birthDateTime=${encodeURIComponent(birthDateTime)}&gender=${formData.gender}&sessionId=${sessionId}`
 			);
 		} catch (err) {
-			setError("提交資料時發生錯誤，請重試");
+			setError(t("submitError"));
 			setIsSubmitting(false);
 		}
 	};
@@ -98,7 +102,9 @@ export default function BirthdayEntryPage() {
 			<div className="min-h-screen bg-[#EFEFEF] flex items-center justify-center">
 				<div className="text-center">
 					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A3B116] mx-auto mb-4"></div>
-					<p className="text-lg text-gray-600">正在驗證支付狀態...</p>
+					<p className="text-lg text-gray-600">
+						{t("verifyingPayment")}
+					</p>
 				</div>
 			</div>
 		);
@@ -112,14 +118,14 @@ export default function BirthdayEntryPage() {
 					<div className="max-w-md p-8 mx-auto text-center bg-white rounded-lg shadow-lg">
 						<div className="mb-4 text-6xl text-red-500">⚠️</div>
 						<h1 className="mb-4 text-2xl font-bold text-gray-800">
-							支付驗證失敗
+							{t("paymentVerificationFailed")}
 						</h1>
 						<p className="mb-6 text-gray-600">{error}</p>
 						<button
 							onClick={() => router.push("/price")}
 							className="bg-[#A3B116] text-white px-6 py-3 rounded-lg hover:bg-[#8B9914] transition-colors"
 						>
-							返回購買頁面
+							{t("returnToPurchase")}
 						</button>
 					</div>
 				</div>
@@ -134,16 +140,17 @@ export default function BirthdayEntryPage() {
 			<div className="container px-4 py-20 mx-auto">
 				<div className="max-w-md p-8 mx-auto bg-white shadow-lg rounded-xl">
 					<div className="mb-8 text-center">
-						<p className="text-gray-600">
-							請填寫您的生辰資料以生成專屬報告
-						</p>
+						<p className="text-gray-600">{t("fillDataPrompt")}</p>
 					</div>
 
 					<form onSubmit={handleSubmit} className="space-y-6">
 						{/* Birth Date */}
 						<div>
 							<label className="block mb-2 text-sm font-medium text-gray-700">
-								出生日期 <span className="text-red-500">*</span>
+								{t("birthDate")}{" "}
+								<span className="text-red-500">
+									{t("required")}
+								</span>
 							</label>
 							<input
 								type="date"
@@ -158,8 +165,10 @@ export default function BirthdayEntryPage() {
 						{/* Birth Time */}
 						<div>
 							<label className="block mb-2 text-sm font-medium text-gray-700">
-								出生時間{" "}
-								<span className="text-gray-400">(選填)</span>
+								{t("birthTime")}{" "}
+								<span className="text-gray-400">
+									({t("optional")})
+								</span>
 							</label>
 							<input
 								type="time"
@@ -169,14 +178,17 @@ export default function BirthdayEntryPage() {
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A3B116]"
 							/>
 							<p className="mt-1 text-xs text-gray-500">
-								提供出生時間可以獲得更準確的分析。如沒有出生時間提供，報告會以12pm作測算。
+								{t("birthTimeHelp")}
 							</p>
 						</div>
 
 						{/* Gender */}
 						<div>
 							<label className="block mb-4 text-sm font-medium text-gray-700">
-								選擇性別 <span className="text-red-500">*</span>
+								{t("gender")}{" "}
+								<span className="text-red-500">
+									{t("required")}
+								</span>
 							</label>
 							<div className="flex justify-center gap-4">
 								<div
@@ -235,10 +247,10 @@ export default function BirthdayEntryPage() {
 							{isSubmitting ? (
 								<div className="flex items-center justify-center">
 									<div className="w-5 h-5 mr-2 border-b-2 border-white rounded-full animate-spin"></div>
-									生成報告中...
+									{t("generatingReport")}
 								</div>
 							) : (
-								"生成專屬報告"
+								t("generateReport")
 							)}
 						</button>
 					</form>
