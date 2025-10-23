@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { use } from "react";
+import { useSession } from "next-auth/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 
@@ -12,6 +13,7 @@ export default function CoupleEntryPage({ params }) {
 	const t = useTranslations("coupleEntry");
 	const searchParams = useSearchParams();
 	const router = useRouter();
+	const { data: session, status } = useSession();
 	const sessionId = searchParams.get("session_id");
 	const specificProblem = searchParams.get("specificProblem") || "";
 	const fromChat = searchParams.get("fromChat") === "true";
@@ -56,6 +58,20 @@ export default function CoupleEntryPage({ params }) {
 			);
 		}
 	}, [fromChat, specificProblem]);
+
+	// Check authentication before allowing access
+	useEffect(() => {
+		if (status === "loading") return; // Wait for session to load
+
+		if (status === "unauthenticated") {
+			console.log("❌ User not logged in, redirecting to login page");
+			// Preserve the session_id and other params for after login
+			const redirectUrl = `/couple-entry${sessionId ? `?session_id=${sessionId}` : ""}${specificProblem ? `&specificProblem=${encodeURIComponent(specificProblem)}` : ""}${fromChat ? "&fromChat=true" : ""}`;
+			router.push(
+				`/${locale}/auth/login?redirect=${encodeURIComponent(redirectUrl)}`
+			);
+		}
+	}, [status, locale, router, sessionId, specificProblem, fromChat]);
 
 	// Verify payment on component mount
 	useEffect(() => {
@@ -190,13 +206,15 @@ export default function CoupleEntryPage({ params }) {
 		}
 	};
 
-	if (isVerifying) {
+	if (isVerifying || status === "loading") {
 		return (
 			<div className="min-h-screen bg-[#EFEFEF] flex items-center justify-center">
 				<div className="text-center">
 					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A3B116] mx-auto mb-4"></div>
 					<p className="text-lg text-gray-600">
-						{t("verifyingPayment")}
+						{status === "loading"
+							? t("checkingAuth") || "檢查登入狀態..."
+							: t("verifyingPayment")}
 					</p>
 				</div>
 			</div>

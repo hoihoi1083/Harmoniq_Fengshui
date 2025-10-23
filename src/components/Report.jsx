@@ -34,6 +34,8 @@ import FourFortuneAnalysis from "@/components/FourFortuneAnalysis";
 import { useLifeReportPersistence } from "@/hooks/useLifeReportPersistence";
 import { useReportDataPersistence } from "@/hooks/useReportDataPersistence";
 import fengshuiLoading from "../../public/images/風水妹/風水妹-loading.png";
+import { useRegionDetection } from "@/hooks/useRegionDetection";
+import { convertByRegion } from "@/utils/chineseConverter";
 
 const wuxingColorMap = {
 	金: "#B2A062",
@@ -93,6 +95,10 @@ export default function ReportPage({
 	const [mingLiData, setMingLiData] = useState(null);
 	const [liuNianData, setLiuNianData] = useState(null);
 	const [jiajuProData, setJiaJuData] = useState(null);
+
+	// Region Detection Hook
+	const { region, isLoading: isRegionLoading } = useRegionDetection();
+	console.log("📍 Report.jsx - Current region:", region);
 
 	// Life Report Persistence Hook
 	const { saveLifeReport, markLifeReportComplete } =
@@ -2821,7 +2827,10 @@ export default function ReportPage({
 																color: "#A3B116",
 															}}
 														>
-															五行齊全
+															{convertByRegion(
+																"五行齊全",
+																region
+															)}
 														</span>
 														<span
 															style={{
@@ -2834,7 +2843,10 @@ export default function ReportPage({
 															}}
 														>
 															-
-															沒有嚴重缺失某一元素
+															{convertByRegion(
+																"沒有嚴重缺失某一元素",
+																region
+															)}
 														</span>
 													</div>
 												) : (
@@ -2894,7 +2906,10 @@ export default function ReportPage({
 																color: "#515151",
 															}}
 														>
-															缺失
+															{convertByRegion(
+																"缺失",
+																region
+															)}
 														</span>
 													</div>
 												)}
@@ -3002,7 +3017,11 @@ export default function ReportPage({
 														"clamp(14px, 3vw, 18px)",
 												}}
 											>
-												年柱-
+												{convertByRegion(
+													"年柱",
+													region
+												)}
+												-
 												<span className="text-[#A3B116]">
 													{wuxingData.year}
 												</span>
@@ -3020,7 +3039,11 @@ export default function ReportPage({
 														"clamp(14px, 3vw, 18px)",
 												}}
 											>
-												月柱-
+												{convertByRegion(
+													"月柱",
+													region
+												)}
+												-
 												<span className="text-[#A3B116]">
 													{wuxingData.month}
 												</span>
@@ -3038,7 +3061,11 @@ export default function ReportPage({
 														"clamp(14px, 3vw, 18px)",
 												}}
 											>
-												日柱-
+												{convertByRegion(
+													"日柱",
+													region
+												)}
+												-
 												<span className="text-[#A3B116]">
 													{wuxingData.day}
 												</span>
@@ -3056,7 +3083,11 @@ export default function ReportPage({
 														"clamp(14px, 3vw, 18px)",
 												}}
 											>
-												時柱-
+												{convertByRegion(
+													"時柱",
+													region
+												)}
+												-
 												<span className="text-[#A3B116]">
 													{wuxingData.hour}
 												</span>
@@ -3153,17 +3184,34 @@ export default function ReportPage({
 													!primaryGod ||
 													!auxiliaryGod
 												) {
-													return "根據五行分析，需要進一步確認用神配置以達到最佳平衡效果。";
+													return convertByRegion(
+														"根據五行分析，需要進一步確認用神配置以達到最佳平衡效果。",
+														region
+													);
 												}
 
 												const strategyDesc = {
-													補缺: "補足所缺",
-													扶弱: "扶助偏弱",
-													抑強: "抑制過強",
-													瀉強: "化解過旺",
+													補缺: convertByRegion(
+														"補足所缺",
+														region
+													),
+													扶弱: convertByRegion(
+														"扶助偏弱",
+														region
+													),
+													抑強: convertByRegion(
+														"抑制過強",
+														region
+													),
+													瀉強: convertByRegion(
+														"化解過旺",
+														region
+													),
 												};
-
-												return `根據您的五行配置分析，建議以「${primaryGod}」為首選用神，「${auxiliaryGod}」為輔助用神。透過${strategyDesc[strategy] || "平衡調和"}的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力。`;
+												return convertByRegion(
+													`根據您的五行配置分析，建議以「${primaryGod}」為首選用神，「${auxiliaryGod}」為輔助用神。透過${strategyDesc[strategy] || convertByRegion("平衡調和", region)}的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力。`,
+													region
+												);
 											})()}
 										</p>
 									</div>

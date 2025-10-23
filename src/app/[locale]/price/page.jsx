@@ -528,6 +528,13 @@ export default function YourPage() {
 
 	// Handle expert88 payment (direct payment without sqft)
 	const handleExpert88Payment = async () => {
+		// Check if user is logged in
+		if (!session) {
+			console.log("❌ User not logged in, redirecting to login page");
+			router.push(`/${locale}/auth/login?redirect=/price`);
+			return;
+		}
+
 		setIsProcessingPayment(true);
 		setCurrentCardType("expert88");
 
@@ -574,11 +581,31 @@ export default function YourPage() {
 					// Redirect to Stripe checkout
 					window.location.href = data.data.url;
 				} else {
-					throw new Error("No checkout URL received");
+					// Check if it's an authentication error
+					if (
+						data.code === "401" ||
+						data.message?.includes("未授權") ||
+						data.message?.includes("unauthorized")
+					) {
+						console.log(
+							"❌ Authentication required, redirecting to login"
+						);
+						router.push(`/${locale}/auth/login?redirect=/price`);
+					} else {
+						throw new Error("No checkout URL received");
+					}
 				}
 			} else {
 				const errorData = await response.json();
-				throw new Error(errorData.message || "Payment error");
+				// Check if it's an authentication error
+				if (response.status === 401 || errorData.code === "401") {
+					console.log(
+						"❌ Authentication required, redirecting to login"
+					);
+					router.push(`/${locale}/auth/login?redirect=/price`);
+				} else {
+					throw new Error(errorData.message || "Payment error");
+				}
 			}
 		} catch (error) {
 			console.error("Expert88 payment error:", error);
@@ -589,6 +616,13 @@ export default function YourPage() {
 
 	// Handle $38 fortune payment with concern type
 	const handleFortunePayment = async (concernType) => {
+		// Check if user is logged in
+		if (!session) {
+			console.log("❌ User not logged in, redirecting to login page");
+			router.push(`/${locale}/auth/login?redirect=/price`);
+			return;
+		}
+
 		setIsProcessingPayment(true);
 		setCurrentCardType(`fortune_${concernType}`);
 
@@ -684,6 +718,13 @@ export default function YourPage() {
 
 	// Handle {formatPrice(88)} couple payment
 	const handleCouplePayment = async () => {
+		// Check if user is logged in
+		if (!session) {
+			console.log("❌ User not logged in, redirecting to login page");
+			router.push(`/${locale}/auth/login?redirect=/price`);
+			return;
+		}
+
 		setIsProcessingPayment(true);
 		setCurrentCardType("couple");
 

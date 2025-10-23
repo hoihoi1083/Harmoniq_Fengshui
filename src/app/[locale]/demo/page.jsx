@@ -413,6 +413,13 @@ export default function DemoPage() {
 
 	// Handle premium payment ($188 for fengshui, $88 for life)
 	const handlePremiumPayment = async () => {
+		// Check if user is logged in
+		if (!session?.user?.userId) {
+			console.log("❌ User not logged in, redirecting to login page");
+			router.push(`/${locale}/auth/login?redirect=/demo`);
+			return;
+		}
+
 		setIsProcessingPayment(true);
 		setCurrentCardType("premium");
 
@@ -476,6 +483,13 @@ export default function DemoPage() {
 
 	// Handle $88 couple payment
 	const handleCouplePayment = async () => {
+		// Check if user is logged in
+		if (!session?.user?.userId) {
+			console.log("❌ User not logged in, redirecting to login page");
+			router.push(`/${locale}/auth/login?redirect=/demo`);
+			return;
+		}
+
 		setIsProcessingPayment(true);
 		setCurrentCardType("couple");
 
@@ -530,6 +544,13 @@ export default function DemoPage() {
 
 	// Handle discounted payment ($188 for fengshui, $88 for life, $38 for others)
 	const handleDiscountPayment = async () => {
+		// Check if user is logged in (except for fengshui which has its own auth check)
+		if (activeTag !== "fengshui" && !session?.user?.userId) {
+			console.log("❌ User not logged in, redirecting to login page");
+			router.push(`/${locale}/auth/login?redirect=/demo`);
+			return;
+		}
+
 		setIsProcessingPayment(true);
 		setCurrentCardType("discount");
 

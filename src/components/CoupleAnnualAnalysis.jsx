@@ -20,7 +20,6 @@ import {
 	getPersonPrimaryElement,
 } from "@/lib/unifiedElementCalculation";
 import { saveComponentContentWithUser } from "@/utils/simpleCoupleContentSave";
-import { useLocale, useTranslations } from "next-intl";
 
 // Helper function to calculate Ba Zi with accurate time-based hour pillar
 const calculateBaziWithTime = (birthDateTime) => {
@@ -107,10 +106,6 @@ const CoupleAnnualAnalysis = ({
 	analyzeWuxingStrength,
 	determineUsefulGods,
 }) => {
-	const locale = useLocale();
-	const t = useTranslations("coupleAnnualAnalysis");
-	const isSimplified = locale === "china" || locale === "zh-CN";
-
 	const { data: session } = useSession();
 	const {
 		analysisData,
@@ -213,12 +208,11 @@ const CoupleAnnualAnalysis = ({
 							getCompatibilityLevel(finalCompatibilityScore),
 						description:
 							analysisData.compatibility?.description ||
-							(isSimplified ? "姻缘分析中..." : "姻緣分析中..."),
+							"姻緣分析中...",
 					},
 					user1Analysis: {
 						dominantElement:
-							user1BasicAnalysis?.dayMasterElement ||
-							(isSimplified ? "未知" : "未知"),
+							user1BasicAnalysis?.dayMasterElement || "未知",
 						elementType: getElementTypeDescription(
 							user1BasicAnalysis?.dayMasterElement
 						),
@@ -228,8 +222,7 @@ const CoupleAnnualAnalysis = ({
 					},
 					user2Analysis: {
 						dominantElement:
-							user2BasicAnalysis?.dayMasterElement ||
-							(isSimplified ? "未知" : "未知"),
+							user2BasicAnalysis?.dayMasterElement || "未知",
 						elementType: getElementTypeDescription(
 							user2BasicAnalysis?.dayMasterElement
 						),
@@ -358,9 +351,7 @@ const CoupleAnnualAnalysis = ({
 			compatibility: {
 				score: fallbackScore,
 				level: getCompatibilityLevel(fallbackScore),
-				description: isSimplified
-					? "基于八字基础分析的配对评估"
-					: "基於八字基礎分析的配對評估",
+				description: "基於八字基礎分析的配對評估",
 			},
 			user1Analysis: {
 				dominantElement: user1BasicAnalysis.dayMasterElement,
@@ -438,7 +429,6 @@ const CoupleAnnualAnalysis = ({
 					currentMonth,
 					compatibilityData: aiData.compatibility,
 					requestType: "annual_strategy",
-					isSimplified: isSimplified,
 				}),
 				signal: controller.signal,
 			});
@@ -477,15 +467,12 @@ const CoupleAnnualAnalysis = ({
 			element2,
 			currentYear,
 			nextYear,
-			currentMonth,
-			isSimplified
+			currentMonth
 		);
 
 		return {
 			[currentYear]: {
-				title: isSimplified
-					? `${currentYear}年感情运势`
-					: `${currentYear}年感情運勢`,
+				title: `${currentYear}年感情運勢`,
 				description: generateYearlyDescription(
 					element1,
 					element2,
@@ -495,9 +482,7 @@ const CoupleAnnualAnalysis = ({
 				currentMonth: currentMonth, // Add current month information
 			},
 			[nextYear]: {
-				title: isSimplified
-					? `${nextYear}年关键应对策略`
-					: `${nextYear}年關鍵應對策略`,
+				title: `${nextYear}年關鍵應對策略`,
 				description: generateYearlyDescription(
 					element1,
 					element2,
@@ -513,64 +498,35 @@ const CoupleAnnualAnalysis = ({
 		element2,
 		currentYear,
 		nextYear,
-		currentMonth,
-		isSimplified = false
+		currentMonth
 	) => {
-		const monthAdviceTemplates = isSimplified
-			? {
-					金: {
-						caution: "避免重大决定，适合内省和规划",
-						positive: "财运旺盛，适合投资和事业发展",
-						travel: "可安排短途旅行放松心情",
-					},
-					木: {
-						caution: "注意人际关系，避免冲突",
-						positive: "创意丰富，适合开展新项目",
-						travel: "适合户外活动和自然之旅",
-					},
-					水: {
-						caution: "财务需谨慎，避免大额支出",
-						positive: "直觉敏锐，适合重要决策",
-						travel: "适合水边休闲和养生之旅",
-					},
-					火: {
-						caution: "情绪易波动，需要冷静处理",
-						positive: "人际关系活跃，适合社交活动",
-						travel: "适合秋季赏枫和温馨聚会",
-					},
-					土: {
-						caution: "健康需要关注，工作压力较大",
-						positive: "稳定发展，适合长期规划",
-						travel: "适合田园风光和文化之旅",
-					},
-				}
-			: {
-					金: {
-						caution: "避免重大決定，適合內省和規劃",
-						positive: "財運旺盛，適合投資和事業發展",
-						travel: "可安排短途旅行放鬆心情",
-					},
-					木: {
-						caution: "注意人際關係，避免衝突",
-						positive: "創意豐富，適合開展新項目",
-						travel: "適合戶外活動和自然之旅",
-					},
-					水: {
-						caution: "財務需謹慎，避免大額支出",
-						positive: "直覺敏銳，適合重要決策",
-						travel: "適合水邊休閒和養生之旅",
-					},
-					火: {
-						caution: "情緒易波動，需要冷靜處理",
-						positive: "人際關係活躍，適合社交活動",
-						travel: "適合秋季賞楓和溫馨聚會",
-					},
-					土: {
-						caution: "健康需要關注，工作壓力較大",
-						positive: "穩定發展，適合長期規劃",
-						travel: "適合田園風光和文化之旅",
-					},
-				};
+		const monthAdviceTemplates = {
+			金: {
+				caution: "避免重大決定，適合內省和規劃",
+				positive: "財運旺盛，適合投資和事業發展",
+				travel: "可安排短途旅行放鬆心情",
+			},
+			木: {
+				caution: "注意人際關係，避免衝突",
+				positive: "創意豐富，適合開展新項目",
+				travel: "適合戶外活動和自然之旅",
+			},
+			水: {
+				caution: "財務需謹慎，避免大額支出",
+				positive: "直覺敏銳，適合重要決策",
+				travel: "適合水邊休閒和養生之旅",
+			},
+			火: {
+				caution: "情緒易波動，需要冷靜處理",
+				positive: "人際關係活躍，適合社交活動",
+				travel: "適合秋季賞楓和溫馨聚會",
+			},
+			土: {
+				caution: "健康需要關注，工作壓力較大",
+				positive: "穩定發展，適合長期規劃",
+				travel: "適合田園風光和文化之旅",
+			},
+		};
 
 		const getAdviceForMonth = (month, year, isPrimary = true) => {
 			const element = isPrimary ? element1 : element2;
@@ -584,9 +540,7 @@ const CoupleAnnualAnalysis = ({
 			// October-specific advice (month 10)
 			if (month === 10) {
 				return element === "火"
-					? isSimplified
-						? "适合秋季户外活动，增进感情交流"
-						: "適合秋季戶外活動，增進感情交流"
+					? "適合秋季戶外活動，增進感情交流"
 					: templates.travel;
 			}
 
@@ -596,38 +550,25 @@ const CoupleAnnualAnalysis = ({
 		return {
 			[currentYear]:
 				currentMonth <= 4
-					? `${currentYear}${isSimplified ? "年" : "年"}${currentMonth}${isSimplified ? "月，" : "月，"}${getAdviceForMonth(currentMonth, currentYear)}`
-					: `${currentYear}${isSimplified ? "年下半年，" : "年下半年，"}${getAdviceForMonth(currentMonth, currentYear)}`,
-			[nextYear]: `${nextYear}${isSimplified ? "年，" : "年，"}${getAdviceForMonth(6, nextYear)}${isSimplified ? "，建议提前设立共同储备金" : "，建議提前設立共同儲備金"}`,
+					? `${currentYear}年${currentMonth}月，${getAdviceForMonth(currentMonth, currentYear)}`
+					: `${currentYear}年下半年，${getAdviceForMonth(currentMonth, currentYear)}`,
+			[nextYear]: `${nextYear}年，${getAdviceForMonth(6, nextYear)}，建議提前設立共同儲備金`,
 		};
 	};
 
 	const generateYearlyDescription = (element1, element2, year) => {
-		const combinations = isSimplified
-			? {
-					金水: "金水相生，感情和谐稳定",
-					水木: "水木相生，关系持续成长",
-					木火: "木火相生，热情洋溢",
-					火土: "火土相生，感情踏实稳固",
-					土金: "土金相生，相互支持",
-					金火: "金火相克，需要调和",
-					火水: "水火不容，需要包容",
-					水土: "水土相克，需要理解",
-					土木: "土木相克，需要沟通",
-					木金: "金克木，需要平衡",
-				}
-			: {
-					金水: "金水相生，感情和諧穩定",
-					水木: "水木相生，關係持續成長",
-					木火: "木火相生，熱情洋溢",
-					火土: "火土相生，感情踏實穩固",
-					土金: "土金相生，相互支持",
-					金火: "金火相剋，需要調和",
-					火水: "水火不容，需要包容",
-					水土: "水土相剋，需要理解",
-					土木: "土木相剋，需要溝通",
-					木金: "金克木，需要平衡",
-				};
+		const combinations = {
+			金水: "金水相生，感情和諧穩定",
+			水木: "水木相生，關係持續成長",
+			木火: "木火相生，熱情洋溢",
+			火土: "火土相生，感情踏實穩固",
+			土金: "土金相生，相互支持",
+			金火: "金火相剋，需要調和",
+			火水: "水火不容，需要包容",
+			水土: "水土相剋，需要理解",
+			土木: "土木相剋，需要溝通",
+			木金: "金克木，需要平衡",
+		};
 
 		const combination = `${element1}${element2}`;
 		const reverseCombo = `${element2}${element1}`;
@@ -635,7 +576,7 @@ const CoupleAnnualAnalysis = ({
 		return (
 			combinations[combination] ||
 			combinations[reverseCombo] ||
-			(isSimplified ? "需要相互调适，增进理解" : "需要相互調適，增進理解")
+			"需要相互調適，增進理解"
 		);
 	};
 
@@ -643,9 +584,7 @@ const CoupleAnnualAnalysis = ({
 		const analysis = {
 			interaction:
 				aiData?.compatibility?.description ||
-				(isSimplified
-					? `${element1}命与${element2}命的相互作用`
-					: `${element1}命與${element2}命的相互作用`),
+				`${element1}命與${element2}命的相互作用`,
 			balance: calculateElementBalance(element1, element2),
 			missing: findMissingElements(element1, element2),
 			advice:
@@ -676,18 +615,14 @@ const CoupleAnnualAnalysis = ({
 			generationCycle[element1] === element2 ||
 			generationCycle[element2] === element1
 		) {
-			return isSimplified
-				? "五行相生，关系和谐平衡"
-				: "五行相生，關係和諧平衡";
+			return "五行相生，關係和諧平衡";
 		} else if (
 			destructionCycle[element1] === element2 ||
 			destructionCycle[element2] === element1
 		) {
-			return isSimplified
-				? "五行相克，需要调和平衡"
-				: "五行相剋，需要調和平衡";
+			return "五行相剋，需要調和平衡";
 		} else {
-			return isSimplified ? "五行平和，关系稳定" : "五行平和，關係穩定";
+			return "五行平和，關係穩定";
 		}
 	};
 
@@ -699,19 +634,13 @@ const CoupleAnnualAnalysis = ({
 		);
 
 		if (missing.length > 0) {
-			return isSimplified
-				? `建议增强${missing.join("、")}元素来完善五行平衡`
-				: `建議增強${missing.join("、")}元素來完善五行平衡`;
+			return `建議增強${missing.join("、")}元素來完善五行平衡`;
 		}
-		return isSimplified
-			? "五行元素齐全，建议保持平衡"
-			: "五行元素齊全，建議保持平衡";
+		return "五行元素齊全，建議保持平衡";
 	};
 
 	const generateBasicInteractionAdvice = (element1, element2) => {
-		return isSimplified
-			? `${element1}命与${element2}命的配对，建议在日常生活中注重五行调和，增进相互理解`
-			: `${element1}命與${element2}命的配對，建議在日常生活中注重五行調和，增進相互理解`;
+		return `${element1}命與${element2}命的配對，建議在日常生活中注重五行調和，增進相互理解`;
 	};
 
 	const calculateBasicCompatibilityScore = (analysis1, analysis2) => {
@@ -731,52 +660,32 @@ const CoupleAnnualAnalysis = ({
 	};
 
 	const getCompatibilityLevel = (score) => {
-		if (isSimplified) {
-			if (score >= 80) return "优秀配对";
-			if (score >= 70) return "良好配对";
-			if (score >= 60) return "稳定配对";
-			return "需要努力";
-		} else {
-			if (score >= 80) return "優秀配對";
-			if (score >= 70) return "良好配對";
-			if (score >= 60) return "穩定配對";
-			return "需要努力";
-		}
+		if (score >= 80) return "優秀配對";
+		if (score >= 70) return "良好配對";
+		if (score >= 60) return "穩定配對";
+		return "需要努力";
 	};
 
 	const getElementTypeDescription = (element) => {
 		const descriptions = {
-			金: isSimplified ? "金命" : "金命",
-			木: isSimplified ? "木命" : "木命",
-			水: isSimplified ? "水命" : "水命",
-			火: isSimplified ? "火命" : "火命",
-			土: isSimplified ? "土命" : "土命",
+			金: "金命",
+			木: "木命",
+			水: "水命",
+			火: "火命",
+			土: "土命",
 		};
-		return (
-			descriptions[element] || (isSimplified ? "未知命格" : "未知命格")
-		);
+		return descriptions[element] || "未知命格";
 	};
 
 	const getElementCharacteristics = (element) => {
-		const characteristics = isSimplified
-			? {
-					金: "坚毅果决，重信守义",
-					木: "积极进取，富有创意",
-					水: "机智灵活，善于变通",
-					火: "热情开朗，富有魅力",
-					土: "踏实稳重，值得信赖",
-				}
-			: {
-					金: "堅毅果決，重信守義",
-					木: "積極進取，富有創意",
-					水: "機智靈活，善於變通",
-					火: "熱情開朗，富有魅力",
-					土: "踏實穩重，值得信賴",
-				};
-		return (
-			characteristics[element] ||
-			(isSimplified ? "性格特质分析中" : "性格特質分析中")
-		);
+		const characteristics = {
+			金: "堅毅果決，重信守義",
+			木: "積極進取，富有創意",
+			水: "機智靈活，善於變通",
+			火: "熱情開朗，富有魅力",
+			土: "踏實穩重，值得信賴",
+		};
+		return characteristics[element] || "性格特質分析中";
 	};
 
 	if (loading) {
@@ -1134,7 +1043,7 @@ const CoupleAnnualAnalysis = ({
 									fontSize: "clamp(20px, 6vw, 35px)",
 								}}
 							>
-								{t("annualStrategyTitle")}
+								2025&2026流年關鍵應對策略
 							</h3>
 						</div>
 
@@ -1198,7 +1107,7 @@ const CoupleAnnualAnalysis = ({
 							fontSize: "clamp(20px, 6vw, 35px)",
 						}}
 					>
-						{t("elementInteractionTitle")}
+						五行互動分析
 					</h3>
 				</div>
 
@@ -1217,7 +1126,7 @@ const CoupleAnnualAnalysis = ({
 											fontSize: "clamp(12px, 3vw, 14px)",
 										}}
 									>
-										{t("elementInteraction")}
+										元素互動
 									</h4>
 								</div>
 							</div>
@@ -1259,7 +1168,7 @@ const CoupleAnnualAnalysis = ({
 											fontSize: "clamp(12px, 3vw, 14px)",
 										}}
 									>
-										{t("relationshipAdvice")}
+										關係建議
 									</h4>
 								</div>
 							</div>
@@ -1296,7 +1205,6 @@ const CoupleAnnualAnalysis = ({
 							user1: analysisData,
 						}));
 					}}
-					t={t}
 				/>
 			)}
 
@@ -1314,7 +1222,6 @@ const CoupleAnnualAnalysis = ({
 							user2: analysisData,
 						}));
 					}}
-					t={t}
 				/>
 			)}
 		</div>
@@ -1330,7 +1237,6 @@ const IndividualAnalysisSection = ({
 	userAnalysis,
 	savedIndividualData,
 	onAnalysisReady,
-	t,
 }) => {
 	const { individualAnalysisCache, setIndividualAnalysisCache } =
 		useCoupleAnalysis();
@@ -1440,20 +1346,13 @@ const IndividualAnalysisSection = ({
 							dominantElement:
 								userAnalysis?.dominantElement ||
 								bazi.yearElement,
-							category: isSimplified ? "感情" : "感情",
-							specificQuestion: isSimplified
-								? `请以专业、结构化的方式分析${gender}的八字特性，包含：
-1. 性格特性：${userAnalysis?.dominantElement || bazi.yearElement}命的核心性格特质
-2. 主要优势：在感情关系中的3个主要个人优势（如：沟通能力强、责任心重、善于理解他人等个人特质，不要包含风水建议或外在建议）
-3. 发展建议：3个具体的感情发展建议（可包含行为建议、沟通方式、注意事项等）
-请避免使用角色扮演、表情符号或过于口语化的表达方式，保持专业分析风格。主要优势请聚焦于个人内在特质，发展建议可包含具体行动指导。`
-								: `請以專業、結構化的方式分析${gender}的八字特性，包含：
+							category: "感情",
+							specificQuestion: `請以專業、結構化的方式分析${gender}的八字特性，包含：
 1. 性格特性：${userAnalysis?.dominantElement || bazi.yearElement}命的核心性格特質
 2. 主要優勢：在感情關係中的3個主要個人優勢（如：溝通能力強、責任心重、善於理解他人等個人特質，不要包含風水建議或外在建議）
 3. 發展建議：3個具體的感情發展建議（可包含行為建議、溝通方式、注意事項等）
 請避免使用角色扮演、表情符號或過於口語化的表達方式，保持專業分析風格。主要優勢請聚焦於個人內在特質，發展建議可包含具體行動指導。`,
 							gender: gender,
-							isSimplified: isSimplified,
 						}),
 						signal: controller.signal,
 					});
@@ -1867,69 +1766,83 @@ const IndividualAnalysisSection = ({
 
 		// Generate more realistic pillar analysis based on actual bazi data
 		return {
-			year: {
-				title: `${t("pillars.year.title")}-${bazi.year}`,
-				subtitle: generatePillarSubtitle(bazi.year, "year"),
+			年柱: {
+				title: `年柱-${bazi.year}`,
+				subtitle: generatePillarSubtitle(bazi.year, "年"),
 				description: generatePillarDescription(
 					bazi.year,
-					"year",
-					t("pillars.year.meaning")
+					"年",
+					"祖業根基，早年環境"
 				),
 			},
-			month: {
-				title: `${t("pillars.month.title")}-${bazi.month}`,
-				subtitle: generatePillarSubtitle(bazi.month, "month"),
+			月柱: {
+				title: `月柱-${bazi.month}`,
+				subtitle: generatePillarSubtitle(bazi.month, "月"),
 				description: generatePillarDescription(
 					bazi.month,
-					"month",
-					t("pillars.month.meaning")
+					"月",
+					"父母宮位，中年發展"
 				),
 			},
-			day: {
-				title: `${t("pillars.day.title")}-${bazi.day}`,
-				subtitle: generatePillarSubtitle(bazi.day, "day"),
+			日柱: {
+				title: `日柱-${bazi.day}`,
+				subtitle: generatePillarSubtitle(bazi.day, "日"),
 				description: generatePillarDescription(
 					bazi.day,
-					"day",
-					t("pillars.day.meaning")
+					"日",
+					"自身性格，配偶關係"
 				),
 			},
-			hour: {
-				title: `${t("pillars.hour.title")}-${bazi.hour}`,
-				subtitle: generatePillarSubtitle(bazi.hour, "hour"),
+			時柱: {
+				title: `時柱-${bazi.hour}`,
+				subtitle: generatePillarSubtitle(bazi.hour, "時"),
 				description: generatePillarDescription(
 					bazi.hour,
-					"hour",
-					t("pillars.hour.meaning")
+					"時",
+					"子女宮位，晚年運勢"
 				),
 			},
 		};
 	};
 
 	const generatePillarSubtitle = (pillar, type) => {
-		return t(`pillars.${type}.subtitle`) + `（${pillar}）`;
+		const templates = {
+			年: "祖業基礎，早年環境影響深遠",
+			月: "父母影響，成長期性格形成",
+			日: "本命特質，核心性格展現",
+			時: "未來發展，晚年運勢趨向",
+		};
+
+		return templates[type] + `（${pillar}）`;
 	};
 
 	const generatePillarDescription = (pillar, type, meaning) => {
 		// Get first character of pillar to determine element
 		const firstChar = pillar.charAt(0);
 		const elementMap = {
-			甲: "wood",
-			乙: "wood",
-			丙: "fire",
-			丁: "fire",
-			戊: "earth",
-			己: "earth",
-			庚: "metal",
-			辛: "metal",
-			壬: "water",
-			癸: "water",
+			甲: "木",
+			乙: "木",
+			丙: "火",
+			丁: "火",
+			戊: "土",
+			己: "土",
+			庚: "金",
+			辛: "金",
+			壬: "水",
+			癸: "水",
 		};
 
-		const element = elementMap[firstChar] || "earth";
-		const elementDescription = t(`elements.${element}`);
+		const element = elementMap[firstChar] || "土";
 
-		return `${meaning}：${elementDescription}，${pillar}${t("pillarDescriptionTemplate")}`;
+		const descriptions = {
+			木: "生機勃勃，具有成長和創新的能力",
+			火: "熱情活躍，具有領導和表達的天賦",
+			土: "穩重踏實，具有包容和協調的特質",
+			金: "堅毅果決，具有分析和執行的能力",
+			水: "靈活變通，具有智慧和適應的本領",
+		};
+
+		return `${meaning}：${descriptions[element]}，${pillar}組合顯示良好的發展潛力。`;
 	};
 
 	if (loading) {
@@ -1994,80 +1907,62 @@ const IndividualAnalysisSection = ({
 			{/* Four Pillars Grid - Responsive Grid */}
 			<div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 sm:mb-8">
 				{Object.entries(individualAnalysis.pillarsAnalysis).map(
-					([pillarName, pillarData]) => {
-						// Map old Chinese keys to new English keys for backward compatibility
-						const pillarKeyMap = {
-							年柱: "year",
-							月柱: "month",
-							日柱: "day",
-							時柱: "hour",
-							时柱: "hour", // Simplified Chinese version
-						};
-						const normalizedPillarKey =
-							pillarKeyMap[pillarName] || pillarName;
-
-						return (
+					([pillarName, pillarData]) => (
+						<div
+							key={pillarName}
+							className="overflow-hidden bg-gray-100 rounded-lg"
+						>
+							{/* Pillar Header */}
 							<div
-								key={pillarName}
-								className="overflow-hidden bg-gray-100 rounded-lg"
+								className={`p-3 text-center text-white sm:p-4 ${
+									colorScheme === "pink"
+										? "bg-[#C74772]"
+										: "bg-[#4A90E2]"
+								}`}
 							>
-								{/* Pillar Header */}
-								<div
-									className={`p-3 text-center text-white sm:p-4 ${
-										colorScheme === "pink"
-											? "bg-[#C74772]"
-											: "bg-[#4A90E2]"
-									}`}
+								<h4
+									className="font-bold"
+									style={{
+										fontFamily: "Noto Sans HK",
+										fontSize: "clamp(14px, 3.5vw, 18px)",
+									}}
 								>
-									<h4
-										className="font-bold"
-										style={{
-											fontFamily: "Noto Sans HK",
-											fontSize:
-												"clamp(14px, 3.5vw, 18px)",
-										}}
-									>
-										{t(
-											`pillars.${normalizedPillarKey}.title`
-										)}
-									</h4>
-									<p
-										className="opacity-90"
-										style={{
-											fontFamily: "Noto Sans HK",
-											fontSize:
-												"clamp(11px, 2.8vw, 14px)",
-										}}
-									>
-										{pillarData.title.split("-")[1]}
-									</p>
-								</div>
-
-								{/* Pillar Content */}
-								<div className="p-3 bg-gray-100 sm:p-4">
-									<p
-										className="mb-2 leading-relaxed text-gray-700"
-										style={{
-											fontFamily: "Noto Sans HK",
-											fontSize:
-												"clamp(10px, 2.5vw, 13px)",
-										}}
-									>
-										{pillarData.subtitle}
-									</p>
-									<p
-										className="leading-relaxed text-gray-600"
-										style={{
-											fontFamily: "Noto Sans HK",
-											fontSize: "clamp(9px, 2.2vw, 11px)",
-										}}
-									>
-										{pillarData.description}
-									</p>
-								</div>
+									{pillarName}
+								</h4>
+								<p
+									className="opacity-90"
+									style={{
+										fontFamily: "Noto Sans HK",
+										fontSize: "clamp(11px, 2.8vw, 14px)",
+									}}
+								>
+									{pillarData.title.split("-")[1]}
+								</p>
 							</div>
-						);
-					}
+
+							{/* Pillar Content */}
+							<div className="p-3 bg-gray-100 sm:p-4">
+								<p
+									className="mb-2 leading-relaxed text-gray-700"
+									style={{
+										fontFamily: "Noto Sans HK",
+										fontSize: "clamp(10px, 2.5vw, 13px)",
+									}}
+								>
+									{pillarData.subtitle}
+								</p>
+								<p
+									className="leading-relaxed text-gray-600"
+									style={{
+										fontFamily: "Noto Sans HK",
+										fontSize: "clamp(9px, 2.2vw, 11px)",
+									}}
+								>
+									{pillarData.description}
+								</p>
+							</div>
+						</div>
+					)
 				)}
 			</div>
 
@@ -2117,7 +2012,7 @@ const IndividualAnalysisSection = ({
 								fontSize: "clamp(14px, 3.5vw, 18px)",
 							}}
 						>
-							{t("mainStrengths")}
+							主要優勢：
 						</h5>
 						<ul className="space-y-2">
 							{individualAnalysis.strengths.map(
@@ -2162,7 +2057,7 @@ const IndividualAnalysisSection = ({
 								fontSize: "clamp(14px, 3.5vw, 18px)",
 							}}
 						>
-							{t("developmentSuggestions")}
+							發展建議：
 						</h5>
 						<ul className="space-y-2">
 							{individualAnalysis.suggestions.map(

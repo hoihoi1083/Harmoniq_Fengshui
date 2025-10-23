@@ -22,6 +22,13 @@ export class EnhancedInitialAnalysis {
 
 	static async callDeepSeekAPI(messages, options = {}) {
 		try {
+			// Add AbortController for timeout control
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => {
+				controller.abort();
+				console.log("⏰ DeepSeek API call timed out after 35 seconds");
+			}, 35000); // 35 second timeout (less than frontend's 45s)
+
 			const response = await fetch(DEEPSEEK_API_URL, {
 				method: "POST",
 				headers: {
@@ -35,7 +42,10 @@ export class EnhancedInitialAnalysis {
 					temperature: options.temperature || 0.7,
 					stream: false,
 				}),
+				signal: controller.signal,
 			});
+
+			clearTimeout(timeoutId);
 
 			if (!response.ok) {
 				throw new Error(
@@ -46,7 +56,11 @@ export class EnhancedInitialAnalysis {
 			const data = await response.json();
 			return data.choices?.[0]?.message?.content || "";
 		} catch (error) {
-			console.error("DeepSeek API call failed:", error);
+			if (error.name === "AbortError") {
+				console.error("DeepSeek API call aborted due to timeout");
+			} else {
+				console.error("DeepSeek API call failed:", error);
+			}
 			return null;
 		}
 	}
