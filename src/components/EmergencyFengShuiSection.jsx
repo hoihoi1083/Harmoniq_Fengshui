@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const EmergencyFengShuiSection = ({
 	femaleUser,
@@ -9,7 +10,9 @@ const EmergencyFengShuiSection = ({
 	analysisData,
 	savedData,
 	onDataReady,
+	isSimplified = false,
 }) => {
+	const t = useTranslations("coupleReport.emergencyFengShuiSection");
 	const [fengShuiData, setFengShuiData] = useState(null);
 	const [loading, setLoading] = useState(false);
 
@@ -57,6 +60,7 @@ const EmergencyFengShuiSection = ({
 				femalePillars: analysisData?.female?.pillars,
 				malePillars: analysisData?.male?.pillars,
 				requestType: "emergency_feng_shui",
+				isSimplified,
 			};
 
 			console.log("📤 Sending request body:", requestBody);
@@ -230,7 +234,7 @@ const EmergencyFengShuiSection = ({
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在生成風水急救方案
+							{t("loadingMessage")}
 						</div>
 						<div
 							className="text-gray-500"
@@ -240,7 +244,7 @@ const EmergencyFengShuiSection = ({
 								fontWeight: 400,
 							}}
 						>
-							請稍候，正在制定緊急應對策略
+							{t("loadingSubMessage")}
 						</div>
 					</div>
 				</div>
@@ -269,7 +273,7 @@ const EmergencyFengShuiSection = ({
 						fontFamily: "Noto Serif TC, serif",
 					}}
 				>
-					72小時內行動方案
+					{t("subtitle")}
 				</h3>
 			</div>
 

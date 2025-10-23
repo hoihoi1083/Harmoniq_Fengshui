@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
 	Heart,
 	AlertTriangle,
@@ -18,7 +19,9 @@ const CoupleSpecificProblemSolution = ({
 	calculateWuxingAnalysis,
 	analyzeWuxingStrength,
 	determineUsefulGods,
+	isSimplified = false,
 }) => {
+	const t = useTranslations("coupleReport.coupleSpecificProblemSolution");
 	const { analysisData, loading: aiLoading, error } = useCoupleAnalysis();
 	const [solution, setSolution] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -784,7 +787,7 @@ const CoupleSpecificProblemSolution = ({
 				<div className="flex items-center justify-center">
 					<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 					<span className="ml-2 text-gray-600">
-						分析您的具體問題中...
+						{t("loadingMessage")}
 					</span>
 				</div>
 			</div>
@@ -796,7 +799,7 @@ const CoupleSpecificProblemSolution = ({
 			<div className="w-full p-8 bg-white rounded-lg shadow-lg">
 				<div className="text-center text-gray-500">
 					<Target className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-					<p>無法分析具體問題，請檢查輸入資料</p>
+					<p>{t("noDataMessage")}</p>
 				</div>
 			</div>
 		);
@@ -819,7 +822,7 @@ const CoupleSpecificProblemSolution = ({
 					}}
 				>
 					<Target className="w-8 h-8 mr-3" />
-					專屬問題解決方案
+					{t("title")}
 				</h2>
 			</div>
 
@@ -832,7 +835,7 @@ const CoupleSpecificProblemSolution = ({
 					>
 						<h3 className="flex items-center text-lg text-white">
 							<Users className="w-5 h-5 mr-2" />
-							問題分析與現況評估
+							{t("problemAnalysisTitle")}
 						</h3>
 					</div>
 					<div className="p-6 border border-purple-200 rounded-lg bg-purple-50">
@@ -842,21 +845,21 @@ const CoupleSpecificProblemSolution = ({
 									className="mb-3 font-medium text-purple-800"
 									style={{ fontSize: "15px" }}
 								>
-									關係狀態
+									{t("relationshipStatus")}
 								</h4>
 								<p
 									className="mb-4 text-black"
 									style={{ fontSize: "15px" }}
 								>
 									{solution.relationshipStatus === "repair"
-										? "需要修復的關係"
-										: "需要增進的關係"}
+										? t("statusRepair")
+										: t("statusStrengthen")}
 								</p>
 								<h4
 									className="mb-3 font-medium text-purple-800"
 									style={{ fontSize: "15px" }}
 								>
-									相合度評分
+									{t("compatibilityScore")}
 								</h4>
 								<div className="flex items-center">
 									<div className="w-24 h-2 mr-3 bg-gray-200 rounded-full">
@@ -887,24 +890,25 @@ const CoupleSpecificProblemSolution = ({
 									className="mb-3 font-medium text-purple-800"
 									style={{ fontSize: "15px" }}
 								>
-									問題類型
+									{t("problemType")}
 								</h4>
 								<p
 									className="text-black"
 									style={{ fontSize: "15px" }}
 								>
 									{solution.problemType === "breakup" &&
-										"分手修復"}
+										t("problemTypes.breakup")}
 									{solution.problemType === "infidelity" &&
-										"第三者/出軌問題"}
+										t("problemTypes.infidelity")}
 									{solution.problemType ===
-										"emotional_distance" && "感情疏遠"}
+										"emotional_distance" &&
+										t("problemTypes.emotional_distance")}
 									{solution.problemType === "strengthen" &&
-										"關係增進"}
+										t("problemTypes.strengthen")}
 									{solution.problemType === "commitment" &&
-										"承諾發展"}
+										t("problemTypes.commitment")}
 									{solution.problemType === "general" &&
-										"一般感情諮詢"}
+										t("problemTypes.general")}
 								</p>
 							</div>
 						</div>
@@ -919,7 +923,7 @@ const CoupleSpecificProblemSolution = ({
 					>
 						<h3 className="flex items-center text-lg text-white">
 							<Heart className="w-5 h-5 mr-2" />
-							情感支持
+							{t("emotionalSupportTitle")}
 						</h3>
 					</div>
 					<div className="p-6 border border-pink-200 rounded-lg bg-pink-50">
@@ -929,7 +933,7 @@ const CoupleSpecificProblemSolution = ({
 									className="mb-3 font-medium text-pink-800"
 									style={{ fontSize: "15px" }}
 								>
-									🌟 希望與信心
+									{t("hopeAndConfidence")}
 								</h4>
 								<p
 									className="text-black"
@@ -944,7 +948,7 @@ const CoupleSpecificProblemSolution = ({
 									className="mb-3 font-medium text-pink-800"
 									style={{ fontSize: "15px" }}
 								>
-									💪 力量與成長
+									{t("strengthAndGrowth")}
 								</h4>
 								<p
 									className="text-black"
@@ -966,7 +970,7 @@ const CoupleSpecificProblemSolution = ({
 					>
 						<h3 className="flex items-center text-lg text-white">
 							<CheckCircle className="w-5 h-5 mr-2" />
-							實際行動建議
+							{t("practicalAdviceTitle")}
 						</h3>
 					</div>
 					<div className="p-6 border border-green-200 rounded-lg bg-green-50">
@@ -999,7 +1003,7 @@ const CoupleSpecificProblemSolution = ({
 					>
 						<h3 className="flex items-center text-lg text-white">
 							<Lightbulb className="w-5 h-5 mr-2" />
-							風水靈性指導
+							{t("spiritualGuidanceTitle")}
 						</h3>
 					</div>
 					<div className="p-6 border border-yellow-200 rounded-lg bg-yellow-50">
@@ -1033,7 +1037,7 @@ const CoupleSpecificProblemSolution = ({
 						>
 							<h3 className="flex items-center text-lg text-white">
 								<Target className="w-5 h-5 mr-2" />
-								行動計劃
+								{t("actionPlanTitle")}
 							</h3>
 						</div>
 						<div className="p-6 border border-blue-200 rounded-lg bg-blue-50">
@@ -1127,7 +1131,7 @@ const CoupleSpecificProblemSolution = ({
 									className="mb-3 font-medium text-blue-800"
 									style={{ fontSize: "15px" }}
 								>
-									預期時間
+									{t("expectedTimeline")}
 								</h4>
 								<p
 									className="text-black"
@@ -1146,7 +1150,7 @@ const CoupleSpecificProblemSolution = ({
 						>
 							<h3 className="flex items-center text-lg text-white">
 								<AlertTriangle className="w-5 h-5 mr-2" />
-								成功指標與決定時機
+								{t("successIndicatorsTitle")}
 							</h3>
 						</div>
 						<div className="p-6 border border-orange-200 rounded-lg bg-orange-50">
@@ -1155,7 +1159,7 @@ const CoupleSpecificProblemSolution = ({
 									className="mb-3 font-medium text-orange-800"
 									style={{ fontSize: "15px" }}
 								>
-									成功指標
+									{t("successIndicators")}
 								</h4>
 								<div className="space-y-3">
 									{(solution.successIndicators || []).map(
@@ -1183,7 +1187,7 @@ const CoupleSpecificProblemSolution = ({
 									className="mb-3 font-medium text-orange-800"
 									style={{ fontSize: "15px" }}
 								>
-									何時該放手
+									{t("whenToMoveOn")}
 								</h4>
 								<p
 									className="text-black"

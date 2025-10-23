@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const ChartDiagnosisSection = ({
 	femaleUser,
@@ -9,7 +10,9 @@ const ChartDiagnosisSection = ({
 	analysisData,
 	savedData,
 	onDataReady,
+	isSimplified = false,
 }) => {
+	const t = useTranslations("coupleReport.chartDiagnosisSection");
 	const [diagnosisData, setDiagnosisData] = useState(null);
 	const [loading, setLoading] = useState(false);
 
@@ -36,6 +39,11 @@ const ChartDiagnosisSection = ({
 	const generateChartDiagnosis = async () => {
 		setLoading(true);
 		try {
+			console.log(
+				"📊 ChartDiagnosisSection - isSimplified prop:",
+				isSimplified
+			);
+
 			// Add timeout to prevent AbortError
 			const controller = new AbortController();
 			const timeoutId = setTimeout(() => {
@@ -45,21 +53,27 @@ const ChartDiagnosisSection = ({
 				);
 			}, 60000); // 60 second timeout
 
+			const requestBody = {
+				femaleUser,
+				maleUser,
+				femaleBazi: analysisData?.female?.bazi,
+				maleBazi: analysisData?.male?.bazi,
+				femalePillars: analysisData?.female?.pillars,
+				malePillars: analysisData?.male?.pillars,
+				requestType: "chart_diagnosis",
+				isSimplified,
+			};
+
+			console.log("📤 Sending to /api/chart-diagnosis:", {
+				isSimplified: requestBody.isSimplified,
+			});
+
 			const response = await fetch("/api/chart-diagnosis", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					femaleUser,
-					maleUser,
-					femaleBazi: analysisData?.female?.bazi,
-					maleBazi: analysisData?.male?.bazi,
-					femalePillars: analysisData?.female?.pillars,
-					malePillars: analysisData?.male?.pillars,
-					requestType: "chart_diagnosis",
-				}),
+				body: JSON.stringify(requestBody),
 				signal: controller.signal,
 			});
-
 			clearTimeout(timeoutId);
 
 			if (response.ok) {
@@ -165,7 +179,7 @@ const ChartDiagnosisSection = ({
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在生成盤面診斷
+							{t("loadingMessage")}
 						</div>
 						<div
 							className="text-gray-500"
@@ -175,7 +189,7 @@ const ChartDiagnosisSection = ({
 								fontWeight: 400,
 							}}
 						>
-							請稍候，正在分析命盤配對細節
+							{t("loadingSubMessage")}
 						</div>
 					</div>
 				</div>
@@ -228,7 +242,7 @@ const ChartDiagnosisSection = ({
 									fontFamily: "Noto Serif TC, serif",
 								}}
 							>
-								女方
+								{t("female")}
 							</h3>
 							<div
 								className="bg-white border-2 border-[#C74772] rounded-full"
@@ -288,7 +302,7 @@ const ChartDiagnosisSection = ({
 									fontFamily: "Noto Serif TC, serif",
 								}}
 							>
-								男方
+								{t("male")}
 							</h3>
 							<div
 								className="bg-white border-2 border-[#3263C4] rounded-full"
@@ -353,7 +367,7 @@ const ChartDiagnosisSection = ({
 									fontFamily: "Noto Serif TC, serif",
 								}}
 							>
-								關鍵合盤徵象
+								{t("keySymptoms")}
 							</span>
 						</div>
 					</div>

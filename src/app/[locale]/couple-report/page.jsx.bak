@@ -48,13 +48,7 @@ import CoupleCoreSuggestion from "@/components/CoupleCoreSuggestion";
 export default function CoupleReportPage({ params }) {
 	const { locale } = use(params);
 	const currentLocale = useLocale();
-	const isSimplified = currentLocale === "zh-CN";
-	console.log(
-		"🚀 CoupleReportPage - currentLocale:",
-		currentLocale,
-		"isSimplified:",
-		isSimplified
-	);
+	const isSimplified = currentLocale === "china" || currentLocale === "zh-CN";
 	const t = useTranslations("coupleReport");
 	console.log("🚀 CoupleReportPage component mounting/re-rendering");
 	const [reportData, setReportData] = useState(null);
@@ -902,7 +896,6 @@ export default function CoupleReportPage({ params }) {
 													t("womanName"),
 											}}
 											currentYear={new Date().getFullYear()}
-											isSimplified={isSimplified}
 										/>
 									</>
 								) : (
@@ -930,7 +923,6 @@ export default function CoupleReportPage({ params }) {
 										user1={memoizedUser1}
 										user2={memoizedUser2}
 										specificProblem={reportData.problem}
-										isSimplified={isSimplified}
 										calculateWuxingAnalysis={
 											calculateWuxingAnalysis
 										}

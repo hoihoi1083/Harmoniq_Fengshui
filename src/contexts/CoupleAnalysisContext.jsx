@@ -19,6 +19,7 @@ export const CoupleAnalysisProvider = ({
 	user1,
 	user2,
 	specificProblem,
+	isSimplified = false,
 	initialData, // Pre-saved data to prevent AI generation
 }) => {
 	const [analysisData, setAnalysisData] = useState(null);
@@ -124,8 +125,13 @@ export const CoupleAnalysisProvider = ({
 						birthday2: user2.birthDateTime,
 						gender: user1.gender || "male",
 						gender2: user2.gender || "female",
-						problem: specificProblem || "感情關係和諧改善建議",
+						problem:
+							specificProblem ||
+							(isSimplified
+								? "感情关系和谐改善建议"
+								: "感情關係和諧改善建議"),
 						sessionId: stableSessionId, // Use stable session ID
+						isSimplified: isSimplified,
 					}),
 				});
 

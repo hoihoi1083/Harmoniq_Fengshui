@@ -300,7 +300,21 @@ export default function LoginPage({ searchParams }) {
 					)}
 
 					<div className="mt-4 text-sm text-center text-gray-400">
-						{t("tip2")}
+						{t("tip2Before")}
+						<Link
+							href="/terms"
+							className="text-[#086E56] hover:text-[#25826D] underline"
+						>
+							{t("tip2Terms")}
+						</Link>
+						{t("tip2And")}
+						<Link
+							href="/privacy"
+							className="text-[#086E56] hover:text-[#25826D] underline"
+						>
+							{t("tip2Privacy")}
+						</Link>
+						{t("tip2After")}
 					</div>
 				</div>
 			</div>

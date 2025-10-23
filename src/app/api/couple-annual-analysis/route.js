@@ -14,6 +14,7 @@ export async function POST(request) {
 			currentMonth,
 			compatibilityData,
 			requestType,
+			isSimplified = false,
 		} = await request.json();
 
 		if (!user1Birthday || !user2Birthday) {
@@ -32,7 +33,8 @@ export async function POST(request) {
 			currentYear,
 			nextYear,
 			currentMonth,
-			compatibilityData
+			compatibilityData,
+			isSimplified
 		);
 
 		return NextResponse.json({
@@ -60,15 +62,52 @@ async function generateAnnualStrategyWithAI(
 	currentYear,
 	nextYear,
 	currentMonth,
-	compatibilityData
+	compatibilityData,
+	isSimplified = false
 ) {
 	try {
 		// Get detailed bazi analysis for both users
 		const user1BaziData = getWuxingData(user1Birthday, "male");
 		const user2BaziData = getWuxingData(user2Birthday, "female");
 
-		// Create detailed prompt for AI analysis
-		const prompt = `作為專業的八字合婚分析師，請根據以下信息生成詳細的流年應對策略：
+		// Create detailed prompt for AI analysis with language support
+		const prompt = isSimplified
+			? `作为专业的八字合婚分析师，请根据以下信息生成详细的流年应对策略：
+
+**基本信息：**
+- 男方生日：${user1Birthday}，${user1Element}命
+- 女方生日：${user2Birthday}，${user2Element}命
+- 八字分析：男方 ${user1BaziData.year} ${user1BaziData.month} ${user1BaziData.day} ${user1BaziData.hour}
+- 八字分析：女方 ${user2BaziData.year} ${user2BaziData.month} ${user2BaziData.day} ${user2BaziData.hour}
+- 配对评分：${compatibilityData?.score || 75}分
+- 当前年份：${currentYear}年${currentMonth}月
+- 分析年份：${currentYear}年和${nextYear}年
+
+**请提供以下详细分析：**
+
+1. **${currentYear}年感情运势分析**
+   - 整体趋势和重点月份
+   - 具体的月份建议（特别是当前${currentMonth}月份之后）
+   - 需要注意的时期和建议
+
+2. **${nextYear}年关键应对策略**
+   - 年度整体运势预测
+   - 重要时期的具体建议
+   - 财务和感情方面的策略
+
+3. **具体月份建议**
+   - 请提供类似"${currentYear}年农历四月，避免重大决定，可安排短途旅行（寅木解巳申之刑）"的具体建议
+   - 请提供类似"${nextYear}丙午年，女方财星过旺，男方须警惕'庚金正财被克'引发的财务焦虑，建议提前设立共同储备金"的专业建议
+
+**分析要求：**
+- 基于真实的八字理论和五行相生相克原理
+- 提供实用的生活建议
+- 考虑两人的五行配合情况
+- 包含具体的时间节点和应对方法
+- 专业术语与通俗解释并重
+
+请用简体中文回答，格式要清晰专业。`
+			: `作為專業的八字合婚分析師，請根據以下信息生成詳細的流年應對策略：
 
 **基本信息：**
 - 男方生日：${user1Birthday}，${user1Element}命
@@ -122,7 +161,8 @@ async function generateAnnualStrategyWithAI(
 			currentMonth,
 			user1Element,
 			user2Element,
-			compatibilityData
+			compatibilityData,
+			isSimplified
 		);
 
 		return structuredAnalysis;
@@ -136,7 +176,8 @@ async function generateAnnualStrategyWithAI(
 			currentMonth,
 			user1Element,
 			user2Element,
-			compatibilityData
+			compatibilityData,
+			isSimplified
 		);
 	}
 }
@@ -148,7 +189,8 @@ function parseAndStructureAIResponse(
 	currentMonth,
 	user1Element,
 	user2Element,
-	compatibilityData
+	compatibilityData,
+	isSimplified = false
 ) {
 	// Try to parse the AI response and extract structured information
 	const lines = aiResponse.split("\n").filter((line) => line.trim());
@@ -177,7 +219,9 @@ function parseAndStructureAIResponse(
 		} else if (
 			trimmedLine.includes("月份") ||
 			trimmedLine.includes("農曆") ||
-			trimmedLine.includes("應對")
+			trimmedLine.includes("农历") ||
+			trimmedLine.includes("應對") ||
+			trimmedLine.includes("应对")
 		) {
 			currentSection = "monthly";
 			monthlyAdvice += trimmedLine + "\n";
@@ -195,14 +239,17 @@ function parseAndStructureAIResponse(
 	// Structure the response
 	return {
 		[currentYear]: {
-			title: `${currentYear}年感情運勢`,
+			title: isSimplified
+				? `${currentYear}年感情运势`
+				: `${currentYear}年感情運勢`,
 			description:
 				currentYearAnalysis.trim() ||
 				generateBasicYearAnalysis(
 					currentYear,
 					user1Element,
 					user2Element,
-					compatibilityData
+					compatibilityData,
+					isSimplified
 				),
 			monthlyFocus:
 				extractMonthlyFocus(monthlyAdvice, currentYear) ||
@@ -210,18 +257,22 @@ function parseAndStructureAIResponse(
 					currentYear,
 					currentMonth,
 					user1Element,
-					user2Element
+					user2Element,
+					isSimplified
 				),
 		},
 		[nextYear]: {
-			title: `${nextYear}年關鍵應對策略`,
+			title: isSimplified
+				? `${nextYear}年关键应对策略`
+				: `${nextYear}年關鍵應對策略`,
 			description:
 				nextYearAnalysis.trim() ||
 				generateBasicYearAnalysis(
 					nextYear,
 					user1Element,
 					user2Element,
-					compatibilityData
+					compatibilityData,
+					isSimplified
 				),
 			monthlyFocus:
 				extractMonthlyFocus(monthlyAdvice, nextYear) ||
@@ -229,7 +280,8 @@ function parseAndStructureAIResponse(
 					nextYear,
 					6,
 					user1Element,
-					user2Element
+					user2Element,
+					isSimplified
 				),
 		},
 	};
@@ -252,23 +304,55 @@ function generateBasicYearAnalysis(
 	year,
 	element1,
 	element2,
-	compatibilityData
+	compatibilityData,
+	isSimplified = false
 ) {
 	const score = compatibilityData?.score || 75;
-	const level = score >= 80 ? "優秀" : score >= 70 ? "良好" : "穩定";
+	const level =
+		score >= 80
+			? isSimplified
+				? "优秀"
+				: "優秀"
+			: score >= 70
+				? isSimplified
+					? "良好"
+					: "良好"
+				: isSimplified
+					? "稳定"
+					: "穩定";
 
-	const elementAnalysis = getElementYearAnalysis(element1, element2, year);
+	const elementAnalysis = getElementYearAnalysis(
+		element1,
+		element2,
+		year,
+		isSimplified
+	);
 
-	return `${year}年整體配對評分${score}分，屬於${level}配對。${elementAnalysis}建議加強溝通，維持感情穩定發展。`;
+	return isSimplified
+		? `${year}年整体配对评分${score}分，属于${level}配对。${elementAnalysis}建议加强沟通，维持感情稳定发展。`
+		: `${year}年整體配對評分${score}分，屬於${level}配對。${elementAnalysis}建議加強溝通，維持感情穩定發展。`;
 }
 
-function generateBasicMonthlyAdvice(year, month, element1, element2) {
-	const seasonAdvice = {
-		spring: "春季感情昇溫，適合增進感情",
-		summer: "夏季需要冷靜，避免情緒化決定",
-		autumn: "秋季適合規劃未來，討論重要事項",
-		winter: "冬季注重內在交流，培養默契",
-	};
+function generateBasicMonthlyAdvice(
+	year,
+	month,
+	element1,
+	element2,
+	isSimplified = false
+) {
+	const seasonAdvice = isSimplified
+		? {
+				spring: "春季感情升温，适合增进感情",
+				summer: "夏季需要冷静，避免情绪化决定",
+				autumn: "秋季适合规划未来，讨论重要事项",
+				winter: "冬季注重内在交流，培养默契",
+			}
+		: {
+				spring: "春季感情昇溫，適合增進感情",
+				summer: "夏季需要冷靜，避免情緒化決定",
+				autumn: "秋季適合規劃未來，討論重要事項",
+				winter: "冬季注重內在交流，培養默契",
+			};
 
 	const season =
 		month <= 3
@@ -279,27 +363,50 @@ function generateBasicMonthlyAdvice(year, month, element1, element2) {
 					? "summer"
 					: "autumn";
 
-	return `${year}年${month}月，${seasonAdvice[season]}。根據${element1}命與${element2}命的配合，建議此時期重點關注相互理解和支持。`;
+	const advice = isSimplified
+		? `${year}年${month}月，${seasonAdvice[season]}。根据${element1}命与${element2}命的配合，建议此时期重点关注相互理解和支持。`
+		: `${year}年${month}月，${seasonAdvice[season]}。根據${element1}命與${element2}命的配合，建議此時期重點關注相互理解和支持。`;
+
+	return advice;
 }
 
-function getElementYearAnalysis(element1, element2, year) {
-	const combinations = {
-		金水: "金水相生，感情和諧，",
-		水木: "水木相生，關係持續成長，",
-		木火: "木火相生，熱情洋溢，",
-		火土: "火土相生，感情踏實穩固，",
-		土金: "土金相生，相互支持，",
-		金火: "金火相剋，需要調和，",
-		火水: "水火不容，需要包容，",
-		水土: "水土相剋，需要理解，",
-		土木: "土木相剋，需要溝通，",
-		木金: "金克木，需要平衡，",
-	};
+function getElementYearAnalysis(
+	element1,
+	element2,
+	year,
+	isSimplified = false
+) {
+	const combinations = isSimplified
+		? {
+				金水: "金水相生，感情和谐，",
+				水木: "水木相生，关系持续成长，",
+				木火: "木火相生，热情洋溢，",
+				火土: "火土相生，感情踏实稳固，",
+				土金: "土金相生，相互支持，",
+				金火: "金火相克，需要调和，",
+				火水: "水火不容，需要包容，",
+				水土: "水土相克，需要理解，",
+				土木: "土木相克，需要沟通，",
+				木金: "金克木，需要平衡，",
+			}
+		: {
+				金水: "金水相生，感情和諧，",
+				水木: "水木相生，關係持續成長，",
+				木火: "木火相生，熱情洋溢，",
+				火土: "火土相生，感情踏實穩固，",
+				土金: "土金相生，相互支持，",
+				金火: "金火相剋，需要調和，",
+				火水: "水火不容，需要包容，",
+				水土: "水土相剋，需要理解，",
+				土木: "土木相剋，需要溝通，",
+				木金: "金克木，需要平衡，",
+			};
 
 	const combo1 = `${element1}${element2}`;
 	const combo2 = `${element2}${element1}`;
 
-	return combinations[combo1] || combinations[combo2] || "需要相互調適，";
+	const fallback = isSimplified ? "需要相互调适，" : "需要相互調適，";
+	return combinations[combo1] || combinations[combo2] || fallback;
 }
 
 function generateFallbackAnnualStrategy(
@@ -308,37 +415,46 @@ function generateFallbackAnnualStrategy(
 	currentMonth,
 	user1Element,
 	user2Element,
-	compatibilityData
+	compatibilityData,
+	isSimplified = false
 ) {
 	return {
 		[currentYear]: {
-			title: `${currentYear}年感情運勢`,
+			title: isSimplified
+				? `${currentYear}年感情运势`
+				: `${currentYear}年感情運勢`,
 			description: generateBasicYearAnalysis(
 				currentYear,
 				user1Element,
 				user2Element,
-				compatibilityData
+				compatibilityData,
+				isSimplified
 			),
 			monthlyFocus: generateBasicMonthlyAdvice(
 				currentYear,
 				currentMonth,
 				user1Element,
-				user2Element
+				user2Element,
+				isSimplified
 			),
 		},
 		[nextYear]: {
-			title: `${nextYear}年關鍵應對策略`,
+			title: isSimplified
+				? `${nextYear}年关键应对策略`
+				: `${nextYear}年關鍵應對策略`,
 			description: generateBasicYearAnalysis(
 				nextYear,
 				user1Element,
 				user2Element,
-				compatibilityData
+				compatibilityData,
+				isSimplified
 			),
 			monthlyFocus: generateBasicMonthlyAdvice(
 				nextYear,
 				6,
 				user1Element,
-				user2Element
+				user2Element,
+				isSimplified
 			),
 		},
 	};

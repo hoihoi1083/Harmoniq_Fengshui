@@ -1,7 +1,12 @@
 {
 	"login": {
 		"tip1": "要使用HarmoniQ服务，您必须登录现有账户或使用以下选项创建一个账户。",
-		"tip2": "使用HarmoniQ服务即表示您同意我们会对收集的数据进行分析。",
+		"tip2": "使用HarmoniQ服务即表示您同意我们会对收集的数据进行分析,并同意用户条款和隐私政策。",
+		"tip2Before": "使用HarmoniQ服务即表示您同意我们会对收集的数据进行分析,并同意",
+		"tip2Terms": "用户条款",
+		"tip2And": "和",
+		"tip2Privacy": "隐私政策",
+		"tip2After": "。",
 		"Apple": "使用Apple账号登录",
 		"Google": "使用Google账号登录",
 		"emailLoginTitle": "使用电子邮件登入",
@@ -1176,6 +1181,230 @@
 		"enterSpecificQuestion": "请输入您的具体问题",
 		"submitError": "提交资料时发生错误，请重试",
 		"generalCoupleAnalysis": "一般情侣关系分析"
+	},
+	"coupleReport": {
+		"loadingTitle": "风水妹正在为你们准备专属合婚分析报告",
+		"loadingSubtitle": "请稍候，正在分析两人的姻缘配对",
+		"backToConsultation": "返回智能咨询",
+		"noReportData": "未找到报告数据",
+		"loadingHistoricalData": "正在载入历史报告数据...",
+		"historicalBannerNotice": "注意：",
+		"historicalBannerText": "您正在查看已保存的夫妻合婚历史报告内容",
+		"calculationTime": "(测算时间:",
+		"generateNewReport": "点击生成新报告",
+		"analysisReportTab": "姻缘合盘分析报告",
+		"solutionTab": "专属问题解决方案",
+		"reportTitle": "姻缘配对分析",
+		"manName": "男方",
+		"womanName": "女方",
+		"coupleMingJu": {
+			"tabs": {
+				"relationship": {
+					"left": "日月互动",
+					"middle": "夫妻宫寅未暗合",
+					"right": "五行气机修补"
+				},
+				"marriage": {
+					"left": "配对特性",
+					"middle": "婚配格局分析",
+					"right": "婚姻调候方案"
+				},
+				"family": {
+					"left": "配对特性",
+					"middle": "夫妻合盘分析",
+					"right": "家庭和睦方案"
+				}
+			}
+		},
+		"coupleSeason": {
+			"title": "夫妻关键季节",
+			"loadingTitle": "风水妹正在分析夫妻关键季节",
+			"loadingSubtitle": "请稍候，正在计算最佳时机配对",
+			"loadingAlt": "风水妹运算中",
+			"noData": "无法载入夫妻季节分析资料",
+			"currentLabel": "当前："
+		},
+		"coupleCoreSuggestion": {
+			"title": "感情开运建议",
+			"loadingTitle": "风水妹正在生成夫妻开运建议",
+			"loadingSubtitle": "请稍候，正在分析最佳运势提升方案",
+			"loadingAlt": "风水妹运算中",
+			"noData": "无法载入夫妻开运建议资料",
+			"tabs": {
+				"relationship": {
+					"title": "关系发展建议",
+					"subtitle": "夫妻合盘策略指南"
+				},
+				"communication": {
+					"title": "沟通建议",
+					"subtitle": "夫妻沟通技巧"
+				},
+				"energy": {
+					"title": "能量提升建议",
+					"subtitle": "夫妻能量调和"
+				},
+				"taboos": {
+					"title": "感情关系禁忌",
+					"subtitle": "夫妻相处禁忌"
+				}
+			},
+			"subsections": {
+				"actionAdvice": "行动建议",
+				"bestTiming": "最佳时机",
+				"precautions": "注意事项",
+				"destinyGuidance": "命理指导建议"
+			},
+			"maleStyle": "男方沟通风格",
+			"femaleStyle": "女方沟通风格",
+			"maleStrategy": "男方沟通策略",
+			"femaleStrategy": "女方沟通策略",
+			"bestTimingLabel": "最佳时机：",
+			"actionAdviceLabel": "行动建议",
+			"luckyItems": "开运物",
+			"weeklyRitual": "每周仪式",
+			"occasion": "场合",
+			"maleColor": "男方主色",
+			"femaleColor": "女方主色",
+			"energyFunction": "能量作用",
+			"fiveElementAnalysis": "五行能量分析",
+			"fengShuiAdvice": "居家风水建议",
+			"annualLuckyColors": "年度幸运色系"
+		},
+		"coupleSpecificProblemSolution": {
+			"title": "专属问题解决方案",
+			"loadingMessage": "分析您的具体问题中...",
+			"noDataMessage": "无法分析具体问题，请检查输入资料",
+			"problemAnalysisTitle": "问题分析与现况评估",
+			"relationshipStatus": "关系状态",
+			"compatibilityScore": "相合度评分",
+			"problemType": "问题类型",
+			"statusRepair": "需要修复的关系",
+			"statusStrengthen": "需要增进的关系",
+			"problemTypes": {
+				"breakup": "分手修复",
+				"infidelity": "第三者/出轨问题",
+				"emotional_distance": "感情疏远",
+				"strengthen": "关系增进",
+				"commitment": "承诺发展",
+				"general": "一般感情咨询"
+			},
+			"emotionalSupportTitle": "情感支持",
+			"hopeAndConfidence": "🌟 希望与信心",
+			"strengthAndGrowth": "💪 力量与成长",
+			"practicalAdviceTitle": "实际行动建议",
+			"spiritualGuidanceTitle": "风水灵性指导",
+			"actionPlanTitle": "行动计划",
+			"expectedTimeline": "预期时间",
+			"successIndicatorsTitle": "成功指标与决定时机",
+			"successIndicators": "成功指标",
+			"whenToMoveOn": "何时该放手"
+		},
+		"enhancedCoupleSpecificProblemSolution": {
+			"loadingMessage": "风水妹正在分析您的专属问题",
+			"loadingSubMessage": "请稍候，正在制定个人化解决方案",
+			"baziAnalysisGenerating": "八字分析生成中...",
+			"analysisFailed": "分析失败",
+			"checkNetworkOrRetry": "请检查网络连接或稍后重试",
+			"calculationFailed": "计算失败",
+			"unableToGenerateAnalysis": "无法生成分析，请稍后重试",
+			"calculating": "计算中...",
+			"yourBazi": "您的八字",
+			"partnerBazi": "伴侣八字",
+			"problemType": "问题类型",
+			"retryAnalysis": "重新分析",
+			"problemCategories": {
+				"emotionCooling": "感情降温类",
+				"specialSituation": "特殊情境类",
+				"tabooBreaking": "禁忌破解话术"
+			},
+			"compatibilityLevels": {
+				"excellent": "优秀配对",
+				"good": "良好配对",
+				"stable": "稳定配对",
+				"needsWork": "需要努力"
+			},
+			"sectionTitles": {
+				"chartDiagnosis": "盘面诊断",
+				"emergencyFengShui": "风水急救",
+				"restartChemistry": "重启默契",
+				"starChartGuidance": "星盘指引",
+				"fengShuiTransformation": "风水转化",
+				"relationshipMethod": "相处心法",
+				"keyAnalysis": "关键分析",
+				"targetedSuggestions": "针对性建议"
+			}
+		},
+		"chartDiagnosisSection": {
+			"loadingMessage": "风水妹正在生成盘面诊断",
+			"loadingSubMessage": "请稍候，正在分析命盘配对细节",
+			"female": "女方",
+			"male": "男方",
+			"keySymptoms": "关键合盘征象"
+		},
+		"emergencyFengShuiSection": {
+			"loadingMessage": "风水妹正在生成风水急救方案",
+			"loadingSubMessage": "请稍候，正在制定紧急应对策略",
+			"subtitle": "72小时内行动方案"
+		},
+		"restartChemistrySection": {
+			"loadingMessage": "风水妹正在生成重启默契方案",
+			"loadingSubMessage": "请稍候，正在分析感情修复策略",
+			"subtitle": "破冰仪式建议"
+		}
+	},
+	"coupleAnnualAnalysis": {
+		"loadingTitle": "风水妹正在分析你们的流年运势",
+		"loadingSubtitle": "请稍候，如果载入时间过长，请检查网络连接",
+		"loadingImage": "风水妹运算中",
+		"errorTitle": "年度分析载入失败",
+		"errorTimeoutMessage": "请求超时或网络连接问题，请稍后重试。",
+		"errorGenericMessage": "载入年度分析时发生错误，请重新尝试。",
+		"errorDetails": "错误详情:",
+		"unknownError": "未知错误",
+		"retryButton": "重新尝试",
+		"tipsTitle": "💡 提示：如果问题持续发生，请尝试：",
+		"tip1": "检查网络连接是否正常",
+		"tip2": "重新刷新浏览器页面",
+		"tip3": "清除浏览器缓存",
+		"tip4": "稍后再试",
+		"noDataMessage": "暂无流年分析数据",
+		"reloadButton": "重新载入",
+		"annualStrategyTitle": "2025&2026流年关键应对策略",
+		"elementInteractionTitle": "五行互动分析",
+		"elementInteraction": "元素互动",
+		"relationshipAdvice": "关系建议",
+		"mainStrengths": "主要优势：",
+		"developmentSuggestions": "发展建议：",
+		"pillars": {
+			"year": {
+				"title": "年柱",
+				"subtitle": "祖业基础，早年环境影响深远",
+				"meaning": "祖业根基，早年环境"
+			},
+			"month": {
+				"title": "月柱",
+				"subtitle": "父母影响，成长期性格形成",
+				"meaning": "父母宫位，中年发展"
+			},
+			"day": {
+				"title": "日柱",
+				"subtitle": "本命特质，核心性格展现",
+				"meaning": "自身性格，配偶关系"
+			},
+			"hour": {
+				"title": "时柱",
+				"subtitle": "未来发展，晚年运势趋向",
+				"meaning": "子女宫位，晚年运势"
+			}
+		},
+		"elements": {
+			"wood": "生机勃勃，具有成长和创新的能力",
+			"fire": "热情活跃，具有领导和表达的天赋",
+			"earth": "稳重踏实，具有包容和协调的特质",
+			"metal": "坚毅果决，具有分析和执行的能力",
+			"water": "灵活变通，具有智慧和适应的本领"
+		},
+		"pillarDescriptionTemplate": "组合显示良好的发展潜力。"
 	},
 	"paymentThankYou": {
 		"title": "感谢您的惠顾",

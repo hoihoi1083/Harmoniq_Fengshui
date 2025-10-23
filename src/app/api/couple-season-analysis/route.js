@@ -6,6 +6,7 @@ export async function POST(req) {
 			currentYear,
 			currentDate,
 			concern = "感情",
+			isSimplified = false,
 		} = await req.json();
 
 		if (!user1Info || !user2Info) {
@@ -33,7 +34,83 @@ export async function POST(req) {
 		];
 
 		// Enhanced date-aware prompt for couple season analysis with simplified language
-		const prompt = `你是親切的風水師「風鈴」。請用白話文(簡單易懂的語言)分析夫妻在不同季節的相處情況：
+		const prompt = isSimplified
+			? `你是亲切的风水师「风铃」。请用白话文(简单易懂的语言)分析夫妻在不同季节的相处情况：
+
+夫妻基本信息：
+- ${name1}生日：${birthday1}，性别：${gender1}
+- ${name2}生日：${birthday2}，性别：${gender2}
+- 分析年份：${currentYear}
+- 当前时间：${currentYear}年${currentMonth}月，当前季节：${currentSeasonName}
+- 关注重点：夫妻${concern}
+
+**重要：请用简单白话文，避免过多专业术语。当前是${currentSeasonName}（${currentMonth}月），请重点分析当前和未来季节。分析顺序：${relevantSeasons.join("→")}**
+
+请用浅显易懂的语言分析夫妻在四个季节的相处重点。**每个季节内容要简洁实用，约80-100字：**
+
+【夫妻四季相处指南】
+
+#### **春季（2-4月，万物复苏）**：
+请用简单易懂的语言分析夫妻在春天的相处情况：
+- 春天对你们关系的好处和需要注意的地方
+- 这个季节容易出现什么问题，如何预防
+- 给夫妻的实用建议（2-3个简单方法）
+- 春季夫妻互动重点和注意事项
+**内容长度：约100字**
+
+#### **夏季（5-7月，天气炎热）**：
+请用简单易懂的语言分析夫妻在夏天的相处情况：
+- 夏天对你们关系的影响（好的和不好的）
+- 天气热的时候容易吵架吗？如何避免
+- 给夫妻的实用建议（2-3个简单方法）
+
+#### **秋季（8-10月，天气凉爽）**：
+请用简单易懂的语言分析夫妻在秋天的相处情况：
+- 秋天对你们关系的影响
+- 这个季节需要特别注意什么
+- 给夫妻的实用建议（2-3个简单方法）
+
+#### **冬季（11-1月，天气寒冷）**：
+请用简单易懂的语言分析夫妻在冬天的相处情况：
+- 冬天对你们关系的影响
+- 天气冷的时候如何维持感情温度
+- 给夫妻的实用建议（2-3个简单方法）
+
+参考白话文风格（要简单易懂）：
+
+夫妻感情示例：
+春季（2-4月，春暖花开）：春天是感情开始变好的时候。${name1}比较容易理解对方，${name2}情绪比较活泼，要注意表达方式。建议：多到户外走走增进感情、敞开心胸多聊天、一起计划今年的目标。3月份天气稳定，最适合深入了解对方。
+
+夏季（5-7月，天气炎热）：夏天是感情考验期！天气热容易吵架，双方都比较容易激动。一定要：控制脾气不要大吵、给对方一些冷静空间、重要决定等天凉再讨论、多看对方的好处。7月份压力大，要特别注意钱的问题不要影响感情。
+
+秋季（8-10月，秋高气爽）：秋天是感情收获期。8月份最适合沟通，可以深入聊天、化解误会、重建信任。9月份感情最稳定，适合做重要承诺、规划未来、增加亲密感。10月份要注意家务分工，不要因为小事影响感情。
+
+冬季（11-1月，天气寒冷）：冬天是感情加深期！天气冷反而感情可以更深，最适合修复关系、增进理解。11-12月最好：多深谈（晚上聊心事、分享内心想法）、培养共同爱好、规划未来梦想、化解以前的伤害。1月份适合总结感情经验、制定长期感情目标。
+
+夫妻婚姻示例：
+春季（寅卯辰月，木旺）：婚姻新生期，木气生发利于婚姻关系更新。双方印星互助，利于相互支持、共同成长。建议：重新审视婚姻目标、增加夫妻共同活动、改善沟通方式。辰月适合处理婚姻中的实际问题。
+
+夏季（巳午未月，火土极旺）：婚姻危机期！火旺冲克，易发生婚姻冲突。务必：避免提及敏感话题、暂缓重大婚姻决定、寻求专业婚姻咨询、加强家庭责任感。未月注意经济压力对婚姻的影响。
+
+白话文要求：
+1. 用简单易懂的语言分析夫妻在不同季节的相处
+2. 针对夫妻${concern}给出实用的季节建议
+3. 每个季节用格式：#### **季节名（几月，天气特色）**：
+4. **四个季节内容长度要差不多**，每季节约80-100字，包含：
+   - 这季节对夫妻关系有什么影响（用大白话）
+   - 可能遇到什么问题
+   - 给夫妻的实用建议（2-3个简单方法）
+   - 这季节要特别注意什么
+5. 内容要实用，让人看了就知道怎么做
+6. 语言要亲切自然，不要太多专业术语
+7. 重点说明什么时候要小心，什么时候是好时机
+8. 提供具体实例和操作建议，避免空泛的概念性描述
+9. **确保四个季节的内容都完整且长度相近，平衡详细程度**
+10. 分析中要体现${name1}和${name2}的个性化特点和相处模式
+11. 每季节控制在80-120字范围内，保持内容密度一致
+
+请确保每个季节的夫妻分析都足够详细深入，为夫妻双方提供真正有价值的个人化感情经营指导。`
+			: `你是親切的風水師「風鈴」。請用白話文(簡單易懂的語言)分析夫妻在不同季節的相處情況：
 
 夫妻基本信息：
 - ${name1}生日：${birthday1}，性別：${gender1}
@@ -160,7 +237,8 @@ export async function POST(req) {
 			concern,
 			user1Info,
 			user2Info,
-			currentSeasonName
+			currentSeasonName,
+			isSimplified
 		);
 
 		return Response.json({
@@ -186,15 +264,16 @@ function parseCoupleSeasonContent(
 	concern,
 	user1Info,
 	user2Info,
-	currentSeasonName = "秋季"
+	currentSeasonName = "秋季",
+	isSimplified = false
 ) {
 	try {
 		// Get season context for time-aware content
 		const getSeasonContext = (season) => {
 			if (season === currentSeasonName) {
-				return "【當前季節】";
+				return isSimplified ? "【当前季节】" : "【當前季節】";
 			} else {
-				return "【未來參考】";
+				return isSimplified ? "【未来参考】" : "【未來參考】";
 			}
 		};
 
@@ -205,28 +284,36 @@ function parseCoupleSeasonContent(
 				period: "寅卯辰月，木旺",
 				icon: "🌸",
 				color: "bg-green-500",
-				keyPoints: ["感情萌芽", "寅卯辰月", "木旺生發"],
+				keyPoints: isSimplified
+					? ["感情萌芽", "寅卯辰月", "木旺生发"]
+					: ["感情萌芽", "寅卯辰月", "木旺生發"],
 			},
 			{
 				name: "夏季",
 				period: "巳午未月，火土極旺",
 				icon: "☀️",
 				color: "bg-red-500",
-				keyPoints: ["情感考驗", "巳午未月", "火旺沖克"],
+				keyPoints: isSimplified
+					? ["情感考验", "巳午未月", "火旺冲克"]
+					: ["情感考驗", "巳午未月", "火旺沖克"],
 			},
 			{
 				name: "秋季",
 				period: "申酉戌月，金旺",
 				icon: "🍂",
 				color: "bg-yellow-500",
-				keyPoints: ["感情收穫", "申酉戌月", "金旺調和"],
+				keyPoints: isSimplified
+					? ["感情收获", "申酉戌月", "金旺调和"]
+					: ["感情收穫", "申酉戌月", "金旺調和"],
 			},
 			{
 				name: "冬季",
 				period: "亥子丑月，水旺",
 				icon: "❄️",
 				color: "bg-blue-500",
-				keyPoints: ["感情修復", "亥子丑月", "水旺調候"],
+				keyPoints: isSimplified
+					? ["感情修复", "亥子丑月", "水旺调候"]
+					: ["感情修復", "亥子丑月", "水旺調候"],
 			},
 		];
 
@@ -349,7 +436,8 @@ function parseCoupleSeasonContent(
 						originalSeasonName,
 						concern,
 						user1Info,
-						user2Info
+						user2Info,
+						isSimplified
 					);
 					// Combine original and fallback if needed - allowing full content
 					if (
@@ -367,7 +455,8 @@ function parseCoupleSeasonContent(
 					originalSeasonName,
 					concern,
 					user1Info,
-					user2Info
+					user2Info,
+					isSimplified
 				);
 			}
 		});
@@ -379,7 +468,12 @@ function parseCoupleSeasonContent(
 		};
 	} catch (error) {
 		console.error("Couple season content parsing error:", error);
-		return getCoupleFallbackSeasonData(concern, user1Info, user2Info);
+		return getCoupleFallbackSeasonData(
+			concern,
+			user1Info,
+			user2Info,
+			isSimplified
+		);
 	}
 }
 
@@ -387,12 +481,28 @@ function getCoupleFallbackSeasonContent(
 	seasonName,
 	concern,
 	user1Info,
-	user2Info
+	user2Info,
+	isSimplified = false
 ) {
-	const name1 = user1Info.name || "男方";
-	const name2 = user2Info.name || "女方";
+	const name1 = user1Info.name || (isSimplified ? "男方" : "男方");
+	const name2 = user2Info.name || (isSimplified ? "女方" : "女方");
 
-	const fallbacks = {
+	const fallbacksSimplified = {
+		感情: {
+			春季: `${name1}与${name2}在春季木旺期间，感情迎来新的萌芽机会。木主生发，利于双方开放沟通、增进理解。建议：1）多进行户外活动增进感情，2）共同制定年度感情目标，3）辰月适合深入了解彼此内心世界。春季宜主动表达关爱，为全年感情发展奠定基础。`,
+			夏季: `${name1}与${name2}在夏季需特别注意情绪管理。火旺易引发争执，双方应保持理性。建议：1）控制脾气避免激烈争吵，2）给彼此适当空间冷静思考，3）重大决定延后到秋季讨论。未月注意家庭经济压力对感情的影响，多关注对方优点维护感情稳定。`,
+			秋季: `${name1}与${name2}迎来感情收获期。金气收敛利于感情关系稳定发展。建议：1）申月适合深度交流化解前期误会，2）酉月感情巩固可做重要承诺规划未来，3）戌月注意家庭责任分工避免摩擦。秋季是感情关系成熟和收获的最佳时机，把握机会巩固感情基础。`,
+			冬季: `${name1}与${name2}进入感情深化黄金期！水旺调候最利修复感情裂痕。建议：1）亥子月加强情感交流培养共同兴趣，2）共同规划未来蓝图制定长期目标，3）丑月总结感情经验为来年发展做准备。冬季深度沟通效果最佳，是修复关系和增进理解的关键时期。`,
+		},
+		婚姻: {
+			春季: `${name1}与${name2}迎来婚姻新生期，木气生发利于婚姻关系更新发展。建议：1）重新审视婚姻目标调整相处模式，2）增加夫妻共同活动增进亲密度，3）改善沟通方式提升理解品质。辰月适合处理婚姻中的实际问题，为全年婚姻和谐奠定基础。`,
+			夏季: `${name1}与${name2}面临婚姻考验期。火旺冲克易发生冲突，需要谨慎应对。建议：1）避免讨论敏感话题减少争执，2）暂缓重大婚姻决定等待理性时机，3）加强家庭责任感共同面对挑战。未月特别注意经济压力对婚姻和谐的影响，多展现关爱支持。`,
+			秋季: `${name1}与${name2}进入婚姻稳定期。金气收敛有助婚姻关系成熟发展。建议：1）申月利于解决婚姻中的实际问题，2）酉月适合巩固夫妻关系做出长期承诺，3）戌月注意家务分工维护家庭和谐。秋季是婚姻关系巩固和升华的最佳时机。`,
+			冬季: `${name1}与${name2}迎来婚姻修复最佳期！水旺调候利于重建和谐夫妻关系。建议：1）制定夫妻沟通规则改善互动品质，2）重新分配家庭责任实现公平合理，3）规划婚姻长期目标加强亲密关系。丑月总结婚姻经验制定来年发展计划，为婚姻长久幸福做准备。`,
+		},
+	};
+
+	const fallbacksTraditional = {
 		感情: {
 			春季: `${name1}與${name2}在春季木旺期間，感情迎來新的萌芽機會。木主生發，利於雙方開放溝通、增進理解。建議：1）多進行戶外活動增進感情，2）共同制定年度感情目標，3）辰月適合深入了解彼此內心世界。春季宜主動表達關愛，為全年感情發展奠定基礎。`,
 			夏季: `${name1}與${name2}在夏季需特別注意情緒管理。火旺易引發爭執，雙方應保持理性。建議：1）控制脾氣避免激烈爭吵，2）給彼此適當空間冷靜思考，3）重大決定延後到秋季討論。未月注意家庭經濟壓力對感情的影響，多關注對方優點維護感情穩定。`,
@@ -407,15 +517,24 @@ function getCoupleFallbackSeasonContent(
 		},
 	};
 
+	const fallbacks = isSimplified ? fallbacksSimplified : fallbacksTraditional;
+
 	return (
 		fallbacks[concern]?.[seasonName] ||
-		`${name1}與${name2}在${seasonName}期間請根據雙方具體情況謹慎分析夫妻關係發展。建議加強溝通理解，共同面對季節性的關係挑戰，把握有利時機促進感情發展。`
+		(isSimplified
+			? `${name1}与${name2}在${seasonName}期间请根据双方具体情况谨慎分析夫妻关系发展。建议加强沟通理解，共同面对季节性的关系挑战，把握有利时机促进感情发展。`
+			: `${name1}與${name2}在${seasonName}期間請根據雙方具體情況謹慎分析夫妻關係發展。建議加強溝通理解，共同面對季節性的關係挑戰，把握有利時機促進感情發展。`)
 	);
 }
 
-function getCoupleFallbackSeasonData(concern, user1Info, user2Info) {
-	const name1 = user1Info.name || "男方";
-	const name2 = user2Info.name || "女方";
+function getCoupleFallbackSeasonData(
+	concern,
+	user1Info,
+	user2Info,
+	isSimplified = false
+) {
+	const name1 = user1Info.name || (isSimplified ? "男方" : "男方");
+	const name2 = user2Info.name || (isSimplified ? "女方" : "女方");
 
 	const seasons = [
 		{
@@ -427,9 +546,12 @@ function getCoupleFallbackSeasonData(concern, user1Info, user2Info) {
 				"春季",
 				concern,
 				user1Info,
-				user2Info
+				user2Info,
+				isSimplified
 			),
-			keyPoints: ["感情萌芽", "寅卯辰月", "木旺生發"],
+			keyPoints: isSimplified
+				? ["感情萌芽", "寅卯辰月", "木旺生发"]
+				: ["感情萌芽", "寅卯辰月", "木旺生發"],
 		},
 		{
 			name: "夏季",
@@ -440,9 +562,12 @@ function getCoupleFallbackSeasonData(concern, user1Info, user2Info) {
 				"夏季",
 				concern,
 				user1Info,
-				user2Info
+				user2Info,
+				isSimplified
 			),
-			keyPoints: ["情感考驗", "巳午未月", "火旺沖克"],
+			keyPoints: isSimplified
+				? ["情感考验", "巳午未月", "火旺冲克"]
+				: ["情感考驗", "巳午未月", "火旺沖克"],
 		},
 		{
 			name: "秋季",
@@ -453,9 +578,12 @@ function getCoupleFallbackSeasonData(concern, user1Info, user2Info) {
 				"秋季",
 				concern,
 				user1Info,
-				user2Info
+				user2Info,
+				isSimplified
 			),
-			keyPoints: ["感情收穫", "申酉戌月", "金旺調和"],
+			keyPoints: isSimplified
+				? ["感情收获", "申酉戌月", "金旺调和"]
+				: ["感情收穫", "申酉戌月", "金旺調和"],
 		},
 		{
 			name: "冬季",
@@ -466,15 +594,22 @@ function getCoupleFallbackSeasonData(concern, user1Info, user2Info) {
 				"冬季",
 				concern,
 				user1Info,
-				user2Info
+				user2Info,
+				isSimplified
 			),
-			keyPoints: ["感情修復", "亥子丑月", "水旺調候"],
+			keyPoints: isSimplified
+				? ["感情修复", "亥子丑月", "水旺调候"]
+				: ["感情修復", "亥子丑月", "水旺調候"],
 		},
 	];
 
 	return {
 		seasons: seasons,
-		title: `夫妻關鍵季節&注意事項 (${concern}指南)`,
-		fullContent: `${name1}與${name2}的夫妻季節分析基礎版本。`,
+		title: isSimplified
+			? `夫妻关键季节&注意事项 (${concern}指南)`
+			: `夫妻關鍵季節&注意事項 (${concern}指南)`,
+		fullContent: isSimplified
+			? `${name1}与${name2}的夫妻季节分析基础版本。`
+			: `${name1}與${name2}的夫妻季節分析基礎版本。`,
 	};
 }

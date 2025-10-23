@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useCoupleAnalysis } from "@/contexts/CoupleAnalysisContext";
 import {
 	calculateUnifiedElements,
@@ -95,15 +96,21 @@ const TAB_CONFIG = {
 
 const TABS = ["left", "middle", "right"];
 
+// Map Chinese concern names to English keys for translations
+const CONCERN_KEY_MAP = {
+	感情: "relationship",
+	婚姻: "marriage",
+	家庭: "family",
+};
+
 function getTabConfig(concern) {
 	return TAB_CONFIG[concern] || TAB_CONFIG.感情;
 }
 
-function getTabLabel(tab, concern) {
-	if (tab === "left") return getTabConfig(concern).left.label;
-	if (tab === "middle") return getTabConfig(concern).middle.label;
-	if (tab === "right") return getTabConfig(concern).right.label;
-	return tab;
+function getTabLabel(tab, concern, t) {
+	if (!t) return tab; // Fallback if no translation function
+	const concernKey = CONCERN_KEY_MAP[concern] || "relationship";
+	return t(`coupleMingJu.tabs.${concernKey}.${tab}`);
 }
 
 function getTabImg(tab, concern) {
@@ -148,17 +155,23 @@ function getTabImgColor(tab, concern, selected) {
 // AI analysis function for couple compatibility
 async function generateCoupleMingJuAnalysis(
 	{ user1, user2, concern, problem, currentYear },
-	tab
+	tab,
+	isSimplified = false
 ) {
 	const concernArea = concern || "感情";
 
 	// Create AI prompt based on tab and concern
-	const prompt = createCoupleAIPrompt(concernArea, tab, {
-		user1,
-		user2,
-		problem,
-		currentYear,
-	});
+	const prompt = createCoupleAIPrompt(
+		concernArea,
+		tab,
+		{
+			user1,
+			user2,
+			problem,
+			currentYear,
+		},
+		isSimplified
+	);
 
 	// Try AI API multiple times for better reliability
 	for (let attempt = 1; attempt <= 3; attempt++) {
@@ -183,6 +196,7 @@ async function generateCoupleMingJuAnalysis(
 					currentYear: currentYear,
 					analysisType: tab,
 					prompt: prompt,
+					isSimplified: isSimplified,
 				}),
 			});
 
@@ -202,7 +216,13 @@ async function generateCoupleMingJuAnalysis(
 			console.error(`❌ AI Analysis Attempt ${attempt} failed:`, error);
 			if (attempt === 3) {
 				// Final fallback
-				return generateFallbackContent(tab, concernArea, user1, user2);
+				return generateFallbackContent(
+					tab,
+					concernArea,
+					user1,
+					user2,
+					isSimplified
+				);
 			}
 		}
 	}
@@ -211,7 +231,8 @@ async function generateCoupleMingJuAnalysis(
 function createCoupleAIPrompt(
 	concern,
 	tab,
-	{ user1, user2, problem, currentYear }
+	{ user1, user2, problem, currentYear },
+	isSimplified = false
 ) {
 	// Calculate unified element analysis for consistent results
 	let elementAnalysisText = "";
@@ -230,21 +251,71 @@ function createCoupleAIPrompt(
 		);
 	} catch (error) {
 		console.warn("Element analysis failed, using basic info:", error);
-		elementAnalysisText = `
+		elementAnalysisText = isSimplified
+			? `
+基本资料：
+男方生辰：${user1.birthDateTime}，性别：${user1.gender || "男"}
+女方生辰：${user2.birthDateTime}，性别：${user2.gender || "女"}
+`
+			: `
 基本資料：
 男方生辰：${user1.birthDateTime}，性別：${user1.gender || "男"}
 女方生辰：${user2.birthDateTime}，性別：${user2.gender || "女"}
 `;
 	}
 
-	const baseContext = `夫妻合盤分析：
+	const baseContext = isSimplified
+		? `夫妻合盘分析：
+${elementAnalysisText}
+关注领域：${concern}，具体问题：${problem}，分析年份：${currentYear}
+
+【重要指示】你是专业的八字合盘命理大师，必须提供具体、准确、有说服力的夫妻合盘分析。避免模糊用词，要给出明确的判断和建议。请使用简体中文回应。`
+		: `夫妻合盤分析：
 ${elementAnalysisText}
 關注領域：${concern}，具體問題：${problem}，分析年份：${currentYear}
 
 【重要指示】你是專業的八字合盤命理大師，必須提供具體、準確、有說服力的夫妻合盤分析。避免模糊用詞，要給出明確的判斷和建議。請使用繁體中文回應。`;
 
 	if (tab === "left") {
-		return `${baseContext}
+		return isSimplified
+			? `${baseContext}
+
+请必须按照以下格式提供夫妻配对特性分析：
+
+【标题格式】
+【[男方日干][女方日干]合盘分析】
+
+内容结构：
+1. 第一段：[男方日干]配[女方日干]，[格局名称]，赋予[具体优势]；然[具体挑战]。全局需[调和方案]，具体长期配对策略如下：
+
+2. 五行调和方案：
+[列出3个具体的五行调和建议，包含方位、物品、时辰等]
+
+3. 长期配对策略：
+[针对当年年份的具体建议，包含季节、活动、风水布局等]
+
+4. 最后段落：[深度分析说明双方命理互动关系和注意事项]
+
+范例格式：
+【辛金配戊土合盘分析】
+
+辛金配戊土，土生金之正印格局，赋予稳定包容、财官相生之利；然金土皆燥，火炎土焦之忧。全局需水润金土，具体长期配对策略如下：
+
+五行调和方案：
+1. 北方水位布局黑曜石或鱼缸化解火燥
+2. 随身佩戴海蓝宝石增强水气流通  
+3. 亥子时辰（21-01时）为最佳沟通时段
+
+长期配对策略：
+2025乙巳年需注意巳申相刑，建议：
+- 立春后共同参与水相关活动（游泳、温泉）
+- 秋季金旺时节进行重要家庭决策
+- 卧室西方放置铜制摆件平衡金气
+
+此局戊土正印护辛金，女方能有效缓解男方癸水食神之波动性，男方甲木正财可疏导女方戊土比肩之固执。惟双午火局需防2025年巳火加入形成三会火局，建议立夏后减少南方行程，多运用黑色系衣着配饰调节。
+
+请严格按照此格式生成，确保包含所有必要元素。`
+			: `${baseContext}
 
 請必須按照以下格式提供夫妻配對特性分析：
 
@@ -283,7 +354,61 @@ ${elementAnalysisText}
 請嚴格按照此格式生成，確保包含所有必要元素。`;
 	} else if (tab === "middle") {
 		if (concern === "感情") {
-			return `${baseContext}
+			return isSimplified
+				? `${baseContext}
+      
+你必须严格按照以下JSON格式回应，提供夫妻感情合盘的具体分析。
+
+【重要】只返回纯JSON格式，不要包含任何markdown代码块标记（如\`\`\`json或\`\`\`），直接从{开始到}结束：
+
+{
+  "合盘核心": {
+    "主要内容": "明确指出双方日干配对的核心格局和感情基础（如：甲木配己土，官印相生）",
+    "状态列表": [
+      "具体配对强弱：[提供具体证据，如男方日干得女方生扶或相克]",
+      "具体感情互动：[明确说出双方在感情上的互动模式]", 
+      "具体吸引力源：[说明双方相互吸引的命理基础]"
+    ],
+    "结论": "给出明确的感情配对总体评价，不要模糊用词"
+  },
+  "感情之源": {
+    "主要分析": "具体分析双方感情宫位配置及相互影响，说明感情发展模式（约100字，要具体）",
+    "关键问题": {
+      "问题1": {
+        "名称": "具体感情问题名称（如：水火不容易起冲突）",
+        "解释": "具体解释这个问题的成因和对感情的影响（50字）"
+      },
+      "问题2": {
+        "名称": "另一个具体感情挑战",
+        "解释": "具体解释第二个问题及其解决方向（50字）"
+      }
+    }
+  },
+  "夫妻互动关键": {
+    "互动列表": [
+      {
+        "方面": "具体互动方面（如：沟通模式）",
+        "特点": "明确说明这方面的互动特点和建议（40字）"
+      },
+      {
+        "方面": "第二个互动方面（如：性格互补）",
+        "特点": "具体互动机制，不要模糊描述（40字）"
+      },
+      {
+        "方面": "第三个互动方面（如：共同目标）",
+        "特点": "明确的互动分析，要有说服力（40字）"
+      }
+    ],
+    "格局核心": "用15字内准确概括夫妻配对的核心优势"
+  }
+}
+
+【强制要求】：
+- 必须提供具体的双方天干地支合盘分析
+- 不允许使用"可能"、"或许"、"一般来说"等模糊词汇
+- 每个分析都要有具体的合盘命理依据
+- 总字数约350字，内容要实用有效`
+				: `${baseContext}
       
 你必須嚴格按照以下JSON格式回應，提供夫妻感情合盤的具體分析。
 
@@ -337,7 +462,61 @@ ${elementAnalysisText}
 - 每個分析都要有具體的合盤命理依據
 - 總字數約350字，內容要實用有效`;
 		} else if (concern === "婚姻") {
-			return `${baseContext}
+			return isSimplified
+				? `${baseContext}
+      
+你必须严格按照以下JSON格式回应，提供婚姻方面的夫妻合盘分析。
+
+【重要】只返回纯JSON格式，不要包含任何markdown代码块标记（如\`\`\`json或\`\`\`），直接从{开始到}结束：
+
+{
+  "婚姻根基": {
+    "主要内容": "明确分析双方婚姻宫配置和夫妻星情况，说出具体婚姻格局",
+    "状态列表": [
+      "具体婚姻基础：[明确说出双方夫妻宫和夫妻星的配合情况]",
+      "具体稳定性：[根据合盘配置给出明确的婚姻稳定度判断]",
+      "具体成长潜力：[说明婚姻关系的发展空间和方向]"
+    ],
+    "结论": "对婚姻关系给出明确而非模糊的总结"
+  },
+  "婚姻发展": {
+    "主要分析": "具体分析适合的婚姻经营模式和发展阶段，要给出明确建议（约100字）",
+    "关键问题": {
+      "问题1": {
+        "名称": "具体婚姻发展障碍",
+        "解释": "明确说明这个障碍的原因和解决方向（50字）"
+      },
+      "问题2": {
+        "名称": "另一个具体婚姻挑战",
+        "解释": "具体分析第二个挑战及应对策略（50字）"
+      }
+    }
+  },
+  "夫妻星配置": {
+    "配置列表": [
+      {
+        "星神": "具体夫妻星名称（如：正官、正财）",
+        "作用": "明确说明这个星神在婚姻中的作用（40字）"
+      },
+      {
+        "星神": "第二个相关星神",
+        "作用": "具体作用机制，不要模糊描述（40字）"
+      },
+      {
+        "星神": "第三个重要星神",
+        "作用": "明确的婚姻影响分析（40字）"
+      }
+    ],
+    "格局核心": "用15字内准确概括婚姻格局的核心特质"
+  }
+}
+
+【强制要求】：
+- 必须提供具体的夫妻星和婚姻宫合盘分析
+- 不允许使用模糊词汇，要有明确判断
+- 每个分析都要有具体的命理依据
+- 总字数约350字，重点关注婚姻稳定性`
+				: `${baseContext}
       
 你必須嚴格按照以下JSON格式回應，提供婚姻方面的夫妻合盤分析。
 
@@ -391,7 +570,61 @@ ${elementAnalysisText}
 - 每個分析都要有具體的命理依據
 - 總字數約350字，重點關注婚姻穩定性`;
 		} else if (concern === "家庭") {
-			return `${baseContext}
+			return isSimplified
+				? `${baseContext}
+      
+你必须严格按照以下JSON格式回应，提供家庭方面的夫妻合盘分析。
+
+【重要】只返回纯JSON格式，不要包含任何markdown代码块标记（如\`\`\`json或\`\`\`），直接从{开始到}结束：
+
+{
+  "家庭基础": {
+    "主要内容": "明确分析双方家庭宫位和子女星配置，说出具体家庭格局",
+    "状态列表": [
+      "具体家庭根基：[明确说出双方在家庭建设上的优势配合]",
+      "具体子女缘：[根据子女星配置分析生育和教养能力]",
+      "具体家庭和谐度：[说明家庭氛围和相处模式]"
+    ],
+    "结论": "对家庭建设给出明确的总体评价"
+  },
+  "家庭经营": {
+    "主要分析": "具体分析适合的家庭经营模式和分工安排，要给出明确建议（约100字）",
+    "关键问题": {
+      "问题1": {
+        "名称": "具体家庭经营挑战",
+        "解释": "明确说明这个挑战的原因和改善方向（50字）"
+      },
+      "问题2": {
+        "名称": "另一个具体家庭问题",
+        "解释": "具体分析第二个问题及解决策略（50字）"
+      }
+    }
+  },
+  "家庭角色配置": {
+    "角色列表": [
+      {
+        "角色": "具体家庭角色（如：经济支柱、教育主导）",
+        "分工": "明确说明这个角色的最佳分工安排（40字）"
+      },
+      {
+        "角色": "第二个重要角色",
+        "分工": "具体分工机制和配合方式（40字）"
+      },
+      {
+        "角色": "第三个关键角色",
+        "分工": "明确的角色定位和责任分配（40字）"
+      }
+    ],
+    "格局核心": "用15字内准确概括家庭经营的核心优势"
+  }
+}
+
+【强制要求】：
+- 必须提供具体的家庭宫位和子女星合盘分析
+- 不允许使用模糊词汇，要有明确的家庭经营建议
+- 每个分析都要有具体的命理依据
+- 总字数约350字，重点关注家庭和谐与发展`
+				: `${baseContext}
       
 你必須嚴格按照以下JSON格式回應，提供家庭方面的夫妻合盤分析。
 
@@ -447,7 +680,37 @@ ${elementAnalysisText}
 		}
 	} else if (tab === "right") {
 		if (concern === "感情") {
-			return `${baseContext}
+			return isSimplified
+				? `${baseContext}
+
+请提供感情调候策略的具体建议，必须按照以下JSON格式。
+
+【重要】只返回纯JSON格式，不要包含任何markdown代码块标记（如\`\`\`json或\`\`\`），直接从{开始到}结束：
+
+{
+  "调候核心": {
+    "五行调节": "明确指出双方需要的具体五行调节方案（如：男方需木火调候，女方需金水平衡）",
+    "调候重点": "具体说明调候的重点时机和方法（60字）"
+  },
+  "实用建议": {
+    "日常调和": [
+      "具体的日常感情调和建议1（30字）",
+      "具体的日常感情调和建议2（30字）",
+      "具体的日常感情调和建议3（30字）"
+    ],
+    "时机把握": [
+      "重要时机的把握建议1（30字）",
+      "重要时机的把握建议2（30字）"
+    ]
+  },
+  "长期策略": {
+    "感情发展": "具体的长期感情发展策略和目标（80字）",
+    "关键节点": "明确指出感情发展的关键节点和注意事项（60字）"
+  }
+}
+
+要求300字，重点提供实用的调候建议。`
+				: `${baseContext}
 
 請提供感情調候策略的具體建議，必須按照以下JSON格式。
 
@@ -477,7 +740,37 @@ ${elementAnalysisText}
 
 要求300字，重點提供實用的調候建議。`;
 		} else if (concern === "婚姻") {
-			return `${baseContext}
+			return isSimplified
+				? `${baseContext}
+
+请提供婚姻调候方案的具体建议，必须按照以下JSON格式。
+
+【重要】只返回纯JSON格式，不要包含任何markdown代码块标记（如\`\`\`json或\`\`\`），直接从{开始到}结束：
+
+{
+  "调候核心": {
+    "五行调节": "明确指出婚姻关系需要的具体五行调节（如：夫妻宫需要火土调和）",
+    "调候重点": "具体说明婚姻调候的重点和方法（60字）"
+  },
+  "实用建议": {
+    "婚姻经营": [
+      "具体的婚姻经营建议1（30字）",
+      "具体的婚姻经营建议2（30字）",
+      "具体的婚姻经营建议3（30字）"
+    ],
+    "冲突化解": [
+      "夫妻冲突化解方法1（30字）",
+      "夫妻冲突化解方法2（30字）"
+    ]
+  },
+  "长期策略": {
+    "婚姻稳定": "具体的长期婚姻稳定策略（80字）",
+    "成长目标": "明确的夫妻共同成长目标和路径（60字）"
+  }
+}
+
+要求300字，重点提供实用的婚姻调候方案。`
+				: `${baseContext}
 
 請提供婚姻調候方案的具體建議，必須按照以下JSON格式。
 
@@ -507,7 +800,37 @@ ${elementAnalysisText}
 
 要求300字，重點提供實用的婚姻調候方案。`;
 		} else if (concern === "家庭") {
-			return `${baseContext}
+			return isSimplified
+				? `${baseContext}
+
+请提供家庭和睦方案的具体建议，必须按照以下JSON格式。
+
+【重要】只返回纯JSON格式，不要包含任何markdown代码块标记（如\`\`\`json或\`\`\`），直接从{开始到}结束：
+
+{
+  "调候核心": {
+    "五行调节": "明确指出家庭和谐需要的具体五行调节（如：家庭气场需要土金调和）",
+    "调候重点": "具体说明家庭调候的重点和实施方法（60字）"
+  },
+  "实用建议": {
+    "家庭和谐": [
+      "具体的家庭和谐建议1（30字）",
+      "具体的家庭和谐建议2（30字）",
+      "具体的家庭和谐建议3（30字）"
+    ],
+    "子女教养": [
+      "子女教养的重点建议1（30字）",
+      "子女教养的重点建议2（30字）"
+    ]
+  },
+  "长期策略": {
+    "家庭发展": "具体的长期家庭发展策略和愿景（80字）",
+    "传承规划": "明确的家庭传承规划和价值延续（60字）"
+  }
+}
+
+要求300字，重点提供实用的家庭经营方案。`
+				: `${baseContext}
 
 請提供家庭和睦方案的具體建議，必須按照以下JSON格式。
 
@@ -540,17 +863,44 @@ ${elementAnalysisText}
 	}
 
 	// Default fallback prompt
-	return `${baseContext}
+	return isSimplified
+		? `${baseContext}
+
+请提供${concern}方面的夫妻合盘分析，包含具体的配对特点、互动模式和调和建议。要求内容具体实用，避免模糊描述，约300字。`
+		: `${baseContext}
 
 請提供${concern}方面的夫妻合盤分析，包含具體的配對特點、互動模式和調和建議。要求內容具體實用，避免模糊描述，約300字。`;
 }
 
-function generateFallbackContent(tab, concern, user1, user2) {
-	const user1Name = user1.name || "男方";
-	const user2Name = user2.name || "女方";
+function generateFallbackContent(
+	tab,
+	concern,
+	user1,
+	user2,
+	isSimplified = false
+) {
+	const user1Name = user1.name || (isSimplified ? "男方" : "男方");
+	const user2Name = user2.name || (isSimplified ? "女方" : "女方");
 
 	if (tab === "left") {
-		return `${user1Name}與${user2Name}的八字配對分析：
+		return isSimplified
+			? `${user1Name}与${user2Name}的八字配对分析：
+
+根据双方生辰八字，此配对展现出独特的五行互动格局。双方在性格特质上既有互补优势，也存在需要调和的差异。
+
+配对优势：
+• 五行互补：双方的日干五行形成良性互动，有助于相互支持
+• 性格平衡：在处事方式上能够互相补足，形成稳定的配对基础
+
+需要注意：
+• 沟通调和：不同的表达方式可能需要更多理解和包容
+• 节奏协调：在生活步调上需要找到平衡点
+
+调和建议：
+建议双方多关注对方的五行特质，在日常相处中运用相生原理，避免相克情况。通过适当的风水调节和时机把握，可以增进感情和谐，建立长久稳定的关系。
+
+此配对具有良好的发展潜力，关键在于双方的理解与配合。`
+			: `${user1Name}與${user2Name}的八字配對分析：
 
 根據雙方生辰八字，此配對展現出獨特的五行互動格局。雙方在性格特質上既有互補優勢，也存在需要調和的差異。
 
@@ -567,84 +917,158 @@ function generateFallbackContent(tab, concern, user1, user2) {
 
 此配對具有良好的發展潛力，關鍵在於雙方的理解與配合。`;
 	} else if (tab === "middle") {
-		return JSON.stringify(
-			{
-				合盤核心: {
-					主要内容: `${user1Name}與${user2Name}的八字合盤顯示良好的配對基礎`,
-					状态列表: [
-						"配對強弱：雙方日干形成穩定的相互關係",
-						"感情互動：在情感表達上有互補特質",
-						"吸引力源：基於五行相生的天然吸引力",
-					],
-					结论: "整體配對評價為良好，具有發展潛力",
-				},
-				感情之源: {
-					主要分析:
-						"雙方的感情宮位配置較為和諧，男方的理性與女方的感性形成良好互補，感情發展呈現穩定上升趨勢。",
-					关键问题: {
-						问题1: {
-							名称: "溝通方式差異",
-							解释: "雙方在表達感情的方式上有所不同，需要多一些耐心和理解。",
-						},
-						问题2: {
-							名称: "生活節奏調和",
-							解释: "在日常生活安排上需要找到雙方都舒適的平衡點。",
-						},
+		const simplifiedContent = {
+			合盘核心: {
+				主要内容: `${user1Name}与${user2Name}的八字合盘显示良好的配对基础`,
+				状态列表: [
+					"配对强弱：双方日干形成稳定的相互关系",
+					"感情互动：在情感表达上有互补特质",
+					"吸引力源：基于五行相生的天然吸引力",
+				],
+				结论: "整体配对评价为良好，具有发展潜力",
+			},
+			感情之源: {
+				主要分析:
+					"双方的感情宫位配置较为和谐，男方的理性与女方的感性形成良好互补，感情发展呈现稳定上升趋势。",
+				关键问题: {
+					问题1: {
+						名称: "沟通方式差异",
+						解释: "双方在表达感情的方式上有所不同，需要多一些耐心和理解。",
+					},
+					问题2: {
+						名称: "生活节奏调和",
+						解释: "在日常生活安排上需要找到双方都舒适的平衡点。",
 					},
 				},
-				夫妻互动关键: {
-					互动列表: [
-						{
-							方面: "情感交流",
-							特點: "建議多用行動表達關愛，減少語言上的誤解",
-						},
-						{
-							方面: "生活規劃",
-							特點: "在重大決定上多商量，發揮各自的優勢特質",
-						},
-						{
-							方面: "相處模式",
-							特點: "保持適當的個人空間，同時增進共同興趣",
-						},
-					],
-					格局核心: "互補配對，和諧發展",
+			},
+			夫妻互动关键: {
+				互动列表: [
+					{
+						方面: "情感交流",
+						特点: "建议多用行动表达关爱，减少语言上的误解",
+					},
+					{
+						方面: "生活规划",
+						特点: "在重大决定上多商量，发挥各自的优势特质",
+					},
+					{
+						方面: "相处模式",
+						特点: "保持适当的个人空间，同时增进共同兴趣",
+					},
+				],
+				格局核心: "互补配对，和谐发展",
+			},
+		};
+
+		const traditionalContent = {
+			合盤核心: {
+				主要内容: `${user1Name}與${user2Name}的八字合盤顯示良好的配對基礎`,
+				状态列表: [
+					"配對強弱：雙方日干形成穩定的相互關係",
+					"感情互動：在情感表達上有互補特質",
+					"吸引力源：基於五行相生的天然吸引力",
+				],
+				结论: "整體配對評價為良好，具有發展潛力",
+			},
+			感情之源: {
+				主要分析:
+					"雙方的感情宮位配置較為和諧，男方的理性與女方的感性形成良好互補，感情發展呈現穩定上升趨勢。",
+				关键问题: {
+					问题1: {
+						名称: "溝通方式差異",
+						解释: "雙方在表達感情的方式上有所不同，需要多一些耐心和理解。",
+					},
+					问题2: {
+						名称: "生活節奏調和",
+						解释: "在日常生活安排上需要找到雙方都舒適的平衡點。",
+					},
 				},
 			},
+			夫妻互动关键: {
+				互动列表: [
+					{
+						方面: "情感交流",
+						特點: "建議多用行動表達關愛，減少語言上的誤解",
+					},
+					{
+						方面: "生活規劃",
+						特點: "在重大決定上多商量，發揮各自的優勢特質",
+					},
+					{
+						方面: "相處模式",
+						特點: "保持適當的個人空間，同時增進共同興趣",
+					},
+				],
+				格局核心: "互補配對，和諧發展",
+			},
+		};
+
+		return JSON.stringify(
+			isSimplified ? simplifiedContent : traditionalContent,
 			null,
 			2
 		);
 	} else if (tab === "right") {
-		return JSON.stringify(
-			{
-				调候核心: {
-					五行调节: `${user1Name}需要調和火土之氣，${user2Name}適合平衡金水能量`,
-					调候重点:
-						"重點在於雙方的五行平衡，建議在季節轉換時特別注意情感調節",
-				},
-				实用建议: {
-					日常调和: [
-						"多在自然環境中約會，增進五行和諧",
-						"選擇適合的顏色和飾品輔助調候",
-						"注意飲食搭配，避免五行相剋的食物組合",
-					],
-					时机把握: [
-						"在吉利的時辰進行重要決定和溝通",
-						"利用流年大運的有利時機推進感情發展",
-					],
-				},
-				长期策略: {
-					感情发展:
-						"建議循序漸進，在穩固感情基礎的同時，規劃未來的共同目標和發展方向。",
-					关键节点:
-						"特別注意農曆的重要節氣，這些時間點對感情發展有重要影響。",
-				},
+		const simplifiedContent = {
+			调候核心: {
+				五行调节: `${user1Name}需要调和火土之气，${user2Name}适合平衡金水能量`,
+				调候重点:
+					"重点在于双方的五行平衡，建议在季节转换时特别注意情感调节",
 			},
+			实用建议: {
+				日常调和: [
+					"多在自然环境中约会，增进五行和谐",
+					"选择适合的颜色和饰品辅助调候",
+					"注意饮食搭配，避免五行相克的食物组合",
+				],
+				时机把握: [
+					"在吉利的时辰进行重要决定和沟通",
+					"利用流年大运的有利时机推进感情发展",
+				],
+			},
+			长期策略: {
+				感情发展:
+					"建议循序渐进，在稳固感情基础的同时，规划未来的共同目标和发展方向。",
+				关键节点:
+					"特别注意农历的重要节气，这些时间点对感情发展有重要影响。",
+			},
+		};
+
+		const traditionalContent = {
+			调候核心: {
+				五行调节: `${user1Name}需要調和火土之氣，${user2Name}適合平衡金水能量`,
+				调候重点:
+					"重點在於雙方的五行平衡，建議在季節轉換時特別注意情感調節",
+			},
+			实用建议: {
+				日常调和: [
+					"多在自然環境中約會，增進五行和諧",
+					"選擇適合的顏色和飾品輔助調候",
+					"注意飲食搭配，避免五行相剋的食物組合",
+				],
+				时机把握: [
+					"在吉利的時辰進行重要決定和溝通",
+					"利用流年大運的有利時機推進感情發展",
+				],
+			},
+			长期策略: {
+				感情发展:
+					"建議循序漸進，在穩固感情基礎的同時，規劃未來的共同目標和發展方向。",
+				关键节点:
+					"特別注意農曆的重要節氣，這些時間點對感情發展有重要影響。",
+			},
+		};
+
+		return JSON.stringify(
+			isSimplified ? simplifiedContent : traditionalContent,
 			null,
 			2
 		);
 	}
 
-	return `分析中...請稍候，正在為您生成專業的夫妻合盤${concern}分析報告。`;
+	return isSimplified
+		? `分析中...请稍候，正在为您生成专业的夫妻合盘${concern}分析报告。`
+		: `分析中...請稍候，正在為您生成專業的夫妻合盤${concern}分析報告。`;
 }
 
 // Structured content renderer for JSON responses
@@ -1265,9 +1689,15 @@ function formatLeftTabContent(content) {
 	);
 }
 
-export function CoupleMingJu({ user1, user2, currentYear }) {
+export function CoupleMingJu({
+	user1,
+	user2,
+	currentYear,
+	isSimplified = false,
+}) {
 	const { data: session } = useSession();
 	const { coupleMingJuCache, setCoupleMingJuCache } = useCoupleAnalysis();
+	const t = useTranslations("coupleReport");
 
 	const [selectedTab, setSelectedTab] = useState("left");
 	const [tabContent, setTabContent] = useState("");
@@ -1571,7 +2001,8 @@ export function CoupleMingJu({ user1, user2, currentYear }) {
 							problem: "夫妻合盤命理分析",
 							currentYear,
 						},
-						tab
+						tab,
+						isSimplified
 					);
 
 					console.log(
@@ -1849,7 +2280,7 @@ export function CoupleMingJu({ user1, user2, currentYear }) {
 				<div className="flex items-center justify-center gap-4 px-2 mb-6 sm:px-4 sm:mb-8 lg:mb-8 sm:gap-8 lg:gap-16 xl:gap-20">
 					{TABS.map((tab) => {
 						const isSelected = selectedTab === tab;
-						const label = getTabLabel(tab, concern);
+						const label = getTabLabel(tab, concern, t);
 						const imgSrc = getTabImg(tab, concern);
 						const bgColor = getTabBg(tab, concern, isSelected);
 						const imgColor = getTabImgColor(

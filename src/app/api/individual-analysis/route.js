@@ -86,6 +86,7 @@ export async function POST(request) {
 			category,
 			specificQuestion,
 			gender,
+			isSimplified = false,
 		} = requestBody;
 
 		if (!birthDateTime) {
@@ -104,9 +105,11 @@ export async function POST(request) {
 			await EnhancedInitialAnalysis.generatePersonalAIAnalysis(
 				birthday,
 				dominantElement || bazi.yearElement,
-				category || "感情",
+				category || (isSimplified ? "感情" : "感情"),
 				specificQuestion ||
-					`請詳細分析${gender || "此人"}的八字特性和性格特質`
+					(isSimplified
+						? `请详细分析${gender || "此人"}的八字特性和性格特质`
+						: `請詳細分析${gender || "此人"}的八字特性和性格特質`)
 			);
 
 		return NextResponse.json({

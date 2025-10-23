@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const RestartChemistrySection = ({
 	femaleUser,
@@ -9,7 +10,9 @@ const RestartChemistrySection = ({
 	analysisData,
 	savedData,
 	onDataReady,
+	isSimplified = false,
 }) => {
+	const t = useTranslations("coupleReport.restartChemistrySection");
 	const [chemistryData, setChemistryData] = useState(null);
 	const [loading, setLoading] = useState(false);
 
@@ -57,6 +60,7 @@ const RestartChemistrySection = ({
 				femalePillars: analysisData?.female?.pillars,
 				malePillars: analysisData?.male?.pillars,
 				requestType: "restart_chemistry",
+				isSimplified,
 			};
 
 			console.log("📤 Sending chemistry request body:", requestBody);
@@ -315,7 +319,7 @@ const RestartChemistrySection = ({
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在生成重啟默契方案
+							{t("loadingMessage")}
 						</div>
 						<div
 							className="text-gray-500"
@@ -325,7 +329,7 @@ const RestartChemistrySection = ({
 								fontWeight: 400,
 							}}
 						>
-							請稍候，正在分析感情修復策略
+							{t("loadingSubMessage")}
 						</div>
 					</div>
 				</div>
@@ -354,7 +358,7 @@ const RestartChemistrySection = ({
 						fontFamily: "Noto Serif TC, serif",
 					}}
 				>
-					破冰儀式建議
+					{t("subtitle")}
 				</h3>
 			</div>
 

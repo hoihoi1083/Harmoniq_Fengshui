@@ -2,15 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { useCoupleAnalysis } from "@/contexts/CoupleAnalysisContext";
 import { getCoupleComponentData } from "@/utils/coupleComponentDataStore";
 import { saveComponentContentWithUser } from "@/utils/simpleCoupleContentSave";
 
-export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
+export default function CoupleSeason({
+	user1,
+	user2,
+	currentYear = 2025,
+	isSimplified = false,
+}) {
 	const { data: session } = useSession();
 	const { coupleSeasonCache, setCoupleSeasonCache } = useCoupleAnalysis();
+	const t = useTranslations("coupleReport.coupleSeason");
 
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -66,16 +73,17 @@ export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
 					user1Info: {
 						birthday: user1?.birthDateTime || "",
 						gender: user1?.gender || "male",
-						name: user1?.name || "男方",
+						name: user1?.name || (isSimplified ? "男方" : "男方"),
 					},
 					user2Info: {
 						birthday: user2?.birthDateTime || "",
 						gender: user2?.gender || "female",
-						name: user2?.name || "女方",
+						name: user2?.name || (isSimplified ? "女方" : "女方"),
 					},
 					currentYear: year,
 					currentDate: seasonInfo, // Add current season context
 					concern: "感情", // Default concern for couple analysis
+					isSimplified: isSimplified,
 				}),
 			});
 
@@ -280,7 +288,7 @@ export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
-							alt="風水妹運算中"
+							alt={t("loadingAlt")}
 							width={120}
 							height={120}
 							className="object-contain"
@@ -297,7 +305,7 @@ export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在分析夫妻關鍵季節
+							{t("loadingTitle")}
 						</div>
 						<div
 							className="text-gray-500"
@@ -307,7 +315,7 @@ export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
 								fontWeight: 400,
 							}}
 						>
-							請稍候，正在計算最佳時機配對
+							{t("loadingSubtitle")}
 						</div>
 					</div>
 				</div>
@@ -329,7 +337,7 @@ export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
 					className="py-6 text-center text-gray-500 sm:py-8"
 					style={{ fontSize: "clamp(14px, 3.5vw, 16px)" }}
 				>
-					無法載入夫妻季節分析資料
+					{t("noData")}
 				</div>
 			</section>
 		);
@@ -355,7 +363,7 @@ export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
 							color: "#B4003C", // Couple theme color
 						}}
 					>
-						夫妻關鍵季節
+						{t("title")}
 					</h2>
 					{/* Current Season Indicator */}
 					{analysisData?.currentSeason && (
@@ -378,7 +386,8 @@ export default function CoupleSeason({ user1, user2, currentYear = 2025 }) {
 									})(),
 								}}
 							>
-								當前：{analysisData.currentSeason} (
+								{t("currentLabel")}
+								{analysisData.currentSeason} (
 								{analysisData.currentMonth}月)
 							</span>
 						</div>

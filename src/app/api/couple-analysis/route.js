@@ -1,118 +1,241 @@
 import { NextResponse } from "next/server";
 
 // Fallback solution generator when API fails
-function generateFallbackSolution(reason = "API暫時不可用") {
+function generateFallbackSolution(
+	reason = "API暫時不可用",
+	isSimplified = false
+) {
 	console.log(`🔄 生成本地情侶分析解決方案，原因：${reason}`);
 
-	const fallbackAnalysis = {
-		compatibility: {
-			score: 78,
-			level: "良好匹配",
-			description:
-				"根據傳統八字分析，你們的配對顯示出良好的互補性。雖然可能存在一些挑戰，但通過相互理解和溝通，可以建立穩定和諧的關係。",
-		},
-		strengths: [
-			"性格特質互補，能夠平衡彼此的不足",
-			"在價值觀和人生目標上有共同點",
-			"溝通風格雖有差異但能相互學習",
-		],
-		challenges: [
-			"處理問題的方式可能存在分歧",
-			"情感表達方式需要更多理解",
-			"生活節奏的協調需要時間磨合",
-		],
-		advice: [
-			"保持開放和耐心的溝通態度",
-			"尊重彼此的個性差異，將其視為學習機會",
-			"建立共同的興趣愛好和目標",
-		],
-		wuxingAnalysis: {
-			user1: {
-				dominantElement: "木",
-				elementBalance: "五行較為平衡，木氣旺盛代表成長性強",
-				strengths: ["適應能力強", "富有創造力"],
-				weaknesses: ["有時過於理想化", "需要更多穩定性"],
-			},
-			user2: {
-				dominantElement: "土",
-				elementBalance: "土氣穩重，提供關係的穩定基礎",
-				strengths: ["務實可靠", "包容性強"],
-				weaknesses: ["有時過於保守", "需要更多變化刺激"],
-			},
-			compatibility:
-				"木土相配，木能從土中汲取養分，土能包容木的成長，形成互補互利的關係",
-			recommendation:
-				"建議在家中東南方向擺放綠色植物，增強木氣；西南方向擺放黃色或褐色裝飾，強化土氣",
-		},
-		fortuneAnalysis: {
-			currentYear: "今年感情運勢整體穩定，春夏季節特別適合深化關係",
-			monthlyTrends: [
-				"春季（2-4月）：感情升溫期，適合深入交流",
-				"夏季（5-7月）：關係穩固期，可考慮未來規劃",
-				"秋季（8-10月）：需要更多耐心，避免小爭執",
-			],
-			bestTiming: "春分至夏至期間是關係發展的最佳時機",
-			warnings: "秋末冬初需要注意溝通方式，避免因小事產生誤解",
-		},
-		relationshipAdvice: {
-			communication:
-				"建議採用溫和而直接的溝通方式，避免在情緒激動時討論重要問題",
-			conflict: "遇到分歧時，先各自冷靜思考，再以開放的心態討論解決方案",
-			growth: "定期分享個人成長心得，支持彼此的夢想和目標",
-			intimacy: "通過共同體驗和回憶創建，加深情感連結",
-		},
-		taboos: {
-			behaviors: ["避免在公共場合激烈爭執", "不要拿對方與他人比較"],
-			timing: [
-				"避免在疲憊或壓力大時討論重要決定",
-				"月圓之夜不適合處理衝突",
-			],
-			feng_shui: ["臥室避免擺放尖銳物品", "不要在床頭擺放鏡子"],
-		},
-		fengShuiLayout: {
-			bedroom: "床頭朝向東方或南方，使用暖色調床品，避免梁柱壓頂",
-			livingRoom: "客廳保持明亮整潔，在東南角擺放綠色植物或水晶",
-			colors: "建議使用綠色、黃色、粉色作為主色調，避免過多黑色或紅色",
-			items: "擺放成對的裝飾品，如一對花瓶或相框，象徵感情和諧",
-			generalAdvice: "保持居住環境的整潔和諧，定期清理不需要的物品",
-		},
-		specificProblem: {
-			analysis: "感情問題通常與溝通方式和期望值的差異有關",
-			solutions: [
-				"增加日常的輕鬆對話時間，不一定要討論嚴肅話題",
-				"學習對方的表達方式和接收方式",
-				"建立定期的關係檢視時間，坦誠分享感受",
-			],
-			actionPlan: "從每週安排一次深度交流開始，逐步建立更好的溝通模式",
-			timeline: "預期在3-6個月內看到明顯的改善",
-		},
-		dailyTips: [
-			"每天睡前分享一件開心的事情",
-			"週末安排共同的戶外活動",
-			"記住對方喜歡的小細節並時常實踐",
-		],
-		communication: {
-			style: "建議採用溫和而清晰的表達方式，多使用「我感覺」而非「你總是」的句型",
-			tips: [
-				"主動詢問對方的想法和感受",
-				"在對方說話時保持專注聆聽",
-				"用肯定的語言表達對關係的重視",
-			],
-		},
-	};
+	const fallbackAnalysis = isSimplified
+		? {
+				compatibility: {
+					score: 78,
+					level: "良好匹配",
+					description:
+						"根据传统八字分析，你们的配对显示出良好的互补性。虽然可能存在一些挑战，但通过相互理解和沟通，可以建立稳定和谐的关系。",
+				},
+				strengths: [
+					"性格特质互补，能够平衡彼此的不足",
+					"在价值观和人生目标上有共同点",
+					"沟通风格虽有差异但能相互学习",
+				],
+				challenges: [
+					"处理问题的方式可能存在分歧",
+					"情感表达方式需要更多理解",
+					"生活节奏的协调需要时间磨合",
+				],
+				advice: [
+					"保持开放和耐心的沟通态度",
+					"尊重彼此的个性差异，将其视为学习机会",
+					"建立共同的兴趣爱好和目标",
+				],
+				wuxingAnalysis: {
+					user1: {
+						dominantElement: "木",
+						elementBalance: "五行较为平衡，木气旺盛代表成长性强",
+						strengths: ["适应能力强", "富有创造力"],
+						weaknesses: ["有时过于理想化", "需要更多稳定性"],
+					},
+					user2: {
+						dominantElement: "土",
+						elementBalance: "土气稳重，提供关系的稳定基础",
+						strengths: ["务实可靠", "包容性强"],
+						weaknesses: ["有时过于保守", "需要更多变化刺激"],
+					},
+					compatibility:
+						"木土相配，木能从土中汲取养分，土能包容木的成长，形成互补互利的关系",
+					recommendation:
+						"建议在家中东南方向摆放绿色植物，增强木气；西南方向摆放黄色或褐色装饰，强化土气",
+				},
+				fortuneAnalysis: {
+					currentYear:
+						"今年感情运势整体稳定，春夏季节特别适合深化关系",
+					monthlyTrends: [
+						"春季（2-4月）：感情升温期，适合深入交流",
+						"夏季（5-7月）：关系稳固期，可考虑未来规划",
+						"秋季（8-10月）：需要更多耐心，避免小争执",
+					],
+					bestTiming: "春分至夏至期间是关系发展的最佳时机",
+					warnings: "秋末冬初需要注意沟通方式，避免因小事产生误解",
+				},
+				relationshipAdvice: {
+					communication:
+						"建议采用温和而直接的沟通方式，避免在情绪激动时讨论重要问题",
+					conflict:
+						"遇到分歧时，先各自冷静思考，再以开放的心态讨论解决方案",
+					growth: "定期分享个人成长心得，支持彼此的梦想和目标",
+					intimacy: "通过共同体验和回忆创建，加深情感连结",
+				},
+				taboos: {
+					behaviors: [
+						"避免在公共场合激烈争执",
+						"不要拿对方与他人比较",
+					],
+					timing: [
+						"避免在疲惫或压力大时讨论重要决定",
+						"月圆之夜不适合处理冲突",
+					],
+					feng_shui: ["卧室避免摆放尖锐物品", "不要在床头摆放镜子"],
+				},
+				fengShuiLayout: {
+					bedroom: "床头朝向东方或南方，使用暖色调床品，避免梁柱压顶",
+					livingRoom: "客厅保持明亮整洁，在东南角摆放绿色植物或水晶",
+					colors: "建议使用绿色、黄色、粉色作为主色调，避免过多黑色或红色",
+					items: "摆放成对的装饰品，如一对花瓶或相框，象征感情和谐",
+					generalAdvice:
+						"保持居住环境的整洁和谐，定期清理不需要的物品",
+				},
+				specificProblem: {
+					analysis: "感情问题通常与沟通方式和期望值的差异有关",
+					solutions: [
+						"增加日常的轻松对话时间，不一定要讨论严肃话题",
+						"学习对方的表达方式和接收方式",
+						"建立定期的关系检视时间，坦诚分享感受",
+					],
+					actionPlan:
+						"从每周安排一次深度交流开始，逐步建立更好的沟通模式",
+					timeline: "预期在3-6个月内看到明显的改善",
+				},
+				dailyTips: [
+					"每天睡前分享一件开心的事情",
+					"周末安排共同的户外活动",
+					"记住对方喜欢的小细节并时常实践",
+				],
+				communication: {
+					style: "建议采用温和而清晰的表达方式，多使用「我感觉」而非「你总是」的句型",
+					tips: [
+						"主动询问对方的想法和感受",
+						"在对方说话时保持专注聆听",
+						"用肯定的语言表达对关系的重视",
+					],
+				},
+			}
+		: {
+				compatibility: {
+					score: 78,
+					level: "良好匹配",
+					description:
+						"根據傳統八字分析，你們的配對顯示出良好的互補性。雖然可能存在一些挑戰，但通過相互理解和溝通，可以建立穩定和諧的關係。",
+				},
+				strengths: [
+					"性格特質互補，能夠平衡彼此的不足",
+					"在價值觀和人生目標上有共同點",
+					"溝通風格雖有差異但能相互學習",
+				],
+				challenges: [
+					"處理問題的方式可能存在分歧",
+					"情感表達方式需要更多理解",
+					"生活節奏的協調需要時間磨合",
+				],
+				advice: [
+					"保持開放和耐心的溝通態度",
+					"尊重彼此的個性差異，將其視為學習機會",
+					"建立共同的興趣愛好和目標",
+				],
+				wuxingAnalysis: {
+					user1: {
+						dominantElement: "木",
+						elementBalance: "五行較為平衡，木氣旺盛代表成長性強",
+						strengths: ["適應能力強", "富有創造力"],
+						weaknesses: ["有時過於理想化", "需要更多穩定性"],
+					},
+					user2: {
+						dominantElement: "土",
+						elementBalance: "土氣穩重，提供關係的穩定基礎",
+						strengths: ["務實可靠", "包容性強"],
+						weaknesses: ["有時過於保守", "需要更多變化刺激"],
+					},
+					compatibility:
+						"木土相配，木能從土中汲取養分，土能包容木的成長，形成互補互利的關係",
+					recommendation:
+						"建議在家中東南方向擺放綠色植物，增強木氣；西南方向擺放黃色或褐色裝飾，強化土氣",
+				},
+				fortuneAnalysis: {
+					currentYear:
+						"今年感情運勢整體穩定，春夏季節特別適合深化關係",
+					monthlyTrends: [
+						"春季（2-4月）：感情升溫期，適合深入交流",
+						"夏季（5-7月）：關係穩固期，可考慮未來規劃",
+						"秋季（8-10月）：需要更多耐心，避免小爭執",
+					],
+					bestTiming: "春分至夏至期間是關係發展的最佳時機",
+					warnings: "秋末冬初需要注意溝通方式，避免因小事產生誤解",
+				},
+				relationshipAdvice: {
+					communication:
+						"建議採用溫和而直接的溝通方式，避免在情緒激動時討論重要問題",
+					conflict:
+						"遇到分歧時，先各自冷靜思考，再以開放的心態討論解決方案",
+					growth: "定期分享個人成長心得，支持彼此的夢想和目標",
+					intimacy: "通過共同體驗和回憶創建，加深情感連結",
+				},
+				taboos: {
+					behaviors: [
+						"避免在公共場合激烈爭執",
+						"不要拿對方與他人比較",
+					],
+					timing: [
+						"避免在疲憊或壓力大時討論重要決定",
+						"月圓之夜不適合處理衝突",
+					],
+					feng_shui: ["臥室避免擺放尖銳物品", "不要在床頭擺放鏡子"],
+				},
+				fengShuiLayout: {
+					bedroom: "床頭朝向東方或南方，使用暖色調床品，避免梁柱壓頂",
+					livingRoom: "客廳保持明亮整潔，在東南角擺放綠色植物或水晶",
+					colors: "建議使用綠色、黃色、粉色作為主色調，避免過多黑色或紅色",
+					items: "擺放成對的裝飾品，如一對花瓶或相框，象徵感情和諧",
+					generalAdvice:
+						"保持居住環境的整潔和諧，定期清理不需要的物品",
+				},
+				specificProblem: {
+					analysis: "感情問題通常與溝通方式和期望值的差異有關",
+					solutions: [
+						"增加日常的輕鬆對話時間，不一定要討論嚴肅話題",
+						"學習對方的表達方式和接收方式",
+						"建立定期的關係檢視時間，坦誠分享感受",
+					],
+					actionPlan:
+						"從每週安排一次深度交流開始，逐步建立更好的溝通模式",
+					timeline: "預期在3-6個月內看到明顯的改善",
+				},
+				dailyTips: [
+					"每天睡前分享一件開心的事情",
+					"週末安排共同的戶外活動",
+					"記住對方喜歡的小細節並時常實踐",
+				],
+				communication: {
+					style: "建議採用溫和而清晰的表達方式，多使用「我感覺」而非「你總是」的句型",
+					tips: [
+						"主動詢問對方的想法和感受",
+						"在對方說話時保持專注聆聽",
+						"用肯定的語言表達對關係的重視",
+					],
+				},
+			};
 
 	return NextResponse.json({
 		success: true,
 		data: fallbackAnalysis,
 		fallback: true,
-		message: `由於${reason}，提供基於傳統命理的分析結果`,
+		message: isSimplified
+			? `由于${reason}，提供基于传统命理的分析结果`
+			: `由於${reason}，提供基於傳統命理的分析結果`,
 	});
 }
 
 export async function POST(request) {
 	try {
-		const { birthday, birthday2, gender, gender2, problem, sessionId } =
-			await request.json();
+		const {
+			birthday,
+			birthday2,
+			gender,
+			gender2,
+			problem,
+			sessionId,
+			isSimplified = false,
+		} = await request.json();
 
 		console.log("🚀 開始情侶分析 API 調用");
 		console.log("📝 分析參數:", {
@@ -122,6 +245,7 @@ export async function POST(request) {
 			gender2,
 			problem,
 			sessionId,
+			isSimplified,
 		});
 
 		// Check if DEEPSEEK_API_KEY is available
@@ -159,7 +283,100 @@ export async function POST(request) {
 						messages: [
 							{
 								role: "system",
-								content: `你是一位專業的情侶關係分析師，結合八字、生肖配對和現代心理學，為情侶提供全面的關係分析。**重要：請全部使用繁體中文輸出，不要使用簡體中文**
+								content: isSimplified
+									? `你是一位专业的情侣关系分析师，结合八字、生肖配对和现代心理学，为情侣提供全面的关系分析。**重要：请全部使用简体中文输出，不要使用繁体中文**
+
+请基于提供的生日信息进行分析，并返回一个严格的JSON格式，包含以下完整结构：
+
+{
+  "compatibility": {
+    "score": 85,
+    "level": "非常匹配",
+    "description": "详细的配对分析..."
+  },
+  "strengths": [
+    "优势1描述",
+    "优势2描述",
+    "优势3描述"
+  ],
+  "challenges": [
+    "挑战1描述",
+    "挑战2描述",
+    "挑战3描述"
+  ],
+  "advice": [
+    "建议1内容",
+    "建议2内容",
+    "建议3内容"
+  ],
+  "wuxingAnalysis": {
+    "user1": {
+      "dominantElement": "木",
+      "elementBalance": "平衡度分析",
+      "strengths": ["五行优势1", "五行优势2"],
+      "weaknesses": ["需要改善点1", "需要改善点2"]
+    },
+    "user2": {
+      "dominantElement": "火",
+      "elementBalance": "平衡度分析",
+      "strengths": ["五行优势1", "五行优势2"],
+      "weaknesses": ["需要改善点1", "需要改善点2"]
+    },
+    "compatibility": "五行配对详细分析",
+    "recommendation": "五行调和建议"
+  },
+  "fortuneAnalysis": {
+    "currentYear": "今年感情运势分析",
+    "monthlyTrends": ["1月运势", "2月运势", "3月运势"],
+    "bestTiming": "最佳时机分析",
+    "warnings": "需要注意的时期"
+  },
+  "relationshipAdvice": {
+    "communication": "沟通建议",
+    "conflict": "冲突处理建议",
+    "growth": "关系成长建议",
+    "intimacy": "亲密关系建议"
+  },
+  "taboos": {
+    "behaviors": ["避免行为1", "避免行为2"],
+    "timing": ["不利时机1", "不利时机2"],
+    "feng_shui": ["风水禁忌1", "风水禁忌2"]
+  },
+  "fengShuiLayout": {
+    "bedroom": "卧室布局建议",
+    "livingRoom": "客厅布局建议",
+    "colors": "建议色彩",
+    "items": "建议摆件",
+    "generalAdvice": "整体风水建议"
+  },
+  "specificProblem": {
+    "analysis": "具体问题分析",
+    "solutions": ["解决方案1", "解决方案2"],
+    "actionPlan": "行动计划",
+    "timeline": "预期时间线"
+  },
+  "dailyTips": [
+    "日常小贴士1",
+    "日常小贴士2",
+    "日常小贴士3"
+  ],
+  "communication": {
+    "style": "沟通风格分析",
+    "tips": [
+      "沟通技巧1",
+      "沟通技巧2",
+      "沟通技巧3"
+    ]
+  }
+}
+
+**重要规则：**
+1. 必须返回有效的JSON格式
+2. 所有文字必须使用简体中文
+3. 分数范围：60-95分
+4. 每个数组至少包含3个项目
+5. 避免使用特殊符号或可能破坏JSON的字符`
+									: `你是一位專業的情侶關係分析師，結合八字、生肖配對和現代心理學，為情侶提供全面的關係分析。**重要：請全部使用繁體中文輸出，不要使用簡體中文**
 
 請基於提供的生日信息進行分析，並返回一個嚴格的JSON格式，包含以下完整結構：
 
@@ -254,7 +471,14 @@ export async function POST(request) {
 							},
 							{
 								role: "user",
-								content: `請分析以下情侶的八字配對和關係：
+								content: isSimplified
+									? `请分析以下情侣的八字配对和关系：
+男方生日：${birthday}，性别：${gender}
+女方生日：${birthday2}，性别：${gender2}
+关注问题：${problem}
+
+请提供详细的情侣分析，包括八字配对、性格互补性、潜在挑战和改善建议。`
+									: `請分析以下情侶的八字配對和關係：
 男方生日：${birthday}，性別：${gender}
 女方生日：${birthday2}，性別：${gender2}
 關注問題：${problem}
@@ -298,20 +522,31 @@ export async function POST(request) {
 					"❌ DeepSeek API request timed out after 30 seconds"
 				);
 				return generateFallbackSolution(
-					"DeepSeek API 請求超時，使用本地分析"
+					isSimplified
+						? "DeepSeek API 请求超时，使用本地分析"
+						: "DeepSeek API 請求超時，使用本地分析",
+					isSimplified
 				);
 			}
 
 			console.error("❌ DeepSeek API request failed:", fetchError);
 			return generateFallbackSolution(
-				"DeepSeek API 請求失敗，使用本地分析"
+				isSimplified
+					? "DeepSeek API 请求失败，使用本地分析"
+					: "DeepSeek API 請求失敗，使用本地分析",
+				isSimplified
 			);
 		}
 
 		// 檢查 aiContent 是否已定義
 		if (typeof aiContent === "undefined") {
 			console.error("❌ aiContent 未定義，返回本地分析");
-			return generateFallbackSolution("AI 內容生成失敗，使用本地分析");
+			return generateFallbackSolution(
+				isSimplified
+					? "AI 内容生成失败，使用本地分析"
+					: "AI 內容生成失敗，使用本地分析",
+				isSimplified
+			);
 		}
 
 		console.log(
@@ -428,118 +663,16 @@ export async function POST(request) {
 			error.message.includes("timed out")
 		) {
 			console.log("🔄 Falling back to local analysis due to API issues");
-
-			// Provide a comprehensive fallback analysis
-			const fallbackAnalysis = {
-				compatibility: {
-					score: 78,
-					level: "良好匹配",
-					description:
-						"根據傳統八字分析，你們的配對顯示出良好的互補性。雖然可能存在一些挑戰，但通過相互理解和溝通，可以建立穩定和諧的關係。",
-				},
-				strengths: [
-					"性格特質互補，能夠平衡彼此的不足",
-					"在價值觀和人生目標上有共同點",
-					"溝通風格雖有差異但能相互學習",
-				],
-				challenges: [
-					"處理問題的方式可能存在分歧",
-					"情感表達方式需要更多理解",
-					"生活節奏的協調需要時間磨合",
-				],
-				advice: [
-					"保持開放和耐心的溝通態度",
-					"尊重彼此的個性差異，將其視為學習機會",
-					"建立共同的興趣愛好和目標",
-				],
-				wuxingAnalysis: {
-					user1: {
-						dominantElement: "木",
-						elementBalance: "五行較為平衡，木氣旺盛代表成長性強",
-						strengths: ["適應能力強", "富有創造力"],
-						weaknesses: ["有時過於理想化", "需要更多穩定性"],
-					},
-					user2: {
-						dominantElement: "土",
-						elementBalance: "土氣穩重，提供關係的穩定基礎",
-						strengths: ["務實可靠", "包容性強"],
-						weaknesses: ["有時過於保守", "需要更多變化刺激"],
-					},
-					compatibility:
-						"木土相配，木能從土中汲取養分，土能包容木的成長，形成互補互利的關係",
-					recommendation:
-						"建議在家中東南方向擺放綠色植物，增強木氣；西南方向擺放黃色或褐色裝飾，強化土氣",
-				},
-				fortuneAnalysis: {
-					currentYear:
-						"今年感情運勢整體穩定，春夏季節特別適合深化關係",
-					monthlyTrends: [
-						"春季（2-4月）：感情升溫期，適合深入交流",
-						"夏季（5-7月）：關係穩固期，可考慮未來規劃",
-						"秋季（8-10月）：需要更多耐心，避免小爭執",
-					],
-					bestTiming: "春分至夏至期間是關係發展的最佳時機",
-					warnings: "秋末冬初需要注意溝通方式，避免因小事產生誤解",
-				},
-				relationshipAdvice: {
-					communication:
-						"建議採用溫和而直接的溝通方式，避免在情緒激動時討論重要問題",
-					conflict:
-						"遇到分歧時，先各自冷靜思考，再以開放的心態討論解決方案",
-					growth: "定期分享個人成長心得，支持彼此的夢想和目標",
-					intimacy: "通過共同體驗和回憶創建，加深情感連結",
-				},
-				taboos: {
-					behaviors: [
-						"避免在公共場合激烈爭執",
-						"不要拿對方與他人比較",
-					],
-					timing: [
-						"避免在疲憊或壓力大時討論重要決定",
-						"月圓之夜不適合處理衝突",
-					],
-					feng_shui: ["臥室避免擺放尖銳物品", "不要在床頭擺放鏡子"],
-				},
-				fengShuiLayout: {
-					bedroom: "床頭朝向東方或南方，使用暖色調床品，避免梁柱壓頂",
-					livingRoom: "客廳保持明亮整潔，在東南角擺放綠色植物或水晶",
-					colors: "建議使用綠色、黃色、粉色作為主色調，避免過多黑色或紅色",
-					items: "擺放成對的裝飾品，如一對花瓶或相框，象徵感情和諧",
-					generalAdvice:
-						"保持居住環境的整潔和諧，定期清理不需要的物品",
-				},
-				specificProblem: {
-					analysis: `針對您提到的問題「${problem}」，這通常與溝通方式和期望值的差異有關`,
-					solutions: [
-						"增加日常的輕鬆對話時間，不一定要討論嚴肅話題",
-						"學習對方的表達方式和接收方式",
-						"建立定期的關係檢視時間，坦誠分享感受",
-					],
-					actionPlan:
-						"從每週安排一次深度交流開始，逐步建立更好的溝通模式",
-					timeline: "預期在3-6個月內看到明顯的改善",
-				},
-				dailyTips: [
-					"每天睡前分享一件開心的事情",
-					"週末安排共同的戶外活動",
-					"記住對方喜歡的小細節並時常實踐",
-				],
-				communication: {
-					style: "建議採用溫和而清晰的表達方式，多使用「我感覺」而非「你總是」的句型",
-					tips: [
-						"主動詢問對方的想法和感受",
-						"在對方說話時保持專注聆聽",
-						"用肯定的語言表達對關係的重視",
-					],
-				},
-			};
-
-			return NextResponse.json({
-				success: true,
-				data: fallbackAnalysis,
-				fallback: true, // Indicate this is a fallback response
-				message: "由於API服務暫時不可用，提供基於傳統命理的分析結果",
-			});
+			return generateFallbackSolution(
+				error.message.includes("timed out")
+					? isSimplified
+						? "API服务超时"
+						: "API服務超時"
+					: isSimplified
+						? "API服务暂时不可用"
+						: "API服務暫時不可用",
+				isSimplified
+			);
 		}
 
 		return NextResponse.json(

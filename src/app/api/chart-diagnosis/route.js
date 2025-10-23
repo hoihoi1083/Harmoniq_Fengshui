@@ -43,7 +43,7 @@ const calculateBaZi = (birthDate) => {
 		// Now BaziCalculator.getDayPillar uses accurate lunisolar calculation
 		const dayPillar = BaziCalculator.getDayPillar(date);
 		const yearPillar = BaziCalculator.getYearPillar(year);
-		
+
 		return {
 			year: `${yearPillar.tianGan}${yearPillar.diZhi}`,
 			month: "丁未", // Simplified for now
@@ -59,9 +59,11 @@ const calculateBaZi = (birthDate) => {
 	try {
 		const yearPillar = BaziCalculator.getYearPillar(date);
 		const dayPillar = BaziCalculator.getDayPillar(date);
-		
-		console.log(`🔧 Fixed ChartDiagnosis BaZi for ${date}: Day Master = ${dayPillar.tianGan}`);
-		
+
+		console.log(
+			`🔧 Fixed ChartDiagnosis BaZi for ${date}: Day Master = ${dayPillar.tianGan}`
+		);
+
 		return {
 			year: yearPillar.tianGan + yearPillar.diZhi,
 			month: "丁未", // Temporary static month
@@ -81,9 +83,10 @@ const calculateBaZi = (birthDate) => {
 		);
 		const dayStemIndex = (daysSinceReference + 9) % 10;
 		const dayBranchIndex = (daysSinceReference + 11) % 12;
-		
+
 		return {
-			year: heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex],
+			year:
+				heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex],
 			month: "丁未",
 			day: heavenlyStems[dayStemIndex] + earthlyBranches[dayBranchIndex],
 			hour: "癸丑",
@@ -167,7 +170,15 @@ export async function POST(request) {
 			femalePillars,
 			malePillars,
 			requestType,
+			isSimplified = false,
 		} = await request.json();
+
+		console.log(
+			"📥 /api/chart-diagnosis received isSimplified:",
+			isSimplified,
+			"Type:",
+			typeof isSimplified
+		);
 
 		if (!femaleUser?.birthDateTime || !maleUser?.birthDateTime) {
 			return NextResponse.json(
@@ -181,14 +192,24 @@ export async function POST(request) {
 		const maleBaziData = calculateBaZi(maleUser.birthDateTime);
 
 		// Debug logging to verify accurate calculation
-		console.log("🔍 ChartDiagnosis BaZi Calculation Results (now using fixed algorithm):");
-		console.log(`男方 (${maleUser.birthDateTime}): ${maleBaziData.dayMaster} (Day Master)`);
-		console.log(`女方 (${femaleUser.birthDateTime}): ${femaleBaziData.dayMaster} (Day Master)`);
-		console.log(`男方八字: ${maleBaziData.year} ${maleBaziData.month} ${maleBaziData.day} ${maleBaziData.hour}`);
-		console.log(`女方八字: ${femaleBaziData.year} ${femaleBaziData.month} ${femaleBaziData.day} ${femaleBaziData.hour}`);
+		console.log(
+			"🔍 ChartDiagnosis BaZi Calculation Results (now using fixed algorithm):"
+		);
+		console.log(
+			`男方 (${maleUser.birthDateTime}): ${maleBaziData.dayMaster} (Day Master)`
+		);
+		console.log(
+			`女方 (${femaleUser.birthDateTime}): ${femaleBaziData.dayMaster} (Day Master)`
+		);
+		console.log(
+			`男方八字: ${maleBaziData.year} ${maleBaziData.month} ${maleBaziData.day} ${maleBaziData.hour}`
+		);
+		console.log(
+			`女方八字: ${femaleBaziData.year} ${femaleBaziData.month} ${femaleBaziData.day} ${femaleBaziData.hour}`
+		);
 
-		// Generate AI analysis prompt
-		const prompt = `作為專業命理師，請針對這對情侶進行簡要的「盤面診斷」分析。
+		// Generate AI analysis prompt (bilingual support)
+		const traditionalPrompt = `作為專業命理師，請針對這對情侶進行簡要的「盤面診斷」分析。
 
 基本資料：
 女方生辰：${femaleUser.birthDateTime}
@@ -211,6 +232,36 @@ export async function POST(request) {
 簡要分析雙方最主要的互動問題，解釋核心衝突點，提供1-2個最重要的調整建議。重點描述他們最容易出現的感情循環問題。
 
 請用簡潔明瞭的中文，每段控制在100字左右，避免過於冗長的描述。`;
+
+		const simplifiedPrompt = `作为专业命理师，请针对这对情侣进行简要的「盘面诊断」分析。
+
+基本资料：
+女方生辰：${femaleUser.birthDateTime}
+女方八字：${femaleBaziData.year} ${femaleBaziData.month} ${femaleBaziData.day} ${femaleBaziData.hour}
+女方日主：${femaleBaziData.dayMaster}，日支：${femaleBaziData.dayBranch}，生于${femaleBaziData.monthBranch}月
+
+男方生辰：${maleUser.birthDateTime}  
+男方八字：${maleBaziData.year} ${maleBaziData.month} ${maleBaziData.day} ${maleBaziData.hour}
+男方日主：${maleBaziData.dayMaster}，日支：${maleBaziData.dayBranch}，生于${maleBaziData.monthBranch}月
+
+请提供三段简洁分析，每段约100字：
+
+女方分析：
+以「${femaleBaziData.dayMaster}${femaleBaziData.monthBranch}月」为标题，简要分析她的核心性格特征、主要情感需求、在感情中的典型行为模式。重点突出最关键的性格特质和感情表达方式。
+
+男方分析：
+以「${maleBaziData.dayMaster}${maleBaziData.monthBranch}月」为标题，简要分析他的性格特点、情感表达方式、在关系中的反应模式。聚焦最重要的性格倾向和沟通风格。
+
+关键合盘征象：
+简要分析双方最主要的互动问题，解释核心冲突点，提供1-2个最重要的调整建议。重点描述他们最容易出现的感情循环问题。
+
+请用简洁明了的中文，每段控制在100字左右，避免过于冗长的描述。`;
+
+		const prompt = isSimplified ? simplifiedPrompt : traditionalPrompt;
+		console.log(
+			"🎯 /api/chart-diagnosis using prompt:",
+			isSimplified ? "SIMPLIFIED (简体)" : "TRADITIONAL (繁體)"
+		);
 
 		// Call DeepSeek API
 		const response = await fetch(
@@ -246,7 +297,8 @@ export async function POST(request) {
 		const parsedAnalysis = parseChartDiagnosis(
 			aiAnalysis,
 			femaleBaziData,
-			maleBaziData
+			maleBaziData,
+			isSimplified
 		);
 
 		return NextResponse.json(parsedAnalysis);
@@ -268,7 +320,12 @@ export async function POST(request) {
 	}
 }
 
-function parseChartDiagnosis(aiText, femaleBaziData, maleBaziData) {
+function parseChartDiagnosis(
+	aiText,
+	femaleBaziData,
+	maleBaziData,
+	isSimplified = false
+) {
 	// Enhanced parsing to extract structured information
 	const sections = {
 		female: {
@@ -342,7 +399,9 @@ function parseChartDiagnosis(aiText, femaleBaziData, maleBaziData) {
 
 			if (
 				trimmedLine.includes("關鍵合盤") ||
-				trimmedLine.includes("合盤徵象")
+				trimmedLine.includes("合盤徵象") ||
+				trimmedLine.includes("关键合盘") ||
+				trimmedLine.includes("合盘征象")
 			) {
 				// Save previous section
 				if (currentSection && contentBuffer.length > 0) {
@@ -393,15 +452,21 @@ function parseChartDiagnosis(aiText, femaleBaziData, maleBaziData) {
 
 		// Ensure we have some content for each section
 		if (!sections.female.content) {
-			sections.female.content = `${femaleBaziData.dayMaster}命生於${femaleBaziData.monthBranch}月，當前大運流年2025乙巳年影響下，情感表達模式具有獨特特徵，需要特別關注溝通方式的調整。`;
+			sections.female.content = isSimplified
+				? `${femaleBaziData.dayMaster}命生于${femaleBaziData.monthBranch}月，当前大运流年2025乙巳年影响下，情感表达模式具有独特特征，需要特别关注沟通方式的调整。`
+				: `${femaleBaziData.dayMaster}命生於${femaleBaziData.monthBranch}月，當前大運流年2025乙巳年影響下，情感表達模式具有獨特特徵，需要特別關注溝通方式的調整。`;
 		}
 
 		if (!sections.male.content) {
-			sections.male.content = `${maleBaziData.dayMaster}命生於${maleBaziData.monthBranch}月，性格傾向和情感需求在當前時運影響下呈現特定模式，對感情關係的處理方式需要相互理解。`;
+			sections.male.content = isSimplified
+				? `${maleBaziData.dayMaster}命生于${maleBaziData.monthBranch}月，性格倾向和情感需求在当前时运影响下呈现特定模式，对感情关系的处理方式需要相互理解。`
+				: `${maleBaziData.dayMaster}命生於${maleBaziData.monthBranch}月，性格傾向和情感需求在當前時運影響下呈現特定模式，對感情關係的處理方式需要相互理解。`;
 		}
 
 		if (!sections.keySymptoms) {
-			sections.keySymptoms = `根據雙方八字合盤分析，主要關注點在於五行互動和性格差異如何影響情感溝通，建議通過相互理解和調整溝通方式來改善關係品質。`;
+			sections.keySymptoms = isSimplified
+				? `根据双方八字合盘分析，主要关注点在于五行互动和性格差异如何影响情感沟通，建议通过相互理解和调整沟通方式来改善关系品质。`
+				: `根據雙方八字合盤分析，主要關注點在於五行互動和性格差異如何影響情感溝通，建議通過相互理解和調整溝通方式來改善關係品質。`;
 		}
 	} catch (error) {
 		console.error("Error parsing chart diagnosis:", error);

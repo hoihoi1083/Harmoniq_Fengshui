@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Heart, Users, Target } from "lucide-react";
 import { calculateUnifiedElements } from "@/lib/unifiedElementCalculation";
@@ -24,7 +25,11 @@ const EnhancedCoupleSpecificProblemSolution = ({
 	user1,
 	user2,
 	specificProblem,
+	isSimplified = false,
 }) => {
+	const t = useTranslations(
+		"coupleReport.enhancedCoupleSpecificProblemSolution"
+	);
 	const { data: session } = useSession();
 	const { analysisData: contextAnalysisData } = useCoupleAnalysis();
 	const [analysisData, setAnalysisData] = useState(null);
@@ -58,10 +63,10 @@ const EnhancedCoupleSpecificProblemSolution = ({
 	};
 
 	const getCompatibilityLevel = (score) => {
-		if (score >= 80) return "優秀配對";
-		if (score >= 70) return "良好配對";
-		if (score >= 60) return "穩定配對";
-		return "需要努力";
+		if (score >= 80) return t("compatibilityLevels.excellent");
+		if (score >= 70) return t("compatibilityLevels.good");
+		if (score >= 60) return t("compatibilityLevels.stable");
+		return t("compatibilityLevels.needsWork");
 	};
 
 	// Function to handle subsection data collection
@@ -290,7 +295,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 
 	// Format BaZi description with structured content
 	const formatBaziDescription = (rawDescription) => {
-		if (!rawDescription) return "八字分析生成中...";
+		if (!rawDescription) return t("baziAnalysisGenerating");
 
 		// If content is too long (over 300 characters), extract key points
 		if (rawDescription.length > 300) {
@@ -346,7 +351,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		}
 	}, [specificProblem]);
 
-	// Load saved data from database first (highest priority) - TEMPORARILY DISABLED for Ba Zi fix
+	// Load saved data from database first (highest priority) - TEMPORARILY DISABLED TO TEST NEW BILINGUAL FALLBACK
 	useEffect(() => {
 		console.log(
 			"🐛 DEBUG: useEffect triggered - user1:",
@@ -356,6 +361,18 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		);
 		console.log("🐛 DEBUG: femaleUser:", femaleUser, "maleUser:", maleUser);
 
+		if (user1 && user2) {
+			// TEMPORARILY SKIP DATABASE LOADING TO TEST NEW FALLBACK LOGIC
+			console.log(
+				"⏭️ SKIPPING database load to test new bilingual fallback"
+			);
+			setDatabaseDataLoaded(true);
+		}
+	}, [user1.birthDateTime, user2.birthDateTime]);
+
+	/* COMMENTED OUT FOR TESTING - RE-ENABLE AFTER VERIFYING FIX
+	// Original database loading code:
+	useEffect(() => {
 		if (user1 && user2) {
 			const loadSavedData = async () => {
 				const sessionId =
@@ -370,19 +387,6 @@ const EnhancedCoupleSpecificProblemSolution = ({
 						sessionId
 					);
 					const result = await getSavedContent(sessionId);
-
-					console.log("🐛 DEBUG: getSavedContent result:", result);
-					console.log("🐛 DEBUG: result.success:", result.success);
-					console.log(
-						"🐛 DEBUG: result.savedContent:",
-						result.savedContent
-					);
-					console.log(
-						"🐛 DEBUG: savedContent keys:",
-						result.savedContent
-							? Object.keys(result.savedContent)
-							: "no savedContent"
-					);
 
 					if (
 						result.success &&
@@ -437,6 +441,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 			loadSavedData();
 		}
 	}, [user1.birthDateTime, user2.birthDateTime]);
+	*/
 
 	// Generate couple analysis when component mounts or data changes (fallback)
 	useEffect(() => {
@@ -479,7 +484,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		) {
 			return {
 				category: "emotion_cooling",
-				categoryName: "感情降溫類",
+				categoryKey: "emotionCooling",
 				color: "bg-pink-100 border-pink-300 text-pink-800",
 				icon: "Heart",
 			};
@@ -501,7 +506,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 			console.log("📍 Matched 特殊情境類");
 			return {
 				category: "special_situation",
-				categoryName: "特殊情境類",
+				categoryKey: "specialSituation",
 				color: "bg-blue-100 border-blue-300 text-blue-800",
 				icon: "Globe",
 			};
@@ -521,7 +526,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 			console.log("📍 Matched 禁忌破解話術");
 			return {
 				category: "taboo_breaking",
-				categoryName: "禁忌破解話術",
+				categoryKey: "tabooBreaking",
 				color: "bg-purple-100 border-purple-300 text-purple-800",
 				icon: "Shield",
 			};
@@ -530,7 +535,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		// Default to 感情降溫類
 		return {
 			category: "emotion_cooling",
-			categoryName: "感情降溫類",
+			categoryKey: "emotionCooling",
 			color: "bg-pink-100 border-pink-300 text-pink-800",
 			icon: "Heart",
 		};
@@ -552,6 +557,11 @@ const EnhancedCoupleSpecificProblemSolution = ({
 	const generateCoupleAnalysis = async () => {
 		setLoading(true);
 		try {
+			console.log(
+				"📊 EnhancedCoupleSpecificProblemSolution - Calling API with isSimplified:",
+				isSimplified
+			);
+
 			const response = await fetch(
 				"/api/couple-specific-problem-analysis",
 				{
@@ -561,6 +571,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 						femaleUser,
 						maleUser,
 						specificProblem,
+						isSimplified,
 					}),
 				}
 			);
@@ -598,27 +609,27 @@ const EnhancedCoupleSpecificProblemSolution = ({
 			// Set error state with user's actual birth dates
 			setAnalysisData({
 				error: true,
-				message: `分析失敗: ${error.message}. 請檢查網路連接或稍後重試。`,
+				message: `${t("analysisFailed")}: ${error.message}. ${t("checkNetworkOrRetry")}`,
 				female: {
 					birthDate: formatBirthDate(femaleUser.birthDateTime),
-					bazi: "計算失敗",
-					description: "無法生成分析，請稍後重試",
+					bazi: t("calculationFailed"),
+					description: t("unableToGenerateAnalysis"),
 					pillars: [
-						"計算中...",
-						"計算中...",
-						"計算中...",
-						"計算中...",
+						t("calculating"),
+						t("calculating"),
+						t("calculating"),
+						t("calculating"),
 					],
 				},
 				male: {
 					birthDate: formatBirthDate(maleUser.birthDateTime),
-					bazi: "計算失敗",
-					description: "無法生成分析，請稍後重試",
+					bazi: t("calculationFailed"),
+					description: t("unableToGenerateAnalysis"),
 					pillars: [
-						"計算中...",
-						"計算中...",
-						"計算中...",
-						"計算中...",
+						t("calculating"),
+						t("calculating"),
+						t("calculating"),
+						t("calculating"),
 					],
 				},
 			});
@@ -661,7 +672,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在分析您的專屬問題
+							{t("loadingMessage")}
 						</div>
 						<div
 							className="text-gray-500"
@@ -671,7 +682,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 								fontWeight: 400,
 							}}
 						>
-							請稍候，正在制定個人化解決方案
+							{t("loadingSubMessage")}
 						</div>
 					</div>
 				</div>
@@ -748,7 +759,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
-							盤面診斷
+							{t("sectionTitles.chartDiagnosis")}
 						</h2>
 					</div>
 					<ChartDiagnosisSection
@@ -759,8 +770,8 @@ const EnhancedCoupleSpecificProblemSolution = ({
 						onDataReady={(data) =>
 							handleSubsectionData("chartDiagnosis", data)
 						}
-					/>
-
+						isSimplified={isSimplified}
+					/>{" "}
 					<div className="mb-4 sm:mb-6">
 						<h2
 							className="font-bold text-[#374A37]"
@@ -781,9 +792,9 @@ const EnhancedCoupleSpecificProblemSolution = ({
 							onDataReady={(data) =>
 								handleSubsectionData("emergencyFengShui", data)
 							}
+							isSimplified={isSimplified}
 						/>
 					</div>
-
 					<div className="mb-4 sm:mb-6">
 						<h2
 							className="font-bold text-[#374A37]"
@@ -804,6 +815,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 							onDataReady={(data) =>
 								handleSubsectionData("restartChemistry", data)
 							}
+							isSimplified={isSimplified}
 						/>
 					</div>
 				</div>
@@ -822,7 +834,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
-							星盤指引
+							{t("sectionTitles.starChartGuidance")}
 						</h2>
 					</div>
 					<StarChartGuidanceSection
@@ -839,7 +851,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
-							風水轉化
+							{t("sectionTitles.fengShuiTransformation")}
 						</h2>
 					</div>
 					<div className="mb-6 sm:mb-8">
@@ -901,7 +913,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
-							針對性建議
+							{t("sectionTitles.targetedSuggestions")}
 						</h2>
 					</div>
 					<div className="mb-6 sm:mb-8">
@@ -928,6 +940,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 							femaleUser={femaleUser}
 							maleUser={maleUser}
 							analysisData={analysisData}
+							isSimplified={isSimplified}
 						/>
 					</div>
 				</div>
@@ -1053,7 +1066,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 													"Noto Serif TC, serif",
 											}}
 										>
-											您的八字
+											你的八字
 										</h3>
 										<div
 											className="bg-white border-2 border-[#C74772] rounded-full self-start sm:self-center"
@@ -1247,7 +1260,10 @@ const EnhancedCoupleSpecificProblemSolution = ({
 											fontSize: "clamp(16px, 4vw, 18px)",
 										}}
 									>
-										問題類型：{problemCategory.categoryName}
+										{t("problemType")}：
+										{t(
+											`problemCategories.${problemCategory.categoryKey}`
+										)}
 									</h3>
 								</div>
 								<div

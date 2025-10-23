@@ -2,7 +2,17 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
 	try {
-		const { femaleUser, maleUser, specificProblem } = await request.json();
+		const {
+			femaleUser,
+			maleUser,
+			specificProblem,
+			isSimplified = false,
+		} = await request.json();
+
+		console.log(
+			"📥 /api/couple-specific-problem-analysis received isSimplified:",
+			isSimplified
+		);
 
 		// Format birth date for display
 		const formatBirthDate = (birthDateTime) => {
@@ -159,22 +169,27 @@ export async function POST(request) {
 			const baziData = calculateBaZi(birthDateTime);
 			const formattedDate = formatBirthDate(birthDateTime);
 
-			// Create pillars array
+			// Create pillars array (bilingual support)
+			const pillarLabels = isSimplified
+				? ["年柱-", "月柱-", "日柱-", "时柱-"] // Simplified Chinese
+				: ["年柱-", "月柱-", "日柱-", "時柱-"]; // Traditional Chinese
+
 			const pillars = [
-				`年柱-${baziData.year}`,
-				`月柱-${baziData.month}`,
-				`日柱-${baziData.day}`,
-				`時柱-${baziData.hour}`,
+				`${pillarLabels[0]}${baziData.year}`,
+				`${pillarLabels[1]}${baziData.month}`,
+				`${pillarLabels[2]}${baziData.day}`,
+				`${pillarLabels[3]}${baziData.hour}`,
 			];
 
 			// Create bazi string
 			const baziString = `${baziData.year} ${baziData.month} ${baziData.day} ${baziData.hour}`;
 
-			// Generate description based on day master
+			// Generate description based on day master (bilingual support)
 			const dayMaster = baziData.dayStem;
 			const dayBranch = baziData.dayBranch;
 
-			const elementDescriptions = {
+			// Element descriptions - Traditional Chinese
+			const elementDescriptionsTraditional = {
 				甲: "甲木如大樹，性格正直，具有領導能力",
 				乙: "乙木如花草，性格溫和，適應力強",
 				丙: "丙火如太陽，性格熱情，充滿活力",
@@ -187,7 +202,43 @@ export async function POST(request) {
 				癸: "癸水如雨露，性格柔和，富有同情心",
 			};
 
-			const description = `日主${dayMaster}${dayBranch.includes("木") ? "木" : dayBranch.includes("火") ? "火" : dayBranch.includes("土") ? "土" : dayBranch.includes("金") ? "金" : "水"}，${elementDescriptions[dayMaster] || "性格獨特，具有獨特的人格魅力"}`;
+			// Element descriptions - Simplified Chinese
+			const elementDescriptionsSimplified = {
+				甲: "甲木如大树，性格正直，具有领导能力",
+				乙: "乙木如花草，性格温和，适应力强",
+				丙: "丙火如太阳，性格热情，充满活力",
+				丁: "丁火如烛光，性格温暖，富有创造力",
+				戊: "戊土如山岳，性格稳重，值得信赖",
+				己: "己土如田园，性格务实，善于包容",
+				庚: "庚金如刀剑，性格果断，意志坚强",
+				辛: "辛金如珠宝，性格细腻，追求完美",
+				壬: "壬水如江河，性格灵活，智慧深邃",
+				癸: "癸水如雨露，性格柔和，富有同情心",
+			};
+
+			const elementDescriptions = isSimplified
+				? elementDescriptionsSimplified
+				: elementDescriptionsTraditional;
+			const fallbackText = isSimplified
+				? "性格独特，具有独特的人格魅力"
+				: "性格獨特，具有獨特的人格魅力";
+
+			// Map day stem to element
+			const stemToElement = {
+				甲: "木",
+				乙: "木",
+				丙: "火",
+				丁: "火",
+				戊: "土",
+				己: "土",
+				庚: "金",
+				辛: "金",
+				壬: "水",
+				癸: "水",
+			};
+
+			const element = stemToElement[dayMaster] || "土";
+			const description = `日主${dayMaster}${element}，${elementDescriptions[dayMaster] || fallbackText}`;
 
 			return {
 				birthDate: formattedDate,
@@ -195,9 +246,7 @@ export async function POST(request) {
 				description: description,
 				pillars: pillars,
 			};
-		};
-
-		// Calculate real BaZi for both users
+		}; // Calculate real BaZi for both users
 		const femaleAnalysis = generateBaZiAnalysis(
 			femaleUser.birthDateTime,
 			"female"
@@ -207,8 +256,8 @@ export async function POST(request) {
 			"male"
 		);
 
-		// Generate AI analysis prompt with actual BaZi data
-		const prompt = `請根據以下真實八字資訊進行專業合盤分析：
+		// Generate AI analysis prompt with actual BaZi data (bilingual support)
+		const traditionalPrompt = `請根據以下真實八字資訊進行專業合盤分析：
 
 女方資訊：
 - 出生時間：${femaleAnalysis.birthDate}
@@ -224,6 +273,8 @@ export async function POST(request) {
 
 請基於這些真實的八字資訊，提供專業的合盤分析和針對具體問題的建議。重點分析兩人的五行互補性、相沖相合情況，以及如何解決提到的具體問題。
 
+**請使用繁體中文回答**
+
 請按照以下格式回覆：
 
 1. **您的八字（女，${femaleAnalysis.birthDate}）**  
@@ -234,7 +285,43 @@ export async function POST(request) {
    八字：${maleAnalysis.bazi}  
    （基於真實八字的詳細格局分析和性格特點）
 
-請提供基於真實八字的專業命理分析，不要使用假設或示例數據。`;
+請提供基於真實八字的專業命理分析，不要使用假設或示例數據。請確保使用繁體中文（台灣用語）。`;
+
+		const simplifiedPrompt = `请根据以下真实八字信息进行专业合盘分析：
+
+女方信息：
+- 出生时间：${femaleAnalysis.birthDate}
+- 八字：${femaleAnalysis.bazi}
+- 性别：女
+
+男方信息：
+- 出生时间：${maleAnalysis.birthDate}
+- 八字：${maleAnalysis.bazi}  
+- 性别：男
+
+具体问题：${specificProblem}
+
+请基于这些真实的八字信息，提供专业的合盘分析和针对具体问题的建议。重点分析两人的五行互补性、相冲相合情况，以及如何解决提到的具体问题。
+
+**请使用简体中文回答**
+
+请按照以下格式回复：
+
+1. **您的八字（女，${femaleAnalysis.birthDate}）**  
+   八字：${femaleAnalysis.bazi}  
+   （基于真实八字的详细格局分析和性格特点）
+
+2. **伴侣八字（男，${maleAnalysis.birthDate}）**  
+   八字：${maleAnalysis.bazi}  
+   （基于真实八字的详细格局分析和性格特点）
+
+请提供基于真实八字的专业命理分析，不要使用假设或示例数据。请确保使用简体中文（中国大陆用语）。`;
+
+		const prompt = isSimplified ? simplifiedPrompt : traditionalPrompt;
+		console.log(
+			"🎯 /api/couple-specific-problem-analysis using prompt:",
+			isSimplified ? "SIMPLIFIED (简体)" : "TRADITIONAL (繁體)"
+		);
 
 		// Make API call to DeepSeek
 		const deepseekResponse = await fetch(
@@ -271,8 +358,21 @@ export async function POST(request) {
 		const deepseekData = await deepseekResponse.json();
 		const aiResponse = deepseekData.choices[0]?.message?.content || "";
 
+		console.log("🤖 AI Response received, length:", aiResponse.length);
+		console.log("🤖 AI Response preview:", aiResponse.substring(0, 500));
+
 		// Parse the AI response to extract structured data
 		const parseAnalysisResponse = (response) => {
+			console.log(
+				"🔍 PARSING AI RESPONSE - Full response length:",
+				response.length
+			);
+			console.log("🔍 First 500 characters:", response.substring(0, 500));
+			console.log(
+				"🔍 Last 500 characters:",
+				response.substring(response.length - 500)
+			);
+
 			const sections = {
 				female: {
 					birthDate: formatBirthDate(femaleUser.birthDateTime),
@@ -289,53 +389,103 @@ export async function POST(request) {
 			};
 
 			// Parse female section
+			console.log("🔍 Attempting to match female pattern...");
 			const femaleMatch = response.match(
-				/1\.\s*\*\*您的八字（女[^）]*）\*\*\s*八字：([^\n]*)\n([^]*?)(?=2\.|$)/
+				/#{0,4}\s*1\.\s*\*\*您的八字（女[^）]*）\*\*\s*\*\*八字[：:]([^\n*]*)\*\*\s*([\s\S]*?)(?=#{0,4}\s*2\.|$)/
 			);
 			if (femaleMatch) {
+				console.log("✅ Female pattern matched!");
+				console.log("   - BaZi:", femaleMatch[1].trim());
+				console.log(
+					"   - Description length:",
+					femaleMatch[2].trim().length
+				);
 				sections.female.bazi = femaleMatch[1].trim();
 				sections.female.description = femaleMatch[2]
 					.replace(/（([^）]*)）/, "$1")
-					.trim();
-
-				// Extract pillars from bazi
+					.trim(); // Extract pillars from bazi (bilingual support)
 				const baziElements = femaleMatch[1].trim().split(/\s+/);
 				if (baziElements.length >= 4) {
+					const pillarLabels = isSimplified
+						? ["年柱-", "月柱-", "日柱-", "时柱-"]
+						: ["年柱-", "月柱-", "日柱-", "時柱-"];
+
 					sections.female.pillars = [
-						`年柱-${baziElements[0] || "甲子"}`,
-						`月柱-${baziElements[1] || "乙丑"}`,
-						`日柱-${baziElements[2] || "丙寅"}`,
-						`時柱-${baziElements[3] || "丁卯"}`,
+						`${pillarLabels[0]}${baziElements[0] || "甲子"}`,
+						`${pillarLabels[1]}${baziElements[1] || "乙丑"}`,
+						`${pillarLabels[2]}${baziElements[2] || "丙寅"}`,
+						`${pillarLabels[3]}${baziElements[3] || "丁卯"}`,
 					];
 				}
+			} else {
+				console.log("❌ Female pattern DID NOT match!");
 			}
 
 			// Parse male section
+			console.log("🔍 Attempting to match male pattern...");
 			const maleMatch = response.match(
-				/2\.\s*\*\*伴侶八字（男[^）]*）\*\*\s*八字：([^\n]*)\n([^]*?)$/
+				/#{0,4}\s*2\.\s*\*\*伴[侣侶]八字（男[^）]*）\*\*\s*\*\*八字[：:]([^\n*]*)\*\*\s*([\s\S]*?)(?=\n\n#{1,4}\s|---|\*\*\*|针对|关系发展|专业提醒|$)/
 			);
 			if (maleMatch) {
+				console.log("✅ Male pattern matched!");
+				console.log("   - BaZi:", maleMatch[1].trim());
+				console.log(
+					"   - Description length:",
+					maleMatch[2].trim().length
+				);
 				sections.male.bazi = maleMatch[1].trim();
 				sections.male.description = maleMatch[2]
 					.replace(/（([^）]*)）/, "$1")
 					.trim();
 
-				// Extract pillars from bazi
+				// Extract pillars from bazi (bilingual support)
 				const baziElements = maleMatch[1].trim().split(/\s+/);
 				if (baziElements.length >= 4) {
+					const pillarLabels = isSimplified
+						? ["年柱-", "月柱-", "日柱-", "时柱-"]
+						: ["年柱-", "月柱-", "日柱-", "時柱-"];
+
 					sections.male.pillars = [
-						`年柱-${baziElements[0] || "戊辰"}`,
-						`月柱-${baziElements[1] || "己巳"}`,
-						`日柱-${baziElements[2] || "庚午"}`,
-						`時柱-${baziElements[3] || "辛未"}`,
+						`${pillarLabels[0]}${baziElements[0] || "戊辰"}`,
+						`${pillarLabels[1]}${baziElements[1] || "己巳"}`,
+						`${pillarLabels[2]}${baziElements[2] || "庚午"}`,
+						`${pillarLabels[3]}${baziElements[3] || "辛未"}`,
 					];
 				}
+			} else {
+				console.log("❌ Male pattern DID NOT match!");
 			}
+
+			console.log("📋 PARSE RESULTS:", {
+				female: {
+					hasBazi: !!sections.female.bazi,
+					baziLength: sections.female.bazi?.length || 0,
+					hasDescription: !!sections.female.description,
+					descriptionLength: sections.female.description?.length || 0,
+				},
+				male: {
+					hasBazi: !!sections.male.bazi,
+					baziLength: sections.male.bazi?.length || 0,
+					hasDescription: !!sections.male.description,
+					descriptionLength: sections.male.description?.length || 0,
+				},
+			});
 
 			return sections;
 		};
 
 		let analysisData = parseAnalysisResponse(aiResponse);
+
+		console.log("📊 Parsed female data:", {
+			hasBazi: !!analysisData.female.bazi,
+			hasDescription: !!analysisData.female.description,
+			descriptionLength: analysisData.female.description?.length || 0,
+		});
+		console.log("📊 Parsed male data:", {
+			hasBazi: !!analysisData.male.bazi,
+			hasDescription: !!analysisData.male.description,
+			descriptionLength: analysisData.male.description?.length || 0,
+		});
 
 		// Use real calculated BaZi if AI parsing failed or returned empty
 		if (

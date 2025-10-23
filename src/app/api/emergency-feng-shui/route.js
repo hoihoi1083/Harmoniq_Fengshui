@@ -74,7 +74,7 @@ function calculateBaZi(birthDate) {
 }
 
 // Parse emergency feng shui recommendations
-function parseEmergencyFengShui(content) {
+function parseEmergencyFengShui(content, isSimplified = false) {
 	try {
 		if (!content || typeof content !== "string") {
 			console.log("⚠️ Invalid content provided to parser");
@@ -110,7 +110,7 @@ function parseEmergencyFengShui(content) {
 				const title = lines[0]
 					.replace(/^\d+[\.\)]\s*/, "")
 					.replace(/^【|】$/g, "");
-				const description = lines.slice(1).join(" ").substring(0, 150);
+				const description = lines.slice(1).join(" ");
 
 				if (title.length > 0 && description.length > 0) {
 					recommendations.push({
@@ -138,16 +138,20 @@ function parseEmergencyFengShui(content) {
 				i++
 			) {
 				const line = allLines[i];
+				// Match both Traditional and Simplified Chinese keywords
 				if (
 					line.includes("擺放") ||
+					line.includes("摆放") ||
 					line.includes("點燃") ||
+					line.includes("点燃") ||
 					line.includes("放置") ||
-					line.includes("鋪設")
+					line.includes("鋪設") ||
+					line.includes("铺设")
 				) {
 					// This looks like a feng shui action
 					const nextLine = allLines[i + 1];
 					recommendations.push({
-						title: line.substring(0, 30),
+						title: line,
 						description:
 							nextLine ||
 							"具體的風水改善建議，有助於提升感情和諧。",
@@ -165,7 +169,7 @@ function parseEmergencyFengShui(content) {
 
 		// Ensure we have at least 3 recommendations with proper fallback
 		while (recommendations.length < 3) {
-			const fallbackRecs = [
+			const traditionalFallbacks = [
 				{
 					title: "臥室擺放金屬風鈴",
 					description:
@@ -185,6 +189,31 @@ function parseEmergencyFengShui(content) {
 					color: colors[2],
 				},
 			];
+
+			const simplifiedFallbacks = [
+				{
+					title: "卧室摆放金属风铃",
+					description:
+						"在卧室东侧挂置小型金属风铃，调和五行能量，增强感情和谐，每日清晨轻拨一次。",
+					color: colors[0],
+				},
+				{
+					title: "客厅点燃暖色蜡烛",
+					description:
+						"每晚点燃暖黄色蜡烛30分钟，营造温馨氛围，促进深度沟通，建议使用天然蜂蜡。",
+					color: colors[1],
+				},
+				{
+					title: "床头放置红色元素",
+					description:
+						"在床头摆放红色靠枕或花朵，激活爱情能量，增强彼此感情连结。",
+					color: colors[2],
+				},
+			];
+
+			const fallbackRecs = isSimplified
+				? simplifiedFallbacks
+				: traditionalFallbacks;
 			recommendations.push(fallbackRecs[recommendations.length]);
 		}
 
@@ -199,8 +228,19 @@ function parseEmergencyFengShui(content) {
 
 export async function POST(request) {
 	try {
-		const { femaleUser, maleUser, femaleBazi, maleBazi, requestType } =
-			await request.json();
+		const {
+			femaleUser,
+			maleUser,
+			femaleBazi,
+			maleBazi,
+			requestType,
+			isSimplified = false,
+		} = await request.json();
+
+		console.log(
+			"📥 /api/emergency-feng-shui received isSimplified:",
+			isSimplified
+		);
 
 		if (!femaleUser || !maleUser) {
 			return NextResponse.json(
@@ -222,7 +262,7 @@ export async function POST(request) {
 		}
 
 		// Create prompt for emergency feng shui recommendations
-		const prompt = `
+		const traditionalPrompt = `
 作為專業風水師，請為這對情侶提供72小時內的緊急風水改善方案。
 
 女方八字：${femaleBaziData.year} ${femaleBaziData.month} ${femaleBaziData.day} ${femaleBaziData.hour}
@@ -238,9 +278,37 @@ export async function POST(request) {
 - 重點關注感情和和諧
 - 內容控制在80-100字內
 - 不要使用標題符號或格式符號
+- 請使用繁體中文回答
 
 請直接提供3個建議：
 `;
+
+		const simplifiedPrompt = `
+作为专业风水师，请为这对情侣提供72小时内的紧急风水改善方案。
+
+女方八字：${femaleBaziData.year} ${femaleBaziData.month} ${femaleBaziData.day} ${femaleBaziData.hour}
+男方八字：${maleBaziData.year} ${maleBaziData.month} ${maleBaziData.day} ${maleBaziData.hour}
+
+请提供3个具体的风水改善建议，每个建议需要：
+1. 具体的行动方案（标题）
+2. 详细的操作说明和风水原理（内容）
+
+要求：
+- 每个建议都要具体可执行
+- 说明风水原理和效果
+- 重点关注感情和和谐
+- 内容控制在80-100字内
+- 不要使用标题符号或格式符号
+- 请只使用简体中文回答
+
+请直接提供3个建议：
+`;
+
+		const prompt = isSimplified ? simplifiedPrompt : traditionalPrompt;
+		console.log(
+			"🎯 /api/emergency-feng-shui using prompt:",
+			isSimplified ? "SIMPLIFIED (简体)" : "TRADITIONAL (繁體)"
+		);
 
 		const response = await fetch(
 			"https://api.deepseek.com/chat/completions",
@@ -255,8 +323,9 @@ export async function POST(request) {
 					messages: [
 						{
 							role: "system",
-							content:
-								"你是專業的風水師，專門提供實用的風水改善建議。回答要具體、實用、易於執行。",
+							content: isSimplified
+								? "你是专业的风水师，专门提供实用的风水改善建议。回答要具体、实用、易于执行。请只使用简体中文。"
+								: "你是專業的風水師，專門提供實用的風水改善建議。回答要具體、實用、易於執行。請使用繁體中文。",
 						},
 						{
 							role: "user",
@@ -283,12 +352,12 @@ export async function POST(request) {
 		console.log("🤖 AI Response:", aiContent);
 
 		// Parse the AI response
-		const parsedData = parseEmergencyFengShui(aiContent);
+		const parsedData = parseEmergencyFengShui(aiContent, isSimplified);
 		console.log("📊 Parsed Data:", parsedData);
 
 		if (!parsedData) {
 			// Return fallback data
-			return NextResponse.json({
+			const traditionalFallback = {
 				recommendations: [
 					{
 						title: "臥室擺放金屬擺件",
@@ -309,7 +378,34 @@ export async function POST(request) {
 						color: "#7B8B5C",
 					},
 				],
-			});
+			};
+
+			const simplifiedFallback = {
+				recommendations: [
+					{
+						title: "卧室摆放金属摆件",
+						description:
+							"在卧室东侧放置小型铜制饰品，能调和五行能量，增强感情稳定性，建议每晚睡前整理一次。",
+						color: "#B08D57",
+					},
+					{
+						title: "床头点燃暖色蜡烛",
+						description:
+							"每晚点燃暖黄色蜡烛约30分钟，营造温馨氛围，暖光能柔化彼此情绪，促进深度沟通。",
+						color: "#C4839F",
+					},
+					{
+						title: "客厅西南角铺红毯",
+						description:
+							"在客厅西南方向铺设小块红色地毯，激活坤土能量，增强家庭和谐与包容心。",
+						color: "#7B8B5C",
+					},
+				],
+			};
+
+			return NextResponse.json(
+				isSimplified ? simplifiedFallback : traditionalFallback
+			);
 		}
 
 		return NextResponse.json(parsedData);

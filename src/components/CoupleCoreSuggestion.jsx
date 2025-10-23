@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { useCoupleAnalysis } from "@/contexts/CoupleAnalysisContext";
 import { getCoupleComponentData } from "@/utils/coupleComponentDataStore";
@@ -12,7 +13,9 @@ export default function CoupleCoreSuggestion({
 	user1,
 	user2,
 	currentYear = 2025,
+	isSimplified = false,
 }) {
+	const t = useTranslations("coupleReport.coupleCoreSuggestion");
 	const { data: session } = useSession();
 	const { coupleCoreSuggestionCache, setCoupleCoreSuggestionCache } =
 		useCoupleAnalysis();
@@ -60,10 +63,10 @@ export default function CoupleCoreSuggestion({
 						},
 						currentYear: year,
 						concern: "感情", // Default concern for couple analysis
+						isSimplified: isSimplified, // Add language preference
 					}),
 				}
 			);
-
 			if (!response.ok) {
 				throw new Error(`API request failed: ${response.status}`);
 			}
@@ -227,8 +230,8 @@ export default function CoupleCoreSuggestion({
 		// Create category structure for couple analysis
 		const coupleCategories = [
 			{
-				title: "關係發展建議",
-				subtitle: "夫妻合盤策略指南",
+				title: t("tabs.relationship.title"),
+				subtitle: t("tabs.relationship.subtitle"),
 				icon: "/images/report/star.png",
 				color: "bg-[#DEAB20]",
 				content: extractCategoryContent(
@@ -238,8 +241,8 @@ export default function CoupleCoreSuggestion({
 				),
 			},
 			{
-				title: "溝通建議",
-				subtitle: "夫妻溝通技巧",
+				title: t("tabs.communication.title"),
+				subtitle: t("tabs.communication.subtitle"),
 				icon: "/images/report/chat.png",
 				color: "bg-[#8A71C7]",
 				content: extractCategoryContent(
@@ -249,8 +252,8 @@ export default function CoupleCoreSuggestion({
 				),
 			},
 			{
-				title: "能量提升建議",
-				subtitle: "夫妻能量調和",
+				title: t("tabs.energy.title"),
+				subtitle: t("tabs.energy.subtitle"),
 				icon: "/images/report/fengshui.png",
 				color: "bg-[#8FA940]",
 				content: extractCategoryContent(
@@ -260,8 +263,8 @@ export default function CoupleCoreSuggestion({
 				),
 			},
 			{
-				title: "感情關係禁忌",
-				subtitle: "夫妻相處禁忌",
+				title: t("tabs.taboos.title"),
+				subtitle: t("tabs.taboos.subtitle"),
 				icon: "/images/report/warning.png",
 				color: "bg-[#B4003C]",
 				content: extractCategoryContent(
@@ -1187,9 +1190,9 @@ export default function CoupleCoreSuggestion({
 			// Create subsections based on the actual content patterns
 			const subsections = [];
 
-			// Extract action advice (行動建議) - highest priority
+			// Extract action advice (行動建議 / 行动建议) - highest priority
 			const actionPattern =
-				/行動建議[：:]?([\s\S]*?)(?=時機與方法|注意事項|具体分析|###|$)/i;
+				/(?:行動建議|行动建议)[：:]?([\s\S]*?)(?=時機與方法|时机与方法|注意事項|注意事项|具体分析|具體分析|###|$)/i;
 			const actionContentMatch = content.match(actionPattern);
 			if (actionContentMatch && actionContentMatch[1]) {
 				const actionContent = cleanContent(
@@ -1197,16 +1200,16 @@ export default function CoupleCoreSuggestion({
 				);
 				if (actionContent.length > 20) {
 					subsections.push({
-						title: "行動建議",
+						title: t("subsections.actionAdvice"),
 						color: "bg-yellow-500",
 						content: actionContent,
 					});
 				}
 			}
 
-			// Extract timing content (時機與方法) - second priority
+			// Extract timing content (時機與方法 / 时机与方法) - second priority
 			const timingPattern =
-				/時機與方法[：:]?([\s\S]*?)(?=注意事項|行動建議|具体分析|###|$)/i;
+				/(?:時機與方法|时机与方法)[：:]?([\s\S]*?)(?=注意事項|注意事项|行動建議|行动建议|具体分析|具體分析|###|$)/i;
 			const timingContentMatch = content.match(timingPattern);
 			if (timingContentMatch && timingContentMatch[1]) {
 				const timingContent = cleanContent(
@@ -1214,32 +1217,30 @@ export default function CoupleCoreSuggestion({
 				);
 				if (timingContent.length > 20) {
 					subsections.push({
-						title: "最佳時機",
+						title: t("subsections.bestTiming"),
 						color: "bg-yellow-500",
 						content: timingContent,
 					});
 				}
 			}
 
-			// Extract precautions (注意事項) - third priority
+			// Extract precautions (注意事項 / 注意事项) - third priority
 			const notesPattern =
-				/注意事項[：:]?([\s\S]*?)(?=行動建議|時機與方法|具体分析|###|$)/i;
+				/(?:注意事項|注意事项)[：:]?([\s\S]*?)(?=行動建議|行动建议|時機與方法|时机与方法|具体分析|具體分析|###|$)/i;
 			const notesContentMatch = content.match(notesPattern);
 			if (notesContentMatch && notesContentMatch[1]) {
 				const notesContent = cleanContent(notesContentMatch[1].trim());
 				if (notesContent.length > 20) {
 					subsections.push({
-						title: "注意事項",
+						title: t("subsections.precautions"),
 						color: "bg-yellow-500",
 						content: notesContent,
 					});
 				}
-			}
-
-			// Only use analysis content if we have fewer than 2 sections
+			} // Only use analysis content if we have fewer than 2 sections
 			if (subsections.length < 2) {
 				const analysisPattern =
-					/具体分析[：:]?([\s\S]*?)(?=行動建議|時機與方法|注意事項|###|$)/i;
+					/(?:具体分析|具體分析)[：:]?([\s\S]*?)(?=行動建議|行动建议|時機與方法|时机与方法|注意事項|注意事项|###|$)/i;
 				const analysisContentMatch = content.match(analysisPattern);
 				if (analysisContentMatch && analysisContentMatch[1]) {
 					let analysisContent = analysisContentMatch[1].trim();
@@ -1263,34 +1264,32 @@ export default function CoupleCoreSuggestion({
 
 						if (practicalSentences.length > 20) {
 							subsections.push({
-								title: "命理指導建議",
+								title: t("subsections.destinyGuidance"),
 								color: "bg-yellow-500",
 								content: cleanContent(practicalSentences),
 							});
 						}
 					}
 				}
-			}
-
-			// If no specific seasonal content found, create general subsections from the structured content
+			} // If no specific seasonal content found, create general subsections from the structured content
 			if (subsections.length === 0) {
 				subsections.push(
 					{
-						title: "行動建議",
+						title: t("subsections.actionAdvice"),
 						color: "bg-yellow-500",
 						content:
 							structuredContent.actions ||
 							"避免重大關係決策（如同居、購房），優先經營日常溫情。",
 					},
 					{
-						title: "最佳時機",
+						title: t("subsections.bestTiming"),
 						color: "bg-yellow-500",
 						content:
 							structuredContent.timing ||
 							"每月安排一次「無目的約會」（如深夜散步、看星星），脫離現實壓力場景。",
 					},
 					{
-						title: "注意事項",
+						title: t("subsections.precautions"),
 						color: "bg-yellow-500",
 						content:
 							structuredContent.notes ||
@@ -1617,7 +1616,7 @@ export default function CoupleCoreSuggestion({
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
-							alt="風水妹運算中"
+							alt={t("loadingAlt")}
 							width={120}
 							height={120}
 							className="object-contain"
@@ -1634,7 +1633,7 @@ export default function CoupleCoreSuggestion({
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在生成夫妻開運建議
+							{t("loadingTitle")}
 						</div>
 						<div
 							className="text-gray-500"
@@ -1644,7 +1643,7 @@ export default function CoupleCoreSuggestion({
 								fontWeight: 400,
 							}}
 						>
-							請稍候，正在分析最佳運勢提升方案
+							{t("loadingSubtitle")}
 						</div>
 					</div>
 				</div>
@@ -1667,7 +1666,7 @@ export default function CoupleCoreSuggestion({
 					className="py-6 text-center text-gray-500 sm:py-8"
 					style={{ fontSize: "clamp(14px, 3.5vw, 16px)" }}
 				>
-					無法載入夫妻開運建議資料
+					{t("noData")}
 				</div>
 			</section>
 		);
@@ -1696,7 +1695,7 @@ export default function CoupleCoreSuggestion({
 							color: "#B4003C", // Couple theme color
 						}}
 					>
-						感情開運建議
+						{t("title")}
 					</h2>
 				</div>
 
@@ -1729,36 +1728,30 @@ export default function CoupleCoreSuggestion({
 				>
 					<div className="grid w-full grid-cols-2 gap-4 mb-4 sm:flex sm:items-center sm:justify-between sm:mb-6">
 						{analysisData.coreIconList.map((item, index) => {
-							const getButtonBgColor = (itemLabel, isActive) => {
-								const colorMap = {
-									關係發展建議: isActive
-										? "bg-[#DEAB20]"
-										: "bg-white",
-									溝通建議: isActive
-										? "bg-[#8A71C7]"
-										: "bg-white",
-									能量提升建議: isActive
-										? "bg-[#8FA940]"
-										: "bg-white",
-									感情關係禁忌: isActive
-										? "bg-[#B4003C]"
-										: "bg-white",
-								};
-								return (
-									colorMap[itemLabel] ||
-									(isActive ? "bg-gray-600" : "bg-gray-300")
-								);
+							const getButtonBgColor = (
+								categoryIndex,
+								isActive
+							) => {
+								const colors = [
+									"bg-[#DEAB20]", // Relationship
+									"bg-[#8A71C7]", // Communication
+									"bg-[#8FA940]", // Energy
+									"bg-[#B4003C]", // Taboos
+								];
+								return isActive
+									? colors[categoryIndex]
+									: "bg-white";
 							};
 
-							const getItemImage = (itemLabel) => {
-								const imageMap = {
-									關係發展建議: "/images/report/star.png",
-									溝通建議: "/images/report/chat.png",
-									能量提升建議: "/images/report/fengshui.png",
-									感情關係禁忌: "/images/report/warning.png",
-								};
+							const getItemImage = (categoryIndex) => {
+								const images = [
+									"/images/report/star.png", // Relationship
+									"/images/report/chat.png", // Communication
+									"/images/report/fengshui.png", // Energy
+									"/images/report/warning.png", // Taboos
+								];
 								return (
-									imageMap[itemLabel] ||
+									images[categoryIndex] ||
 									"/images/report/heart.png"
 								);
 							};
@@ -1784,7 +1777,7 @@ export default function CoupleCoreSuggestion({
 								>
 									<div
 										className={`rounded-full flex items-center justify-center text-white transition-all duration-300 ${getButtonBgColor(
-											item.label,
+											index,
 											activeCategoryIndex === index
 										)}`}
 										style={{
@@ -1795,7 +1788,7 @@ export default function CoupleCoreSuggestion({
 										}}
 									>
 										<img
-											src={getItemImage(item.label)}
+											src={getItemImage(index)}
 											alt={item.label}
 											style={{
 												width: "clamp(24px, 6vw, 32px)",
@@ -1825,7 +1818,6 @@ export default function CoupleCoreSuggestion({
 							);
 						})}
 					</div>
-
 					{/* Active Category Title */}
 					<div className="text-center">
 						<h3
@@ -1834,18 +1826,15 @@ export default function CoupleCoreSuggestion({
 								fontSize: "clamp(24px, 6vw, 40px)",
 								fontWeight: 700,
 								color: (() => {
-									const colorMap = {
-										關係發展建議: "#DEAB20",
-										溝通建議: "#8A71C7",
-										能量提升建議: "#8FA940",
-										感情關係禁忌: "#B4003C",
-									};
+									const titleColors = [
+										"#DEAB20",
+										"#8A71C7",
+										"#8FA940",
+										"#B4003C",
+									];
 									return (
-										colorMap[
-											analysisData.coreIconList[
-												activeCategoryIndex
-											]?.label
-										] || "#B4003C"
+										titleColors[activeCategoryIndex] ||
+										"#B4003C"
 									);
 								})(),
 								marginBottom: "clamp(6px, 2vw, 8px)",
@@ -1853,8 +1842,7 @@ export default function CoupleCoreSuggestion({
 						>
 							{activeCategory.title}
 						</h3>
-					</div>
-
+					</div>{" "}
 					{/* Content Display */}
 					<div className="mt-6 sm:mt-8">
 						<div style={{ padding: "clamp(16px, 4vw, 24px)" }}>
