@@ -11,6 +11,8 @@ import {
 } from "@/lib/fortunePeriodCalculator";
 import Image from "next/image";
 import fengshuiLoading from "../../public/images/風水妹/風水妹-loading.png";
+import { convertByRegion } from "@/utils/chineseConverter";
+import { useRegionDetection } from "@/hooks/useRegionDetection";
 
 const CareerFortuneAnalysis = ({
 	userInfo,
@@ -20,6 +22,7 @@ const CareerFortuneAnalysis = ({
 	showHistorical,
 	historicalData,
 }) => {
+	const { region } = useRegionDetection();
 	const [activeTab, setActiveTab] = useState("天賦特質解碼");
 	const [careerAnalysis, setCareerAnalysis] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -234,7 +237,7 @@ const CareerFortuneAnalysis = ({
 					</div>
 				</div>
 				<p className="text-lg text-[#5A5A5A]">
-					正在生成事業運勢分析...
+					{convertByRegion("正在生成事業運勢分析...", region)}
 				</p>
 			</div>
 		);
@@ -244,7 +247,10 @@ const CareerFortuneAnalysis = ({
 		return (
 			<div className="py-20 text-center">
 				<p className="text-lg text-[#5A5A5A]">
-					事業分析生成失敗，請重新整理頁面
+					{convertByRegion(
+						"事業分析生成失敗，請重新整理頁面",
+						region
+					)}
 				</p>
 			</div>
 		);
@@ -264,7 +270,7 @@ const CareerFortuneAnalysis = ({
 							fontSize: "clamp(24px, 5vw, 36px)",
 						}}
 					>
-						事業運勢分析
+						{convertByRegion("事業運勢分析", region)}
 					</h2>
 				</div>
 
@@ -277,7 +283,8 @@ const CareerFortuneAnalysis = ({
 							fontSize: "clamp(16px, 3.5vw, 20px)",
 						}}
 					>
-						總結：{careerAnalysis.summary.title}
+						{convertByRegion("總結", region)}：
+						{convertByRegion(careerAnalysis.summary.title, region)}
 					</h3>
 				</div>
 
@@ -289,7 +296,10 @@ const CareerFortuneAnalysis = ({
 						lineHeight: 1.6,
 					}}
 				>
-					{careerAnalysis.summary.description}
+					{convertByRegion(
+						careerAnalysis.summary.description,
+						region
+					)}
 				</p>
 			</div>
 
@@ -305,7 +315,7 @@ const CareerFortuneAnalysis = ({
 						fontSize: "clamp(20px, 4vw, 28px)",
 					}}
 				>
-					事業發展全景圖
+					{convertByRegion("事業發展全景圖", region)}
 				</h3>
 
 				{/* Tab Navigation */}
@@ -325,7 +335,7 @@ const CareerFortuneAnalysis = ({
 								boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
 							}}
 						>
-							{tab}
+							{convertByRegion(tab, region)}
 						</button>
 					))}
 				</div>
@@ -341,7 +351,7 @@ const CareerFortuneAnalysis = ({
 									fontSize: "clamp(18px, 4vw, 24px)",
 								}}
 							>
-								天賦解碼
+								{convertByRegion("天賦解碼", region)}
 							</h4>
 
 							<div className="space-y-4 sm:space-y-6">
@@ -361,7 +371,10 @@ const CareerFortuneAnalysis = ({
 													"clamp(16px, 3.5vw, 20px)",
 											}}
 										>
-											{talent.name}
+											{convertByRegion(
+												talent.name,
+												region
+											)}
 										</h5>
 										<p
 											className="mb-3 leading-relaxed sm:mb-4"
@@ -373,7 +386,10 @@ const CareerFortuneAnalysis = ({
 												lineHeight: 1.5,
 											}}
 										>
-											{talent.description}
+											{convertByRegion(
+												talent.description,
+												region
+											)}
 										</p>
 										<div className="p-2 rounded-lg sm:p-3 bg-white/10">
 											<p
@@ -385,7 +401,10 @@ const CareerFortuneAnalysis = ({
 													lineHeight: 1.4,
 												}}
 											>
-												{talent.attention}
+												{convertByRegion(
+													talent.attention,
+													region
+												)}
 											</p>
 										</div>
 									</div>
@@ -403,7 +422,7 @@ const CareerFortuneAnalysis = ({
 									fontSize: "clamp(18px, 4vw, 24px)",
 								}}
 							>
-								黃金賽道
+								{convertByRegion("黃金賽道", region)}
 							</h4>
 
 							{/* Mobile Card Layout */}
@@ -436,7 +455,10 @@ const CareerFortuneAnalysis = ({
 														"clamp(12px, 2.5vw, 14px)",
 												}}
 											>
-												{period.luck}
+												{convertByRegion(
+													period.luck,
+													region
+												)}
 											</span>
 										</div>
 										<div
@@ -449,8 +471,23 @@ const CareerFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											<strong>動作：</strong>
-											{period.action}（{period.bestYear}）
+											<strong>
+												{convertByRegion(
+													"動作",
+													region
+												)}
+												：
+											</strong>
+											{convertByRegion(
+												period.action,
+												region
+											)}
+											（
+											{convertByRegion(
+												period.bestYear,
+												region
+											)}
+											）
 										</div>
 										<div
 											className="text-white/80"
@@ -462,8 +499,17 @@ const CareerFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											<strong>注意：</strong>
-											{period.warning}
+											<strong>
+												{convertByRegion(
+													"注意",
+													region
+												)}
+												：
+											</strong>
+											{convertByRegion(
+												period.warning,
+												region
+											)}
 										</div>
 									</div>
 								))}
@@ -483,7 +529,10 @@ const CareerFortuneAnalysis = ({
 														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												時期
+												{convertByRegion(
+													"時期",
+													region
+												)}
 											</th>
 											<th
 												className="p-3 text-left lg:p-4"
@@ -494,7 +543,10 @@ const CareerFortuneAnalysis = ({
 														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												大運
+												{convertByRegion(
+													"大運",
+													region
+												)}
 											</th>
 											<th
 												className="p-3 text-left lg:p-4"
@@ -505,7 +557,10 @@ const CareerFortuneAnalysis = ({
 														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												關鍵動作
+												{convertByRegion(
+													"關鍵動作",
+													region
+												)}
 											</th>
 											<th
 												className="p-3 text-left lg:p-4"
@@ -516,7 +571,10 @@ const CareerFortuneAnalysis = ({
 														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												風險預警
+												{convertByRegion(
+													"風險預警",
+													region
+												)}
 											</th>
 										</tr>
 									</thead>
@@ -549,7 +607,10 @@ const CareerFortuneAnalysis = ({
 																"clamp(12px, 2.5vw, 14px)",
 														}}
 													>
-														{period.luck}
+														{convertByRegion(
+															period.luck,
+															region
+														)}
 													</td>
 													<td
 														className="p-3 lg:p-4"
@@ -560,8 +621,16 @@ const CareerFortuneAnalysis = ({
 																"clamp(12px, 2.5vw, 14px)",
 														}}
 													>
-														{period.action}（
-														{period.bestYear}）
+														{convertByRegion(
+															period.action,
+															region
+														)}
+														（
+														{convertByRegion(
+															period.bestYear,
+															region
+														)}
+														）
 													</td>
 													<td
 														className="p-3 lg:p-4"
@@ -572,7 +641,10 @@ const CareerFortuneAnalysis = ({
 																"clamp(12px, 2.5vw, 14px)",
 														}}
 													>
-														{period.warning}
+														{convertByRegion(
+															period.warning,
+															region
+														)}
 													</td>
 												</tr>
 											)
@@ -592,7 +664,7 @@ const CareerFortuneAnalysis = ({
 									fontSize: "clamp(18px, 4vw, 24px)",
 								}}
 							>
-								巔峰時機
+								{convertByRegion("巔峰時機", region)}
 							</h4>
 
 							<div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
@@ -605,7 +677,7 @@ const CareerFortuneAnalysis = ({
 												"clamp(14px, 3.5vw, 18px)",
 										}}
 									>
-										權力巔峰
+										{convertByRegion("權力巔峰", region)}
 									</h5>
 									<p
 										style={{
@@ -616,17 +688,19 @@ const CareerFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											careerAnalysis.talents[
 												"權力巔峰標誌"
-											].content.peakYear
-										}
+											].content.peakYear,
+											region
+										)}
 										：
-										{
+										{convertByRegion(
 											careerAnalysis.talents[
 												"權力巔峰標誌"
-											].content.peakDescription
-										}
+											].content.peakDescription,
+											region
+										)}
 									</p>
 								</div>
 								<div className="p-3 rounded-lg sm:p-4 bg-white/20">
@@ -638,7 +712,7 @@ const CareerFortuneAnalysis = ({
 												"clamp(14px, 3.5vw, 18px)",
 										}}
 									>
-										最佳合作
+										{convertByRegion("最佳合作", region)}
 									</h5>
 									<p
 										style={{
@@ -649,11 +723,12 @@ const CareerFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											careerAnalysis.talents[
 												"權力巔峰標誌"
-											].content.bestPartners
-										}
+											].content.bestPartners,
+											region
+										)}
 									</p>
 								</div>
 								<div className="p-3 rounded-lg sm:p-4 bg-white/20 md:col-span-2">
@@ -665,7 +740,7 @@ const CareerFortuneAnalysis = ({
 												"clamp(14px, 3.5vw, 18px)",
 										}}
 									>
-										行業紅線
+										{convertByRegion("行業紅線", region)}
 									</h5>
 									<p
 										style={{
@@ -676,11 +751,12 @@ const CareerFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											careerAnalysis.talents[
 												"權力巔峰標誌"
-											].content.avoidIndustries
-										}
+											].content.avoidIndustries,
+											region
+										)}
 									</p>
 								</div>
 							</div>
@@ -698,7 +774,7 @@ const CareerFortuneAnalysis = ({
 						fontSize: "clamp(20px, 5vw, 30px)",
 					}}
 				>
-					晉升秘訣
+					{convertByRegion("晉升秘訣", region)}
 				</h3>
 
 				<div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -716,7 +792,11 @@ const CareerFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 14px)",
 								}}
 							>
-								{careerAnalysis.strategies.officeLayout.title}
+								{convertByRegion(
+									careerAnalysis.strategies.officeLayout
+										.title,
+									region
+								)}
 							</h4>
 						</div>
 						<p
@@ -727,7 +807,11 @@ const CareerFortuneAnalysis = ({
 								lineHeight: 1.5,
 							}}
 						>
-							{careerAnalysis.strategies.officeLayout.description}
+							{convertByRegion(
+								careerAnalysis.strategies.officeLayout
+									.description,
+								region
+							)}
 						</p>
 						<p
 							className="text-[#757575]"
@@ -737,7 +821,10 @@ const CareerFortuneAnalysis = ({
 								lineHeight: 1.4,
 							}}
 						>
-							{careerAnalysis.strategies.officeLayout.details}
+							{convertByRegion(
+								careerAnalysis.strategies.officeLayout.details,
+								region
+							)}
 						</p>
 					</div>
 
@@ -755,7 +842,11 @@ const CareerFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 14px)",
 								}}
 							>
-								{careerAnalysis.strategies.annualStrategy.title}
+								{convertByRegion(
+									careerAnalysis.strategies.annualStrategy
+										.title,
+									region
+								)}
 							</h4>
 						</div>
 						<p
@@ -766,11 +857,16 @@ const CareerFortuneAnalysis = ({
 								lineHeight: 1.5,
 							}}
 						>
-							{careerAnalysis.strategies.annualStrategy.year}：
-							{
+							{convertByRegion(
+								careerAnalysis.strategies.annualStrategy.year,
+								region
+							)}
+							：
+							{convertByRegion(
 								careerAnalysis.strategies.annualStrategy
-									.description
-							}
+									.description,
+								region
+							)}
 						</p>
 						<p
 							className="text-[#757575]"
@@ -780,7 +876,11 @@ const CareerFortuneAnalysis = ({
 								lineHeight: 1.4,
 							}}
 						>
-							{careerAnalysis.strategies.annualStrategy.benefit}
+							{convertByRegion(
+								careerAnalysis.strategies.annualStrategy
+									.benefit,
+								region
+							)}
 						</p>
 					</div>
 
@@ -798,7 +898,11 @@ const CareerFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 14px)",
 								}}
 							>
-								{careerAnalysis.strategies.lifelongTaboo.title}
+								{convertByRegion(
+									careerAnalysis.strategies.lifelongTaboo
+										.title,
+									region
+								)}
 							</h4>
 						</div>
 						<p
@@ -809,7 +913,10 @@ const CareerFortuneAnalysis = ({
 								lineHeight: 1.5,
 							}}
 						>
-							{careerAnalysis.strategies.lifelongTaboo.warning}
+							{convertByRegion(
+								careerAnalysis.strategies.lifelongTaboo.warning,
+								region
+							)}
 						</p>
 						<p
 							className="text-[#757575]"
@@ -819,7 +926,10 @@ const CareerFortuneAnalysis = ({
 								lineHeight: 1.4,
 							}}
 						>
-							{careerAnalysis.strategies.lifelongTaboo.reason}
+							{convertByRegion(
+								careerAnalysis.strategies.lifelongTaboo.reason,
+								region
+							)}
 						</p>
 					</div>
 				</div>

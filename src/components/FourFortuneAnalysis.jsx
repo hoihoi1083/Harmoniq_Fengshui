@@ -18,6 +18,8 @@ import CareerFortuneAnalysis from "@/components/CareerFortuneAnalysis";
 import WealthFortuneAnalysis from "@/components/WealthFortuneAnalysis";
 import RelationshipFortuneAnalysis from "@/components/RelationshipFortuneAnalysis";
 import fengshuiLoading from "../../public/images/風水妹/風水妹-loading.png";
+import { convertByRegion } from "@/utils/chineseConverter";
+import { useRegionDetection } from "@/hooks/useRegionDetection";
 
 const wuxingColorMap = {
 	金: "#B2A062",
@@ -43,6 +45,7 @@ export default function FourFortuneAnalysis({
 	const locale = useLocale();
 	const t = useTranslations("report");
 	const sectionRefs = useRef([]);
+	const { region } = useRegionDetection();
 
 	// State management
 	const [userInfo, setUserInfo] = useState(null);
@@ -78,6 +81,13 @@ export default function FourFortuneAnalysis({
 			});
 		}
 	}, [propUserInfo, birthDateTime, gender, sessionId]);
+
+	// Update section title when region changes
+	useEffect(() => {
+		if (region) {
+			setSections([{ title: convertByRegion("四大運勢分析", region) }]);
+		}
+	}, [region]);
 
 	// Use direct callback reference to prevent memoization loops
 
@@ -389,7 +399,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 500,
 											}}
 										>
-											風水妹正在分析您的命理資料
+											{convertByRegion(
+												"風水妹正在分析您的命理資料",
+												region
+											)}
 										</div>
 										<div
 											className="text-gray-500"
@@ -401,7 +414,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 400,
 											}}
 										>
-											請稍候，正在解析四大運勢
+											{convertByRegion(
+												"請稍候，正在解析四大運勢",
+												region
+											)}
 										</div>
 									</div>
 								</div>
@@ -486,6 +502,7 @@ export default function FourFortuneAnalysis({
 									{/* Four Pillars in responsive layout */}
 									<div className="flex flex-wrap justify-center gap-5 mt-4 mb-4 lg:justify-start sm:gap-4 sm:mb-6 lg:mt-10">
 										{/* 年柱 */}
+										{/* 年柱 */}
 										<div className="bg-white border-2 border-black rounded-full px-3 sm:px-6 lg:px-10 py-2 min-w-[100px] sm:min-w-[120px] lg:min-w-[140px] text-center flex-shrink-0">
 											<div
 												className="font-bold text-[#374A37]"
@@ -496,7 +513,11 @@ export default function FourFortuneAnalysis({
 														"clamp(14px, 3vw, 18px)",
 												}}
 											>
-												年柱-
+												{convertByRegion(
+													"年柱",
+													region
+												)}
+												-
 												<span className="text-[#A3B116]">
 													{wuxingData.year}
 												</span>
@@ -514,7 +535,11 @@ export default function FourFortuneAnalysis({
 														"clamp(14px, 3vw, 18px)",
 												}}
 											>
-												月柱-
+												{convertByRegion(
+													"月柱",
+													region
+												)}
+												-
 												<span className="text-[#A3B116]">
 													{wuxingData.month}
 												</span>
@@ -532,7 +557,11 @@ export default function FourFortuneAnalysis({
 														"clamp(14px, 3vw, 18px)",
 												}}
 											>
-												日柱-
+												{convertByRegion(
+													"日柱",
+													region
+												)}
+												-
 												<span className="text-[#A3B116]">
 													{wuxingData.day}
 												</span>
@@ -550,7 +579,11 @@ export default function FourFortuneAnalysis({
 														"clamp(14px, 3vw, 18px)",
 												}}
 											>
-												時柱-
+												{convertByRegion(
+													"時柱",
+													region
+												)}
+												-
 												<span className="text-[#A3B116]">
 													{wuxingData.hour}
 												</span>
@@ -575,11 +608,16 @@ export default function FourFortuneAnalysis({
 														"Noto Serif TC, serif",
 												}}
 											>
-												五行-
-												{
+												{convertByRegion(
+													"五行",
+													region
+												)}
+												-
+												{convertByRegion(
 													analysis.strengthAnalysis
-														.strengthDesc
-												}
+														.strengthDesc,
+													region
+												)}
 											</div>
 										</div>
 
@@ -597,30 +635,34 @@ export default function FourFortuneAnalysis({
 														"Noto Serif TC, serif",
 												}}
 											>
-												{(() => {
-													const missingElements =
-														analysis
-															.strengthAnalysis
-															.weakElements || [];
-													if (
-														missingElements.length ===
-														0
-													) {
-														return "五行沒有缺失";
-													} else if (
-														missingElements.length ===
-														1
-													) {
-														return `缺${missingElements[0]}`;
-													} else if (
-														missingElements.length ===
-														2
-													) {
-														return `缺${missingElements.join("")}`;
-													} else {
-														return `缺${missingElements.slice(0, 2).join("")}等`;
-													}
-												})()}
+												{convertByRegion(
+													(() => {
+														const missingElements =
+															analysis
+																.strengthAnalysis
+																.weakElements ||
+															[];
+														if (
+															missingElements.length ===
+															0
+														) {
+															return "五行沒有缺失";
+														} else if (
+															missingElements.length ===
+															1
+														) {
+															return `缺${missingElements[0]}`;
+														} else if (
+															missingElements.length ===
+															2
+														) {
+															return `缺${missingElements.join("")}`;
+														} else {
+															return `缺${missingElements.slice(0, 2).join("")}等`;
+														}
+													})(),
+													region
+												)}
 											</div>
 										</div>
 									</div>
@@ -636,29 +678,34 @@ export default function FourFortuneAnalysis({
 												lineHeight: 1.8,
 											}}
 										>
-											{(() => {
-												const {
-													primaryGod,
-													auxiliaryGod,
-													strategy,
-												} = analysis.usefulGods || {};
+											{convertByRegion(
+												(() => {
+													const {
+														primaryGod,
+														auxiliaryGod,
+														strategy,
+													} =
+														analysis.usefulGods ||
+														{};
 
-												if (
-													!primaryGod ||
-													!auxiliaryGod
-												) {
-													return "根據五行分析，需要進一步確認用神配置以達到最佳平衡效果。";
-												}
+													if (
+														!primaryGod ||
+														!auxiliaryGod
+													) {
+														return "根據五行分析，需要進一步確認用神配置以達到最佳平衡效果。";
+													}
 
-												const strategyDesc = {
-													補缺: "補足所缺",
-													扶弱: "扶助偏弱",
-													抑強: "抑制過強",
-													瀉強: "化解過旺",
-												};
+													const strategyDesc = {
+														補缺: "補足所缺",
+														扶弱: "扶助偏弱",
+														抑強: "抑制過強",
+														瀉強: "化解過旺",
+													};
 
-												return `根據您的五行配置分析，建議以「${primaryGod}」為首選用神，「${auxiliaryGod}」為輔助用神。透過${strategyDesc[strategy] || "平衡調和"}的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力。`;
-											})()}
+													return `根據您的五行配置分析，建議以「${primaryGod}」為首選用神，「${auxiliaryGod}」為輔助用神。透過${strategyDesc[strategy] || "平衡調和"}的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力。`;
+												})(),
+												region
+											)}
 										</p>
 									</div>
 								</div>
@@ -708,7 +755,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 500,
 											}}
 										>
-											風水妹正在生成健康運勢分析
+											{convertByRegion(
+												"風水妹正在生成健康運勢分析",
+												region
+											)}
 										</div>
 										<div
 											className="text-gray-500"
@@ -720,7 +770,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 400,
 											}}
 										>
-											請稍候，正在分析身體健康運勢
+											{convertByRegion(
+												"請稍候，正在分析身體健康運勢",
+												region
+											)}
 										</div>
 									</div>
 								</div>
@@ -779,7 +832,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 500,
 											}}
 										>
-											風水妹正在生成事業運勢分析
+											{convertByRegion(
+												"風水妹正在生成事業運勢分析",
+												region
+											)}
 										</div>
 										<div
 											className="text-gray-500"
@@ -791,7 +847,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 400,
 											}}
 										>
-											請稍候，正在解析事業發展運勢
+											{convertByRegion(
+												"請稍候，正在解析事業發展運勢",
+												region
+											)}
 										</div>
 									</div>
 								</div>
@@ -850,7 +909,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 500,
 											}}
 										>
-											風水妹正在生成財運運勢分析
+											{convertByRegion(
+												"風水妹正在生成財運運勢分析",
+												region
+											)}
 										</div>
 										<div
 											className="text-gray-500"
@@ -862,7 +924,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 400,
 											}}
 										>
-											請稍候，正在分析財富運勢
+											{convertByRegion(
+												"請稍候，正在分析財富運勢",
+												region
+											)}
 										</div>
 									</div>
 								</div>
@@ -921,7 +986,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 500,
 											}}
 										>
-											風水妹正在生成感情運勢分析
+											{convertByRegion(
+												"風水妹正在生成感情運勢分析",
+												region
+											)}
 										</div>
 										<div
 											className="text-gray-500"
@@ -933,7 +1001,10 @@ export default function FourFortuneAnalysis({
 												fontWeight: 400,
 											}}
 										>
-											請稍候，正在分析桃花運勢
+											{convertByRegion(
+												"請稍候，正在分析桃花運勢",
+												region
+											)}
 										</div>
 									</div>
 								</div>

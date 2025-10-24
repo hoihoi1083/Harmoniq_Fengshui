@@ -8,6 +8,8 @@ import {
 } from "@/lib/fortunePeriodCalculator";
 import Image from "next/image";
 import fengshuiLoading from "../../public/images/風水妹/風水妹-loading.png";
+import { convertByRegion } from "@/utils/chineseConverter";
+import { useRegionDetection } from "@/hooks/useRegionDetection";
 
 const HealthFortuneAnalysis = ({
 	userInfo,
@@ -17,6 +19,7 @@ const HealthFortuneAnalysis = ({
 	showHistorical,
 	historicalData,
 }) => {
+	const { region } = useRegionDetection();
 	const [activeTab, setActiveTab] = useState("腎骨系統核心");
 	const [healthAnalysis, setHealthAnalysis] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -260,7 +263,7 @@ const HealthFortuneAnalysis = ({
 					className="text-[#5A5A5A]"
 					style={{ fontSize: "clamp(14px, 3vw, 18px)" }}
 				>
-					正在生成健康運勢分析...
+					{convertByRegion("正在生成健康運勢分析...", region)}
 				</p>
 			</div>
 		);
@@ -273,7 +276,10 @@ const HealthFortuneAnalysis = ({
 					className="text-[#5A5A5A]"
 					style={{ fontSize: "clamp(14px, 3vw, 18px)" }}
 				>
-					健康分析生成失敗，請重新整理頁面
+					{convertByRegion(
+						"健康分析生成失敗，請重新整理頁面",
+						region
+					)}
 				</p>
 			</div>
 		);
@@ -356,7 +362,7 @@ const HealthFortuneAnalysis = ({
 						fontSize: "clamp(18px, 4vw, 24px)",
 					}}
 				>
-					{getTabTitle(tabName)}
+					{convertByRegion(getTabTitle(tabName), region)}
 				</h4>
 				<p
 					className="mb-4 sm:mb-6"
@@ -366,7 +372,10 @@ const HealthFortuneAnalysis = ({
 						lineHeight: 1.5,
 					}}
 				>
-					{getTabDescription(tabName, systemData.content)}
+					{convertByRegion(
+						getTabDescription(tabName, systemData.content),
+						region
+					)}
 				</p>
 
 				<div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
@@ -383,7 +392,7 @@ const HealthFortuneAnalysis = ({
 										fontSize: "clamp(14px, 3vw, 16px)",
 									}}
 								>
-									{card.title}
+									{convertByRegion(card.title, region)}
 								</h5>
 								<p
 									style={{
@@ -392,7 +401,7 @@ const HealthFortuneAnalysis = ({
 										lineHeight: 1.4,
 									}}
 								>
-									{card.text}
+									{convertByRegion(card.text, region)}
 								</p>
 							</div>
 						)
@@ -414,7 +423,7 @@ const HealthFortuneAnalysis = ({
 							fontSize: "clamp(24px, 5vw, 36px)",
 						}}
 					>
-						健康運勢分析
+						{convertByRegion("健康運勢分析", region)}
 					</h2>
 				</div>
 
@@ -427,7 +436,8 @@ const HealthFortuneAnalysis = ({
 							fontSize: "clamp(16px, 3.5vw, 20px)",
 						}}
 					>
-						總結：{healthAnalysis.summary.title}
+						{convertByRegion("總結", region)}：
+						{convertByRegion(healthAnalysis.summary.title, region)}
 					</h3>
 				</div>
 
@@ -439,7 +449,10 @@ const HealthFortuneAnalysis = ({
 						lineHeight: 1.6,
 					}}
 				>
-					{healthAnalysis.summary.description}
+					{convertByRegion(
+						healthAnalysis.summary.description,
+						region
+					)}
 				</p>
 			</div>
 
@@ -455,7 +468,7 @@ const HealthFortuneAnalysis = ({
 						fontSize: "clamp(20px, 4vw, 28px)",
 					}}
 				>
-					三大系統深度解析
+					{convertByRegion("三大系統深度解析", region)}
 				</h3>
 
 				{/* Tab Navigation */}
@@ -475,7 +488,7 @@ const HealthFortuneAnalysis = ({
 								boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
 							}}
 						>
-							{tab}
+							{convertByRegion(tab, region)}
 						</button>
 					))}
 				</div>
@@ -501,7 +514,7 @@ const HealthFortuneAnalysis = ({
 						fontSize: "clamp(20px, 4vw, 28px)",
 					}}
 				>
-					全週期調養方案
+					{convertByRegion("全週期調養方案", region)}
 				</h3>
 
 				<div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -519,7 +532,7 @@ const HealthFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 14px)",
 								}}
 							>
-								作息
+								{convertByRegion("作息", region)}
 							</h4>
 						</div>
 						<p
@@ -530,7 +543,10 @@ const HealthFortuneAnalysis = ({
 								lineHeight: 1.4,
 							}}
 						>
-							{healthAnalysis.careRegimen.diet}
+							{convertByRegion(
+								healthAnalysis.careRegimen.diet,
+								region
+							)}
 						</p>
 					</div>
 
@@ -548,7 +564,7 @@ const HealthFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 14px)",
 								}}
 							>
-								經絡
+								{convertByRegion("經絡", region)}
 							</h4>
 						</div>
 						<p
@@ -559,7 +575,10 @@ const HealthFortuneAnalysis = ({
 								lineHeight: 1.4,
 							}}
 						>
-							{healthAnalysis.careRegimen.acupoints}
+							{convertByRegion(
+								healthAnalysis.careRegimen.acupoints,
+								region
+							)}
 						</p>
 					</div>
 
@@ -577,7 +596,7 @@ const HealthFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 14px)",
 								}}
 							>
-								運動
+								{convertByRegion("運動", region)}
 							</h4>
 						</div>
 						<p
@@ -588,7 +607,10 @@ const HealthFortuneAnalysis = ({
 								lineHeight: 1.4,
 							}}
 						>
-							{healthAnalysis.careRegimen.exercise}
+							{convertByRegion(
+								healthAnalysis.careRegimen.exercise,
+								region
+							)}
 						</p>
 					</div>
 
@@ -606,7 +628,7 @@ const HealthFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 14px)",
 								}}
 							>
-								大運提醒
+								{convertByRegion("大運提醒", region)}
 							</h4>
 						</div>
 						<p
@@ -617,7 +639,10 @@ const HealthFortuneAnalysis = ({
 								lineHeight: 1.4,
 							}}
 						>
-							{healthAnalysis.careRegimen.lifeStageReminder}
+							{convertByRegion(
+								healthAnalysis.careRegimen.lifeStageReminder,
+								region
+							)}
 						</p>
 					</div>
 				</div>

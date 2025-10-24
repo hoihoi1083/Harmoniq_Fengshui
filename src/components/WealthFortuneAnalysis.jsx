@@ -8,6 +8,8 @@ import {
 } from "@/lib/fortunePeriodCalculator";
 import Image from "next/image";
 import fengshuiLoading from "../../public/images/風水妹/風水妹-loading.png";
+import { convertByRegion } from "@/utils/chineseConverter";
+import { useRegionDetection } from "@/hooks/useRegionDetection";
 
 const WealthFortuneAnalysis = ({
 	userInfo,
@@ -17,6 +19,7 @@ const WealthFortuneAnalysis = ({
 	showHistorical,
 	historicalData,
 }) => {
+	const { region } = useRegionDetection();
 	const [activeTab, setActiveTab] = useState("奠基期");
 	const [wealthAnalysis, setWealthAnalysis] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -272,7 +275,7 @@ const WealthFortuneAnalysis = ({
 					</div>
 				</div>
 				<p className="text-lg text-[#5A5A5A]">
-					正在生成財運運勢分析...
+					{convertByRegion("正在生成財運運勢分析...", region)}
 				</p>
 			</div>
 		);
@@ -282,7 +285,10 @@ const WealthFortuneAnalysis = ({
 		return (
 			<div className="py-20 text-center">
 				<p className="text-lg text-[#5A5A5A]">
-					財運分析生成失敗，請重新整理頁面
+					{convertByRegion(
+						"財運分析生成失敗，請重新整理頁面",
+						region
+					)}
 				</p>
 			</div>
 		);
@@ -302,7 +308,7 @@ const WealthFortuneAnalysis = ({
 							fontSize: "clamp(24px, 5vw, 36px)",
 						}}
 					>
-						財運運勢分析
+						{convertByRegion("財運運勢分析", region)}
 					</h2>
 				</div>
 
@@ -315,7 +321,8 @@ const WealthFortuneAnalysis = ({
 							fontSize: "clamp(16px, 3.5vw, 20px)",
 						}}
 					>
-						總結：{wealthAnalysis.summary.title}
+						{convertByRegion("總結", region)}：
+						{convertByRegion(wealthAnalysis.summary.title, region)}
 					</h3>
 				</div>
 
@@ -327,7 +334,10 @@ const WealthFortuneAnalysis = ({
 						lineHeight: 1.6,
 					}}
 				>
-					{wealthAnalysis.summary.description}
+					{convertByRegion(
+						wealthAnalysis.summary.description,
+						region
+					)}
 				</p>
 			</div>
 
@@ -343,7 +353,7 @@ const WealthFortuneAnalysis = ({
 						fontSize: "clamp(20px, 4vw, 28px)",
 					}}
 				>
-					三階段財運密碼
+					{convertByRegion("三階段財運密碼", region)}
 				</h3>
 
 				{/* Tab Navigation */}
@@ -363,7 +373,7 @@ const WealthFortuneAnalysis = ({
 								boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
 							}}
 						>
-							{tab}
+							{convertByRegion(tab, region)}
 						</button>
 					))}
 				</div>
@@ -377,8 +387,15 @@ const WealthFortuneAnalysis = ({
 							fontSize: "clamp(14px, 3vw, 18px)",
 						}}
 					>
-						{wealthAnalysis.threeStages[activeTab].ageRange}·
-						{wealthAnalysis.threeStages[activeTab].fortune}
+						{convertByRegion(
+							wealthAnalysis.threeStages[activeTab].ageRange,
+							region
+						)}
+						·
+						{convertByRegion(
+							wealthAnalysis.threeStages[activeTab].fortune,
+							region
+						)}
 					</h4>
 				</div>
 
@@ -396,10 +413,11 @@ const WealthFortuneAnalysis = ({
 												"clamp(12px, 2.5vw, 16px)",
 										}}
 									>
-										{
+										{convertByRegion(
 											wealthAnalysis.threeStages["奠基期"]
-												.fortune
-										}
+												.fortune,
+											region
+										)}
 									</h5>
 								</div>
 								<div className="space-y-3 sm:space-y-4">
@@ -413,10 +431,11 @@ const WealthFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											wealthAnalysis.threeStages["奠基期"]
-												.content.phase1.description
-										}
+												.content.phase1.description,
+											region
+										)}
 									</p>
 									<div className="bg-[#F5F5F5] rounded-lg p-2 sm:p-3">
 										<p
@@ -429,11 +448,12 @@ const WealthFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											{
+											{convertByRegion(
 												wealthAnalysis.threeStages[
 													"奠基期"
-												].content.phase1.keyYear
-											}
+												].content.phase1.keyYear,
+												region
+											)}
 										</p>
 									</div>
 									<div className="p-2 rounded-lg sm:p-3 bg-red-50">
@@ -447,11 +467,12 @@ const WealthFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											{
+											{convertByRegion(
 												wealthAnalysis.threeStages[
 													"奠基期"
-												].content.phase1.trapYear
-											}
+												].content.phase1.trapYear,
+												region
+											)}
 										</p>
 									</div>
 								</div>
@@ -467,11 +488,14 @@ const WealthFortuneAnalysis = ({
 												"clamp(12px, 2.5vw, 16px)",
 										}}
 									>
-										{
+										{convertByRegion(
 											wealthAnalysis.threeStages[
 												"奠基期"
-											].content.phase2.name.split("（")[0]
-										}
+											].content.phase2.name.split(
+												"（"
+											)[0],
+											region
+										)}
 									</h5>
 								</div>
 								<div className="space-y-3 sm:space-y-4">
@@ -485,10 +509,11 @@ const WealthFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											wealthAnalysis.threeStages["奠基期"]
-												.content.phase2.description
-										}
+												.content.phase2.description,
+											region
+										)}
 									</p>
 									<div className="p-2 rounded-lg sm:p-3 bg-red-50">
 										<p
@@ -501,11 +526,12 @@ const WealthFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											{
+											{convertByRegion(
 												wealthAnalysis.threeStages[
 													"奠基期"
-												].content.phase2.warning
-											}
+												].content.phase2.warning,
+												region
+											)}
 										</p>
 									</div>
 								</div>
@@ -525,7 +551,7 @@ const WealthFortuneAnalysis = ({
 												"clamp(12px, 2.5vw, 16px)",
 										}}
 									>
-										甲木傷官
+										{convertByRegion("甲木傷官", region)}
 									</h5>
 								</div>
 								<div className="space-y-3 sm:space-y-4">
@@ -539,10 +565,11 @@ const WealthFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											wealthAnalysis.threeStages["爆發期"]
-												.content.description
-										}
+												.content.description,
+											region
+										)}
 									</p>
 									<div className="bg-[#F5F5F5] rounded-lg p-2 sm:p-3">
 										<p
@@ -555,11 +582,12 @@ const WealthFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											{
+											{convertByRegion(
 												wealthAnalysis.threeStages[
 													"爆發期"
-												].content.keyYear
-											}
+												].content.keyYear,
+												region
+											)}
 										</p>
 									</div>
 								</div>
@@ -575,7 +603,7 @@ const WealthFortuneAnalysis = ({
 												"clamp(12px, 2.5vw, 16px)",
 										}}
 									>
-										財富峰值
+										{convertByRegion("財富峰值", region)}
 									</h5>
 								</div>
 								<div className="space-y-3 sm:space-y-4">
@@ -589,10 +617,11 @@ const WealthFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											wealthAnalysis.threeStages["爆發期"]
-												.content.industries
-										}
+												.content.industries,
+											region
+										)}
 									</p>
 									<div className="bg-[#F5F5F5] rounded-lg p-2 sm:p-3">
 										<p
@@ -605,11 +634,12 @@ const WealthFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											{
+											{convertByRegion(
 												wealthAnalysis.threeStages[
 													"爆發期"
-												].content.peakYear
-											}
+												].content.peakYear,
+												region
+											)}
 										</p>
 									</div>
 								</div>
@@ -627,15 +657,17 @@ const WealthFortuneAnalysis = ({
 										fontSize: "clamp(12px, 2.5vw, 16px)",
 									}}
 								>
-									{
+									{convertByRegion(
 										wealthAnalysis.threeStages["守成期"]
-											.ageRange
-									}
+											.ageRange,
+										region
+									)}
 									·
-									{
+									{convertByRegion(
 										wealthAnalysis.threeStages["守成期"]
-											.fortune
-									}
+											.fortune,
+										region
+									)}
 								</h5>
 							</div>
 							<div className="space-y-3 sm:space-y-4">
@@ -647,10 +679,11 @@ const WealthFortuneAnalysis = ({
 										lineHeight: 1.5,
 									}}
 								>
-									{
+									{convertByRegion(
 										wealthAnalysis.threeStages["守成期"]
-											.content.description
-									}
+											.content.description,
+										region
+									)}
 								</p>
 								<div className="bg-[#F5F5F5] rounded-lg p-2 sm:p-3">
 									<p
@@ -663,10 +696,11 @@ const WealthFortuneAnalysis = ({
 											lineHeight: 1.4,
 										}}
 									>
-										{
+										{convertByRegion(
 											wealthAnalysis.threeStages["守成期"]
-												.content.keyYear
-										}
+												.content.keyYear,
+											region
+										)}
 									</p>
 								</div>
 								<div className="p-2 rounded-lg sm:p-3 bg-red-50">
@@ -680,10 +714,11 @@ const WealthFortuneAnalysis = ({
 											lineHeight: 1.4,
 										}}
 									>
-										{
+										{convertByRegion(
 											wealthAnalysis.threeStages["守成期"]
-												.content.avoidIndustries
-										}
+												.content.avoidIndustries,
+											region
+										)}
 									</p>
 								</div>
 							</div>
@@ -701,7 +736,7 @@ const WealthFortuneAnalysis = ({
 						fontSize: "clamp(20px, 5vw, 30px)",
 					}}
 				>
-					財富法則
+					{convertByRegion("財富法則", region)}
 				</h3>
 
 				<div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -720,10 +755,11 @@ const WealthFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 16px)",
 								}}
 							>
-								{
+								{convertByRegion(
 									wealthAnalysis.wealthRules.assetAllocation
-										.title
-								}
+										.title,
+									region
+								)}
 							</h4>
 						</div>
 						<div className="space-y-2 sm:space-y-3">
@@ -735,10 +771,11 @@ const WealthFortuneAnalysis = ({
 									lineHeight: 1.5,
 								}}
 							>
-								{
+								{convertByRegion(
 									wealthAnalysis.wealthRules.assetAllocation
-										.realEstate
-								}
+										.realEstate,
+									region
+								)}
 							</p>
 							<p
 								className="text-[#374A37]"
@@ -748,10 +785,11 @@ const WealthFortuneAnalysis = ({
 									lineHeight: 1.5,
 								}}
 							>
-								{
+								{convertByRegion(
 									wealthAnalysis.wealthRules.assetAllocation
-										.preciousMetals
-								}
+										.preciousMetals,
+									region
+								)}
 							</p>
 							<p
 								className="text-[#374A37]"
@@ -761,10 +799,11 @@ const WealthFortuneAnalysis = ({
 									lineHeight: 1.5,
 								}}
 							>
-								{
+								{convertByRegion(
 									wealthAnalysis.wealthRules.assetAllocation
-										.cash
-								}
+										.cash,
+									region
+								)}
 							</p>
 						</div>
 					</div>
@@ -784,7 +823,11 @@ const WealthFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 16px)",
 								}}
 							>
-								{wealthAnalysis.wealthRules.partnerships.title}
+								{convertByRegion(
+									wealthAnalysis.wealthRules.partnerships
+										.title,
+									region
+								)}
 							</h4>
 						</div>
 						<div className="space-y-2 sm:space-y-3">
@@ -796,10 +839,11 @@ const WealthFortuneAnalysis = ({
 										fontSize: "clamp(12px, 2.5vw, 14px)",
 									}}
 								>
-									{
+									{convertByRegion(
 										wealthAnalysis.wealthRules.partnerships
-											.zodiacA.animal
-									}
+											.zodiacA.animal,
+										region
+									)}
 								</p>
 								<p
 									className="text-[#757575]"
@@ -809,10 +853,11 @@ const WealthFortuneAnalysis = ({
 										lineHeight: 1.4,
 									}}
 								>
-									{
+									{convertByRegion(
 										wealthAnalysis.wealthRules.partnerships
-											.zodiacA.description
-									}
+											.zodiacA.description,
+										region
+									)}
 								</p>
 							</div>
 							<div>
@@ -823,10 +868,11 @@ const WealthFortuneAnalysis = ({
 										fontSize: "clamp(12px, 2.5vw, 14px)",
 									}}
 								>
-									{
+									{convertByRegion(
 										wealthAnalysis.wealthRules.partnerships
-											.zodiacB.animal
-									}
+											.zodiacB.animal,
+										region
+									)}
 								</p>
 								<p
 									className="text-[#757575]"
@@ -836,10 +882,11 @@ const WealthFortuneAnalysis = ({
 										lineHeight: 1.4,
 									}}
 								>
-									{
+									{convertByRegion(
 										wealthAnalysis.wealthRules.partnerships
-											.zodiacB.description
-									}
+											.zodiacB.description,
+										region
+									)}
 								</p>
 							</div>
 						</div>
@@ -860,10 +907,11 @@ const WealthFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 16px)",
 								}}
 							>
-								{
+								{convertByRegion(
 									wealthAnalysis.wealthRules.wealthDirection
-										.title
-								}
+										.title,
+									region
+								)}
 							</h4>
 						</div>
 						<div className="space-y-2 sm:space-y-3">
@@ -874,10 +922,11 @@ const WealthFortuneAnalysis = ({
 									fontSize: "clamp(12px, 2.5vw, 14px)",
 								}}
 							>
-								{
+								{convertByRegion(
 									wealthAnalysis.wealthRules.wealthDirection
-										.location
-								}
+										.location,
+									region
+								)}
 							</p>
 							<p
 								className="text-[#374A37]"
@@ -887,10 +936,11 @@ const WealthFortuneAnalysis = ({
 									lineHeight: 1.5,
 								}}
 							>
-								{
+								{convertByRegion(
 									wealthAnalysis.wealthRules.wealthDirection
-										.description
-								}
+										.description,
+									region
+								)}
 							</p>
 							<p
 								className="text-[#757575]"
@@ -900,10 +950,11 @@ const WealthFortuneAnalysis = ({
 									lineHeight: 1.4,
 								}}
 							>
-								{
+								{convertByRegion(
 									wealthAnalysis.wealthRules.wealthDirection
-										.warning
-								}
+										.warning,
+									region
+								)}
 							</p>
 						</div>
 					</div>

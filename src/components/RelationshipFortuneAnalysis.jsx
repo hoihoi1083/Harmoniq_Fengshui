@@ -8,6 +8,8 @@ import {
 } from "@/lib/fortunePeriodCalculator";
 import Image from "next/image";
 import fengshuiLoading from "../../public/images/風水妹/風水妹-loading.png";
+import { convertByRegion } from "@/utils/chineseConverter";
+import { useRegionDetection } from "@/hooks/useRegionDetection";
 
 const RelationshipFortuneAnalysis = ({
 	userInfo,
@@ -17,6 +19,7 @@ const RelationshipFortuneAnalysis = ({
 	showHistorical,
 	historicalData,
 }) => {
+	const { region } = useRegionDetection();
 	const [activeTab, setActiveTab] = useState("正緣特徵三重認證");
 	const [relationshipAnalysis, setRelationshipAnalysis] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -263,7 +266,7 @@ const RelationshipFortuneAnalysis = ({
 					</div>
 				</div>
 				<p className="text-lg text-[#5A5A5A]">
-					正在生成感情運勢分析...
+					{convertByRegion("正在生成感情運勢分析...", region)}
 				</p>
 			</div>
 		);
@@ -273,7 +276,10 @@ const RelationshipFortuneAnalysis = ({
 		return (
 			<div className="py-20 text-center">
 				<p className="text-lg text-[#5A5A5A]">
-					感情分析生成失敗，請重新整理頁面
+					{convertByRegion(
+						"感情分析生成失敗，請重新整理頁面",
+						region
+					)}
 				</p>
 			</div>
 		);
@@ -293,7 +299,7 @@ const RelationshipFortuneAnalysis = ({
 							fontSize: "clamp(24px, 5vw, 36px)",
 						}}
 					>
-						感情運勢分析
+						{convertByRegion("感情運勢分析", region)}
 					</h2>
 				</div>
 
@@ -306,7 +312,11 @@ const RelationshipFortuneAnalysis = ({
 							fontSize: "clamp(16px, 3.5vw, 20px)",
 						}}
 					>
-						總結：{relationshipAnalysis.summary.title}
+						{convertByRegion("總結", region)}：
+						{convertByRegion(
+							relationshipAnalysis.summary.title,
+							region
+						)}
 					</h3>
 				</div>
 
@@ -318,7 +328,10 @@ const RelationshipFortuneAnalysis = ({
 						lineHeight: 1.6,
 					}}
 				>
-					{relationshipAnalysis.summary.description}
+					{convertByRegion(
+						relationshipAnalysis.summary.description,
+						region
+					)}
 				</p>
 			</div>
 
@@ -334,7 +347,7 @@ const RelationshipFortuneAnalysis = ({
 						fontSize: "clamp(20px, 4vw, 28px)",
 					}}
 				>
-					感情全週期透視
+					{convertByRegion("感情全週期透視", region)}
 				</h3>
 
 				{/* Tab Navigation */}
@@ -354,7 +367,7 @@ const RelationshipFortuneAnalysis = ({
 								boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
 							}}
 						>
-							{tab}
+							{convertByRegion(tab, region)}
 						</button>
 					))}
 				</div>
@@ -380,7 +393,7 @@ const RelationshipFortuneAnalysis = ({
 												"clamp(12px, 2.5vw, 14px)",
 										}}
 									>
-										基本屬性
+										{convertByRegion("基本屬性", region)}
 									</h4>
 								</div>
 								<div className="space-y-2 sm:space-y-3">
@@ -394,10 +407,11 @@ const RelationshipFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											relationshipAnalysis.authenticity
-												.profession.description
-										}
+												.profession.description,
+											region
+										)}
 									</p>
 									<div className="p-2 rounded-lg sm:p-3 bg-red-50">
 										<p
@@ -410,11 +424,12 @@ const RelationshipFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											{
+											{convertByRegion(
 												relationshipAnalysis
 													.authenticity.profession
-													.warning
-											}
+													.warning,
+												region
+											)}
 										</p>
 									</div>
 								</div>
@@ -437,7 +452,7 @@ const RelationshipFortuneAnalysis = ({
 												"clamp(12px, 2.5vw, 14px)",
 										}}
 									>
-										年齡差距
+										{convertByRegion("年齡差距", region)}
 									</h4>
 								</div>
 								<div className="space-y-2 sm:space-y-3">
@@ -451,10 +466,11 @@ const RelationshipFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											relationshipAnalysis.authenticity
-												.ageGap.description
-										}
+												.ageGap.description,
+											region
+										)}
 									</p>
 									<div className="p-2 rounded-lg sm:p-3 bg-red-50">
 										<p
@@ -467,10 +483,12 @@ const RelationshipFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											{
+											{convertByRegion(
 												relationshipAnalysis
-													.authenticity.ageGap.warning
-											}
+													.authenticity.ageGap
+													.warning,
+												region
+											)}
 										</p>
 									</div>
 								</div>
@@ -493,7 +511,7 @@ const RelationshipFortuneAnalysis = ({
 												"clamp(12px, 2.5vw, 14px)",
 										}}
 									>
-										相識契機
+										{convertByRegion("相識契機", region)}
 									</h4>
 								</div>
 								<div className="space-y-2 sm:space-y-3">
@@ -507,10 +525,11 @@ const RelationshipFortuneAnalysis = ({
 											lineHeight: 1.5,
 										}}
 									>
-										{
+										{convertByRegion(
 											relationshipAnalysis.authenticity
-												.meetingChance.description
-										}
+												.meetingChance.description,
+											region
+										)}
 									</p>
 									<div className="p-2 rounded-lg sm:p-3 bg-red-50">
 										<p
@@ -523,11 +542,12 @@ const RelationshipFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											{
+											{convertByRegion(
 												relationshipAnalysis
 													.authenticity.meetingChance
-													.warning
-											}
+													.warning,
+												region
+											)}
 										</p>
 									</div>
 								</div>
@@ -544,7 +564,7 @@ const RelationshipFortuneAnalysis = ({
 									fontSize: "clamp(18px, 4vw, 24px)",
 								}}
 							>
-								情劫週期
+								{convertByRegion("情劫週期", region)}
 							</h4>
 
 							{/* Mobile Card Layout */}
@@ -566,7 +586,10 @@ const RelationshipFortuneAnalysis = ({
 														"clamp(14px, 3vw, 16px)",
 												}}
 											>
-												{cycle.period}
+												{convertByRegion(
+													cycle.period,
+													region
+												)}
 											</span>
 											<span
 												className="ml-2 text-white/80"
@@ -577,7 +600,10 @@ const RelationshipFortuneAnalysis = ({
 														"clamp(12px, 2.5vw, 14px)",
 												}}
 											>
-												{cycle.fortune}
+												{convertByRegion(
+													cycle.fortune,
+													region
+												)}
 											</span>
 										</div>
 										<div
@@ -590,11 +616,23 @@ const RelationshipFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											<strong>關鍵流年：</strong>
-											{cycle.dangerousYear}
+											<strong>
+												{convertByRegion(
+													"關鍵流年",
+													region
+												)}
+												：
+											</strong>
+											{convertByRegion(
+												cycle.dangerousYear,
+												region
+											)}
 											{cycle.crisis && (
 												<span className="block mt-1">
-													{cycle.crisis}
+													{convertByRegion(
+														cycle.crisis,
+														region
+													)}
 												</span>
 											)}
 										</div>
@@ -608,8 +646,17 @@ const RelationshipFortuneAnalysis = ({
 												lineHeight: 1.4,
 											}}
 										>
-											<strong>解決方案：</strong>
-											{cycle.solution}
+											<strong>
+												{convertByRegion(
+													"解決方案",
+													region
+												)}
+												：
+											</strong>
+											{convertByRegion(
+												cycle.solution,
+												region
+											)}
 										</div>
 									</div>
 								))}
@@ -629,7 +676,10 @@ const RelationshipFortuneAnalysis = ({
 														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												時期
+												{convertByRegion(
+													"時期",
+													region
+												)}
 											</th>
 											<th
 												className="w-1/5 p-3 text-left lg:p-4"
@@ -640,7 +690,10 @@ const RelationshipFortuneAnalysis = ({
 														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												大運
+												{convertByRegion(
+													"大運",
+													region
+												)}
 											</th>
 											<th
 												className="w-1/3 p-3 text-left lg:p-4"
@@ -651,7 +704,10 @@ const RelationshipFortuneAnalysis = ({
 														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												關鍵流年
+												{convertByRegion(
+													"關鍵流年",
+													region
+												)}
 											</th>
 											<th
 												className="w-1/3 p-3 text-left lg:p-4"
@@ -662,7 +718,10 @@ const RelationshipFortuneAnalysis = ({
 														"clamp(14px, 2.5vw, 16px)",
 												}}
 											>
-												解決方案
+												{convertByRegion(
+													"解決方案",
+													region
+												)}
 											</th>
 										</tr>
 									</thead>
@@ -683,7 +742,10 @@ const RelationshipFortuneAnalysis = ({
 															"clamp(12px, 2.5vw, 14px)",
 													}}
 												>
-													{cycle.period}
+													{convertByRegion(
+														cycle.period,
+														region
+													)}
 												</td>
 												<td
 													className="p-3 lg:p-4"
@@ -694,7 +756,10 @@ const RelationshipFortuneAnalysis = ({
 															"clamp(12px, 2.5vw, 14px)",
 													}}
 												>
-													{cycle.fortune}
+													{convertByRegion(
+														cycle.fortune,
+														region
+													)}
 												</td>
 												<td
 													className="p-3 lg:p-4"
@@ -706,10 +771,16 @@ const RelationshipFortuneAnalysis = ({
 														lineHeight: 1.4,
 													}}
 												>
-													{cycle.dangerousYear}
+													{convertByRegion(
+														cycle.dangerousYear,
+														region
+													)}
 													{cycle.crisis && (
 														<div className="mt-1 text-white/80">
-															{cycle.crisis}
+															{convertByRegion(
+																cycle.crisis,
+																region
+															)}
 														</div>
 													)}
 												</td>
@@ -723,7 +794,10 @@ const RelationshipFortuneAnalysis = ({
 														lineHeight: 1.4,
 													}}
 												>
-													{cycle.solution}
+													{convertByRegion(
+														cycle.solution,
+														region
+													)}
 												</td>
 											</tr>
 										))}
@@ -744,7 +818,7 @@ const RelationshipFortuneAnalysis = ({
 						fontSize: "clamp(20px, 4vw, 28px)",
 					}}
 				>
-					婚姻穩固法則
+					{convertByRegion("婚姻穩固法則", region)}
 				</h3>
 
 				<div className="w-full sm:w-[95%] mx-auto">
@@ -765,7 +839,7 @@ const RelationshipFortuneAnalysis = ({
 										fontSize: "clamp(12px, 2.5vw, 14px)",
 									}}
 								>
-									最佳婚年
+									{convertByRegion("最佳婚年", region)}
 								</h4>
 							</div>
 							<div className="space-y-2 sm:space-y-3">
@@ -776,10 +850,11 @@ const RelationshipFortuneAnalysis = ({
 										fontSize: "clamp(13px, 2.8vw, 15px)",
 									}}
 								>
-									{
+									{convertByRegion(
 										relationshipAnalysis.marriageRules
-											.bestYear.year
-									}
+											.bestYear.year,
+										region
+									)}
 								</p>
 								<p
 									className="text-[#374A37] leading-relaxed"
@@ -789,10 +864,11 @@ const RelationshipFortuneAnalysis = ({
 										lineHeight: 1.5,
 									}}
 								>
-									{
+									{convertByRegion(
 										relationshipAnalysis.marriageRules
-											.bestYear.description
-									}
+											.bestYear.description,
+										region
+									)}
 								</p>
 							</div>
 						</div>
@@ -813,7 +889,7 @@ const RelationshipFortuneAnalysis = ({
 										fontSize: "clamp(12px, 2.5vw, 14px)",
 									}}
 								>
-									相處禁忌
+									{convertByRegion("相處禁忌", region)}
 								</h4>
 							</div>
 							<div className="space-y-3">
@@ -824,10 +900,11 @@ const RelationshipFortuneAnalysis = ({
 											fontFamily: "Noto Serif TC, serif",
 										}}
 									>
-										{
+										{convertByRegion(
 											relationshipAnalysis.marriageRules
-												.taboos.financial.title
-										}
+												.taboos.financial.title,
+											region
+										)}
 									</p>
 									<p
 										className="text-xs text-[#757575]"
@@ -836,10 +913,11 @@ const RelationshipFortuneAnalysis = ({
 												"Noto Sans HK, sans-serif",
 										}}
 									>
-										{
+										{convertByRegion(
 											relationshipAnalysis.marriageRules
-												.taboos.financial.description
-										}
+												.taboos.financial.description,
+											region
+										)}
 									</p>
 								</div>
 								<div>
@@ -849,10 +927,11 @@ const RelationshipFortuneAnalysis = ({
 											fontFamily: "Noto Serif TC, serif",
 										}}
 									>
-										{
+										{convertByRegion(
 											relationshipAnalysis.marriageRules
-												.taboos.frequency.title
-										}
+												.taboos.frequency.title,
+											region
+										)}
 									</p>
 									<p
 										className="text-xs text-[#757575]"
@@ -861,10 +940,11 @@ const RelationshipFortuneAnalysis = ({
 												"Noto Sans HK, sans-serif",
 										}}
 									>
-										{
+										{convertByRegion(
 											relationshipAnalysis.marriageRules
-												.taboos.frequency.description
-										}
+												.taboos.frequency.description,
+											region
+										)}
 									</p>
 								</div>
 							</div>
@@ -886,7 +966,7 @@ const RelationshipFortuneAnalysis = ({
 										fontSize: "clamp(12px, 2.5vw, 14px)",
 									}}
 								>
-									子女緣
+									{convertByRegion("子女緣", region)}
 								</h4>
 							</div>
 							<div className="space-y-2 sm:space-y-3">
@@ -897,10 +977,11 @@ const RelationshipFortuneAnalysis = ({
 										fontSize: "clamp(13px, 2.8vw, 15px)",
 									}}
 								>
-									{
+									{convertByRegion(
 										relationshipAnalysis.marriageRules
-											.childrenFate.timing
-									}
+											.childrenFate.timing,
+										region
+									)}
 								</p>
 								<p
 									className="text-[#374A37] leading-relaxed"
@@ -910,10 +991,11 @@ const RelationshipFortuneAnalysis = ({
 										lineHeight: 1.5,
 									}}
 								>
-									{
+									{convertByRegion(
 										relationshipAnalysis.marriageRules
-											.childrenFate.description
-									}
+											.childrenFate.description,
+										region
+									)}
 								</p>
 							</div>
 						</div>

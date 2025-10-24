@@ -2457,7 +2457,10 @@ export default function ReportPage({
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在為您準備專屬命理分析報告
+							{convertByRegion(
+								"風水妹正在為您準備專屬命理分析報告",
+								region
+							)}
 						</div>
 						<div
 							className="text-gray-500"
@@ -2467,7 +2470,10 @@ export default function ReportPage({
 								fontWeight: 400,
 							}}
 						>
-							請稍候，正在深度解析您的八字命盤
+							{convertByRegion(
+								"請稍候，正在深度解析您的八字命盤",
+								region
+							)}
 						</div>
 					</div>
 				</div>
@@ -2599,9 +2605,8 @@ export default function ReportPage({
 									boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
 								}}
 							>
-								命理分析報告
-							</button>
-
+								{convertByRegion("命理分析報告", region)}
+							</button>{" "}
 							{/* 四大運勢分析 Tab */}
 							<button
 								onClick={() => setActiveTab("fortune")}
@@ -2616,7 +2621,7 @@ export default function ReportPage({
 									boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
 								}}
 							>
-								四大運勢分析
+								{convertByRegion("四大運勢分析", region)}
 							</button>
 						</div>
 					</div>
@@ -3233,7 +3238,6 @@ export default function ReportPage({
 							style={{ pointerEvents: "none" }}
 						/>
 					</div>
-
 					<div className="relative z-10 mb-4 sm:mb-6 lg:mb-8">
 						<h2
 							className="font-bold text-[#A3B116] text-center lg:text-left"
@@ -3243,42 +3247,58 @@ export default function ReportPage({
 								marginBottom: "clamp(16px, 3vw, 40px)",
 							}}
 						>
-							四柱排盤&納音解析
+							{convertByRegion("四柱排盤&納音解析", region)}
 						</h2>
 					</div>
-
 					{/* Navigation Tabs */}
 					<div className="relative z-10 mb-4 sm:mb-6 lg:mb-8">
 						<div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-3 lg:gap-6">
-							{["年柱", "月柱", "日柱", "時柱"].map((pillar) => (
-								<button
-									key={pillar}
-									onClick={() => setActivePillar(pillar)}
-									className="flex-shrink-0 w-full text-center transition-all duration-200 sm:w-auto"
-									style={{
-										minWidth: "clamp(100px, 20vw, 180px)",
-										height: "clamp(35px, 8vw, 50px)",
-										borderRadius: "clamp(16px, 4vw, 26px)",
-										backgroundColor: "#FFFFFF",
-										color: "#000000",
-										border:
-											activePillar === pillar
-												? "4px solid #A3B116"
-												: "4px solid transparent",
-										fontFamily: "Noto Sans HK, sans-serif",
-										fontWeight: 600,
-										fontSize: "clamp(12px, 3vw, 16px)",
-										cursor: "pointer",
-										boxShadow:
-											"0 2px 6.2px rgba(0, 0, 0, 0.4)",
-									}}
-								>
-									{pillar}
-								</button>
-							))}
+							{[
+								convertByRegion("年柱", region),
+								convertByRegion("月柱", region),
+								convertByRegion("日柱", region),
+								convertByRegion("時柱", region),
+							].map((pillar, index) => {
+								const originalPillar = [
+									"年柱",
+									"月柱",
+									"日柱",
+									"時柱",
+								][index];
+								return (
+									<button
+										key={originalPillar}
+										onClick={() =>
+											setActivePillar(originalPillar)
+										}
+										className="flex-shrink-0 w-full text-center transition-all duration-200 sm:w-auto"
+										style={{
+											minWidth:
+												"clamp(100px, 20vw, 180px)",
+											height: "clamp(35px, 8vw, 50px)",
+											borderRadius:
+												"clamp(16px, 4vw, 26px)",
+											backgroundColor: "#FFFFFF",
+											color: "#000000",
+											border:
+												activePillar === originalPillar
+													? "4px solid #A3B116"
+													: "4px solid transparent",
+											fontFamily:
+												"Noto Sans HK, sans-serif",
+											fontWeight: 600,
+											fontSize: "clamp(12px, 3vw, 16px)",
+											cursor: "pointer",
+											boxShadow:
+												"0 2px 6.2px rgba(0, 0, 0, 0.4)",
+										}}
+									>
+										{pillar}
+									</button>
+								);
+							})}
 						</div>
-					</div>
-
+					</div>{" "}
 					{/* Tab Content */}
 					<div className="relative z-10">
 						{/* 年柱 Content */}
@@ -3556,7 +3576,10 @@ export default function ReportPage({
 												</div>
 											</div>
 											<p className="text-sm sm:text-lg text-[#5A5A5A]">
-												正在分析您的童年生活特征...
+												{convertByRegion(
+													"正在分析您的童年生活特征...",
+													region
+												)}
 											</p>
 										</div>
 									) : lifeStageAnalysis["年柱"] ? (
@@ -3571,11 +3594,12 @@ export default function ReportPage({
 															"clamp(20px, 5vw, 36px)",
 													}}
 												>
-													{
+													{convertByRegion(
 														lifeStageAnalysis[
 															"年柱"
-														].title
-													}
+														].title || "",
+														region
+													)}
 												</h4>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
 													<p
@@ -3589,11 +3613,12 @@ export default function ReportPage({
 															lineHeight: 1.8,
 														}}
 													>
-														{
+														{convertByRegion(
 															lifeStageAnalysis[
 																"年柱"
-															].content
-														}
+															].content || "",
+															region
+														)}
 													</p>
 												</div>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
@@ -3608,11 +3633,12 @@ export default function ReportPage({
 															lineHeight: 1.8,
 														}}
 													>
-														{
+														{convertByRegion(
 															lifeStageAnalysis[
 																"年柱"
-															].example
-														}
+															].example || "",
+															region
+														)}
 													</p>
 												</div>
 												{lifeStageAnalysis["年柱"]
@@ -3629,11 +3655,12 @@ export default function ReportPage({
 																lineHeight: 1.8,
 															}}
 														>
-															{
+															{convertByRegion(
 																lifeStageAnalysis[
 																	"年柱"
-																].wisdom
-															}
+																].wisdom || "",
+																region
+															)}
 														</p>
 													</div>
 												)}
@@ -3927,7 +3954,10 @@ export default function ReportPage({
 												</div>
 											</div>
 											<p className="text-sm sm:text-lg text-[#5A5A5A]">
-												正在分析您的青年时期特征...
+												{convertByRegion(
+													"正在分析您的青年时期特征...",
+													region
+												)}
 											</p>
 										</div>
 									) : lifeStageAnalysis["月柱"] ? (
@@ -3942,11 +3972,12 @@ export default function ReportPage({
 															"clamp(20px, 5vw, 36px)",
 													}}
 												>
-													{
+													{convertByRegion(
 														lifeStageAnalysis[
 															"月柱"
-														].title
-													}
+														].title || "",
+														region
+													)}
 												</h4>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
 													<p
@@ -3960,11 +3991,12 @@ export default function ReportPage({
 															lineHeight: 1.8,
 														}}
 													>
-														{
+														{convertByRegion(
 															lifeStageAnalysis[
 																"月柱"
-															].content
-														}
+															].content || "",
+															region
+														)}
 													</p>
 												</div>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
@@ -3979,12 +4011,18 @@ export default function ReportPage({
 															lineHeight: 1.8,
 														}}
 													>
-														<strong>例子：</strong>{" "}
-														{
+														<strong>
+															{convertByRegion(
+																"例子：",
+																region
+															)}
+														</strong>{" "}
+														{convertByRegion(
 															lifeStageAnalysis[
 																"月柱"
-															].example
-														}
+															].example || "",
+															region
+														)}
 													</p>
 												</div>
 												{lifeStageAnalysis["月柱"]
@@ -4002,13 +4040,17 @@ export default function ReportPage({
 															}}
 														>
 															<strong>
-																智慧洞察：
+																{convertByRegion(
+																	"智慧洞察：",
+																	region
+																)}
 															</strong>
-															{
+															{convertByRegion(
 																lifeStageAnalysis[
 																	"月柱"
-																].wisdom
-															}
+																].wisdom || "",
+																region
+															)}
 														</p>
 													</div>
 												)}
@@ -4302,7 +4344,10 @@ export default function ReportPage({
 												</div>
 											</div>
 											<p className="text-sm sm:text-lg text-[#5A5A5A]">
-												正在分析您的成年时期特征...
+												{convertByRegion(
+													"正在分析您的成年时期特征...",
+													region
+												)}
 											</p>
 										</div>
 									) : lifeStageAnalysis["日柱"] ? (
@@ -4317,11 +4362,12 @@ export default function ReportPage({
 															"clamp(20px, 5vw, 36px)",
 													}}
 												>
-													{
+													{convertByRegion(
 														lifeStageAnalysis[
 															"日柱"
-														].title
-													}
+														].title || "",
+														region
+													)}
 												</h4>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
 													<p
@@ -4335,11 +4381,12 @@ export default function ReportPage({
 															lineHeight: 1.8,
 														}}
 													>
-														{
+														{convertByRegion(
 															lifeStageAnalysis[
 																"日柱"
-															].content
-														}
+															].content || "",
+															region
+														)}
 													</p>
 												</div>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
@@ -4354,11 +4401,12 @@ export default function ReportPage({
 															lineHeight: 1.8,
 														}}
 													>
-														{
+														{convertByRegion(
 															lifeStageAnalysis[
 																"日柱"
-															].example
-														}
+															].example || "",
+															region
+														)}
 													</p>
 												</div>
 												{lifeStageAnalysis["日柱"]
@@ -4375,11 +4423,12 @@ export default function ReportPage({
 																lineHeight: 1.8,
 															}}
 														>
-															{
+															{convertByRegion(
 																lifeStageAnalysis[
 																	"日柱"
-																].wisdom
-															}
+																].wisdom || "",
+																region
+															)}
 														</p>
 													</div>
 												)}
@@ -4673,7 +4722,10 @@ export default function ReportPage({
 												</div>
 											</div>
 											<p className="text-sm sm:text-lg text-[#5A5A5A]">
-												正在分析您的老年时期特征...
+												{convertByRegion(
+													"正在分析您的老年时期特征...",
+													region
+												)}
 											</p>
 										</div>
 									) : lifeStageAnalysis["時柱"] ? (
@@ -4688,11 +4740,12 @@ export default function ReportPage({
 															"clamp(20px, 5vw, 36px)",
 													}}
 												>
-													{
+													{convertByRegion(
 														lifeStageAnalysis[
 															"時柱"
-														].title
-													}
+														].title || "",
+														region
+													)}
 												</h4>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
 													<p
@@ -4706,11 +4759,12 @@ export default function ReportPage({
 															lineHeight: 1.8,
 														}}
 													>
-														{
+														{convertByRegion(
 															lifeStageAnalysis[
 																"時柱"
-															].content
-														}
+															].content || "",
+															region
+														)}
 													</p>
 												</div>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
@@ -4725,11 +4779,12 @@ export default function ReportPage({
 															lineHeight: 1.8,
 														}}
 													>
-														{
+														{convertByRegion(
 															lifeStageAnalysis[
 																"時柱"
-															].example
-														}
+															].example || "",
+															region
+														)}
 													</p>
 												</div>
 												{lifeStageAnalysis["時柱"]
@@ -4746,11 +4801,12 @@ export default function ReportPage({
 																lineHeight: 1.8,
 															}}
 														>
-															{
+															{convertByRegion(
 																lifeStageAnalysis[
 																	"時柱"
-																].wisdom
-															}
+																].wisdom || "",
+																region
+															)}
 														</p>
 													</div>
 												)}
@@ -4898,7 +4954,10 @@ export default function ReportPage({
 												"clamp(16px, 3vw, 24px)",
 										}}
 									>
-										五行分佈深度解析
+										{convertByRegion(
+											"五行分佈深度解析",
+											region
+										)}
 									</h2>
 								</div>
 
@@ -4913,7 +4972,10 @@ export default function ReportPage({
 										if (!distribution) {
 											return (
 												<div className="py-6 text-center text-gray-500 sm:py-8">
-													無法載入五行分析數據
+													{convertByRegion(
+														"無法載入五行分析數據",
+														region
+													)}
 												</div>
 											);
 										}
@@ -4996,7 +5058,10 @@ export default function ReportPage({
 																					"clamp(12px, 3vw, 14px)",
 																			}}
 																		>
-																			分數(包括藏干):
+																			{convertByRegion(
+																				"分數(包括藏干):",
+																				region
+																			)}
 																		</span>
 																		<span
 																			className="font-bold text-[#374A37]"
@@ -5018,7 +5083,10 @@ export default function ReportPage({
 																					"clamp(12px, 3vw, 14px)",
 																			}}
 																		>
-																			強度:
+																			{convertByRegion(
+																				"強度:",
+																				region
+																			)}
 																		</span>
 																		<span
 																			className="font-bold text-yellow-600"
@@ -5040,7 +5108,10 @@ export default function ReportPage({
 																					"clamp(12px, 3vw, 14px)",
 																			}}
 																		>
-																			特性:
+																			{convertByRegion(
+																				"特性:",
+																				region
+																			)}
 																		</span>
 																		<p
 																			className="mt-1 text-[#374A37]"
@@ -5050,9 +5121,12 @@ export default function ReportPage({
 																				lineHeight: 1.5,
 																			}}
 																		>
-																			{getElementTrait(
-																				element,
-																				star
+																			{convertByRegion(
+																				getElementTrait(
+																					element,
+																					star
+																				),
+																				region
 																			)}
 																		</p>
 																	</div>
@@ -5064,7 +5138,10 @@ export default function ReportPage({
 																					"clamp(12px, 3vw, 14px)",
 																			}}
 																		>
-																			對命主的影響:
+																			{convertByRegion(
+																				"對命主的影響:",
+																				region
+																			)}
 																		</span>
 																		<p
 																			className="mt-1"
@@ -5075,9 +5152,12 @@ export default function ReportPage({
 																				lineHeight: 1.5,
 																			}}
 																		>
-																			{getElementInfluence(
-																				element,
-																				star
+																			{convertByRegion(
+																				getElementInfluence(
+																					element,
+																					star
+																				),
+																				region
 																			)}
 																		</p>
 																	</div>
@@ -5109,7 +5189,10 @@ export default function ReportPage({
 																				"clamp(14px, 1.5vw, 16px)",
 																		}}
 																	>
-																		五行
+																		{convertByRegion(
+																			"五行",
+																			region
+																		)}
 																	</div>
 																	<div
 																		className="py-2 font-bold text-white"
@@ -5120,8 +5203,14 @@ export default function ReportPage({
 																				"clamp(14px, 1.5vw, 16px)",
 																		}}
 																	>
-																		數值
-																		(包括藏干)
+																		{convertByRegion(
+																			"數值",
+																			region
+																		)}
+																		{convertByRegion(
+																			"(包括藏干)",
+																			region
+																		)}
 																	</div>
 																	<div
 																		className="py-2 font-bold text-white"
@@ -5132,7 +5221,10 @@ export default function ReportPage({
 																				"clamp(14px, 1.5vw, 16px)",
 																		}}
 																	>
-																		強度
+																		{convertByRegion(
+																			"強度",
+																			region
+																		)}
 																	</div>
 																	<div
 																		className="py-2 font-bold text-white"
@@ -5143,7 +5235,10 @@ export default function ReportPage({
 																				"clamp(14px, 1.5vw, 16px)",
 																		}}
 																	>
-																		特性
+																		{convertByRegion(
+																			"特性",
+																			region
+																		)}
 																	</div>
 																	<div
 																		className="py-2 font-bold text-white"
@@ -5154,7 +5249,10 @@ export default function ReportPage({
 																				"clamp(14px, 1.5vw, 16px)",
 																		}}
 																	>
-																		對命主的影響
+																		{convertByRegion(
+																			"對命主的影響",
+																			region
+																		)}
 																	</div>
 																</div>
 															</div>
@@ -5258,9 +5356,12 @@ export default function ReportPage({
 																						lineHeight: 1.4,
 																					}}
 																				>
-																					{getElementTrait(
-																						element,
-																						star
+																					{convertByRegion(
+																						getElementTrait(
+																							element,
+																							star
+																						),
+																						region
 																					)}
 																				</div>
 
@@ -5274,9 +5375,12 @@ export default function ReportPage({
 																						lineHeight: 1.4,
 																					}}
 																				>
-																					{getElementInfluence(
-																						element,
-																						star
+																					{convertByRegion(
+																						getElementInfluence(
+																							element,
+																							star
+																						),
+																						region
 																					)}
 																				</div>
 																			</div>
@@ -5301,7 +5405,10 @@ export default function ReportPage({
 											fontSize: "clamp(24px, 6vw, 42px)",
 										}}
 									>
-										五行流通阻礙點
+										{convertByRegion(
+											"五行流通阻礙點",
+											region
+										)}
 									</h3>
 
 									<div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 xl:grid-cols-3">
@@ -5335,7 +5442,10 @@ export default function ReportPage({
 															"clamp(14px, 3vw, 16px)",
 													}}
 												>
-													正在進行五行流通深度分析...
+													{convertByRegion(
+														"正在進行五行流通深度分析...",
+														region
+													)}
 												</p>
 											</div>
 										)}
@@ -5359,7 +5469,10 @@ export default function ReportPage({
 																	"clamp(12px, 3vw, 16px)",
 															}}
 														>
-															{obstacle.title}
+															{convertByRegion(
+																obstacle.title,
+																region
+															)}
 														</div>
 														<p
 															className="mb-3 leading-relaxed text-black sm:mb-4"
@@ -5372,9 +5485,10 @@ export default function ReportPage({
 																lineHeight: 1.6,
 															}}
 														>
-															{
-																obstacle.description
-															}
+															{convertByRegion(
+																obstacle.description,
+																region
+															)}
 														</p>
 														<div className="mb-2">
 															<span
@@ -5386,7 +5500,10 @@ export default function ReportPage({
 																		"clamp(13px, 3vw, 15px)",
 																}}
 															>
-																生活影響...
+																{convertByRegion(
+																	"生活影響...",
+																	region
+																)}
 															</span>
 														</div>
 														<p
@@ -5400,9 +5517,10 @@ export default function ReportPage({
 																lineHeight: 1.5,
 															}}
 														>
-															{
-																obstacle.lifeImpact
-															}
+															{convertByRegion(
+																obstacle.lifeImpact,
+																region
+															)}
 														</p>
 													</div>
 												)
@@ -5421,7 +5539,10 @@ export default function ReportPage({
 																"clamp(14px, 3vw, 16px)",
 														}}
 													>
-														正在為您準備個人化的五行流通分析...
+														{convertByRegion(
+															"正在為您準備個人化的五行流通分析...",
+															region
+														)}
 													</p>
 												</div>
 											)}
@@ -5441,7 +5562,10 @@ export default function ReportPage({
 												"clamp(24px, 4vw, 60px)",
 										}}
 									>
-										十神格局與內在關聯
+										{convertByRegion(
+											"十神格局與內在關聯",
+											region
+										)}
 									</h2>
 								</div>
 
@@ -5936,9 +6060,10 @@ export default function ReportPage({
 																			}}
 																		>
 																			-{" "}
-																			{
-																				data.meaning
-																			}
+																			{convertByRegion(
+																				data.meaning,
+																				region
+																			)}
 																		</span>
 																	</div>
 																</div>
@@ -5952,9 +6077,10 @@ export default function ReportPage({
 																			"clamp(16px, 4vw, 24px)",
 																	}}
 																>
-																	{
-																		data.expression
-																	}
+																	{convertByRegion(
+																		data.expression,
+																		region
+																	)}
 																</h3>
 															</div>
 
@@ -5969,7 +6095,10 @@ export default function ReportPage({
 																			"clamp(24px, 6vw, 42px)",
 																	}}
 																>
-																	實際表現
+																	{convertByRegion(
+																		"實際表現",
+																		region
+																	)}
 																</h4>
 																{data.realManifestation.map(
 																	(
@@ -5990,9 +6119,10 @@ export default function ReportPage({
 																				lineHeight: 1.6,
 																			}}
 																		>
-																			{
-																				item
-																			}
+																			{convertByRegion(
+																				item,
+																				region
+																			)}
 																		</p>
 																	)
 																)}
@@ -6010,11 +6140,12 @@ export default function ReportPage({
 																		lineHeight: 1.6,
 																	}}
 																>
-																	{
+																	{convertByRegion(
 																		data
 																			.warnings
-																			.title
-																	}
+																			.title,
+																		region
+																	)}
 																</p>
 																{data.warnings.items.map(
 																	(
@@ -6036,9 +6167,10 @@ export default function ReportPage({
 																			}}
 																		>
 																			▶{" "}
-																			{
-																				item
-																			}
+																			{convertByRegion(
+																				item,
+																				region
+																			)}
 																		</p>
 																	)
 																)}
@@ -6055,11 +6187,12 @@ export default function ReportPage({
 																			"clamp(24px, 6vw, 42px)",
 																	}}
 																>
-																	{
+																	{convertByRegion(
 																		data
 																			.coreConflicts
-																			.title
-																	}
+																			.title,
+																		region
+																	)}
 																</h3>
 
 																<div className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-2 xl:grid-cols-3">
@@ -6085,9 +6218,10 @@ export default function ReportPage({
 																							"clamp(12px, 3vw, 16px)",
 																					}}
 																				>
-																					{
-																						conflict.title
-																					}
+																					{convertByRegion(
+																						conflict.title,
+																						region
+																					)}
 																				</div>
 
 																				{/* Main description */}
@@ -6102,9 +6236,10 @@ export default function ReportPage({
 																							lineHeight: 1.6,
 																						}}
 																					>
-																						{
-																							conflict.description
-																						}
+																						{convertByRegion(
+																							conflict.description,
+																							region
+																						)}
 																					</p>
 																				</div>
 
@@ -6133,9 +6268,10 @@ export default function ReportPage({
 																								lineHeight: 1.5,
 																							}}
 																						>
-																							{
-																								conflict.psychologicalRoots
-																							}
+																							{convertByRegion(
+																								conflict.psychologicalRoots,
+																								region
+																							)}
 																						</p>
 																					</div>
 																				)}
@@ -6165,9 +6301,10 @@ export default function ReportPage({
 																								lineHeight: 1.5,
 																							}}
 																						>
-																							{
-																								conflict.developmentalStages
-																							}
+																							{convertByRegion(
+																								conflict.developmentalStages,
+																								region
+																							)}
 																						</p>
 																					</div>
 																				)}
@@ -6197,9 +6334,10 @@ export default function ReportPage({
 																							lineHeight: 1.5,
 																						}}
 																					>
-																						{
-																							conflict.example
-																						}
+																						{convertByRegion(
+																							conflict.example,
+																							region
+																						)}
 																					</p>
 																				</div>
 																			</div>
@@ -6225,9 +6363,8 @@ export default function ReportPage({
 											fontSize: "clamp(32px, 8vw, 70px)",
 										}}
 									>
-										化解提示
-									</h2>
-
+										{convertByRegion("化解提示", region)}
+									</h2>{" "}
 									{/* Show loading state if no AI content */}
 									{!analysis?.lifeAdvice?.tips ? (
 										<div
@@ -6256,7 +6393,10 @@ export default function ReportPage({
 														"clamp(14px, 3.5vw, 18px)",
 												}}
 											>
-												正在生成個人化建議...
+												{convertByRegion(
+													"正在生成個人化建議...",
+													region
+												)}
 											</p>
 											<p
 												className="text-gray-500"
@@ -6265,7 +6405,10 @@ export default function ReportPage({
 														"clamp(12px, 3vw, 14px)",
 												}}
 											>
-												AI正在根據您的八字命理分析，為您量身定制專屬的化解提示
+												{convertByRegion(
+													"AI正在根據您的八字命理分析，為您量身定制專屬的化解提示",
+													region
+												)}
 											</p>
 										</div>
 									) : (
@@ -6281,7 +6424,10 @@ export default function ReportPage({
 													lineHeight: 1.6,
 												}}
 											>
-												透過這些策略，你可以在生活和工作中更好地平衡才華與壓力，發揮自己的潛力，迎接機會的來臨。
+												{convertByRegion(
+													"透過這些策略，你可以在生活和工作中更好地平衡才華與壓力，發揮自己的潛力，迎接機會的來臨。",
+													region
+												)}
 											</p>
 										</>
 									)}
@@ -6305,7 +6451,10 @@ export default function ReportPage({
 																"clamp(18px, 4.5vw, 36px)",
 														}}
 													>
-														{tip.title}
+														{convertByRegion(
+															tip.title,
+															region
+														)}
 													</h3>
 													<p
 														className="leading-relaxed text-black"
@@ -6317,7 +6466,10 @@ export default function ReportPage({
 																"clamp(14px, 3.5vw, 20px)",
 														}}
 													>
-														{tip.content}
+														{convertByRegion(
+															tip.content,
+															region
+														)}
 													</p>
 													{tip.example && (
 														<div className="mt-3 sm:mt-4">
@@ -6330,7 +6482,10 @@ export default function ReportPage({
 																		"clamp(14px, 3.5vw, 20px)",
 																}}
 															>
-																例如：
+																{convertByRegion(
+																	"例如：",
+																	region
+																)}
 															</p>
 															<p
 																className="text-[#5A5A5A] leading-relaxed mt-1"
@@ -6341,7 +6496,10 @@ export default function ReportPage({
 																		"clamp(13px, 3.2vw, 20px)",
 																}}
 															>
-																{tip.example}
+																{convertByRegion(
+																	tip.example,
+																	region
+																)}
 															</p>
 														</div>
 													)}
@@ -6361,7 +6519,12 @@ export default function ReportPage({
 										marginBottom: "clamp(32px, 5vw, 88px)",
 									}}
 								>
-									<span>綜合調理與人生建議</span>
+									<span>
+										{convertByRegion(
+											"綜合調理與人生建議",
+											region
+										)}
+									</span>
 								</h3>
 
 								{isLoadingComprehensiveLifeAdvice ? (
@@ -6386,7 +6549,10 @@ export default function ReportPage({
 												</div>
 											</div>
 											<span className="text-lg sm:text-xl text-[#8B4513] text-center">
-												AI正在生成綜合人生建議...
+												{convertByRegion(
+													"AI正在生成綜合人生建議...",
+													region
+												)}
 											</span>
 										</div>
 									</div>
@@ -6495,7 +6661,10 @@ export default function ReportPage({
 																	"clamp(11px, 2.5vw, 18px)",
 															}}
 														>
-															{tab.key}
+															{convertByRegion(
+																tab.key,
+																region
+															)}
 														</span>
 													</div>
 												);
@@ -6514,7 +6683,10 @@ export default function ReportPage({
 														"clamp(28px, 6vw, 38px)",
 												}}
 											>
-												{activeComprehensiveTab}
+												{convertByRegion(
+													activeComprehensiveTab,
+													region
+												)}
 											</h4>
 										</div>
 
@@ -6551,7 +6723,10 @@ export default function ReportPage({
 																	"clamp(8px, 4vw, 22px)",
 															}}
 														>
-															{subTab}
+															{convertByRegion(
+																subTab,
+																region
+															)}
 														</button>
 													))}
 												</div>
@@ -6568,7 +6743,10 @@ export default function ReportPage({
 																		"clamp(20px, 5vw, 36px)",
 																}}
 															>
-																補益建議
+																{convertByRegion(
+																	"補益建議",
+																	region
+																)}
 															</h4>
 															<div
 																className="leading-relaxed text-black"
@@ -6603,9 +6781,10 @@ export default function ReportPage({
 																							•
 																						</span>
 																						<span>
-																							{
-																								item
-																							}
+																							{convertByRegion(
+																								item,
+																								region
+																							)}
 																						</span>
 																					</li>
 																				)
@@ -6613,17 +6792,21 @@ export default function ReportPage({
 																		</ul>
 																	) : (
 																		<p>
-																			{
+																			{convertByRegion(
 																				comprehensiveLifeAdvice
 																					.wuxingHarmony
 																					.summary
-																					.supplement
-																			}
+																					.supplement,
+																				region
+																			)}
 																		</p>
 																	)
 																) : (
 																	<p className="italic text-gray-500">
-																		暫無補益建議
+																		{convertByRegion(
+																			"暫無補益建議",
+																			region
+																		)}
 																	</p>
 																)}
 															</div>
@@ -6640,7 +6823,10 @@ export default function ReportPage({
 																		"clamp(20px, 5vw, 36px)",
 																}}
 															>
-																强化方法
+																{convertByRegion(
+																	"强化方法",
+																	region
+																)}
 															</h4>
 															<div
 																className="leading-relaxed text-black"
@@ -6675,9 +6861,10 @@ export default function ReportPage({
 																							•
 																						</span>
 																						<span>
-																							{
-																								item
-																							}
+																							{convertByRegion(
+																								item,
+																								region
+																							)}
 																						</span>
 																					</li>
 																				)
@@ -6685,17 +6872,21 @@ export default function ReportPage({
 																		</ul>
 																	) : (
 																		<p>
-																			{
+																			{convertByRegion(
 																				comprehensiveLifeAdvice
 																					.wuxingHarmony
 																					.summary
-																					.strengthen
-																			}
+																					.strengthen,
+																				region
+																			)}
 																		</p>
 																	)
 																) : (
 																	<p className="italic text-gray-500">
-																		暫無强化建議
+																		{convertByRegion(
+																			"暫無强化建議",
+																			region
+																		)}
 																	</p>
 																)}
 															</div>
@@ -6712,7 +6903,10 @@ export default function ReportPage({
 																		"clamp(20px, 5vw, 36px)",
 																}}
 															>
-																避免事項
+																{convertByRegion(
+																	"避免事項",
+																	region
+																)}
 															</h4>
 															<div
 																className="leading-relaxed text-black"
@@ -6747,9 +6941,10 @@ export default function ReportPage({
 																							•
 																						</span>
 																						<span>
-																							{
-																								item
-																							}
+																							{convertByRegion(
+																								item,
+																								region
+																							)}
 																						</span>
 																					</li>
 																				)
@@ -6757,17 +6952,21 @@ export default function ReportPage({
 																		</ul>
 																	) : (
 																		<p>
-																			{
+																			{convertByRegion(
 																				comprehensiveLifeAdvice
 																					.wuxingHarmony
 																					.summary
-																					.avoid
-																			}
+																					.avoid,
+																				region
+																			)}
 																		</p>
 																	)
 																) : (
 																	<p className="italic text-gray-500">
-																		暫無避免事項
+																		{convertByRegion(
+																			"暫無避免事項",
+																			region
+																		)}
 																	</p>
 																)}
 															</div>
@@ -6787,7 +6986,10 @@ export default function ReportPage({
 																	"clamp(16px, 4vw, 24px)",
 															}}
 														>
-															詳細說明
+															{convertByRegion(
+																"詳細說明",
+																region
+															)}
 														</h5>
 														<p
 															className="leading-relaxed text-black"
@@ -6796,11 +6998,12 @@ export default function ReportPage({
 																	"clamp(14px, 3.5vw, 20px)",
 															}}
 														>
-															{
+															{convertByRegion(
 																comprehensiveLifeAdvice
 																	.wuxingHarmony
-																	.detailed
-															}
+																	.detailed,
+																region
+															)}
 														</p>
 													</div>
 												)}
@@ -6838,7 +7041,10 @@ export default function ReportPage({
 																	"clamp(8px, 4vw, 22px)",
 															}}
 														>
-															{subTab}
+															{convertByRegion(
+																subTab,
+																region
+															)}
 														</button>
 													))}
 												</div>
@@ -6855,7 +7061,10 @@ export default function ReportPage({
 																		"clamp(20px, 5vw, 36px)",
 																}}
 															>
-																運動建議
+																{convertByRegion(
+																	"運動建議",
+																	region
+																)}
 															</h4>
 															<div
 																className="leading-relaxed text-black"
@@ -6888,9 +7097,10 @@ export default function ReportPage({
 																							•
 																						</span>
 																						<span>
-																							{
-																								item
-																							}
+																							{convertByRegion(
+																								item,
+																								region
+																							)}
 																						</span>
 																					</li>
 																				)
@@ -6898,16 +7108,20 @@ export default function ReportPage({
 																		</ul>
 																	) : (
 																		<p>
-																			{
+																			{convertByRegion(
 																				comprehensiveLifeAdvice
 																					.healthWellness
-																					.exercise
-																			}
+																					.exercise,
+																				region
+																			)}
 																		</p>
 																	)
 																) : (
 																	<p className="italic text-gray-500">
-																		暫無運動建議
+																		{convertByRegion(
+																			"暫無運動建議",
+																			region
+																		)}
 																	</p>
 																)}
 															</div>
@@ -6924,7 +7138,10 @@ export default function ReportPage({
 																		"clamp(20px, 5vw, 36px)",
 																}}
 															>
-																情緒調節
+																{convertByRegion(
+																	"情緒調節",
+																	region
+																)}
 															</h4>
 															<div
 																className="leading-relaxed text-black"
@@ -6937,15 +7154,19 @@ export default function ReportPage({
 																	.healthWellness
 																	?.emotion ? (
 																	<p>
-																		{
+																		{convertByRegion(
 																			comprehensiveLifeAdvice
 																				.healthWellness
-																				.emotion
-																		}
+																				.emotion,
+																			region
+																		)}
 																	</p>
 																) : (
 																	<p className="italic text-gray-500">
-																		暫無情緒調節建議
+																		{convertByRegion(
+																			"暫無情緒調節建議",
+																			region
+																		)}
 																	</p>
 																)}
 															</div>
@@ -6965,7 +7186,10 @@ export default function ReportPage({
 																	"clamp(16px, 4vw, 24px)",
 															}}
 														>
-															詳細說明
+															{convertByRegion(
+																"詳細說明",
+																region
+															)}
 														</h5>
 														<p
 															className="leading-relaxed text-black"
@@ -6974,11 +7198,12 @@ export default function ReportPage({
 																	"clamp(14px, 3.5vw, 20px)",
 															}}
 														>
-															{
+															{convertByRegion(
 																comprehensiveLifeAdvice
 																	.healthWellness
-																	.detailed
-															}
+																	.detailed,
+																region
+															)}
 														</p>
 													</div>
 												)}
@@ -7017,7 +7242,10 @@ export default function ReportPage({
 																	"clamp(8px, 4vw, 22px)",
 															}}
 														>
-															{subTab}
+															{convertByRegion(
+																subTab,
+																region
+															)}
 														</button>
 													))}
 												</div>
@@ -7037,7 +7265,10 @@ export default function ReportPage({
 																			"clamp(20px, 5vw, 36px)",
 																	}}
 																>
-																	近期事業方向
+																	{convertByRegion(
+																		"近期事業方向",
+																		region
+																	)}
 																</h4>
 																<div
 																	className="leading-relaxed text-black"
@@ -7051,11 +7282,12 @@ export default function ReportPage({
 																		.nearTerm ===
 																	"string" ? (
 																		<p className="leading-relaxed">
-																			{
+																			{convertByRegion(
 																				comprehensiveLifeAdvice
 																					.careerDirection
-																					.nearTerm
-																			}
+																					.nearTerm,
+																				region
+																			)}
 																		</p>
 																	) : (
 																		<div className="space-y-3">
@@ -7065,14 +7297,18 @@ export default function ReportPage({
 																				.ageRange && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						年齡範圍：
+																						{convertByRegion(
+																							"年齡範圍：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.nearTerm
-																							.ageRange
-																					}
+																							.ageRange,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7081,14 +7317,18 @@ export default function ReportPage({
 																				.pattern && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						格局：
+																						{convertByRegion(
+																							"格局：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.nearTerm
-																							.pattern
-																					}
+																							.pattern,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7097,21 +7337,27 @@ export default function ReportPage({
 																				.industries && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						推薦行業：
+																						{convertByRegion(
+																							"推薦行業：",
+																							region
+																						)}
 																					</strong>
-																					{Array.isArray(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.nearTerm
-																							.industries
-																					)
-																						? comprehensiveLifeAdvice.careerDirection.nearTerm.industries.join(
-																								"、"
-																							)
-																						: comprehensiveLifeAdvice
+																					{convertByRegion(
+																						Array.isArray(
+																							comprehensiveLifeAdvice
 																								.careerDirection
 																								.nearTerm
-																								.industries}
+																								.industries
+																						)
+																							? comprehensiveLifeAdvice.careerDirection.nearTerm.industries.join(
+																									"、"
+																								)
+																							: comprehensiveLifeAdvice
+																									.careerDirection
+																									.nearTerm
+																									.industries,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7120,14 +7366,18 @@ export default function ReportPage({
 																				.risk && (
 																				<p>
 																					<strong className="text-[#B4003C]">
-																						風險預警：
+																						{convertByRegion(
+																							"風險預警：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.nearTerm
-																							.risk
-																					}
+																							.risk,
+																						region
+																					)}
 																				</p>
 																			)}
 																		</div>
@@ -7149,7 +7399,10 @@ export default function ReportPage({
 																			"clamp(20px, 5vw, 36px)",
 																	}}
 																>
-																	中期事業方向
+																	{convertByRegion(
+																		"中期事業方向",
+																		region
+																	)}
 																</h4>
 																<div
 																	className="leading-relaxed text-black"
@@ -7163,11 +7416,12 @@ export default function ReportPage({
 																		.midTerm ===
 																	"string" ? (
 																		<p className="leading-relaxed">
-																			{
+																			{convertByRegion(
 																				comprehensiveLifeAdvice
 																					.careerDirection
-																					.midTerm
-																			}
+																					.midTerm,
+																				region
+																			)}
 																		</p>
 																	) : (
 																		<div className="space-y-3">
@@ -7177,14 +7431,18 @@ export default function ReportPage({
 																				.ageRange && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						年齡範圍：
+																						{convertByRegion(
+																							"年齡範圍：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.midTerm
-																							.ageRange
-																					}
+																							.ageRange,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7193,14 +7451,18 @@ export default function ReportPage({
 																				.transformation && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						轉化：
+																						{convertByRegion(
+																							"轉化：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.midTerm
-																							.transformation
-																					}
+																							.transformation,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7209,14 +7471,18 @@ export default function ReportPage({
 																				.strategy && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						策略：
+																						{convertByRegion(
+																							"策略：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.midTerm
-																							.strategy
-																					}
+																							.strategy,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7225,14 +7491,18 @@ export default function ReportPage({
 																				.decision && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						決策：
+																						{convertByRegion(
+																							"決策：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.midTerm
-																							.decision
-																					}
+																							.decision,
+																						region
+																					)}
 																				</p>
 																			)}
 																		</div>
@@ -7254,7 +7524,10 @@ export default function ReportPage({
 																			"clamp(20px, 5vw, 36px)",
 																	}}
 																>
-																	遠期事業方向
+																	{convertByRegion(
+																		"遠期事業方向",
+																		region
+																	)}
 																</h4>
 																<div
 																	className="leading-relaxed text-black"
@@ -7268,11 +7541,12 @@ export default function ReportPage({
 																		.longTerm ===
 																	"string" ? (
 																		<p className="leading-relaxed">
-																			{
+																			{convertByRegion(
 																				comprehensiveLifeAdvice
 																					.careerDirection
-																					.longTerm
-																			}
+																					.longTerm,
+																				region
+																			)}
 																		</p>
 																	) : (
 																		<div className="space-y-3">
@@ -7282,14 +7556,18 @@ export default function ReportPage({
 																				.ageRange && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						年齡範圍：
+																						{convertByRegion(
+																							"年齡範圍：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.longTerm
-																							.ageRange
-																					}
+																							.ageRange,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7298,14 +7576,18 @@ export default function ReportPage({
 																				.fortune && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						運勢：
+																						{convertByRegion(
+																							"運勢：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.longTerm
-																							.fortune
-																					}
+																							.fortune,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7314,14 +7596,18 @@ export default function ReportPage({
 																				.knowledge && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						知識：
+																						{convertByRegion(
+																							"知識：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.longTerm
-																							.knowledge
-																					}
+																							.knowledge,
+																						region
+																					)}
 																				</p>
 																			)}
 																			{comprehensiveLifeAdvice
@@ -7330,14 +7616,18 @@ export default function ReportPage({
 																				.wellness && (
 																				<p>
 																					<strong className="text-[#007BFF]">
-																						養生：
+																						{convertByRegion(
+																							"養生：",
+																							region
+																						)}
 																					</strong>
-																					{
+																					{convertByRegion(
 																						comprehensiveLifeAdvice
 																							.careerDirection
 																							.longTerm
-																							.wellness
-																					}
+																							.wellness,
+																						region
+																					)}
 																				</p>
 																			)}
 																		</div>
@@ -7359,7 +7649,10 @@ export default function ReportPage({
 																	"clamp(16px, 4vw, 24px)",
 															}}
 														>
-															詳細說明
+															{convertByRegion(
+																"詳細說明",
+																region
+															)}
 														</h5>
 														<p
 															className="leading-relaxed text-black"
@@ -7368,11 +7661,12 @@ export default function ReportPage({
 																	"clamp(14px, 3.5vw, 20px)",
 															}}
 														>
-															{
+															{convertByRegion(
 																comprehensiveLifeAdvice
 																	.careerDirection
-																	.detailed
-															}
+																	.detailed,
+																region
+															)}
 														</p>
 													</div>
 												)}

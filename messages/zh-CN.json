@@ -1568,5 +1568,81 @@
 				"consequence": "后果"
 			}
 		}
+	},
+	"reportHistory": {
+		"title": "历史记录",
+		"subtitle": "查看您的所有报告记录",
+		"loading": "载入中...",
+		"coupleReports": {
+			"title": "合盘报告",
+			"loading": "载入合盘报告中...",
+			"noRecords": "尚无合盘报告记录",
+			"noRecordsHint": "完成合盘测算后，报告将显示在这里",
+			"card": {
+				"title": "合盘分析报告",
+				"person1": "对象一",
+				"person2": "对象二",
+				"calculationDate": "测算日期",
+				"statusCompleted": "✓ 已完成",
+				"statusProcessing": "⏳ 测算中",
+				"viewReport": "查看报告"
+			}
+		},
+		"lifeReports": {
+			"title": "人生报告",
+			"loading": "载入人生报告中...",
+			"noRecords": "尚无人生报告记录",
+			"noRecordsHint": "完成人生测算后，报告将显示在这里",
+			"card": {
+				"title": "人生分析报告",
+				"person": "命主",
+				"calculationDate": "测算日期",
+				"statusCompleted": "✓ 已完成",
+				"statusProcessing": "⏳ 测算中",
+				"viewReport": "查看报告"
+			}
+		},
+		"fortuneReports": {
+			"title": "个人流年报告",
+			"noRecords": "暂无报告记录",
+			"noRecordsHint": "您还没有测算任何命理报告",
+			"startCalculation": "开始测算",
+			"card": {
+				"titleSuffix": "分析报告",
+				"person": "命主",
+				"calculationDate": "测算日期",
+				"statusCompleted": "✓ 已完成",
+				"statusProcessing": "⏳ 测算中",
+				"viewReport": "查看报告"
+			},
+			"concerns": {
+				"事業": "事业",
+				"感情": "感情",
+				"財運": "财运",
+				"健康": "健康",
+				"學業": "学业",
+				"analysisReport": "分析报告"
+			}
+		},
+		"gender": {
+			"male": "男",
+			"female": "女",
+			"unknown": "未知"
+		},
+		"pagination": {
+			"showing": "显示第",
+			"to": "至",
+			"of": "项，共",
+			"items": "项",
+			"previous": "上一页",
+			"next": "下一页"
+		},
+		"errors": {
+			"userInfo": "无法获取用户信息，请先登录",
+			"fetchFailed": "获取报告失败",
+			"networkError": "网络错误，请稍后再试",
+			"coupleFetchFailed": "获取合盘报告失败",
+			"lifeFetchFailed": "获取人生报告失败"
+		}
 	}
 }

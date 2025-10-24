@@ -3,13 +3,17 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 
 const ReportHistoryPage = () => {
 	const { data: session, status } = useSession();
 	const router = useRouter();
+	const params = useParams();
+	const locale = params.locale || "zh-TW";
+	const t = useTranslations("reportHistory");
 	const [reports, setReports] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -51,14 +55,14 @@ const ReportHistoryPage = () => {
 			// Check if user has session storage data
 			const storedEmail = localStorage.getItem("userEmail");
 			if (!storedEmail) {
-				router.push("/zh-TW/auth/login");
+				router.push(`/${locale}/auth/login`);
 				return;
 			}
 		}
 		fetchReports();
 		fetchCoupleReports();
 		fetchLifeReports();
-	}, [session, status]);
+	}, [session, status, locale]);
 
 	const fetchReports = async (page = 1) => {
 		try {
@@ -73,7 +77,7 @@ const ReportHistoryPage = () => {
 			}
 
 			if (!userEmail && !userId) {
-				setError("無法獲取用戶信息，請先登錄");
+				setError(t("errors.userInfo"));
 				return;
 			}
 
@@ -92,11 +96,11 @@ const ReportHistoryPage = () => {
 				setPagination(data.data.pagination);
 				setError(null);
 			} else {
-				setError(data.error || "獲取報告失敗");
+				setError(data.error || t("errors.fetchFailed"));
 			}
 		} catch (err) {
 			console.error("Fetch reports error:", err);
-			setError("網絡錯誤，請稍後再試");
+			setError(t("errors.networkError"));
 		} finally {
 			setLoading(false);
 		}
@@ -115,7 +119,7 @@ const ReportHistoryPage = () => {
 			}
 
 			if (!userEmail && !userId) {
-				setCoupleError("無法獲取用戶信息，請先登錄");
+				setCoupleError(t("errors.userInfo"));
 				return;
 			}
 
@@ -137,11 +141,11 @@ const ReportHistoryPage = () => {
 				setCouplePagination(data.data.pagination);
 				setCoupleError(null);
 			} else {
-				setCoupleError(data.error || "獲取合盤報告失敗");
+				setCoupleError(data.error || t("errors.coupleFetchFailed"));
 			}
 		} catch (err) {
 			console.error("Error fetching couple reports:", err);
-			setCoupleError("網絡錯誤，請稍後再試");
+			setCoupleError(t("errors.networkError"));
 		} finally {
 			setCoupleLoading(false);
 		}
@@ -174,7 +178,7 @@ const ReportHistoryPage = () => {
 			}
 
 			if (!userEmail && !userId) {
-				setLifeError("無法獲取用戶信息，請先登錄");
+				setLifeError(t("errors.userInfo"));
 				return;
 			}
 
@@ -224,20 +228,20 @@ const ReportHistoryPage = () => {
 				setLifePagination(data.data.pagination);
 				setLifeError(null);
 			} else {
-				setLifeError(data.error || "獲取人生報告失敗");
+				setLifeError(data.error || t("errors.lifeFetchFailed"));
 			}
 		} catch (err) {
 			console.error("Error fetching life reports:", err);
-			setLifeError("網絡錯誤，請稍後再試");
+			setLifeError(t("errors.networkError"));
 		} finally {
 			setLifeLoading(false);
 		}
 	};
 
 	const formatDate = (dateString) => {
-		if (!dateString) return "未知";
+		if (!dateString) return t("gender.unknown");
 		const date = new Date(dateString);
-		return date.toLocaleDateString("zh-TW", {
+		return date.toLocaleDateString(locale === "zh-CN" ? "zh-CN" : "zh-TW", {
 			year: "numeric",
 			month: "2-digit",
 			day: "2-digit",
@@ -245,35 +249,57 @@ const ReportHistoryPage = () => {
 	};
 
 	const formatBirthday = (birthday) => {
-		if (!birthday) return "未知";
+		if (!birthday) return t("gender.unknown");
 		return birthday.replace(/-/g, "/");
 	};
 
 	const getReportTypeLabel = (type) => {
 		switch (type) {
 			case "fortune":
-				return "命理測算";
+				return t("fortuneReports.concerns.事業");
 			case "couple":
-				return "合婚分析";
+				return t("coupleReports.title");
 			case "bazhai":
-				return "八宅風水";
+				return t("fortuneReports.concerns.事業");
 			default:
-				return "命理測算";
+				return t("fortuneReports.concerns.事業");
 		}
 	};
 
 	const getConcernLabel = (concern) => {
-		const concernMap = {
+		// Map simplified Chinese to traditional Chinese keys
+		const concernMapping = {
+			事业: "事業",
 			事業: "事業",
 			感情: "感情",
+			财运: "財運",
 			財運: "財運",
 			健康: "健康",
+			学业: "學業",
 			學業: "學業",
 		};
-		return concernMap[concern] || concern || "一般";
+
+		const concernKey = concernMapping[concern] || concern || "事業";
+		return t(`fortuneReports.concerns.${concernKey}`, {
+			defaultValue: concern || "事業",
+		});
 	};
 
 	const getConcernImage = (concern) => {
+		// Normalize concern to traditional Chinese for image lookup
+		const concernMapping = {
+			事业: "事業",
+			事業: "事業",
+			感情: "感情",
+			财运: "財運",
+			財運: "財運",
+			健康: "健康",
+			学业: "學業",
+			學業: "學業",
+		};
+
+		const normalizedConcern = concernMapping[concern] || concern || "事業";
+
 		const imageMap = {
 			事業: "/images/demo/career.png",
 			感情: "/images/demo/relationship.png",
@@ -281,11 +307,13 @@ const ReportHistoryPage = () => {
 			健康: "/images/demo/health.png",
 			學業: "/images/demo/career.png", // Using career image for study as fallback
 		};
-		return imageMap[concern] || "/images/demo/career.png";
+		return imageMap[normalizedConcern] || "/images/demo/career.png";
 	};
 
 	const getGenderLabel = (gender) => {
-		return gender === "male" ? "男" : gender === "female" ? "女" : "未知";
+		if (gender === "male") return t("gender.male");
+		if (gender === "female") return t("gender.female");
+		return t("gender.unknown");
 	};
 
 	const handlePageChange = (newPage) => {
@@ -313,7 +341,7 @@ const ReportHistoryPage = () => {
 				<div className="flex items-center justify-center flex-1 py-8">
 					<div className="text-center">
 						<div className="w-12 h-12 mx-auto mb-4 border-b-2 border-blue-600 rounded-full animate-spin"></div>
-						<p className="text-gray-600">載入中...</p>
+						<p className="text-gray-600">{t("loading")}</p>
 					</div>
 				</div>
 				<Footer />
@@ -336,7 +364,7 @@ const ReportHistoryPage = () => {
 								WebkitTextStroke: "1px #567156",
 							}}
 						>
-							歷史紀錄
+							{t("title")}
 						</h1>
 						<p
 							className=" text-[30px]"
@@ -345,7 +373,7 @@ const ReportHistoryPage = () => {
 								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
-							查看您的所有報告記錄
+							{t("subtitle")}
 						</p>
 					</div>
 
@@ -358,14 +386,14 @@ const ReportHistoryPage = () => {
 								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
-							合盤報告
+							{t("coupleReports.title")}
 						</h2>
 
 						{coupleLoading ? (
 							<div className="py-8 text-center">
 								<div className="w-8 h-8 mx-auto border-b-2 border-blue-600 rounded-full animate-spin"></div>
 								<p className="mt-2 text-gray-600">
-									載入合盤報告中...
+									{t("coupleReports.loading")}
 								</p>
 							</div>
 						) : coupleError ? (
@@ -380,10 +408,10 @@ const ReportHistoryPage = () => {
 							<div className="py-8 text-center">
 								<div className="p-8 border border-gray-200 rounded-md bg-gray-50">
 									<p className="text-lg text-gray-500">
-										尚無合盤報告記錄
+										{t("coupleReports.noRecords")}
 									</p>
 									<p className="mt-2 text-sm text-gray-400">
-										完成合盤測算後，報告將顯示在這裡
+										{t("coupleReports.noRecordsHint")}
 									</p>
 								</div>
 							</div>
@@ -410,14 +438,19 @@ const ReportHistoryPage = () => {
 													{/* Title */}
 													<div className="text-center">
 														<h3 className="mb-1 text-lg font-bold text-gray-900">
-															合盤分析報告
+															{t(
+																"coupleReports.card.title"
+															)}
 														</h3>
 													</div>
 
 													{/* Two People Info */}
 													<div className="text-center">
 														<h4 className="mb-1 text-lg font-semibold text-gray-900">
-															對象一(
+															{t(
+																"coupleReports.card.person1"
+															)}
+															(
 															{getGenderLabel(
 																report
 																	.userInputs
@@ -433,7 +466,10 @@ const ReportHistoryPage = () => {
 															)}
 														</p>
 														<h4 className="mt-2 mb-1 text-lg font-semibold text-gray-900">
-															對象二(
+															{t(
+																"coupleReports.card.person2"
+															)}
+															(
 															{getGenderLabel(
 																report
 																	.userInputs
@@ -453,7 +489,10 @@ const ReportHistoryPage = () => {
 													{/* Generation Date */}
 													<div className="pt-2 text-center border-t border-gray-100">
 														<p className="text-sm font-medium text-gray-700">
-															測算日期:{" "}
+															{t(
+																"coupleReports.card.calculationDate"
+															)}
+															:{" "}
 															{formatDate(
 																report.reportGeneratedAt ||
 																	report.createdAt
@@ -471,8 +510,12 @@ const ReportHistoryPage = () => {
 															}`}
 														>
 															{report.reportGenerated
-																? "✓ 已完成"
-																: "⏳ 測算中"}
+																? t(
+																		"coupleReports.card.statusCompleted"
+																	)
+																: t(
+																		"coupleReports.card.statusProcessing"
+																	)}
 														</span>
 													</div>
 												</div>
@@ -481,10 +524,12 @@ const ReportHistoryPage = () => {
 												<div className="mt-4">
 													{report.reportGenerated && (
 														<Link
-															href={`/zh-TW/couple-report?sessionId=${report.sessionId}`}
+															href={`/${locale}/couple-report?sessionId=${report.sessionId}`}
 															className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
 														>
-															查看報告
+															{t(
+																"coupleReports.card.viewReport"
+															)}
 														</Link>
 													)}
 												</div>
@@ -507,7 +552,7 @@ const ReportHistoryPage = () => {
 											}
 											className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
 										>
-											上一頁
+											{t("pagination.previous")}
 										</button>
 										<span className="px-3 py-2 text-sm font-medium text-gray-700">
 											{couplePagination.currentPage} /{" "}
@@ -525,7 +570,7 @@ const ReportHistoryPage = () => {
 											}
 											className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
 										>
-											下一頁
+											{t("pagination.next")}
 										</button>
 									</div>
 								)}
@@ -542,14 +587,14 @@ const ReportHistoryPage = () => {
 								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
-							人生報告
+							{t("lifeReports.title")}
 						</h2>
 
 						{lifeLoading ? (
 							<div className="py-8 text-center">
 								<div className="w-8 h-8 mx-auto border-b-2 border-green-600 rounded-full animate-spin"></div>
 								<p className="mt-2 text-gray-600">
-									載入人生報告中...
+									{t("lifeReports.loading")}
 								</p>
 							</div>
 						) : lifeError ? (
@@ -562,10 +607,10 @@ const ReportHistoryPage = () => {
 							<div className="py-8 text-center">
 								<div className="p-8 border border-gray-200 rounded-md bg-gray-50">
 									<p className="text-lg text-gray-500">
-										尚無人生報告記錄
+										{t("lifeReports.noRecords")}
 									</p>
 									<p className="mt-2 text-sm text-gray-400">
-										完成人生測算後，報告將顯示在這裡
+										{t("lifeReports.noRecordsHint")}
 									</p>
 								</div>
 							</div>
@@ -592,14 +637,19 @@ const ReportHistoryPage = () => {
 													{/* Title */}
 													<div className="text-center">
 														<h3 className="mb-1 text-lg font-bold text-gray-900">
-															人生分析報告
+															{t(
+																"lifeReports.card.title"
+															)}
 														</h3>
 													</div>
 
 													{/* Birthday and Gender */}
 													<div className="text-center">
 														<h4 className="mb-1 text-lg font-semibold text-gray-900">
-															命主(
+															{t(
+																"lifeReports.card.person"
+															)}
+															(
 															{getGenderLabel(
 																report
 																	.userInputs
@@ -615,14 +665,19 @@ const ReportHistoryPage = () => {
 																			.userInputs
 																			.birthday
 																	)
-																: "未知"}
+																: t(
+																		"gender.unknown"
+																	)}
 														</p>
 													</div>
 
 													{/* Generation Date */}
 													<div className="pt-2 text-center border-t border-gray-100">
 														<p className="text-sm font-medium text-gray-700">
-															測算日期:{" "}
+															{t(
+																"lifeReports.card.calculationDate"
+															)}
+															:{" "}
 															{formatDate(
 																report.reportGeneratedAt ||
 																	report.updatedAt
@@ -640,8 +695,12 @@ const ReportHistoryPage = () => {
 															}`}
 														>
 															{report.reportGenerated
-																? "✓ 已完成"
-																: "⏳ 測算中"}
+																? t(
+																		"lifeReports.card.statusCompleted"
+																	)
+																: t(
+																		"lifeReports.card.statusProcessing"
+																	)}
 														</span>
 													</div>
 												</div>
@@ -650,10 +709,12 @@ const ReportHistoryPage = () => {
 												<div className="mt-4">
 													{report.reportGenerated && (
 														<Link
-															href={`/zh-TW/report?sessionId=${report.sessionId}&birthDateTime=${report.userInputs?.birthday || ""}&gender=${report.userInputs?.gender || ""}&showHistorical=true`}
+															href={`/${locale}/report?sessionId=${report.sessionId}&birthDateTime=${report.userInputs?.birthday || ""}&gender=${report.userInputs?.gender || ""}&showHistorical=true`}
 															className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-green-600 border border-transparent rounded-md hover:bg-green-700"
 														>
-															查看報告
+															{t(
+																"lifeReports.card.viewReport"
+															)}
 														</Link>
 													)}
 												</div>
@@ -676,7 +737,7 @@ const ReportHistoryPage = () => {
 											}
 											className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
 										>
-											上一頁
+											{t("pagination.previous")}
 										</button>
 										<span className="px-3 py-2 text-sm font-medium text-gray-700">
 											{lifePagination.currentPage} /{" "}
@@ -694,7 +755,7 @@ const ReportHistoryPage = () => {
 											}
 											className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
 										>
-											下一頁
+											{t("pagination.next")}
 										</button>
 									</div>
 								)}
@@ -711,7 +772,7 @@ const ReportHistoryPage = () => {
 								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
-							個人流年報告
+							{t("fortuneReports.title")}
 						</h2>
 					</div>
 
@@ -760,16 +821,16 @@ const ReportHistoryPage = () => {
 								</svg>
 							</div>
 							<h3 className="mb-2 text-lg font-medium text-gray-900">
-								暫無報告記錄
+								{t("fortuneReports.noRecords")}
 							</h3>
 							<p className="mb-4 text-gray-500">
-								您還沒有測算任何命理報告
+								{t("fortuneReports.noRecordsHint")}
 							</p>
 							<Link
-								href="/zh-TW/fortune-entry"
+								href={`/${locale}/fortune-entry`}
 								className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700"
 							>
-								開始測算
+								{t("fortuneReports.startCalculation")}
 							</Link>
 						</div>
 					) : (
@@ -800,14 +861,19 @@ const ReportHistoryPage = () => {
 															report.userInputs
 																?.concern
 														)}
-														分析報告
+														{t(
+															"fortuneReports.card.titleSuffix"
+														)}
 													</h3>
 												</div>
 
 												{/* Birthday and Gender */}
 												<div className="text-center">
 													<h4 className="mb-1 text-lg font-semibold text-gray-900">
-														命主(
+														{t(
+															"fortuneReports.card.person"
+														)}
+														(
 														{getGenderLabel(
 															report.userInputs
 																?.gender
@@ -825,7 +891,10 @@ const ReportHistoryPage = () => {
 												{/* Generation Date */}
 												<div className="pt-2 text-center border-t border-gray-100">
 													<p className="text-sm font-medium text-gray-700">
-														測算日期:{" "}
+														{t(
+															"fortuneReports.card.calculationDate"
+														)}
+														:{" "}
 														{formatDate(
 															report.reportGeneratedAt ||
 																report.createdAt
@@ -843,8 +912,12 @@ const ReportHistoryPage = () => {
 														}`}
 													>
 														{report.reportGenerated
-															? "✓ 已完成"
-															: "⏳ 測算中"}
+															? t(
+																	"fortuneReports.card.statusCompleted"
+																)
+															: t(
+																	"fortuneReports.card.statusProcessing"
+																)}
 													</span>
 												</div>
 											</div>
@@ -852,7 +925,7 @@ const ReportHistoryPage = () => {
 											{/* Action Button */}
 											<div className="mt-4">
 												<Link
-													href={`/zh-TW/feng-shui-report?sessionId=${
+													href={`/${locale}/feng-shui-report?sessionId=${
 														report.sessionId
 													}&birthday=${report.userInputs?.birthday || ""}&gender=${
 														report.userInputs
@@ -863,7 +936,9 @@ const ReportHistoryPage = () => {
 													}&showHistorical=true`}
 													className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
 												>
-													查看報告
+													{t(
+														"fortuneReports.card.viewReport"
+													)}
 												</Link>
 											</div>
 										</div>
@@ -876,15 +951,17 @@ const ReportHistoryPage = () => {
 								<div className="flex items-center justify-between mt-8">
 									<div className="flex items-center text-sm text-gray-700">
 										<span>
-											顯示第{" "}
+											{t("pagination.showing")}{" "}
 											{(pagination.currentPage - 1) * 12 +
 												1}{" "}
-											至{" "}
+											{t("pagination.to")}{" "}
 											{Math.min(
 												pagination.currentPage * 12,
 												pagination.totalCount
 											)}{" "}
-											項，共 {pagination.totalCount} 項
+											{t("pagination.of")}{" "}
+											{pagination.totalCount}{" "}
+											{t("pagination.items")}
 										</span>
 									</div>
 									<div className="flex items-center space-x-2">
@@ -897,7 +974,7 @@ const ReportHistoryPage = () => {
 											disabled={!pagination.hasPrevPage}
 											className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
 										>
-											上一頁
+											{t("pagination.previous")}
 										</button>
 										<span className="px-3 py-2 text-sm font-medium text-gray-700">
 											{pagination.currentPage} /{" "}
@@ -912,7 +989,7 @@ const ReportHistoryPage = () => {
 											disabled={!pagination.hasNextPage}
 											className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
 										>
-											下一頁
+											{t("pagination.next")}
 										</button>
 									</div>
 								</div>
