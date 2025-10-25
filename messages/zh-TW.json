@@ -1444,6 +1444,8 @@
 		"daysAgo": "天前",
 		"title": "風鈴聊天室",
 		"placeholder": "有任何疑問嗎？請隨時與我分享～",
+		"aiName": "風鈴",
+		"aiThinking": "風鈴費神運算中",
 		"shortcuts": {
 			"wealth": "我想增多財運",
 			"health": "如何更健康",

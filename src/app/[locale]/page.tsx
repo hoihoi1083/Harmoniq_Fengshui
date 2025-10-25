@@ -1946,7 +1946,10 @@ export default function Home() {
 													/>
 													<div>
 														<div className="text-sm font-medium text-black md:text-base">
-															風鈴
+															{currentLocale ===
+															"zh-CN"
+																? "风铃"
+																: "風鈴"}
 														</div>
 													</div>
 												</div>
@@ -2370,7 +2373,7 @@ export default function Home() {
 										<div className="flex items-center p-3 md:p-4">
 											<img
 												src="/images/風水妹/風水妹2.png"
-												alt="風鈴"
+												alt={t("aiName")}
 												className="w-10 h-10 mr-2 rounded-full shadow:lg md:w-12 md:h-12 md:mr-3"
 												onError={(e) => {
 													(
@@ -2380,14 +2383,14 @@ export default function Home() {
 											/>
 											<div>
 												<div className="font-medium text-black">
-													風鈴
+													{t("aiName")}
 												</div>
 											</div>
 										</div>
 										<div className="px-3 pb-3 md:px-4 md:pb-4">
 											<div className="flex items-center space-x-2">
 												<span className="text-sm text-black">
-													風鈴費神運算中
+													{t("aiThinking")}
 												</span>
 												<Brain className="w-4 h-4 text-purple-600 animate-pulse" />
 												<div className="w-32 h-2 overflow-hidden bg-gray-200 rounded-full">
@@ -2423,7 +2426,11 @@ export default function Home() {
 											setInputMessage(e.target.value)
 										}
 										onKeyPress={handleKeyPress}
-										placeholder="輸入任何問題，風鈴會分析並引導你..."
+										placeholder={
+											currentLocale === "zh-CN"
+												? "输入任何问题，风铃会分析并引导你..."
+												: "輸入任何問題，風鈴會分析並引導你..."
+										}
 										className="flex-1 px-2 py-2 text-xs text-black placeholder-gray-500 bg-transparent resize-none focus:outline-none sm:px-3 sm:py-2.5 sm:text-sm md:px-6 md:py-3 md:text-base"
 										rows={1}
 										disabled={isLoading}

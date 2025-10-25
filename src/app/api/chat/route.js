@@ -453,8 +453,13 @@ function analyzeDetailedEmotion(message) {
 
 export async function POST(request) {
 	try {
-		const { messages, userProfile, emotion, context } =
-			await request.json();
+		const {
+			messages,
+			userProfile,
+			emotion,
+			context,
+			locale = "zh-TW",
+		} = await request.json();
 
 		// Get session for intent tracking
 		// const session = await getServerSession();

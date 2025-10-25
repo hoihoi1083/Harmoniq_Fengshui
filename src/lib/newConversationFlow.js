@@ -1,7 +1,9 @@
 // 改進的對話流程系統 - 自然對話式引導
+import { getTranslation, getRandomTranslation } from "./chatTranslations.js";
+
 export class ImprovedConversationFlow {
 	// 🆕 新增：分析非核心領域的用戶輸入
-	static async analyzeNonCoreUserInput(message) {
+	static async analyzeNonCoreUserInput(message, locale = "zh-TW") {
 		// 核心服務領域
 		const coreAreas = [
 			"工作",
@@ -27,7 +29,7 @@ export class ImprovedConversationFlow {
 	}
 
 	// 🆕 處理非核心用戶輸入
-	static async handleNonCoreInput(message) {
+	static async handleNonCoreInput(message, locale = "zh-TW") {
 		// 常見錯字檢測模式
 		const typoPatterns = [
 			{ pattern: /[工]作/, suggestion: "工作", typo: true },
@@ -46,24 +48,20 @@ export class ImprovedConversationFlow {
 					isCoreArea: false,
 					isTypo: typo,
 					suggestedCoreArea: suggestion,
-					aiResponse: `😊 風鈴覺得你可能想問的是「${suggestion}」的問題呢！如果不是的話，請再說得清楚一點哦～
-
-我們的專業風水服務包括：
-💼 **工作** - 事業發展、職場關係
-💕 **感情** - 桃花運、婚姻配對  
-💰 **財運** - 財富增長、投資運勢
-👶 **子女** - 子女運、教育發展
-🤝 **人際關係** - 社交運、人緣改善
-🏥 **健康** - 身心靈調理、養生風水
-✨ **因緣** - 機會把握、命運改善
-
-你想了解哪個方面呢？`,
+					aiResponse:
+						getTranslation(
+							locale,
+							"nonCoreInput.typoSuggestion",
+							suggestion
+						) +
+						"\n\n" +
+						getTranslation(locale, "nonCoreInput.serviceIntro"),
 				};
 			}
 		}
 
 		// 分析用戶意圖並引導到核心領域
-		return await this.analyzeAndGuideToCore(message);
+		return await this.analyzeAndGuideToCore(message, locale);
 	}
 
 	// 🆕 檢查是否為話題偏離（用戶已有核心關注但突然問無關問題）
@@ -518,6 +516,7 @@ export class ImprovedConversationFlow {
 		message,
 		concern,
 		emotion,
+		locale = "zh-TW",
 		messageLength = 0
 	) {
 		// console.log("🎯 generateNaturalResponse被調用，message:", message);
@@ -580,13 +579,19 @@ export class ImprovedConversationFlow {
 		// 階段1：初始對話，建立關係
 		if (conversationState === "initial" || !conversationState) {
 			if (emotion === "平靜" && !concern) {
-				return "你好呀～我係風鈴！✨ 有咩生活上嘅困擾想搵我傾傾呢？無論係工作、感情、財運定係健康，我都可以幫你分析風水運勢架～";
+				return getTranslation(locale, "initialGreeting");
 			} else if (concern) {
-				return this.generateConcernIntroResponse(concern, emotion);
+				return this.generateConcernIntroResponse(
+					concern,
+					emotion,
+					locale
+				);
 			} else {
 				return (
-					this.generateEmotionalComfort(emotion) +
-					"可以話俾我知發生咩事嗎？我會用心聆聽。"
+					this.generateEmotionalComfort(emotion, locale) +
+					(locale === "zh-TW"
+						? "可以話俾我知發生咩事嗎？我會用心聆聽。"
+						: "可以告诉我发生什么事吗？我会用心聆听。")
 				);
 			}
 		}
@@ -609,17 +614,14 @@ export class ImprovedConversationFlow {
 				!hasBirthday
 			) {
 				if (relationshipAnalysisType === "individual") {
-					return (
-						"好！我會為你進行個人感情分析 🌸\n\n" +
-						"為咗更準確分析你嘅感情運勢，我需要你嘅出生日期。\n" +
-						"請提供：出生年月日（例如：1990年5月15日）"
+					return getTranslation(
+						locale,
+						"relationshipAnalysis.individualChoice"
 					);
 				} else if (relationshipAnalysisType === "couple") {
-					return (
-						"好！我會為你哋進行合婚配對分析 💕\n\n" +
-						"為咗分析你哋嘅八字合配度，我需要兩個人嘅出生資料：\n" +
-						"1️⃣ 首先請提供你嘅出生年月日（例如：1990年5月15日）\n" +
-						"2️⃣ 之後會請你提供伴侶嘅出生資料"
+					return getTranslation(
+						locale,
+						"relationshipAnalysis.coupleChoice"
 					);
 				}
 			}
@@ -632,13 +634,9 @@ export class ImprovedConversationFlow {
 				hasPartnerBirthday &&
 				!hasSpecificProblem
 			) {
-				return (
-					"好！我已經收集咗你哋兩個人嘅出生資料 💕\n\n" +
-					"現在請告訴我你哋嘅具體感情問題，比如：\n" +
-					"• 你哋嘅關係遇到咩困難？\n" +
-					"• 想了解你哋嘅合配度？\n" +
-					"• 有咩特別想改善嘅地方？\n\n" +
-					"我會根據你哋嘅八字進行合婚分析。"
+				return getTranslation(
+					locale,
+					"relationshipAnalysis.withBothBirthdays"
 				);
 			}
 
@@ -762,119 +760,46 @@ export class ImprovedConversationFlow {
 
 		// 如果在任何階段收到生日信息
 		if (this.detectBirthdayInfo(message).hasBirthday && !hasBirthday) {
-			return this.generateBirthdayReceivedResponse(primaryConcern);
+			return this.generateBirthdayReceivedResponse(
+				primaryConcern,
+				locale
+			);
 		}
 
 		// 更主動的默認回應
 		if (primaryConcern) {
-			return `我明白你關心${primaryConcern}方面嘅問題。可以詳細講下你遇到嘅具體情況嗎？比如最近發生咗咩事令你困擾？`;
+			return getTranslation(
+				locale,
+				"defaultResponses.withConcern",
+				primaryConcern
+			);
 		} else {
-			return "我想幫你分析下，請告訴我你最關心邊方面？比如工作、感情、健康定係其他困擾？";
+			return getTranslation(locale, "defaultResponses.withoutConcern");
 		}
 	}
 
 	// 生成關注領域介紹回應
-	static generateConcernIntroResponse(concern, emotion) {
-		const responses = {
-			工作: [
-				"工作確實係人生好重要嘅一部分，我明白你嘅困擾。",
-				"職場上嘅事情有時真係好複雜，我理解你嘅感受。",
-			],
-			感情: [
-				"感情問題最影響心情，我明白你而家嘅感受。",
-				"愛情路上總有起伏，你願意分享多啲你嘅情況嗎？",
-			],
-			財運: [
-				"錢嘅問題確實令人擔心，我明白你嘅焦慮。",
-				"財運係好多人關心嘅問題，我可以幫你分析。",
-			],
-			健康: [
-				"健康係最寶貴嘅財富，我明白你嘅擔心。",
-				"身體健康確實好重要，你而家有咩具體嘅困擾？",
-			],
-			人際關係: [
-				"人際關係有時真係好難處理，我理解你嘅困難。",
-				"同人相處確實需要智慧，你遇到咩困難？",
-			],
-			子女: [
-				"養育子女真係唔容易，我明白你嘅關心。",
-				"為人父母總係為子女操心，有咩具體令你擔心？",
-			],
-			因緣: [
-				"人生機會確實好重要，我明白你想把握時機。",
-				"命運同機遇有時難以掌握，你想改善邊方面？",
-			],
-			居家佈局: [
-				"家居風水確實好重要，我明白你想改善居住環境。",
-				"好嘅家居佈局可以提升運勢，你想調整邊個空間？",
-			],
-		};
-
-		const concernResponses = responses[concern] || ["我明白你嘅關心。"];
+	static generateConcernIntroResponse(concern, emotion, locale = "zh-TW") {
 		const base =
-			concernResponses[
-				Math.floor(Math.random() * concernResponses.length)
-			];
-
-		return (
-			base +
-			"可以話俾我知具體係咩情況嗎？比如而家遇到咩困難，或者想改善咩問題？"
-		);
+			getRandomTranslation(locale, `concernIntro.${concern}`) ||
+			getRandomTranslation(locale, "concernIntro.default");
+		const followUp = getTranslation(locale, "concernIntro.followUp");
+		return base + followUp;
 	}
 
 	// 生成情感安慰
-	static generateEmotionalComfort(emotion) {
-		const comfortMessages = {
-			困擾: "我感受到你嘅困擾，呢種感覺好真實。",
-			沮喪: "我明白你而家嘅沮喪，你並唔孤單。",
-			憤怒: "我理解你嘅憤怒，有呢啲情緒係正常嘅。",
-			壓力: "我感受到你承受嘅壓力，深呼吸一下。",
-			希望: "我感受到你想改善嘅決心，呢個態度好好。",
-		};
-
-		return comfortMessages[emotion] || "我會陪伴住你，";
+	static generateEmotionalComfort(emotion, locale = "zh-TW") {
+		return (
+			getTranslation(locale, `emotionalComfort.${emotion}`) ||
+			getTranslation(locale, "emotionalComfort.default")
+		);
 	}
 
 	// 深入探討具體問題
-	static generateSpecificQuestionProbe(concern, emotion) {
-		const probes = {
-			工作: [
-				"我理解工作上有困難確實唔容易。可以講得詳細啲嗎？比如：",
-				"• 係同事或上司關係有問題？",
-				"• 工作量太大或者壓力太重？",
-				"• 想轉工但唔知點做？",
-				"• 定係薪金或者發展前景問題？",
-				"",
-				"講多啲具體情況，我先能夠俾到最適合你嘅建議。",
-			].join("\n"),
-			感情: [
-				"感情嘅事確實令人困擾。我明白你嘅感受。",
-				"",
-				"我可以為你提供兩種分析選擇：",
-				"",
-				"🌸 **個人感情分析** - 分析你個人嘅感情運勢、桃花運、感情障礙等",
-				"💕 **合婚配對分析** - 如果你有伴侶，我可以分析你哋嘅八字合配度、感情相容性",
-				"",
-				"你想要邊種分析？",
-			].join("\n"),
-			財運: [
-				"錢嘅問題確實令人擔心。可以講得詳細啲嗎？",
-				"• 係收入唔夠或者想增加收入？",
-				"• 投資虧損或者理財困難？",
-				"• 定係有債務或者其他財務壓力？",
-				"",
-				"知道具體情況，我先可以俾到針對性嘅風水建議。",
-			].join("\n"),
-			健康: "你而家身體有咩唔舒服？定係想預防某啲健康問題？可以講得具體啲。",
-			人際關係:
-				"你同邊啲人嘅關係有問題？係朋友、家人，定係同事？可以詳細講下發生咗咩事。",
-			子女: "關於子女，你最擔心係咩？係學習、健康，定係行為問題？講多啲具體情況。",
-			因緣: "你想把握咩機會？定係想改善運勢？可以講得詳細啲你嘅期望。",
-		};
-
+	static generateSpecificQuestionProbe(concern, emotion, locale = "zh-TW") {
 		return (
-			probes[concern] ||
-			"可以詳細講下你嘅情況嗎？講多啲具體嘅問題，我先可以幫到你。"
+			getTranslation(locale, `specificQuestionProbe.${concern}`) ||
+			getTranslation(locale, "specificQuestionProbe.default")
 		);
 	}
 
@@ -929,32 +854,18 @@ export class ImprovedConversationFlow {
 	}
 
 	// 請求生日信息（觸發模態框）
-	static generateModalTriggerResponse(concern) {
-		return `好！我已經了解你嘅${concern}問題。現在我需要你嘅出生資料來為你做詳細分析。
-
-請提供你嘅：
-• 出生日期（年月日）
-• 性別
-
-有咗呢啲資料，我可以根據你嘅八字五行，為你提供精準嘅${concern}分析同改善建議。`;
+	static generateModalTriggerResponse(concern, locale = "zh-TW") {
+		return getTranslation(locale, "modalTrigger", concern);
 	}
 
 	// 收到生日後的回應
-	static generateBirthdayReceivedResponse(concern) {
-		return `收到！我已經記錄咗你嘅生日資料。依家我會為你準備一份詳細嘅${concern}分析報告。
-
-呢份報告會包括：
-• 你嘅八字五行分析
-• ${concern}運勢評估
-• 針對你具體問題嘅建議
-• 風水改善方案
-
-我而家開始為你分析...`;
+	static generateBirthdayReceivedResponse(concern, locale = "zh-TW") {
+		return getTranslation(locale, "birthdayReceived", concern);
 	}
 
 	// 報告生成回應
-	static generateReportGenerationResponse(concern) {
-		return `你嘅${concern}分析報告已經準備好！報告包括咗根據你嘅八字分析同具體建議。正在為你生成詳細分析...`;
+	static generateReportGenerationResponse(concern, locale = "zh-TW") {
+		return getTranslation(locale, "reportGeneration", concern);
 	}
 
 	// 提供詳細分析選項

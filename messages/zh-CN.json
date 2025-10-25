@@ -1063,7 +1063,7 @@
 			"comingSoon": "敬請期待"
 		},
 		"sections": {
-			"materialsNeeded": "所需材料"
+			"materialsNeeded": "所需物料"
 		},
 		"pricing": {
 			"perTime": "/每次"
@@ -1437,6 +1437,8 @@
 		"daysAgo": "天前",
 		"title": "风铃聊天室",
 		"placeholder": "有任何疑问吗？请随时与我分享～",
+		"aiName": "风铃",
+		"aiThinking": "风铃费神运算中",
 		"shortcuts": {
 			"wealth": "我想增多财运",
 			"health": "如何更健康",

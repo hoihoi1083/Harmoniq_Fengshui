@@ -10,6 +10,7 @@
  */
 
 import { BaziCalculator } from "./baziCalculator.js";
+import { getTranslation } from "./chatTranslations.js"; // 🌐 Add translation support
 
 // DeepSeek API 配置
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || process.env.API_KEY;
@@ -2161,7 +2162,11 @@ ${
 	// 📊 Report Recommendations
 	// ==========================================
 
-	static getReportRecommendations(category, region = "hongkong") {
+	static getReportRecommendations(
+		category,
+		region = "hongkong",
+		locale = "zh-TW"
+	) {
 		const categoryNames = {
 			工作: "工作",
 			財運: "財運",
@@ -2201,7 +2206,26 @@ ${
 
 		const pricing = getRegionalPricing(region);
 
-		return `\n\n───────────────────\n💎 **想要更深入的分析嗎？**\n根據你的狀況，風鈴為你推薦：\n\n**1️⃣ 一份關於${concernName}的詳細報告** 價值${pricing.currency}${pricing.fortune.original}，限時優惠${pricing.currency}${pricing.fortune.discount}\n- 深入分析你的${concernName}運勢，提供具體建議和改善方案\n- 詳細的五行調理方法\n- 最佳行動時機指導\n\n**2️⃣ 一份綜合命理報告** 價值${pricing.currency}${pricing.comprehensive.original}，限時優惠${pricing.currency}${pricing.comprehensive.discount}\n- 全面的八字命盤分析，包含各方面運勢預測\n- 流年大運走勢分析\n- 人際關係和事業發展建議\n\n請回覆「1」或「2」選擇你想要的報告～`;
+		// Use translation system
+		const header = getTranslation(locale, "reportRecommendations.header");
+		const option1 = getTranslation(
+			locale,
+			"reportRecommendations.option1",
+			concernName,
+			pricing.currency,
+			pricing.fortune.original,
+			pricing.fortune.discount
+		);
+		const option2 = getTranslation(
+			locale,
+			"reportRecommendations.option2",
+			pricing.currency,
+			pricing.comprehensive.original,
+			pricing.comprehensive.discount
+		);
+		const footer = getTranslation(locale, "reportRecommendations.footer");
+
+		return `\n\n${header}\n\n${option1}\n\n${option2}\n\n${footer}`;
 	}
 
 	static getCoupleReportRecommendations(region = "hongkong") {
