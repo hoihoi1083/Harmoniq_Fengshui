@@ -24,6 +24,7 @@ export default function MenuBar({ className, isOpen, setIsOpen, from }) {
 	const t2 = useTranslations("toast");
 	const pathname = usePathname();
 	const router = useRouter(); // Add router
+	const currentLocale = pathname?.split("/")[1] || "zh-TW"; // Extract locale from URL
 
 	const { data: session } = useSession();
 	const isLogined = session?.user?.userId;
@@ -112,7 +113,9 @@ export default function MenuBar({ className, isOpen, setIsOpen, from }) {
 							href="/report-history"
 							onClick={() => setIsOpen(false)}
 						>
-							查看報告
+							{currentLocale === "zh-CN"
+								? "查看报告"
+								: "查看報告"}
 						</Link>
 					)}
 
