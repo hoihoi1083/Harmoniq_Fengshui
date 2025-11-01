@@ -192,6 +192,29 @@ export default function Home() {
 		setMessages([]);
 		setShowLandingPage(true);
 
+		// 🔥 Restore pending message if user just logged in
+		const pendingMessage = localStorage.getItem("pendingChatMessage");
+		const pendingTimestamp = localStorage.getItem("pendingChatTimestamp");
+
+		// Check if pending message exists and is recent (within 10 minutes)
+		if (pendingMessage && pendingTimestamp && session?.user) {
+			const timeDiff = Date.now() - parseInt(pendingTimestamp);
+			const tenMinutes = 10 * 60 * 1000;
+
+			if (timeDiff < tenMinutes) {
+				console.log(
+					"🔄 Restoring pending message after login:",
+					pendingMessage
+				);
+				setInputMessage(pendingMessage);
+				setShowLandingPage(false);
+			}
+
+			// Clear the stored message
+			localStorage.removeItem("pendingChatMessage");
+			localStorage.removeItem("pendingChatTimestamp");
+		}
+
 		// 如果需要轉移對話，先執行轉移再加載歷史
 		if (shouldTransferConversations && oldAnonymousId) {
 			transferAnonymousConversations(oldAnonymousId, userId).then(() => {
@@ -335,6 +358,9 @@ export default function Home() {
 
 		// Check if user is logged in before sending message
 		if (!session) {
+			// Save the current question to localStorage before redirecting
+			localStorage.setItem("pendingChatMessage", inputMessage.trim());
+			localStorage.setItem("pendingChatTimestamp", Date.now().toString());
 			router.push("/auth/login");
 			return;
 		}
@@ -911,6 +937,15 @@ export default function Home() {
 
 	// 處理快捷標籤點擊
 	const handleShortcutClick = (shortcutText) => {
+		// Check if user is logged in
+		if (!session) {
+			// Save the shortcut text before redirecting to login
+			localStorage.setItem("pendingChatMessage", shortcutText);
+			localStorage.setItem("pendingChatTimestamp", Date.now().toString());
+			router.push("/auth/login");
+			return;
+		}
+
 		setInputMessage(shortcutText);
 		// 自動聚焦到輸入框
 		setTimeout(() => {
@@ -1399,7 +1434,7 @@ export default function Home() {
 							<div className="flex items-center justify-between">
 								<div className="flex items-center space-x-2">
 									<span className="text-lg text-[#606060] font-bold">
-										付費報告預覽
+										{t("paidReportPreview")}
 									</span>
 									<span className="text-xl"></span>
 								</div>

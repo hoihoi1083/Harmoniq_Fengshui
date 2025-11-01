@@ -108,26 +108,37 @@ export default function RegionLanguageSelector({
 			// Update region state immediately (for instant pricing updates)
 			await changeRegion(selectedRegion);
 
-			// Only navigate to new locale if it's actually different
-			if (regionConfig.locale !== currentLocale) {
+			// Check if locale is different
+			const needsLocaleChange = regionConfig.locale !== currentLocale;
+
+			if (needsLocaleChange) {
 				console.log(
 					`🔄 Navigating from ${currentLocale} to ${regionConfig.locale}`
 				);
-				const newPathname = `/${pathname.split("/").slice(2).join("/")}`;
 
-				// Use replace instead of push for smoother transition
+				// Get the path without locale
+				const pathParts = pathname.split("/").filter(Boolean);
+				const pathWithoutLocale = pathParts.slice(1).join("/");
+				const newPathname = pathWithoutLocale
+					? `/${pathWithoutLocale}`
+					: "/";
+
+				// Start navigation immediately - don't wait
 				router.replace(newPathname, { locale: regionConfig.locale });
+
+				// Keep switching state visible for a brief moment for user feedback
+				setTimeout(() => setSwitching(false), 150);
 			} else {
 				// Same locale but different region (HK vs TW) - instant update complete
 				console.log(
 					`✅ Same locale (${regionConfig.locale}), region switched instantly`
 				);
+				// Reset switching state immediately for instant feedback
+				setSwitching(false);
 			}
 		} catch (error) {
 			console.error("❌ Region change error:", error);
-		} finally {
-			// Small delay to prevent rapid clicking
-			setTimeout(() => setSwitching(false), 300);
+			setSwitching(false);
 		}
 	};
 
@@ -182,7 +193,7 @@ export default function RegionLanguageSelector({
 					{regions.map((regionConfig) => (
 						<DropdownMenuItem
 							key={regionConfig.key}
-							className="focus:bg-inherit p-0"
+							className="p-0 focus:bg-inherit"
 							onClick={() => handleRegionChange(regionConfig.key)}
 							disabled={switching}
 						>

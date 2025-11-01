@@ -1448,7 +1448,8 @@
 			"dating": "我想拍拖",
 			"loveLife": "我想增强桃花运",
 			"healthConcern": "我身体会有隐患吗"
-		}
+		},
+		"paidReportPreview": "付费报告预览"
 	},
 	"fengShuiReport": {
 		"page": {
@@ -1576,7 +1577,7 @@
 		"subtitle": "查看您的所有报告记录",
 		"loading": "载入中...",
 		"coupleReports": {
-			"title": "合盘报告",
+			"title": "双人合盘流年测算",
 			"loading": "载入合盘报告中...",
 			"noRecords": "尚无合盘报告记录",
 			"noRecordsHint": "完成合盘测算后，报告将显示在这里",
@@ -1591,7 +1592,7 @@
 			}
 		},
 		"lifeReports": {
-			"title": "人生报告",
+			"title": "命理测算",
 			"loading": "载入人生报告中...",
 			"noRecords": "尚无人生报告记录",
 			"noRecordsHint": "完成人生测算后，报告将显示在这里",
@@ -1605,7 +1606,7 @@
 			}
 		},
 		"fortuneReports": {
-			"title": "个人流年报告",
+			"title": "个人流年测算",
 			"noRecords": "暂无报告记录",
 			"noRecordsHint": "您还没有测算任何命理报告",
 			"startCalculation": "开始测算",

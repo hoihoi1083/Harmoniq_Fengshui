@@ -54,6 +54,7 @@ const ChatHistorySchema = new mongoose.Schema(
 				"initial",
 				"ai_analyzing",
 				"birthday_collection",
+				"awaiting_birthday_choice", // 🎂 等待用戶選擇使用已保存或輸入新生日
 				"asking_detailed_report",
 				"ready_for_detailed_report",
 				"collecting_payment_info",

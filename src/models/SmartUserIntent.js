@@ -205,6 +205,7 @@ const SmartUserIntentSchema = new mongoose.Schema(
 				"birthday_collected",
 				"birthday_provided", // 🔧 修復：添加缺失的狀態
 				"birthday_collection",
+				"awaiting_birthday_choice", // 🎂 新增：等待用戶選擇使用已保存生日或輸入新生日
 				"asking_partner_birthday",
 				"asking_detailed_report",
 				"ready_for_detailed_report",

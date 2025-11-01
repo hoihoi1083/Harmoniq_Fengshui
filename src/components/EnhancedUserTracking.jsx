@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -76,7 +76,6 @@ export const trackUserJourney = (step, stepData = {}) => {
 
 export default function EnhancedUserTracking() {
 	const pathname = usePathname();
-	const searchParams = useSearchParams();
 
 	useEffect(() => {
 		if (!GA_TRACKING_ID) return;
@@ -89,7 +88,7 @@ export default function EnhancedUserTracking() {
 			currentStep: pathname,
 			timeSpent: Date.now(),
 		});
-	}, [pathname, searchParams]);
+	}, [pathname]);
 
 	return null;
 }

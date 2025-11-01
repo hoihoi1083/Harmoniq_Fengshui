@@ -121,8 +121,7 @@ async function checkSavedBirthdayAndGenerateMessage(
 	userEmail,
 	userId,
 	topic,
-	aiResponse = null,
-	locale = "zh-TW"
+	aiResponse = null
 ) {
 	try {
 		// 搜索該用戶是否有已保存且確認的生日
@@ -138,34 +137,6 @@ async function checkSavedBirthdayAndGenerateMessage(
 			const formattedDate = `${savedDate.getFullYear()}年${savedDate.getMonth() + 1}月${savedDate.getDate()}日`;
 
 			const topicText = topic || "命理";
-
-			// 🐛 Debug: Log locale value
-			console.log(
-				"🌐 checkSavedBirthdayAndGenerateMessage - Received locale:",
-				locale
-			);
-
-			// Localized text
-			const texts =
-				locale === "zh-CN"
-					? {
-							fenglingFound: "风铃发现你之前提供过生日资料呢！📅",
-							lastBirthday: "你上次的生日是：",
-							pleaseChoose: "请选择：",
-							option1: "使用这个生日进行",
-							analysis: "分析",
-							option2: "我想使用其他生日",
-							pleaseReply: "请回复「1」或「2」～",
-						}
-					: {
-							fenglingFound: "風鈴發現你之前提供過生日資料呢！📅",
-							lastBirthday: "你上次的生日是：",
-							pleaseChoose: "請選擇：",
-							option1: "使用這個生日進行",
-							analysis: "分析",
-							option2: "我想使用其他生日",
-							pleaseReply: "請回覆「1」或「2」～",
-						};
 
 			// 如果有 AI 分析回應，先顯示分析，再顯示生日確認
 			let fullMessage = "";
@@ -192,26 +163,27 @@ async function checkSavedBirthdayAndGenerateMessage(
 
 ───────────────────
 
-${texts.fenglingFound}
+風鈴發現你之前提供過生日資料呢！📅
 
-${texts.lastBirthday}**${formattedDate}**
+你上次的生日是：**${formattedDate}**
 
-${texts.pleaseChoose}
-1️⃣ ${texts.option1}${topicText}${texts.analysis}
-2️⃣ ${texts.option2}
+請選擇：
+1️⃣ 使用這個生日進行${topicText}分析
+2️⃣ 我想使用其他生日
 
-${texts.pleaseReply}`;
+請回覆「1」或「2」～`;
 			} else {
-				fullMessage = `${texts.fenglingFound}
+				fullMessage = `風鈴發現你之前提供過生日資料呢！📅
 
-${texts.lastBirthday}**${formattedDate}**
+你上次的生日是：**${formattedDate}**
 
-${texts.pleaseChoose}
-1️⃣ ${texts.option1}${topicText}${texts.analysis}
-2️⃣ ${texts.option2}
+請選擇：
+1️⃣ 使用這個生日進行${topicText}分析
+2️⃣ 我想使用其他生日
 
-${texts.pleaseReply}`;
+請回覆「1」或「2」～`;
 			}
+
 			return {
 				hasSavedBirthday: true,
 				savedBirthday: existingBirthdayData.userBirthday,
@@ -1774,12 +1746,12 @@ ${baseServices}
 請分析用戶訊息並返回 JSON 格式：
 
 {
-	"isWithinScope": true/false,
-	"detectedTopic": "感情|財運|工作|健康|其他",
-	"specificProblem": "簡潔問題描述 - 如果用戶只說'感情'就寫'一般感情諮詢'，'財運'就寫'一般財運諮詢'",
-	"confidence": 0.8,
-	"aiResponse": "禮貌回應用戶訊息，如果不在服務範圍內請提供友善的確認回應",
-	"serviceRecommendation": "建議用戶使用我們的哪項服務"
+    "isWithinScope": true/false,
+    "detectedTopic": "感情|財運|工作|健康|其他",
+    "specificProblem": "簡潔問題描述 - 如果用戶只說'感情'就寫'一般感情諮詢'，'財運'就寫'一般財運諮詢'",
+    "confidence": 0.8,
+    "aiResponse": "禮貌回應用戶訊息，如果不在服務範圍內請提供友善的確認回應",
+    "serviceRecommendation": "建議用戶使用我們的哪項服務"
 }
 
 **重要分類規則：**
@@ -1865,12 +1837,12 @@ ${baseServices}
 請分析用戶訊息並返回 JSON 格式：
 
 {
-	"isWithinScope": true/false,
-	"detectedTopic": "感情|財運|工作|健康|其他",
-	"specificProblem": "基於情緒狀態和對話歷史的具體問題描述",
-	"confidence": 0.8,
-	"aiResponse": "結合情緒狀態和對話歷史的個性化回應",
-	"serviceRecommendation": "基於用戶具體情況和歷史的服務建議"
+    "isWithinScope": true/false,
+    "detectedTopic": "感情|財運|工作|健康|其他",
+    "specificProblem": "基於情緒狀態和對話歷史的具體問題描述",
+    "confidence": 0.8,
+    "aiResponse": "結合情緒狀態和對話歷史的個性化回應",
+    "serviceRecommendation": "基於用戶具體情況和歷史的服務建議"
 }
 
 **重要增強規則：**
@@ -2838,9 +2810,9 @@ ${selectedEnding}`;
 五行屬性：[根據八字分析五行屬性，如：土命/火命等]
 ${displayTopic}宮主星：[分析對應主星，如：天府星（穩重權威）]
    - 關鍵格局：
-	 身強/身弱：[分析日主強弱]
-	 用神：[分析用神，如：火（溫暖調候，生機盎然）]
-	 大運節點：[分析當前大運]
+     身強/身弱：[分析日主強弱]
+     用神：[分析用神，如：火（溫暖調候，生機盎然）]
+     大運節點：[分析當前大運]
 
 💖 哈囉親愛的[五行]命小夥伴！讓風鈴為你解鎖${new Date().getFullYear()}年的${displayTopic}密碼～  
 
@@ -3271,15 +3243,15 @@ export async function POST(request) {
 			sessionId: sessionId,
 			conversationState: userIntent?.conversationState,
 			primaryConcern: userIntent?.primaryConcern,
-			message: message?.trim(),
+			message: message?.trim()
 		});
-
+		
 		// 🐛 DEBUG: Add state info to response for debugging
 		const debugInfo = {
 			loadedState: userIntent?.conversationState,
 			loadedConcern: userIntent?.primaryConcern,
 			message: message?.trim(),
-			sessionId: sessionId,
+			sessionId: sessionId
 		};
 
 		// 檢查是否為生日輸入
@@ -4048,28 +4020,23 @@ export async function POST(request) {
 				};
 			}
 		}
-
+		
 		// 🔍 Debug: 檢查 userIntent 狀態
 		if (message?.trim() === "1" || message?.trim() === "2") {
 			console.log("🔍 當前 userIntent 狀態:", {
 				exists: !!userIntent,
 				conversationState: userIntent?.conversationState,
 				message: message?.trim(),
-				sessionId: sessionId,
+				sessionId: sessionId
 			});
 		}
-
+		
 		// 🎂 檢查是否為生日確認選擇 ("1" 或 "2")
 		if (
 			(message.trim() === "1" || message.trim() === "2") &&
 			userIntent?.conversationState === "awaiting_birthday_choice"
 		) {
-			console.log(
-				"🎂 檢測到生日選擇:",
-				message.trim(),
-				"狀態:",
-				userIntent?.conversationState
-			);
+			console.log("🎂 檢測到生日選擇:", message.trim(), "狀態:", userIntent?.conversationState);
 			// 🎂 查詢資料庫中是否有已保存的生日
 			const existingSavedBirthday = await SmartUserIntent.findOne({
 				$or: [{ userEmail: userEmail }, { userId: userId }],
@@ -4195,24 +4162,7 @@ export async function POST(request) {
 				}
 
 				// 🎯 添加報告選擇部分
-				response +=
-					locale === "zh-CN"
-						? `\n\n───────────────────
-💎 想要更深入的分析吗？
-根据你的状况，风铃为你推荐：
-
-1️⃣ 一份关于${concern}的详细报告 价值HK$88，限时优惠HK$38
-- 深入分析你的${concern}运势，提供具体建议和改善方案
-- 详细的五行调理方法
-- 最佳行动时机指导
-
-2️⃣ 一份综合命理报告 价值HK$168，限时优惠HK$88
-- 全面的八字命盘分析，包含各方面运势预测
-- 流年大运走势分析
-- 人际关系和事业发展建议
-
-请回复「1」或「2」选择你想要的报告～`
-						: `\n\n───────────────────
+				response += `\n\n───────────────────
 💎 想要更深入的分析嗎？
 根據你的狀況，風鈴為你推薦：
 
@@ -4226,7 +4176,9 @@ export async function POST(request) {
 - 流年大運走勢分析
 - 人際關係和事業發展建議
 
-請回覆「1」或「2」選擇你想要的報告～`; // 更新狀態
+請回覆「1」或「2」選擇你想要的報告～`;
+
+				// 更新狀態
 				userIntent.conversationState = "asking_detailed_report";
 				await userIntent.save();
 
@@ -4658,7 +4610,7 @@ export async function POST(request) {
 			console.log("🔵 進入 isChoiceInput 處理區塊，當前狀態:", {
 				conversationState: userIntent?.conversationState,
 				primaryConcern: userIntent?.primaryConcern,
-				message: message?.trim(),
+				message: message?.trim()
 			});
 			// 🔧 處理用戶選擇回應 (1️⃣2️⃣ 等 + 文字選項) - 僅當不在詢問詳細報告或生日確認狀態
 			let choice = message.match(/[12]/)?.[0];
@@ -4696,20 +4648,7 @@ export async function POST(request) {
 							day: "numeric",
 						});
 
-						response =
-							locale === "zh-CN"
-								? `好！我会为你进行个人感情分析 🌸
-
-风铃发现你之前提供过生日资料呢！📅
-
-你上次的生日是：${formattedDate}
-
-请选择：
-1️⃣ 使用这个生日进行感情分析
-2️⃣ 我想使用其他生日
-
-请回复「1」或「2」～`
-								: `好！我會為你進行個人感情分析 🌸
+						response = `好！我會為你進行個人感情分析 🌸
 
 風鈴發現你之前提供過生日資料呢！📅
 
@@ -5237,17 +5176,11 @@ export async function POST(request) {
 					}
 				} else {
 					// 🎂 其他主題 - 檢查是否有已保存的生日
-					console.log(
-						"🌐 Calling checkSavedBirthdayAndGenerateMessage with locale:",
-						locale
-					);
 					const birthdayCheck =
 						await checkSavedBirthdayAndGenerateMessage(
 							userEmail,
 							userId,
-							detectedTopic,
-							null,
-							locale
+							detectedTopic
 						);
 
 					if (aiResponse && aiResponse.trim()) {
@@ -5255,11 +5188,10 @@ export async function POST(request) {
 					} else {
 						combinedResponse = `💫 已為你切換到${detectedTopic}分析！\n\n${birthdayCheck.message}`;
 					}
-
+					
 					// 🔧 如果找到已保存的生日，設置狀態為等待選擇
 					if (birthdayCheck.hasSavedBirthday) {
-						userIntent.conversationState =
-							"awaiting_birthday_choice";
+						userIntent.conversationState = "awaiting_birthday_choice";
 					}
 				} // 重置會話狀態並更新主要關注點
 				// 🔧 映射 detectedTopic 到有效的 primaryConcern 值 (防止無效枚舉值)
@@ -5380,8 +5312,7 @@ export async function POST(request) {
 									userEmail,
 									userId,
 									aiTopicAnalysis.detectedTopic,
-									aiTopicAnalysis.aiResponse, // 🎯 傳入 AI 分析內容
-									locale
+									aiTopicAnalysis.aiResponse // 🎯 傳入 AI 分析內容
 								);
 
 							if (
@@ -5398,11 +5329,10 @@ export async function POST(request) {
 							} else {
 								combinedResponse = `💫 已為你切換到${aiTopicAnalysis.detectedTopic}分析！\n\n${birthdayCheck.message}`;
 							}
-
+							
 							// 🔧 如果找到已保存的生日，設置狀態為等待選擇
 							if (birthdayCheck.hasSavedBirthday) {
-								userIntent.conversationState =
-									"awaiting_birthday_choice";
+								userIntent.conversationState = "awaiting_birthday_choice";
 							}
 						}
 
@@ -5701,7 +5631,7 @@ export async function POST(request) {
 							userIntent.conversationState =
 								"birthday_collection";
 							response = `💕 好的！為了進行準確的合婚分析，我需要你們雙方的生日資料。
-						
+                        
 請先提供你的生日（年月日），例如：1995年3月15日
 
 💡 小貼士：你也可以一次提供雙方生日，例如：「我1995/3/15，她1996/8/20」`;
@@ -6106,9 +6036,9 @@ export async function POST(request) {
 五行屬性：[分析五行屬性]
 [主要分析領域]宮主星：[對應主星]
    - 關鍵格局：
-	 [身強弱分析]
-	 用神：[用神分析]
-	 大運節點：[當前大運分析]
+     [身強弱分析]
+     用神：[用神分析]
+     大運節點：[當前大運分析]
 
 💖 哈囉親愛的[五行]命寶寶！風鈴來幫你分析${enhancedResult.detectedTopic || "運勢"}啦～根據你的五行特質，[年份]年會是[運勢特點]的一年呢！(´▽\`ʃ♡ƪ)
 
@@ -6354,44 +6284,30 @@ export async function POST(request) {
 								);
 							const remainingAnalyses = userStats.remaining || 10;
 							const dailyLimit = 10;
-							const rateLimitInfo =
-								locale === "zh-CN"
-									? `\n\n📊 今日分析额度: 你每日可进行 ${dailyLimit} 次初步分析，目前还剩 ${remainingAnalyses} 次机会哦～`
-									: `\n\n📊 今日分析額度: 你每日可進行 ${dailyLimit} 次初步分析，目前還剩 ${remainingAnalyses} 次機會哦～`;
+							const rateLimitInfo = `\n\n📊 今日分析額度: 你每日可進行 ${dailyLimit} 次初步分析，目前還剩 ${remainingAnalyses} 次機會哦～`;
 							response = response + rateLimitInfo;
 						} catch (error) {
 							console.log("⚠️ 獲取分析額度信息失敗:", error);
 						}
-
+						
 						// 🔧 設置狀態為等待生日選擇
 						if (userIntent) {
-							userIntent.conversationState =
-								"awaiting_birthday_choice";
+							userIntent.conversationState = "awaiting_birthday_choice";
 							await userIntent.save();
-							console.log(
-								"✅ 已設置 conversationState = awaiting_birthday_choice, sessionId:",
-								sessionId
-							);
+							console.log("✅ 已設置 conversationState = awaiting_birthday_choice, sessionId:", sessionId);
 						} else {
 							// 創建新的 userIntent
-							console.log(
-								"⚠️ userIntent 不存在，創建新的 userIntent, sessionId:",
-								sessionId
-							);
+							console.log("⚠️ userIntent 不存在，創建新的 userIntent, sessionId:", sessionId);
 							const newUserIntent = new SmartUserIntent({
 								sessionId: sessionId,
 								userId: userId,
 								userEmail: userEmail,
-								primaryConcern:
-									analysis.detectedTopic || "財運",
+								primaryConcern: analysis.detectedTopic || "財運",
 								conversationState: "awaiting_birthday_choice",
 								conversationActive: true,
 							});
 							await newUserIntent.save();
-							console.log(
-								"✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice, _id:",
-								newUserIntent._id
-							);
+							console.log("✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice, _id:", newUserIntent._id);
 						}
 					} else {
 						console.log("📝 未找到已保存的生日，使用標準引導訊息");
@@ -6494,28 +6410,20 @@ export async function POST(request) {
 							);
 						const remainingAnalyses = userStats.remaining || 10;
 						const dailyLimit = 10;
-						const rateLimitInfo =
-							locale === "zh-CN"
-								? `\n\n📊 今日分析额度: 你每日可进行 ${dailyLimit} 次初步分析，目前还剩 ${remainingAnalyses} 次机会哦～`
-								: `\n\n📊 今日分析額度: 你每日可進行 ${dailyLimit} 次初步分析，目前還剩 ${remainingAnalyses} 次機會哦～`;
+						const rateLimitInfo = `\n\n📊 今日分析額度: 你每日可進行 ${dailyLimit} 次初步分析，目前還剩 ${remainingAnalyses} 次機會哦～`;
 						response = response + rateLimitInfo;
 					} catch (error) {
 						console.log("⚠️ 獲取分析額度信息失敗:", error);
 					}
-
+					
 					// 🔧 設置狀態為等待生日選擇
 					if (userIntent) {
-						userIntent.conversationState =
-							"awaiting_birthday_choice";
+						userIntent.conversationState = "awaiting_birthday_choice";
 						await userIntent.save();
-						console.log(
-							"✅ 已設置 conversationState = awaiting_birthday_choice"
-						);
+						console.log("✅ 已設置 conversationState = awaiting_birthday_choice");
 					} else {
 						// 創建新的 userIntent
-						console.log(
-							"⚠️ userIntent 不存在，創建新的 userIntent"
-						);
+						console.log("⚠️ userIntent 不存在，創建新的 userIntent");
 						const newUserIntent = new SmartUserIntent({
 							sessionId: sessionId,
 							userId: userId,
@@ -6525,9 +6433,7 @@ export async function POST(request) {
 							conversationActive: true,
 						});
 						await newUserIntent.save();
-						console.log(
-							"✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice"
-						);
+						console.log("✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice");
 					}
 				} else {
 					console.log("📝 未找到已保存的生日，使用標準引導訊息");
@@ -6562,18 +6468,14 @@ export async function POST(request) {
 		try {
 			if (!userIntent) {
 				// 🎂 檢查是否顯示了已保存生日選單
-				const showedSavedBirthdayMenu =
-					response.includes("你上次的生日是") &&
-					response.includes("請選擇");
-
+				const showedSavedBirthdayMenu = response.includes('你上次的生日是') && response.includes('請選擇');
+				
 				userIntent = new SmartUserIntent({
 					userEmail: userEmail,
 					userId: userId, // 🆕 新增：保存userId
 					sessionId: sessionId,
 					// 🎯 移除 conversationHistory - 改用ChatHistory存儲
-					conversationState: showedSavedBirthdayMenu
-						? "awaiting_birthday_choice"
-						: "birthday_collection", // 🎂 根據是否顯示保存生日選單設置狀態
+					conversationState: showedSavedBirthdayMenu ? "awaiting_birthday_choice" : "birthday_collection", // 🎂 根據是否顯示保存生日選單設置狀態
 					specificQuestion: analysis.specificProblem,
 					primaryConcern: analysis.isWithinScope
 						? analysis.detectedTopic
@@ -6582,12 +6484,7 @@ export async function POST(request) {
 					originalSpecificProblem: analysis.specificProblem,
 					originalUserMessage: message, // 🆕 永不覆蓋的原始訊息
 				});
-				console.log(
-					"✅ 創建 userIntent，狀態:",
-					userIntent.conversationState,
-					"顯示了保存生日選單:",
-					showedSavedBirthdayMenu
-				);
+				console.log("✅ 創建 userIntent，狀態:", userIntent.conversationState, "顯示了保存生日選單:", showedSavedBirthdayMenu);
 			} else if (isBirthdayInput) {
 				// 更新狀態為詢問詳細報告
 				userIntent.conversationState = "asking_detailed_report";

@@ -19,6 +19,12 @@ if (typeof window !== "undefined" && MIXPANEL_TOKEN) {
 		// 隱私設置
 		opt_out_tracking_by_default: false,
 		ignore_dnt: false,
+		// 增加 batch 請求來減少並發
+		batch_requests: true,
+		batch_size: 50,
+		batch_flush_interval_ms: 2000,
+		// 增加鎖定超時時間
+		property_blacklist: [],
 		// 自定義配置
 		loaded: function (mixpanel) {
 			console.log(
@@ -28,6 +34,32 @@ if (typeof window !== "undefined" && MIXPANEL_TOKEN) {
 		},
 	});
 }
+
+// 防抖隊列來避免並發問題
+let trackingQueue = [];
+let isProcessing = false;
+
+const processQueue = async () => {
+	if (isProcessing || trackingQueue.length === 0) return;
+
+	isProcessing = true;
+	const event = trackingQueue.shift();
+
+	try {
+		await new Promise((resolve) => {
+			mixpanel.track(event.name, event.properties);
+			// 添加小延遲以避免鎖定衝突
+			setTimeout(resolve, 50);
+		});
+	} catch (error) {
+		console.warn("⚠️ Mixpanel tracking error:", error);
+	}
+
+	isProcessing = false;
+	if (trackingQueue.length > 0) {
+		processQueue();
+	}
+};
 
 // 風水分析事件追蹤類
 class FengShuiMixpanel {
@@ -198,7 +230,7 @@ class FengShuiMixpanel {
 		});
 	}
 
-	// 基礎追蹤方法
+	// 基礎追蹤方法（使用隊列避免並發）
 	static track(eventName, properties = {}) {
 		if (typeof window === "undefined") return;
 
@@ -222,7 +254,14 @@ class FengShuiMixpanel {
 			主機名稱: window.location.hostname,
 		};
 
-		mixpanel.track(eventName, enhancedProperties);
+		// 添加到隊列而不是直接發送
+		trackingQueue.push({
+			name: eventName,
+			properties: enhancedProperties,
+		});
+
+		// 啟動隊列處理
+		processQueue();
 
 		const logPrefix =
 			isTest || isTestUser ? "🧪 測試事件:" : "🎯 正式事件:";

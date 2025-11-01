@@ -125,7 +125,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 								{/* Logo for Mobile */}
 								<Link
 									href="/home"
-									className="flex items-center"
+									className="relative z-10 flex items-center"
 								>
 									<Image
 										src={
@@ -137,34 +137,37 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 										width={32}
 										height={32}
 										className="w-8 h-8"
+										style={{
+											filter: "none",
+											backfaceVisibility: "hidden",
+											WebkitFontSmoothing: "antialiased",
+										}}
+										priority
 									/>
 								</Link>
 							</div>
 						) : (
 							<Link
 								href="/home"
-								className="flex items-center gap-2"
+								className="relative z-10 flex items-center gap-2"
 							>
 								<Image
 									src={
 										navTextColor === "#fff"
-											? "/images/logo/logo-white.png"
-											: "/images/logo/logo-black.png"
+											? "/images/logo/logo-desktop.png"
+											: "/images/logo/logo-desktop.png"
 									}
 									alt="HarmoniQ Logo"
-									width={32}
+									width={62}
 									height={32}
-									className="w-8 h-8 mx-2"
-								/>
-								<span
-									className="text-2xl font-bold mr-15"
+									className="h-8 mx-2 w-38"
 									style={{
-										fontFamily: "Noto Serif TC, serif",
-										color: navTextColor,
+										filter: "none",
+										backfaceVisibility: "hidden",
+										WebkitFontSmoothing: "antialiased",
 									}}
-								>
-									HarmoniQ
-								</span>
+									priority
+								/>
 							</Link>
 						)}
 

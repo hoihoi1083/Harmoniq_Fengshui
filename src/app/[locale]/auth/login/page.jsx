@@ -30,7 +30,7 @@ export default function LoginPage({ searchParams }) {
 		try {
 			await signIn(provider, {
 				redirect: true,
-				callbackUrl: "/price", // Redirect to price page after login
+				callbackUrl: "/", // Redirect to chat page after login
 			});
 			setIsLoading(false);
 		} catch (error) {
@@ -53,7 +53,7 @@ export default function LoginPage({ searchParams }) {
 				email: formData.email,
 				password: formData.password,
 				redirect: false,
-				callbackUrl: "/price", // Redirect to price page after login
+				callbackUrl: "/", // Redirect to chat page after login
 			});
 
 			if (result?.error) {
@@ -61,7 +61,7 @@ export default function LoginPage({ searchParams }) {
 				toast.error(t("loginFailedCheckCredentials"));
 			} else {
 				toast.success(t("loginSuccess"));
-				router.push("/price");
+				router.push("/"); // Redirect to chat page
 			}
 		} catch (error) {
 			console.error("Login error:", error);

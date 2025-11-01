@@ -306,14 +306,23 @@ export class EnhancedInitialAnalysis {
 			bazi.dayElement
 		);
 
-		let response = `🔮 根據你的生日分析，風鈴為你解讀${category}方面的運勢和解決方案：\n\n`;
+		let response =
+			locale === "zh-CN"
+				? `🔮 根据你的生日分析，风铃为你解读${category}方面的运势和解决方案：\n\n`
+				: `🔮 根據你的生日分析，風鈴為你解讀${category}方面的運勢和解決方案：\n\n`;
 
 		// 1. 基礎分析（不提及五行和八字，因為缺少時辰可能不準確）
 		const zodiacAnimal = this.getChineseZodiac(year);
-		response += `📊 你的命理基礎分析\n`;
+		response +=
+			locale === "zh-CN"
+				? `📊 你的命理基础分析\n`
+				: `📊 你的命理基礎分析\n`;
 		response += `出生年份：${year}年\n`;
 		response += `出生月份：${birthday.getMonth() + 1}月\n`;
-		response += `生肖屬相：${zodiacAnimal}\n\n`;
+		response +=
+			locale === "zh-CN"
+				? `生肖属相：${zodiacAnimal}\n\n`
+				: `生肖屬相：${zodiacAnimal}\n\n`;
 
 		// 2. AI處理所有詳細分析，不再需要基礎分析重複
 
