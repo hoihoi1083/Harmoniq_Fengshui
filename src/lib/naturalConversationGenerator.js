@@ -13,7 +13,7 @@ class NaturalConversationGenerator {
 				transitions: [
 					"不過別擔心，",
 					"其實從命理角度來看，",
-					"讓風鈴來幫你分析一下，",
+					"讓小鈴來幫你分析一下，",
 				],
 				encouragements: [
 					"每個困難都是成長的機會！",
@@ -196,8 +196,8 @@ class NaturalConversationGenerator {
 		let enhanced = originalResponse;
 
 		// 如果回應太過正式，增加一些親和力
-		if (!enhanced.includes("風鈴") && !enhanced.includes("我")) {
-			enhanced = enhanced.replace(/^/, "風鈴來幫你分析一下！\n\n");
+		if (!enhanced.includes("小鈴") && !enhanced.includes("我")) {
+			enhanced = enhanced.replace(/^/, "小鈴來幫你分析一下！\n\n");
 		}
 
 		// 確保有適當的表情符號

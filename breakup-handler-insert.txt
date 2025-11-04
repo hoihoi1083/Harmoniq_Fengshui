@@ -1,0 +1,27 @@
+
+		// 🔧 優先檢查分手狀態選擇 (A, B, C, D) - 必須在 EnhancedMessageAnalyzer 之前
+		if (isBreakupChoice && userIntent?.primaryConcern === "感情") {
+			console.log("💔 檢測到分手選擇，優先處理:", message);
+
+			const chatHistory = await ChatHistory.findOne({
+				$or: [{ conversationId: sessionId }, { sessionId: sessionId }],
+			});
+
+			const hasBreakupOptions = chatHistory?.messages?.some(
+				(msg) =>
+					msg.role === "assistant" &&
+					(msg.content.includes("A. 剛分手") ||
+						msg.content.includes("A. 刚分手") ||
+						msg.content.includes("請選擇你的感情狀態") ||
+						msg.content.includes("请选择你的感情状态"))
+			);
+
+			if (hasBreakupOptions) {
+				console.log("✅ 確認有分手選項歷史，處理選擇:", message);
+				const breakupChoice = message.trim().toUpperCase().charAt(0);
+
+				// 使用已有的handler在line 3993-4207處理完整響應
+				// 這裡只需跳轉到那個handler
+				console.log("🎯 跳轉到現有的分手handler，breakupChoice:", breakupChoice);
+			}
+		}

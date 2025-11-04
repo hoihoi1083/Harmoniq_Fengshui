@@ -95,7 +95,7 @@ const FiveElement = ({
 						{/* Loading spinner */}
 						<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-						{/* 風水妹 loading image */}
+						{/* 小鈴 loading image */}
 						<div className="flex items-center justify-center">
 							<Image
 								src="/images/風水妹/風水妹-loading.png"

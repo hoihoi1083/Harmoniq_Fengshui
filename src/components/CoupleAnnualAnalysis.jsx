@@ -695,11 +695,11 @@ const CoupleAnnualAnalysis = ({
 					{/* Loading spinner */}
 					<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-					{/* 風水妹 loading image */}
+					{/* 小鈴 loading image */}
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
-							alt="風水妹運算中"
+							alt="小鈴運算中"
 							width={120}
 							height={120}
 							className="object-contain"
@@ -716,7 +716,7 @@ const CoupleAnnualAnalysis = ({
 								fontWeight: 500,
 							}}
 						>
-							風水妹正在分析你們的流年運勢
+							小鈴正在分析你們的流年運勢
 						</div>
 						<div
 							className="text-gray-500"
@@ -1442,7 +1442,7 @@ const IndividualAnalysisSection = ({
 				/✨|🌙|💖|🎯|🔍|💡|🌱|～|~|唷|啦|哦|呢|⚠️|🌸|💑|💞|💧/g,
 				""
 			) // Remove emojis and casual particles
-			.replace(/風鈴[^。！？]*[。！？]/g, "") // Remove 風鈴 sentences
+			.replace(/小鈴[^。！？]*[。！？]/g, "") // Remove 小鈴 sentences
 			.replace(/叮鈴鈴.*$/g, "") // Remove promotional content
 			.replace(/解鎖.*報告.*$/gm, "") // Remove unlock promotion
 			.replace(/嗨～.*風水師.*～/g, "") // Remove character introduction
@@ -1464,7 +1464,7 @@ const IndividualAnalysisSection = ({
 			// Skip empty lines, promotional content, casual phrases, and feng shui advice
 			if (
 				!line ||
-				line.includes("風鈴") ||
+				line.includes("小鈴") ||
 				line.includes("解鎖") ||
 				line.includes("專屬") ||
 				line.includes("偷偷告訴") ||

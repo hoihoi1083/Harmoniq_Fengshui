@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { convertToSimplified } from "@/utils/chineseConverter";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || process.env.API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
@@ -213,25 +214,34 @@ ${analysisRequirements}`;
 
 ### 2. 【天干${yearGanZhi.stem}效应】
 天干${yearGanZhi.stem}为**正官**（示例）
+天干${yearGanZhi.stem}触发三重效应
 1. **职权提升**：具体分析...
 2. **合庚减泄**：具体分析...
 3. **官星透出**：具体分析...
 
-### 3. 【地支${yearGanZhi.branch}效应】
-地支${yearGanZhi.branch}为**偏印**（示例）
-1. **学习能力**：具体分析...
-2. **创意思维**：具体分析...
-3. **人际变化**：具体分析...
-
-### 4. 【实际表现】
+实际表现
 在${concern}领域的具体表现：
 - 具体会在哪些时间点或情况下出现变化（注意：当前是${new Date().getMonth() + 1}月，如提及未来月份请明确标示"明年"或具体月份范围）
 - 实际的影响程度和表现形式
 - 可能遇到的具体情况或挑战
 - 如使用季节或其他时间词汇，请明确指出对应的具体月份（例：春季指明年3-5月）
 
-### 5. 【注意事项】
-**风险提醒**：
+### 3. 【地支${yearGanZhi.branch}效应】
+地支${yearGanZhi.branch}为**偏印**（示例）
+地支${yearGanZhi.branch}触发三重效应
+1. **学习能力**：具体分析...
+2. **创意思维**：具体分析...
+3. **人际变化**：具体分析...
+
+实际表现
+在${concern}领域的具体表现：
+- 具体会在哪些时间点或情况下出现变化（注意：当前是${new Date().getMonth() + 1}月，如提及未来月份请明确标示"明年"或具体月份范围）
+- 实际的影响程度和表现形式
+- 可能遇到的具体情况或挑战
+- 如使用季节或其他时间词汇，请明确指出对应的具体月份（例：春季指明年3-5月）
+
+### 4. 【注意事项】
+风险
 针对${concern}领域可能出现的具体风险，包括：
 - 时间节点上的注意事项
 - 具体会在哪些时间点或情况下出现变化（注意：当前是${new Date().getMonth() + 1}月，如提及未来月份请明确标示"明年"或具体月份范围）
@@ -239,7 +249,7 @@ ${analysisRequirements}`;
 - 可能遇到的困难或障碍
 - 需要避免的行为或决策
 
-**建议指引**：
+建议
 针对${concern}领域的具体建议：
 - 最佳行动时机和策略
 - 具体会在哪些时间点或情况下出现变化（注意：当前是${new Date().getMonth() + 1}月，如提及未来月份请明确标示"明年"或具体月份范围）
@@ -247,10 +257,10 @@ ${analysisRequirements}`;
 - 如何化解不利因素
 - 具体的改善方法和步骤
 
-**总结要点**：
+总结
 结合八字和流年特点，总结${concern}在${currentYear}年的整体运势走向，提供核心建议和关键提醒。
 
-**重要提醒**：以上5个部分（流年干支作用、天干效应、地支效应、实际表现、注意事项）已经包含所有必要内容，请勿在【注意事项】之后再添加额外的"建议"或"总结"段落。所有建议内容应整合在【注意事项】的**建议指引**中，所有总结内容应整合在【注意事项】的**总结要点**中。
+**重要提醒**：以上4个部分（流年干支作用、天干效应、地支效应、注意事项）已经包含所有必要内容，请勿在【注意事项】之后再添加额外的"建议"或"总结"段落。所有建议内容应整合在【注意事项】的**建议**中，所有总结内容应整合在【注意事项】的**总结**中。
 
 请确保每个部分都针对${concern}领域提供具体、实用的内容，避免使用通用的建议。`
 				: `請分析以下信息：
@@ -270,25 +280,34 @@ ${analysisRequirements}`;
 
 ### 2. 【天干${yearGanZhi.stem}效應】
 天干${yearGanZhi.stem}為**正官**（示例）
+天干${yearGanZhi.stem}觸發三重效應
 1. **職權提升**：具體分析...
 2. **合庚減洩**：具體分析...
 3. **官星透出**：具體分析...
 
-### 3. 【地支${yearGanZhi.branch}效應】
-地支${yearGanZhi.branch}為**偏印**（示例）
-1. **學習能力**：具體分析...
-2. **創意思維**：具體分析...
-3. **人際變化**：具體分析...
-
-### 4. 【實際表現】
+實際表現
 在${concern}領域的具體表現：
 - 具體會在哪些時間點或情況下出現變化（注意：當前是${new Date().getMonth() + 1}月，如提及未來月份請明確標示"明年"或具體月份範圍）
 - 實際的影響程度和表現形式
 - 可能遇到的具體情況或挑戰
 - 如使用季節或其他時間詞彙，請明確指出對應的具體月份（例：春季指明年3-5月）
 
-### 5. 【注意事項】
-**風險提醒**：
+### 3. 【地支${yearGanZhi.branch}效應】
+地支${yearGanZhi.branch}為**偏印**（示例）
+地支${yearGanZhi.branch}觸發三重效應
+1. **學習能力**：具體分析...
+2. **創意思維**：具體分析...
+3. **人際變化**：具體分析...
+
+實際表現
+在${concern}領域的具體表現：
+- 具體會在哪些時間點或情況下出現變化（注意：當前是${new Date().getMonth() + 1}月，如提及未來月份請明確標示"明年"或具體月份範圍）
+- 實際的影響程度和表現形式
+- 可能遇到的具體情況或挑戰
+- 如使用季節或其他時間詞彙，請明確指出對應的具體月份（例：春季指明年3-5月）
+
+### 4. 【注意事項】
+風險
 針對${concern}領域可能出現的具體風險，包括：
 - 時間節點上的注意事項
 - 具體會在哪些時間點或情況下出現變化（注意：當前是${new Date().getMonth() + 1}月，如提及未來月份請明確標示"明年"或具體月份範圍）
@@ -296,7 +315,7 @@ ${analysisRequirements}`;
 - 可能遇到的困難或障礙
 - 需要避免的行為或決策
 
-**建議指引**：
+建議
 針對${concern}領域的具體建議：
 - 最佳行動時機和策略
 - 具體會在哪些時間點或情況下出現變化（注意：當前是${new Date().getMonth() + 1}月，如提及未來月份請明確標示"明年"或具體月份範圍）
@@ -304,10 +323,10 @@ ${analysisRequirements}`;
 - 如何化解不利因素
 - 具體的改善方法和步驟
 
-**總結要點**：
+總結
 結合八字和流年特點，總結${concern}在${currentYear}年的整體運勢走向，提供核心建議和關鍵提醒。
 
-**重要提醒**：以上5個部分（流年干支作用、天干效應、地支效應、實際表現、注意事項）已經包含所有必要內容，請勿在【注意事項】之後再添加額外的"建議"或"總結"段落。所有建議內容應整合在【注意事項】的**建議指引**中，所有總結內容應整合在【注意事項】的**總結要點**中。
+**重要提醒**：以上4個部分（流年干支作用、天干效應、地支效應、注意事項）已經包含所有必要內容，請勿在【注意事項】之後再添加額外的"建議"或"總結"段落。所有建議內容應整合在【注意事項】的**建議**中，所有總結內容應整合在【注意事項】的**總結**中。
 
 請確保每個部分都針對${concern}領域提供具體、實用的內容，避免使用通用的建議。`;
 
@@ -333,9 +352,27 @@ ${analysisRequirements}`;
 
 		console.log("✅ AI GanZhi analysis completed");
 
+		// Convert to Simplified Chinese if needed
+		let finalContent = aiContent;
+		if (locale === "zh-CN") {
+			console.log(
+				"🔄 Converting Traditional Chinese to Simplified Chinese..."
+			);
+			console.log(
+				"📝 Sample BEFORE conversion:",
+				aiContent.substring(0, 200)
+			);
+			finalContent = convertToSimplified(aiContent);
+			console.log(
+				"📝 Sample AFTER conversion:",
+				finalContent.substring(0, 200)
+			);
+			console.log("✅ Conversion completed");
+		}
+
 		return NextResponse.json({
 			success: true,
-			analysis: aiContent,
+			analysis: finalContent,
 			baZi: baZi,
 			yearGanZhi: yearGanZhi,
 			userInfo: {

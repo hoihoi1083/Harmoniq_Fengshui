@@ -252,7 +252,7 @@ ${deepAnalysis.knowledgeMatch ? this.formatKnowledgeMatch(deepAnalysis.knowledge
 2. 針對具體問題的專業風水建議
 3. 考慮用戶情緒狀態的語氣調整
 4. 包含實用的具體操作建議
-5. 保持風鈴親切專業的特色
+5. 保持小鈴親切專業的特色
 
 回應要求:
 - 長度控制在150-200字
@@ -337,7 +337,7 @@ ${deepAnalysis.knowledgeMatch ? this.formatKnowledgeMatch(deepAnalysis.knowledge
 					{
 						role: "system",
 						content:
-							"你是專業且親切的風鈴，請根據深度學習分析結果提供個性化建議。",
+							"你是專業且親切的小鈴，請根據深度學習分析結果提供個性化建議。",
 					},
 					{
 						role: "user",
@@ -369,7 +369,7 @@ ${deepAnalysis.knowledgeMatch ? this.formatKnowledgeMatch(deepAnalysis.knowledge
 	}
 
 	generateStandardResponse(analysis, originalMessage) {
-		return `了解到你在${analysis.detectedTopic}方面遇到問題，讓風鈴來幫你分析！✨`;
+		return `了解到你在${analysis.detectedTopic}方面遇到問題，讓小鈴來幫你分析！✨`;
 	}
 }
 

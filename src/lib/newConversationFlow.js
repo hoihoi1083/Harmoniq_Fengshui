@@ -148,13 +148,13 @@ export class ImprovedConversationFlow {
 		return {
 			isDeviation: true,
 			currentConcern: currentConcern,
-			aiResponse: `哇～風鈴覺得你剛剛問的東西好有趣呢！😊
+			aiResponse: `哇～小鈴覺得你剛剛問的東西好有趣呢！😊
 
-不過我們剛才不是在聊「${currentAreaName}」的問題嗎？風鈴想先幫你把這個處理好呢～
+不過我們剛才不是在聊「${currentAreaName}」的問題嗎？小鈴想先幫你把這個處理好呢～
 
 讓我們繼續聊「${currentAreaName}」的事情好嗎？這樣我才能給你最專業的風水建議哦！✨
 
-如果你想換話題到其他風水領域，也可以告訴風鈴：
+如果你想換話題到其他風水領域，也可以告訴小鈴：
 💼 **工作** - 事業發展、職場關係
 💕 **感情** - 桃花運、婚姻配對  
 💰 **財運** - 財富增長、投資運勢
@@ -199,7 +199,7 @@ export class ImprovedConversationFlow {
 					suggestedCoreArea: mapping.core,
 					aiResponse: `哇～你問的「${keyword}」很有意思呢！✨
 
-風鈴覺得這個跟我們的「${mapping.core}」服務很相關哦，因為${mapping.reason}！
+小鈴覺得這個跟我們的「${mapping.core}」服務很相關哦，因為${mapping.reason}！
 
 我們的專業風水服務包括：
 💼 **工作** - 事業發展、職場關係、生意創業
@@ -220,9 +220,9 @@ export class ImprovedConversationFlow {
 			isCoreArea: false,
 			isTypo: false,
 			suggestedCoreArea: null,
-			aiResponse: `咦～風鈴不太明白你的意思呢 😅
+			aiResponse: `咦～小鈴不太明白你的意思呢 😅
 
-不過沒關係！風鈴最擅長的是這些專業風水服務：
+不過沒關係！小鈴最擅長的是這些專業風水服務：
 
 💼 **工作** - 事業發展、職場關係、升職加薪
 💕 **感情** - 桃花運、婚姻配對、感情問題
@@ -232,7 +232,7 @@ export class ImprovedConversationFlow {
 🏥 **健康** - 身心調理、養生風水、健康運勢
 ✨ **因緣** - 機會把握、命運改善、時機選擇
 
-你最想了解哪個方面呢？風鈴會用最可愛的方式幫你分析哦～💕`,
+你最想了解哪個方面呢？小鈴會用最可愛的方式幫你分析哦～💕`,
 		};
 	}
 

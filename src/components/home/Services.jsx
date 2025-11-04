@@ -8,7 +8,7 @@ const ServiceSection = () => {
 	const steps = [
 		{
 			num: "1",
-			title: "風鈴聊天室",
+			title: "小鈴聊天室",
 			subtitle: "免費測評房間/命理",
 			image: "/images/hero/hero-1.png",
 		},

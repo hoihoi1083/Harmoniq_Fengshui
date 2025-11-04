@@ -5,13 +5,13 @@ export const CHAT_TRANSLATIONS = {
 	"zh-TW": {
 		// Initial greetings
 		initialGreeting:
-			"你好呀～我係風鈴！✨ 有咩生活上嘅困擾想搵我傾傾呢？無論係工作、感情、財運定係健康，我都可以幫你分析風水運勢架～",
+			"你好呀～我係小鈴！✨ 有咩生活上嘅困擾想搵我傾傾呢？無論係工作、感情、財運定係健康，我都可以幫你分析風水運勢架～",
 
 		// Topic deviation responses
 		topicDeviation: {
 			template: (currentAreaName) =>
-				`哇～風鈴覺得你剛剛問的東西好有趣呢！😊\n\n不過我們剛才不是在聊「${currentAreaName}」的問題嗎？風鈴想先幫你把這個處理好呢～\n\n讓我們繼續聊「${currentAreaName}」的事情好嗎？這樣我才能給你最專業的風水建議哦！✨`,
-			serviceList: `如果你想換話題到其他風水領域，也可以告訴風鈴：
+				`哇～小鈴覺得你剛剛問的東西好有趣呢！😊\n\n不過我們剛才不是在聊「${currentAreaName}」的問題嗎？小鈴想先幫你把這個處理好呢～\n\n讓我們繼續聊「${currentAreaName}」的事情好嗎？這樣我才能給你最專業的風水建議哦！✨`,
+			serviceList: `如果你想換話題到其他風水領域，也可以告訴小鈴：
 💼 **工作** - 事業發展、職場關係
 💕 **感情** - 桃花運、婚姻配對  
 💰 **財運** - 財富增長、投資運勢
@@ -24,7 +24,7 @@ export const CHAT_TRANSLATIONS = {
 		// Non-core input handling
 		nonCoreInput: {
 			typoSuggestion: (suggestion) =>
-				`😊 風鈴覺得你可能想問的是「${suggestion}」的問題呢！如果不是的話，請再說得清楚一點哦～`,
+				`😊 小鈴覺得你可能想問的是「${suggestion}」的問題呢！如果不是的話，請再說得清楚一點哦～`,
 			serviceIntro: `我們的專業風水服務包括：
 💼 **工作** - 事業發展、職場關係
 💕 **感情** - 桃花運、婚姻配對  
@@ -35,9 +35,9 @@ export const CHAT_TRANSLATIONS = {
 ✨ **因緣** - 機會把握、命運改善
 
 你想了解哪個方面呢？`,
-			genericGuidance: `咦～風鈴不太明白你的意思呢 😅
+			genericGuidance: `咦～小鈴不太明白你的意思呢 😅
 
-不過沒關係！風鈴最擅長的是這些專業風水服務：
+不過沒關係！小鈴最擅長的是這些專業風水服務：
 
 💼 **工作** - 事業發展、職場關係、升職加薪
 💕 **感情** - 桃花運、婚姻配對、感情問題
@@ -47,7 +47,7 @@ export const CHAT_TRANSLATIONS = {
 🏥 **健康** - 身心調理、養生風水、健康運勢
 ✨ **因緣** - 機會把握、命運改善、時機選擇
 
-你最想了解哪個方面呢？風鈴會用最可愛的方式幫你分析哦～💕`,
+你最想了解哪個方面呢？小鈴會用最可愛的方式幫你分析哦～💕`,
 		},
 
 		// Relationship analysis choices
@@ -285,7 +285,7 @@ export const CHAT_TRANSLATIONS = {
 		reportRecommendations: {
 			header: `───────────────────
 💎 **想要更深入的分析嗎？**
-根據你的狀況，風鈴為你推薦：`,
+根據你的狀況，小鈴為你推薦：`,
 			option1: (concernName, currency, original, discount) =>
 				`**1️⃣ 一份關於${concernName}的詳細報告** 價值${currency}${original}，限時優惠${currency}${discount}
 - 深入分析你的${concernName}運勢，提供具體建議和改善方案
@@ -322,7 +322,7 @@ export const CHAT_TRANSLATIONS = {
 		smartChat2: {
 			thankYouResponse: "謝謝你跟我分享這個！😊",
 			outOfScopeNote:
-				"\n\n雖然這個話題很有趣，不過風鈴主要專精於風水命理方面的分析哦～",
+				"\n\n雖然這個話題很有趣，不過小鈴主要專精於風水命理方面的分析哦～",
 			baziAnalysisError:
 				"很抱歉，在分析你們的八字時遇到了問題，請稍後再試。",
 			invalidChoiceError: "抱歉，我沒有理解你的選擇 😅",
@@ -392,7 +392,7 @@ export const CHAT_TRANSLATIONS = {
 • 1999/3/15  
 • 1999年3月15日
 
-風鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`,
+小鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`,
 
 		// 📊 Daily analysis quota message
 		dailyAnalysisQuota: (
@@ -404,30 +404,30 @@ export const CHAT_TRANSLATIONS = {
 
 		// 🎂 Birthday invitation for specific topics
 		birthdayInvitation: (topic) =>
-			`告訴風鈴你的生日，我可以幫你看看${topic}方面的運勢哦！`,
+			`告訴小鈴你的生日，我可以幫你看看${topic}方面的運勢哦！`,
 
 		// 🎂 Birthday invitation with full template (includes examples)
 		birthdayInvitationFull: (topic) =>
-			`告訴風鈴你的生日，我可以幫你看看${topic}方面的運勢哦！
+			`告訴小鈴你的生日，我可以幫你看看${topic}方面的運勢哦！
 
 📅 生日格式範例：
 • 1999-03-15
 • 1999/3/15  
 • 1999年3月15日
 
-風鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`,
+小鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`,
 	},
 
 	"zh-CN": {
 		// Initial greetings
 		initialGreeting:
-			"你好呀～我是风铃！✨ 有什么生活上的困扰想找我聊聊呢？无论是工作、感情、财运还是健康，我都可以帮你分析风水运势～",
+			"你好呀～我是小铃！✨ 有什么生活上的困扰想找我聊聊呢？无论是工作、感情、财运还是健康，我都可以帮你分析风水运势～",
 
 		// Topic deviation responses
 		topicDeviation: {
 			template: (currentAreaName) =>
-				`哇～风铃觉得你刚刚问的东西好有趣呢！😊\n\n不过我们刚才不是在聊「${currentAreaName}」的问题吗？风铃想先帮你把这个处理好呢～\n\n让我们继续聊「${currentAreaName}」的事情好吗？这样我才能给你最专业的风水建议哦！✨`,
-			serviceList: `如果你想换话题到其他风水领域，也可以告诉风铃：
+				`哇～小铃觉得你刚刚问的东西好有趣呢！😊\n\n不过我们刚才不是在聊「${currentAreaName}」的问题吗？小铃想先帮你把这个处理好呢～\n\n让我们继续聊「${currentAreaName}」的事情好吗？这样我才能给你最专业的风水建议哦！✨`,
+			serviceList: `如果你想换话题到其他风水领域，也可以告诉小铃：
 💼 **工作** - 事业发展、职场关系
 💕 **感情** - 桃花运、婚姻配对  
 💰 **财运** - 财富增长、投资运势
@@ -440,7 +440,7 @@ export const CHAT_TRANSLATIONS = {
 		// Non-core input handling
 		nonCoreInput: {
 			typoSuggestion: (suggestion) =>
-				`😊 风铃觉得你可能想问的是「${suggestion}」的问题呢！如果不是的话，请再说得清楚一点哦～`,
+				`😊 小铃觉得你可能想问的是「${suggestion}」的问题呢！如果不是的话，请再说得清楚一点哦～`,
 			serviceIntro: `我们的专业风水服务包括：
 💼 **工作** - 事业发展、职场关系
 💕 **感情** - 桃花运、婚姻配对  
@@ -451,9 +451,9 @@ export const CHAT_TRANSLATIONS = {
 ✨ **因缘** - 机会把握、命运改善
 
 你想了解哪个方面呢？`,
-			genericGuidance: `咦～风铃不太明白你的意思呢 😅
+			genericGuidance: `咦～小铃不太明白你的意思呢 😅
 
-不过没关系！风铃最擅长的是这些专业风水服务：
+不过没关系！小铃最擅长的是这些专业风水服务：
 
 💼 **工作** - 事业发展、职场关系、升职加薪
 💕 **感情** - 桃花运、婚姻配对、感情问题
@@ -463,7 +463,7 @@ export const CHAT_TRANSLATIONS = {
 🏥 **健康** - 身心调理、养生风水、健康运势
 ✨ **因缘** - 机会把握、命运改善、时机选择
 
-你最想了解哪个方面呢？风铃会用最可爱的方式帮你分析哦～💕`,
+你最想了解哪个方面呢？小铃会用最可爱的方式帮你分析哦～💕`,
 		},
 
 		// Relationship analysis choices
@@ -701,7 +701,7 @@ export const CHAT_TRANSLATIONS = {
 		reportRecommendations: {
 			header: `───────────────────
 💎 **想要更深入的分析吗？**
-根据你的状况，风铃为你推荐：`,
+根据你的状况，小铃为你推荐：`,
 			option1: (concernName, currency, original, discount) =>
 				`**1️⃣ 一份关于${concernName}的详细报告** 价值${currency}${original}，限时优惠${currency}${discount}
 - 深入分析你的${concernName}运势，提供具体建议和改善方案
@@ -738,7 +738,7 @@ export const CHAT_TRANSLATIONS = {
 		smartChat2: {
 			thankYouResponse: "谢谢你跟我分享这个！😊",
 			outOfScopeNote:
-				"\n\n虽然这个话题很有趣，不过风铃主要专精于风水命理方面的分析哦～",
+				"\n\n虽然这个话题很有趣，不过小铃主要专精于风水命理方面的分析哦～",
 			baziAnalysisError:
 				"很抱歉，在分析你们的八字时遇到了问题，请稍后再试。",
 			invalidChoiceError: "抱歉，我没有理解你的选择 😅",
@@ -808,7 +808,7 @@ export const CHAT_TRANSLATIONS = {
 • 1999/3/15  
 • 1999年3月15日
 
-风铃会先给你一个简单的分析，如果你觉得有帮助，还可以做更详细的完整报告哦～💕`,
+小铃会先给你一个简单的分析，如果你觉得有帮助，还可以做更详细的完整报告哦～💕`,
 
 		// 📊 Daily analysis quota message
 		dailyAnalysisQuota: (
@@ -820,18 +820,18 @@ export const CHAT_TRANSLATIONS = {
 
 		// 🎂 Birthday invitation for specific topics
 		birthdayInvitation: (topic) =>
-			`告诉风铃你的生日，我可以帮你看看${topic}方面的运势哦！`,
+			`告诉小铃你的生日，我可以帮你看看${topic}方面的运势哦！`,
 
 		// 🎂 Birthday invitation with full template (includes examples)
 		birthdayInvitationFull: (topic) =>
-			`告诉风铃你的生日，我可以帮你看看${topic}方面的运势哦！
+			`告诉小铃你的生日，我可以帮你看看${topic}方面的运势哦！
 
 📅 生日格式范例：
 • 1999-03-15
 • 1999/3/15  
 • 1999年3月15日
 
-风铃会先给你一个简单的分析，如果你觉得有帮助，还可以做更详细的完整报告哦～💕`,
+小铃会先给你一个简单的分析，如果你觉得有帮助，还可以做更详细的完整报告哦～💕`,
 	},
 };
 

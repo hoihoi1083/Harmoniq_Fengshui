@@ -35,7 +35,7 @@ export async function POST(req) {
 
 		// Enhanced date-aware prompt for couple season analysis with simplified language
 		const prompt = isSimplified
-			? `你是亲切的风水师「风铃」。请用白话文(简单易懂的语言)分析夫妻在不同季节的相处情况：
+			? `你是亲切的风水师「小铃」。请用白话文(简单易懂的语言)分析夫妻在不同季节的相处情况：
 
 夫妻基本信息：
 - ${name1}生日：${birthday1}，性别：${gender1}
@@ -110,7 +110,7 @@ export async function POST(req) {
 11. 每季节控制在80-120字范围内，保持内容密度一致
 
 请确保每个季节的夫妻分析都足够详细深入，为夫妻双方提供真正有价值的个人化感情经营指导。`
-			: `你是親切的風水師「風鈴」。請用白話文(簡單易懂的語言)分析夫妻在不同季節的相處情況：
+			: `你是親切的風水師「小鈴」。請用白話文(簡單易懂的語言)分析夫妻在不同季節的相處情況：
 
 夫妻基本信息：
 - ${name1}生日：${birthday1}，性別：${gender1}

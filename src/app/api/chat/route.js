@@ -341,7 +341,7 @@ function generateBirthdayAnalysisResponse(birthday, concern = "工作") {
 		const month = birthday.getMonth() + 1;
 		const day = birthday.getDate();
 
-		return `🔮 風鈴看了你的生日，用爺爺教的八字方法幫你算了算～
+		return `🔮 小鈴看了你的生日，用爺爺教的八字方法幫你算了算～
 
 **你的性格特質：**
 ${analysis.basic}
@@ -355,25 +355,25 @@ ${analysis.fengshui}
 ───────────────────
 💎 **想要更深入的分析嗎？**
 
-風鈴可以為你提供更詳細的個人化報告，包括：
+小鈴可以為你提供更詳細的個人化報告，包括：
 • 完整的八字命盤分析
 • 流年運勢預測
 • 詳細的風水佈局建議
 • 最佳時機指引
 
-這樣的深度分析會更準確更實用哦～ 有興趣的話告訴風鈴！✨`;
+這樣的深度分析會更準確更實用哦～ 有興趣的話告訴小鈴！✨`;
 	} catch (error) {
 		console.error("Birthday analysis generation error:", error);
 		return `哇～是${birthday.getFullYear()}年${birthday.getMonth() + 1}月${birthday.getDate()}日生日的小哥哥/小姐姐呀！✨  
 
-風鈴幫你算了一下～你的五行屬性很特別哦！
+小鈴幫你算了一下～你的五行屬性很特別哦！
 
 📊 **基本分析：**
 • 你的性格特質很適合${concern}發展
 • 建議在東南方擺放有利的物品
 • 今年下半年運勢會有不錯的提升
 
-想知道更詳細的分析嗎？風鈴可以為你做更深入的八字命盤解讀～💕`;
+想知道更詳細的分析嗎？小鈴可以為你做更深入的八字命盤解讀～💕`;
 	}
 }
 // Generate contextual suggestions based on conversation (DISABLED - too pushy)

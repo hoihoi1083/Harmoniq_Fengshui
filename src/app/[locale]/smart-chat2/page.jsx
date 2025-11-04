@@ -882,7 +882,7 @@ export default function SmartChat2() {
 						formattedMessages.unshift({
 							role: "assistant",
 							content:
-								"你好呀～我是風水妹！✨ 歡迎回到智能風水顧問 Smart-Chat2 (AI版)！\n\n繼續您之前的對話...",
+								"你好呀～我是小鈴！✨ 歡迎回到智能風水顧問 Smart-Chat2 (AI版)！\n\n繼續您之前的對話...",
 							timestamp: new Date(
 								data.metadata?.createdAt || Date.now()
 							),
@@ -899,7 +899,7 @@ export default function SmartChat2() {
 						{
 							role: "assistant",
 							content:
-								"你好呀～我是風水妹！✨ 歡迎來到智能風水顧問 Smart-Chat2 (AI版)！\n\n這是您之前的對話，請繼續...",
+								"你好呀～我是小鈴！✨ 歡迎來到智能風水顧問 Smart-Chat2 (AI版)！\n\n這是您之前的對話，請繼續...",
 							timestamp: new Date(),
 							aiAnalysis: null,
 							systemType: "smart-chat2",
@@ -1035,7 +1035,7 @@ export default function SmartChat2() {
 						<div className="flex items-center space-x-3">
 							<img
 								src="/images/風水妹/風水妹.png"
-								alt="風水妹"
+								alt="小鈴"
 								className="w-10 h-10 rounded-full"
 								onError={(e) => {
 									e.target.style.display = "none";
@@ -1264,11 +1264,11 @@ export default function SmartChat2() {
 							{showLandingPage ? (
 								/* 落地頁 */
 								<div className="flex flex-col items-center justify-center h-full">
-									{/* HarmoniQ Logo和風水妹 */}
+									{/* HarmoniQ Logo和小鈴 */}
 									<div className="flex flex-row items-center ">
 										<img
 											src="/images/風水妹/風水妹.png"
-											alt="風水妹"
+											alt="小鈴"
 											className=" w-50 h-50 md:w-50 md:h-50"
 											onError={(e) => {
 												e.target.style.display = "none";
@@ -1405,13 +1405,13 @@ export default function SmartChat2() {
 												</div>
 											</div>
 										) : (
-											/* AI助手消息樣式 - 白色背景配風水妹頭像 */
+											/* AI助手消息樣式 - 白色背景配小鈴頭像 */
 											<div className="max-w-[95%] md:max-w-[90%] bg-white rounded-2xl shadow-md border border-gray-200">
 												{/* 助手頭像和標題 */}
 												<div className="flex items-center p-3 md:p-4">
 													<img
 														src="/images/風水妹/風水妹.png"
-														alt="風水妹"
+														alt="小鈴"
 														className="w-10 h-10 mr-2 rounded-full md:w-12 md:h-12 md:mr-3"
 														onError={(e) => {
 															e.target.style.display =
@@ -1580,7 +1580,7 @@ export default function SmartChat2() {
 										<div className="flex items-center p-3 md:p-4">
 											<img
 												src="/images/風水妹/風水妹.png"
-												alt="風水妹"
+												alt="小鈴"
 												className="w-10 h-10 mr-2 rounded-full md:w-12 md:h-12 md:mr-3"
 												onError={(e) => {
 													e.target.style.display =
@@ -1596,7 +1596,7 @@ export default function SmartChat2() {
 										<div className="px-3 pb-3 md:px-4 md:pb-4">
 											<div className="flex items-center space-x-2">
 												<span className="text-sm text-black">
-													風水妹費神運算中
+													小鈴費神運算中
 												</span>
 												<Brain className="w-4 h-4 text-purple-600 animate-pulse" />
 												<div className="flex space-x-1">
@@ -1636,7 +1636,7 @@ export default function SmartChat2() {
 											setInputMessage(e.target.value)
 										}
 										onKeyPress={handleKeyPress}
-										placeholder="輸入任何問題，風水妹會分析並引導你..."
+										placeholder="輸入任何問題，小鈴會分析並引導你..."
 										className="flex-1 px-4 py-2 text-sm text-black placeholder-gray-500 bg-transparent resize-none md:px-6 md:py-3 md:text-base focus:outline-none"
 										rows={1}
 										disabled={isLoading}

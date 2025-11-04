@@ -399,7 +399,7 @@ class EnhancedMessageAnalyzer {
 			// 直接問候
 			/^(你好|你好|hi|hello|嗨|hey)/i,
 			// 稱呼問候
-			/^(你好|你好|嗨|哈囉)[，,]?\s*(風鈴|老師|大師|師傅)/i,
+			/^(你好|你好|嗨|哈囉)[，,]?\s*(小鈴|老師|大師|師傅)/i,
 			// 客套話
 			/^(早安|午安|晚安|早上好|下午好|晚上好)/i,
 			// 感謝用語
@@ -449,7 +449,7 @@ class EnhancedMessageAnalyzer {
 	handleGreeting(analysis, originalMessage) {
 		const responses = {
 			direct: [
-				`你好呀～我是風鈴！✨ 很高興認識你！
+				`你好呀～我是小鈴！✨ 很高興認識你！
 
 我是解難專家，可以幫你分析人生各方面的問題和運勢。無論你在感情、工作、財運或健康方面遇到什麼問題，我都很樂意為你提供分析和建議！
 
@@ -827,7 +827,7 @@ class EnhancedMessageAnalyzer {
 			financial_concern:
 				"經濟壓力確實很大，不過困難是暫時的！讓我幫你看看轉機在哪裡 💪",
 			health_worry: "身體健康最重要，要好好照顧自己呢 🌿",
-			general_concern: "聽起來你遇到了一些挑戰，讓風鈴來幫你分析一下！",
+			general_concern: "聽起來你遇到了一些挑戰，讓小鈴來幫你分析一下！",
 		};
 
 		const supportMessage =
@@ -882,7 +882,7 @@ class EnhancedMessageAnalyzer {
 
 想要更詳細的分析和解決方案嗎？告訴我你是男生還是女生，我就能為你做完整的命理分析，找出最適合的改善方法！
 
-風鈴的分析報告會包含：
+小鈴的分析報告會包含：
 🎯 問題根源分析
 📈 改善時機建議  
 🏠 相關風水調整

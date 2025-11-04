@@ -347,13 +347,13 @@ export default function DemoSection() {
 							</div>
 						</div>
 
-						{/* Right side - 風水妹 character */}
+						{/* Right side - 小鈴 character */}
 						<div className="relative z-10 flex items-center justify-center">
 							<div className="relative flex items-center justify-center">
 								{/* Main character image - Optimized for horizontal layout */}
 								<img
 									src="/images/風水妹/風水妹3.png"
-									alt="風水妹 Character"
+									alt="小鈴 Character"
 									className="h-auto select-none drop-shadow-2xl"
 									style={{
 										width: "clamp(70px, 12vw, 200px)",

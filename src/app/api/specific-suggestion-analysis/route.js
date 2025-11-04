@@ -50,33 +50,34 @@ function parseSpecificSuggestionContent(aiResponse, isSimplified = false) {
 	try {
 		console.log("Raw AI Response:", aiResponse);
 
-		// Extract suggestions section
+		// Extract suggestions section - support both simplified and traditional Chinese
 		const suggestionsMatch = aiResponse.match(
-			/五大建議方案[：:](.*?)五大禁忌行為/s
+			/五大建[议議]方案[：:](.*?)五大禁忌[行为為]/s
 		);
 		let suggestionsText = suggestionsMatch
 			? suggestionsMatch[1].trim()
 			: "";
 
 		if (!suggestionsText) {
-			// Alternative pattern for suggestions
+			// Alternative pattern for suggestions - support both variants
 			const altSuggestionsMatch = aiResponse.match(
-				/建議方案[：:]?(.*?)(?=禁忌|避免|注意)/s
+				/建[议議]方案[：:]?(.*?)(?=禁忌|避免|注意)/s
 			);
 			suggestionsText = altSuggestionsMatch
 				? altSuggestionsMatch[1].trim()
 				: "";
 		}
 
-		// Extract taboos section
+		// Extract taboos section - support both simplified and traditional Chinese
 		const taboosMatch = aiResponse.match(
-			/五大禁忌行為[：:](.*?)(?:\n\n|$)/s
+			/五大禁忌[行为為][：:](.*?)(?:\n\n|$)/s
 		);
 		let taboosText = taboosMatch ? taboosMatch[1].trim() : "";
 
 		if (!taboosText) {
-			// Alternative pattern for taboos
-			const altTaboosMatch = aiResponse.match(/禁忌行為[：:]?(.*?)$/s);
+			// Alternative pattern for taboos - support both variants
+			const altTaboosMatch =
+				aiResponse.match(/禁忌[行为為][：:]?(.*?)$/s);
 			taboosText = altTaboosMatch ? altTaboosMatch[1].trim() : "";
 		}
 

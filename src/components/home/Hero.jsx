@@ -135,7 +135,7 @@ export default function Hero() {
 		{
 			num: 1,
 			image: "/images/hero/hero-1-white.png",
-			title: "風鈴聊天室",
+			title: "小鈴聊天室",
 			subtitle: "免費測評房間/命理",
 		},
 		{

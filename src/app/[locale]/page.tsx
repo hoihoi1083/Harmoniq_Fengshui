@@ -23,7 +23,7 @@ import { useTranslations } from "next-intl";
 
 export default function Home() {
 	const t = useTranslations("chatPage");
-	const { data: session } = useSession();
+	const { data: session, status } = useSession();
 	const router = useRouter();
 	const pathname = usePathname();
 	const currentLocale = pathname?.split("/")[1] || "zh-TW"; // Extract locale from URL
@@ -1169,14 +1169,14 @@ export default function Home() {
 					const hasWelcomeMessage = formattedMessages.some(
 						(msg) =>
 							msg.role === "assistant" &&
-							msg.content.includes("歡迎來到風鈴聊天室")
+							msg.content.includes("歡迎來到小鈴聊天室")
 					);
 
 					if (!hasWelcomeMessage) {
 						formattedMessages.unshift({
 							role: "assistant",
 							content:
-								"你好呀～我是風鈴！✨ 歡迎回到風鈴聊天室！\n\n繼續您之前的對話...",
+								"你好呀～我是小鈴！✨ 歡迎回到小鈴聊天室！\n\n繼續您之前的對話...",
 							timestamp: new Date(
 								data.metadata?.createdAt || Date.now()
 							),
@@ -1193,7 +1193,7 @@ export default function Home() {
 						{
 							role: "assistant",
 							content:
-								"你好呀～我是風鈴！✨ 歡迎來到風鈴聊天室！\n\n這是您之前的對話，請繼續...",
+								"你好呀～我是小鈴！✨ 歡迎來到小鈴聊天室！\n\n這是您之前的對話，請繼續...",
 							timestamp: new Date(),
 							aiAnalysis: null,
 							systemType: "smart-chat2",
@@ -1339,7 +1339,7 @@ export default function Home() {
 						<div className="flex items-center space-x-3">
 							<img
 								src="/images/風水妹/風水妹2.png"
-								alt="風鈴"
+								alt="小鈴"
 								className="w-10 h-10 rounded-full"
 								onError={(e) => {
 									(
@@ -1356,77 +1356,89 @@ export default function Home() {
 						</div>
 					</div>
 
-					{/* 歷史對話 */}
-					<div className="bg-[#E0E0E0] rounded-lg mx-4 mb-4">
-						<div className="p-4 border-b border-[#d0d0d0]">
-							<h3 className="flex items-center justify-between font-medium text-gray-800">
-								{t("historyTitle")}
-								{isLoadingHistory && (
-									<div className="w-4 h-4 border-b-2 border-gray-800 rounded-full animate-spin"></div>
-								)}
-							</h3>
-						</div>
-						<div className="p-2 overflow-y-auto max-h-48">
-							{conversationHistory.length === 0 ? (
-								<div className="p-3 text-sm text-center text-gray-600">
-									{isLoadingHistory
-										? t("loading")
-										: t("noHistory")}
-								</div>
-							) : (
-								conversationHistory.map((conversation) => (
-									<div
-										key={conversation.conversationId}
-										className="p-3 hover:bg-[#d0d0d0] rounded cursor-pointer transition-colors mb-1"
-										onClick={() => {
-											loadSpecificConversation(
-												conversation.conversationId
-											);
-											handleMobileNavigation();
-										}}
-									>
-										<div className="text-sm font-medium text-gray-800 truncate">
-											{conversation.title ||
-												t("untitledConversation")}
-										</div>
-										<div className="flex items-center justify-between mt-1 text-xs text-gray-600">
-											<span>
-												{formatConversationTime(
-													conversation.lastUpdated
-												)}
-											</span>
-											<span className="bg-[#d0d0d0] text-gray-800 px-2 py-0.5 rounded-full text-xs">
-												{conversation.messageCount || 0}
-											</span>
-										</div>
-										{conversation.topics &&
-											conversation.topics.length > 0 && (
-												<div className="flex flex-wrap gap-1 mt-2">
-													{conversation.topics
-														.slice(0, 2)
-														.map((topic, index) => (
-															<span
-																key={index}
-																className="text-xs bg-[#c0c0c0] text-gray-800 px-2 py-0.5 rounded"
-															>
-																{topic}
-															</span>
-														))}
-													{conversation.topics
-														.length > 2 && (
-														<span className="text-xs text-gray-600">
-															+
-															{conversation.topics
-																.length - 2}
-														</span>
-													)}
-												</div>
-											)}
+					{/* 歷史對話 - 僅在登入時顯示 */}
+					{session && status === "authenticated" && (
+						<div className="bg-[#E0E0E0] rounded-lg mx-4 mb-4">
+							<div className="p-4 border-b border-[#d0d0d0]">
+								<h3 className="flex items-center justify-between font-medium text-gray-800">
+									{t("historyTitle")}
+									{isLoadingHistory && (
+										<div className="w-4 h-4 border-b-2 border-gray-800 rounded-full animate-spin"></div>
+									)}
+								</h3>
+							</div>
+							<div className="p-2 overflow-y-auto max-h-48">
+								{conversationHistory.length === 0 ? (
+									<div className="p-3 text-sm text-center text-gray-600">
+										{isLoadingHistory
+											? t("loading")
+											: t("noHistory")}
 									</div>
-								))
-							)}
+								) : (
+									conversationHistory.map((conversation) => (
+										<div
+											key={conversation.conversationId}
+											className="p-3 hover:bg-[#d0d0d0] rounded cursor-pointer transition-colors mb-1"
+											onClick={() => {
+												loadSpecificConversation(
+													conversation.conversationId
+												);
+												handleMobileNavigation();
+											}}
+										>
+											<div className="text-sm font-medium text-gray-800 truncate">
+												{conversation.title ||
+													t("untitledConversation")}
+											</div>
+											<div className="flex items-center justify-between mt-1 text-xs text-gray-600">
+												<span>
+													{formatConversationTime(
+														conversation.lastUpdated
+													)}
+												</span>
+												<span className="bg-[#d0d0d0] text-gray-800 px-2 py-0.5 rounded-full text-xs">
+													{conversation.messageCount ||
+														0}
+												</span>
+											</div>
+											{conversation.topics &&
+												conversation.topics.length >
+													0 && (
+													<div className="flex flex-wrap gap-1 mt-2">
+														{conversation.topics
+															.slice(0, 2)
+															.map(
+																(
+																	topic,
+																	index
+																) => (
+																	<span
+																		key={
+																			index
+																		}
+																		className="text-xs bg-[#c0c0c0] text-gray-800 px-2 py-0.5 rounded"
+																	>
+																		{topic}
+																	</span>
+																)
+															)}
+														{conversation.topics
+															.length > 2 && (
+															<span className="text-xs text-gray-600">
+																+
+																{conversation
+																	.topics
+																	.length - 2}
+															</span>
+														)}
+													</div>
+												)}
+										</div>
+									))
+								)}
+							</div>
 						</div>
-					</div>
+					)}
 
 					{/* 付費報告預覽 */}
 					<div className="px-4 mb-4">
@@ -1580,7 +1592,7 @@ export default function Home() {
 									<div className="flex flex-row items-center gap-3 sm:flex-row sm:gap-6 md:gap-8 sm:mt-0">
 										<img
 											src="/images/風水妹/風水妹.png"
-											alt="風鈴"
+											alt="小鈴"
 											className="flex-shrink-0 w-20 h-20 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-50 lg:h-50"
 											onError={(e) => {
 												(
@@ -1970,7 +1982,7 @@ export default function Home() {
 												<div className="flex items-center p-3 md:p-4">
 													<img
 														src="/images/風水妹/風水妹2.png"
-														alt="風鈴"
+														alt="小鈴"
 														className="w-10 h-10 mr-2 rounded-full shadow-lg md:w-12 md:h-12 md:mr-3"
 														onError={(e) => {
 															(
@@ -2010,10 +2022,10 @@ export default function Home() {
 																/📅.*\*\*生日格式範例/.test(
 																	content
 																) ||
-																/告訴風鈴你的生日/.test(
+																/告訴小鈴你的生日/.test(
 																	content
 																) ||
-																/風鈴會先給你一個簡單的分析/.test(
+																/小鈴會先給你一個簡單的分析/.test(
 																	content
 																) ||
 																/───────────────────/.test(
@@ -2077,7 +2089,7 @@ export default function Home() {
 
 																// 其他結構化內容的處理（生日格式等）
 																const splitPatterns =
-																	/(?=為了提供最適合的分析|你想要哪種分析|告訴風鈴你的生日|📅.*\*\*生日格式範例)/;
+																	/(?=為了提供最適合的分析|你想要哪種分析|告訴小鈴你的生日|📅.*\*\*生日格式範例)/;
 																const parts =
 																	content.split(
 																		splitPatterns
@@ -2103,10 +2115,10 @@ export default function Home() {
 																				"**生日格式範例"
 																			) &&
 																			!part.includes(
-																				"告訴風鈴你的生日"
+																				"告訴小鈴你的生日"
 																			) &&
 																			!part.includes(
-																				"風鈴會先給你一個簡單的分析"
+																				"小鈴會先給你一個簡單的分析"
 																			);
 
 																		if (
@@ -2463,8 +2475,8 @@ export default function Home() {
 										onKeyPress={handleKeyPress}
 										placeholder={
 											currentLocale === "zh-CN"
-												? "输入任何问题，风铃会分析并引导你..."
-												: "輸入任何問題，風鈴會分析並引導你..."
+												? "输入任何问题，小铃会分析并引导你..."
+												: "輸入任何問題，小鈴會分析並引導你..."
 										}
 										className="flex-1 px-2 py-2 text-xs text-black placeholder-gray-500 bg-transparent resize-none focus:outline-none sm:px-3 sm:py-2.5 sm:text-sm md:px-6 md:py-3 md:text-base"
 										rows={1}

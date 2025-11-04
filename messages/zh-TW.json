@@ -1190,7 +1190,7 @@
 		"generalCoupleAnalysis": "一般情侶關係分析"
 	},
 	"coupleReport": {
-		"loadingTitle": "風水妹正在為你們準備專屬合婚分析報告",
+		"loadingTitle": "小鈴正在為你們準備專屬合婚分析報告",
 		"loadingSubtitle": "請稍候，正在分析兩人的姻緣配對",
 		"backToConsultation": "返回智能諮詢",
 		"noReportData": "未找到報告數據",
@@ -1225,17 +1225,17 @@
 		},
 		"coupleSeason": {
 			"title": "夫妻關鍵季節",
-			"loadingTitle": "風水妹正在分析夫妻關鍵季節",
+			"loadingTitle": "小鈴正在分析夫妻關鍵季節",
 			"loadingSubtitle": "請稍候，正在計算最佳時機配對",
-			"loadingAlt": "風水妹運算中",
+			"loadingAlt": "小鈴運算中",
 			"noData": "無法載入夫妻季節分析資料",
 			"currentLabel": "當前："
 		},
 		"coupleCoreSuggestion": {
 			"title": "感情開運建議",
-			"loadingTitle": "風水妹正在生成夫妻開運建議",
+			"loadingTitle": "小鈴正在生成夫妻開運建議",
 			"loadingSubtitle": "請稍候，正在分析最佳運勢提升方案",
-			"loadingAlt": "風水妹運算中",
+			"loadingAlt": "小鈴運算中",
 			"noData": "無法載入夫妻開運建議資料",
 			"tabs": {
 				"relationship": {
@@ -1307,7 +1307,7 @@
 			"whenToMoveOn": "何時該放手"
 		},
 		"enhancedCoupleSpecificProblemSolution": {
-			"loadingMessage": "風水妹正在分析您的專屬問題",
+			"loadingMessage": "小鈴正在分析您的專屬問題",
 			"loadingSubMessage": "請稍候，正在制定個人化解決方案",
 			"baziAnalysisGenerating": "八字分析生成中...",
 			"analysisFailed": "分析失敗",
@@ -1342,27 +1342,27 @@
 			}
 		},
 		"chartDiagnosisSection": {
-			"loadingMessage": "風水妹正在生成盤面診斷",
+			"loadingMessage": "小鈴正在生成盤面診斷",
 			"loadingSubMessage": "請稍候，正在分析命盤配對細節",
 			"female": "女方",
 			"male": "男方",
 			"keySymptoms": "關鍵合盤徵象"
 		},
 		"emergencyFengShuiSection": {
-			"loadingMessage": "風水妹正在生成風水急救方案",
+			"loadingMessage": "小鈴正在生成風水急救方案",
 			"loadingSubMessage": "請稍候，正在制定緊急應對策略",
 			"subtitle": "72小時內行動方案"
 		},
 		"restartChemistrySection": {
-			"loadingMessage": "風水妹正在生成重啟默契方案",
+			"loadingMessage": "小鈴正在生成重啟默契方案",
 			"loadingSubMessage": "請稍候，正在分析感情修復策略",
 			"subtitle": "破冰儀式建議"
 		}
 	},
 	"coupleAnnualAnalysis": {
-		"loadingTitle": "風水妹正在分析你們的流年運勢",
+		"loadingTitle": "小鈴正在分析你們的流年運勢",
 		"loadingSubtitle": "請稍候，如果載入時間過長，請檢查網路連線",
-		"loadingImage": "風水妹運算中",
+		"loadingImage": "小鈴運算中",
 		"errorTitle": "年度分析載入失敗",
 		"errorTimeoutMessage": "請求超時或網路連線問題，請稍後重試。",
 		"errorGenericMessage": "載入年度分析時發生錯誤，請重新嘗試。",
@@ -1444,8 +1444,8 @@
 		"daysAgo": "天前",
 		"title": "風鈴聊天室",
 		"placeholder": "有任何疑問嗎？請隨時與我分享～",
-		"aiName": "風鈴",
-		"aiThinking": "風鈴費神運算中",
+		"aiName": "小鈴",
+		"aiThinking": "小鈴費神運算中",
 		"shortcuts": {
 			"wealth": "我想增多財運",
 			"health": "如何更健康",
@@ -1460,8 +1460,8 @@
 	},
 	"fengShuiReport": {
 		"page": {
-			"loadingTitle": "風水妹正在為你準備專屬風水分析報告",
-			"loadingAlt": "風水妹運算中",
+			"loadingTitle": "小鈴正在為你準備專屬風水分析報告",
+			"loadingAlt": "小鈴運算中",
 			"errorReturn": "返回",
 			"errorMissingSession": "缺少支付會話ID，請重新進行支付",
 			"errorPaymentIncomplete": "支付未完成，請完成支付後再試",
@@ -1484,16 +1484,16 @@
 		},
 		"components": {
 			"fiveElement": {
-				"loadingText": "風水妹已經在運算五行配置中，請稍候",
-				"loadingAlt": "風水妹運算中",
+				"loadingText": "小鈴已經在運算五行配置中，請稍候",
+				"loadingAlt": "小鈴運算中",
 				"allElementsPresent": "五行齊全",
 				"noSevereMissing": "- 沒有嚴重缺失某一元素",
 				"missingElements": "命局缺",
 				"needsSupport": "需要後天補充以達到平衡"
 			},
 			"zodiac": {
-				"loadingText": "風水妹已經在運算八字分析中，請稍候",
-				"loadingAlt": "風水妹運算中",
+				"loadingText": "小鈴已經在運算八字分析中，請稍候",
+				"loadingAlt": "小鈴運算中",
 				"defaultAdvice": "根據五行分析，需要進一步確認用神配置以達到最佳平衡效果。",
 				"adviceTemplate": "根據你的五行配置分析，建議以「{primaryGod}」為首選用神，「{auxiliaryGod}」為輔助用神。透過{strategy}的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力。",
 				"strategy_補缺": "補足所缺",
@@ -1512,15 +1512,15 @@
 			},
 			"questionFocus": {
 				"sectionTitle": "疑問重點",
-				"loadingText": "風水妹已經在分析您的疑問重點，請稍候",
-				"loadingAlt": "風水妹運算中",
+				"loadingText": "小鈴已經在分析您的疑問重點，請稍候",
+				"loadingAlt": "小鈴運算中",
 				"errorText": "分析過程中遇到問題，已顯示備用內容",
 				"analysisTitle": "分析指導",
 				"analysisContent": "根據您的關注領域「{concern}」和具體問題「{problem}」，我們將為您提供專業的命理分析和建議。\n\n💡 詳細的分析內容請參閱報告中的其他相關章節。"
 			},
 			"mingJu": {
-				"loadingAlt": "風水妹運算中",
-				"loadingText": "風水妹已經在運算命局核心解析中，請稍候",
+				"loadingAlt": "小鈴運算中",
+				"loadingText": "小鈴已經在運算命局核心解析中，請稍候",
 				"dayMaster": "日主特性",
 				"tabs": {
 					"health": {
@@ -1544,12 +1544,12 @@
 			"ganZhi": {
 				"title": "流年干支作用",
 				"subtitle": "流年干支的變化對個人運勢有著深遠的影響，以該年屬性為主軸解析",
-				"loadingAlt": "風水妹運算中",
-				"loadingText": "風水妹已經在運算流年干支分析中，請稍候",
+				"loadingAlt": "小鈴運算中",
+				"loadingText": "小鈴已經在運算流年干支分析中，請稍候",
 				"loadingDataText": "載入流年分析數據中..."
 			},
 			"jiXiong": {
-				"loading": "風水妹已經在運算吉凶分析中，請稍候",
+				"loading": "小鈴已經在運算吉凶分析中，請稍候",
 				"error": "分析出現問題：",
 				"showingBasicAnalysis": "顯示基礎分析結果",
 				"auspicious": "吉象",
@@ -1558,7 +1558,7 @@
 			},
 			"season": {
 				"title": "關鍵季節",
-				"loading": "風水妹已經在運算四季分析中，請稍候",
+				"loading": "小鈴已經在運算四季分析中，請稍候",
 				"noData": "無法載入季節分析資料",
 				"current": "當前：",
 				"analyzingSeasons": "正在分析關鍵季節..."
@@ -1566,11 +1566,11 @@
 			"coreSuggestion": {
 				"title": "核心原則",
 				"subtitle": "基於您的八字命理，著重於長期的生活調整和基礎運勢提升。",
-				"loading": "風水妹已經在運算開運建議中，請稍候",
+				"loading": "小鈴已經在運算開運建議中，請稍候",
 				"noData": "無法載入開運建議資料"
 			},
 			"specificSuggestion": {
-				"loading": "風水妹已經在運算針對性建議中，請稍候",
+				"loading": "小鈴已經在運算針對性建議中，請稍候",
 				"noData": "無法載入針對性建議資料",
 				"subtitle": "針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。",
 				"suggestionsTitle": "建議方案",

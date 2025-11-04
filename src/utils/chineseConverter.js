@@ -145,6 +145,10 @@ const traditionalToSimplified = {
 	際: "际",
 	發: "发",
 	變: "变",
+	觸: "触",
+	溝: "沟",
+	誤: "误",
+	覽: "览",
 
 	// User-specific additions
 	據: "据",

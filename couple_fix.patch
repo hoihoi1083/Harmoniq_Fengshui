@@ -1,0 +1,85 @@
+--- a/src/app/api/smart-chat2/route.js
++++ b/src/app/api/smart-chat2/route.js
+@@ -3435,11 +3435,29 @@
+ 	// 🔍 Debug couple analysis condition
+ 	console.log("🔍 DEBUG - 合婚分析條件檢查:");
+ 	console.log("   couplesBirthdayData:", !!couplesBirthdayData);
+ 	console.log(
+ 		"   userIntent?.relationshipAnalysisType:",
+ 		userIntent?.relationshipAnalysisType
+ 	);
++	console.log(
++		"   userIntent?.primaryConcern:",
++		userIntent?.primaryConcern
++	);
++
++	// 🔧 容錯條件：如果偵測到雙方生日，且符合以下任一條件，則執行合婚分析：
++	// 1. relationshipAnalysisType 明確為 "couple" (標準流程)
++	// 2. primaryConcern 是 "感情" (用戶選擇感情但尚未明確選擇合婚/個人)
++	const shouldProcessCouple =
++		couplesBirthdayData &&
++		(userIntent?.relationshipAnalysisType === "couple" ||
++			userIntent?.primaryConcern === "感情");
++
+ 	console.log(
+-		"   條件是否滿足:",
+-		couplesBirthdayData &&
+-			userIntent?.relationshipAnalysisType === "couple"
++		"   shouldProcessCouple:",
++		shouldProcessCouple
+ 	);
+ 
+-	if (
+-		couplesBirthdayData &&
+-		userIntent?.relationshipAnalysisType === "couple"
+-	) {
++	if (shouldProcessCouple) {
+ 		// 🎯 處理合婚分析的雙方生日輸入
+ 		console.log("🎯 檢測到合婚分析中的雙方生日:", couplesBirthdayData);
++
++		// 🔧 如果 relationshipAnalysisType 未設定，在這裡設定為 "couple"
++		if (!userIntent) {
++			userIntent = new SmartUserIntent({
++				sessionId: sessionId,
++				userEmail: userEmail,
++				userId: userId,
++				conversationActive: true,
++				primaryConcern: "感情",
++				relationshipAnalysisType: "couple",
++				conversationState: "asking_detailed_report",
++				createdAt: new Date(),
++			});
++		} else if (!userIntent.relationshipAnalysisType || userIntent.relationshipAnalysisType !== "couple") {
++			userIntent.relationshipAnalysisType = "couple";
++			console.log("🔧 自動設定 relationshipAnalysisType = couple (因檢測到雙方生日)");
++		}
+ 
+ 		// 🚫 檢查每日初步分析限制（合婚分析）
+@@ -3578,6 +3596,19 @@
+ 				userIntent.originalSpecificProblem ||
+ 				userIntent.specificQuestion
+ 			);
++
++			// 🔧 保存 userIntent 更新（relationshipAnalysisType 等）
++			if (userIntent) {
++				await userIntent.save();
++			}
+ 		} catch (error) {
+ 			console.error("❌ 生成合婚分析失敗:", error);
+ 			response = "很抱歉，在分析你們的八字時遇到了問題，請稍後再試。";
+ 			analysis = {
+ 				detectedTopic: "感情",
+ 				isWithinScope: true,
+ 				confidence: 0.8,
+ 				specificProblem: "系統錯誤",
+ 			};
+ 		}
++
++		// 🎯 一旦合婚分析已生成，立即回傳結果，避免後續分支覆蓋 response
++		return NextResponse.json({
++			response,
++			analysis,
++			systemType: "smart-chat2",
++			timestamp: new Date().toISOString(),
++		});
+ 	} else if (topicAndBirthdayData) {

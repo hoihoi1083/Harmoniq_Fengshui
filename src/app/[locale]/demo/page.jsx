@@ -1101,8 +1101,14 @@ export default function DemoPage() {
 											<img
 												src={
 													activeTag === "fengshui"
-														? "/images/demo/material2.png"
-														: "/images/demo/material.png"
+														? currentRegion ===
+															"china"
+															? "/images/demo/material2-cny.png"
+															: "/images/demo/material2.png"
+														: currentRegion ===
+															  "china"
+															? "/images/demo/material-cny.png"
+															: "/images/demo/material.png"
 												}
 												alt={t(
 													"sections.materialsNeeded"

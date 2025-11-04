@@ -139,7 +139,7 @@ class ResponseQualityManager {
 				politeness: "請問",
 			},
 			casual: {
-				greeting: "哈囉～讓風鈴幫你看看",
+				greeting: "哈囉～讓小鈴幫你看看",
 				transition: "來來來，我們聊聊",
 				question: "想知道你比較關心",
 				conclusion: "我覺得你可以試試",

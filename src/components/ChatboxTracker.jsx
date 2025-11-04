@@ -165,12 +165,12 @@ export default function ChatboxTracker() {
 				mutations.forEach((mutation) => {
 					mutation.addedNodes.forEach((node) => {
 						if (node.nodeType === Node.ELEMENT_NODE) {
-							// 檢測 AI 回應 (包含風鈴、AI等關鍵字)
+							// 檢測 AI 回應 (包含小鈴、AI等關鍵字)
 							const isAIResponse =
 								node.textContent &&
-								(node.textContent.includes("風鈴") ||
+								(node.textContent.includes("小鈴") ||
 									node.textContent.includes("AI") ||
-									node.querySelector('img[alt*="風鈴"]') ||
+									node.querySelector('img[alt*="小鈴"]') ||
 									node.className?.includes("assistant"));
 
 							if (isAIResponse) {

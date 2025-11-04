@@ -56,6 +56,8 @@ const ChatHistorySchema = new mongoose.Schema(
 				"birthday_collection",
 				"awaiting_birthday_choice", // 🎂 等待用戶選擇使用已保存或輸入新生日
 				"asking_detailed_report",
+				// 新增：支持感情流程中選擇 A/B/C/D 之後的狀態
+				"asking_relationship_type",
 				"ready_for_detailed_report",
 				"collecting_payment_info",
 				"completed",

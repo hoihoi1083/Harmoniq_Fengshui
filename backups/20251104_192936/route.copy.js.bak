@@ -469,17 +469,10 @@ function parseCouplesBirthdays(message) {
 }
 
 // 🔧 格式化合婚分析回應 - 將結構化對象轉換為字符串
-function formatCoupleAnalysisResponse(analysisResult, locale = "zh-TW") {
+function formatCoupleAnalysisResponse(analysisResult) {
 	if (!analysisResult || typeof analysisResult !== "object") {
 		return analysisResult;
 	}
-
-	// 🌐 Localized text based on locale
-	const isSimplified = locale === "zh-CN";
-	const texts = {
-		deeperAnalysis: isSimplified ? "想要更深入的分析吗？" : "想要更深入的分析嗎？",
-		recommendation: isSimplified ? "根据你们的状况，风铃为你们推荐：" : "根據你們的狀況，風鈴為你們推薦："
-	};
 
 	let formattedResponse = "";
 
@@ -511,7 +504,7 @@ function formatCoupleAnalysisResponse(analysisResult, locale = "zh-TW") {
 	// 6. 合婚報告推薦
 	if (analysisResult.reportRecommendation) {
 		const rec = analysisResult.reportRecommendation;
-		formattedResponse += `───────────────────\n💎 **${texts.deeperAnalysis}**\n${texts.recommendation}\n\n`;
+		formattedResponse += `───────────────────\n💎 **想要更深入的分析嗎？**\n根據你們的狀況，風鈴為你們推薦：\n\n`;
 
 		if (rec.options && rec.options.length > 0) {
 			// 處理多選項格式
@@ -2286,7 +2279,7 @@ ${analysis.aiResponse}
 				{
 					role: "system",
 					content:
-						`你是親切可愛的風鈴，善於先回答用戶問題再自然地介紹自己的專業服務。你只提供風水命理相關服務，不要推薦不存在的服務。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），絕對不可使用農曆用詞\n3. 🚫 禁止用詞：「農曆十月」「陰曆八月」「農曆四月」等\n4. ✅ 正確用法：「10月出生者」「十月份」「8月」等\n5. 當前是2025年10月19日，請確保回應基於2025年，不可提及2024年\n6. 用戶提供的生日是西曆日期，請據此分析\n7. 不要在回應中包含字數統計標記\n8. 保持風鈴親切可愛的語氣風格`,
+						"你是親切可愛的風鈴，善於先回答用戶問題再自然地介紹自己的專業服務。你只提供風水命理相關服務，不要推薦不存在的服務。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），絕對不可使用農曆用詞\n3. 🚫 禁止用詞：「農曆十月」「陰曆八月」「農曆四月」等\n4. ✅ 正確用法：「10月出生者」「十月份」「8月」等\n5. 當前是2025年10月19日，請確保回應基於2025年，不可提及2024年\n6. 用戶提供的生日是西曆日期，請據此分析\n7. 不要在回應中包含字數統計標記\n8. 保持風鈴親切可愛的語氣風格",
 				},
 				{
 					role: "user",
@@ -2808,17 +2801,11 @@ ${selectedEnding}`;
 具體問題：${specificProblem}
 原始訊息：${originalMessage}
 
-${this.locale === "zh-CN" 
-	? `请以风铃的身份，按照以下格式测算详细的八字分析报告：
-
-🔮 风铃看了你的八字，发现你有很特别的${displayTopic}潜质呢！💼
-
-**1. 命盘速读**`
-	: `請以風鈴的身份，按照以下格式測算詳細的八字分析報告：
+請以風鈴的身份，按照以下格式測算詳細的八字分析報告：
 
 🔮 風鈴看了你的八字，發現你有很特別的${displayTopic}潛質呢！💼
 
-**1. 命盤速讀**`}
+**1. 命盤速讀**
 八字：${baziString}
 五行屬性：[根據八字分析五行屬性，如：土命/火命等]
 ${displayTopic}宮主星：[分析對應主星，如：天府星（穩重權威）]
@@ -2827,17 +2814,11 @@ ${displayTopic}宮主星：[分析對應主星，如：天府星（穩重權威�
      用神：[分析用神，如：火（溫暖調候，生機盎然）]
      大運節點：[分析當前大運]
 
-${this.locale === "zh-CN" 
-	? `💖 哈啰亲爱的[五行]命小伙伴！让风铃为你解锁${new Date().getFullYear()}年的${displayTopic}密码～  
-
-**2. 年度预警**  
-✨【成就星】[时间范围]「[吉星名称]」发威！[具体建议和机会]～  
-⚠️【小人煞】小心属「[生肖]」的[相关人士][注意事项]，[具体防范建议]哦！`
-	: `💖 哈囉親愛的[五行]命小夥伴！讓風鈴為你解鎖${new Date().getFullYear()}年的${displayTopic}密碼～  
+💖 哈囉親愛的[五行]命小夥伴！讓風鈴為你解鎖${new Date().getFullYear()}年的${displayTopic}密碼～  
 
 **2. 年度預警**  
 ✨【成就星】[時間範圍]「[吉星名稱]」發威！[具體建議和機會]～  
-⚠️【小人煞】小心屬「[生肖]」的[相關人士][注意事項]，[具體防範建議]喔！`}  
+⚠️【小人煞】小心屬「[生肖]」的[相關人士][注意事項]，[具體防範建議]喔！  
 
 ⚠️ 關鍵指示：
 1. 所有日期和月份必須嚴格使用西曆（公曆），例如：1月、2月、3月等
@@ -2858,22 +2839,12 @@ ${this.locale === "zh-CN"
 [五行]命寶寶記得多用「[五行相生原理]」原理，[具體建議]能讓你[效果]！✨ 有問題隨時喚醒風鈴喔～
 
 ───────────────────
-💎 **想要更深入的分析${locale === 'zh-CN' ? '吗' : '嗎'}？**
-**1️⃣ ${locale === 'zh-CN' ? '详细报告' : '詳細報告'}** 價值$88，限時優惠$38
-**2️⃣ ${locale === 'zh-CN' ? '综合命理报告' : '綜合命理報告'}** 價值$168，限時優惠$88  
+💎 **想要更深入的分析嗎？**
+**1️⃣ 详细报告** 價值$88，限時優惠$38
+**2️⃣ 综合命理报告** 價值$168，限時優惠$88  
 
 
-${this.locale === "zh-CN"
-? `要求：
-1. 保持风铃可爱亲切的语气，使用表情符号和可爱语助词
-2. 提供具体实用的建议，避免空泛描述
-3. 重点分析用户关注的${displayTopic}领域
-4. 总长度约400-500字
-5. 格式要完整，包含所有必要部分
-6. 所有日期和月份都必须严格使用西历（公历），如1月、2月、3月等，绝对不可使用农历用词
-7. 当前日期是2025年10月19日，请确保分析基于2025年时间轴，不可提及2024年
-8. 特别注意：用户的生日是西历日期，不是农历，请据此分析命理特质`
-: `要求：
+要求：
 1. 保持風鈴可愛親切的語氣，使用表情符號和可愛語助詞
 2. 提供具體實用的建議，避免空泛描述
 3. 重點分析用戶關注的${displayTopic}領域
@@ -2882,7 +2853,6 @@ ${this.locale === "zh-CN"
 6. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等，絕對不可使用農曆用詞
 7. 當前日期是2025年10月19日，請確保分析基於2025年時間軸，不可提及2024年
 8. 特別注意：用戶的生日是西曆日期，不是農曆，請據此分析命理特質`;
-}
 
 		try {
 			const classifier = new AITopicClassifier(locale);
@@ -2890,7 +2860,7 @@ ${this.locale === "zh-CN"
 				{
 					role: "system",
 					content:
-						`你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。請按照指定格式測算詳細且實用的分析報告。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如：1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月出生」「10月份」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」「農曆四月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此進行命理分析\n8. 不要在回應中包含字數統計標記\n9. 保持風鈴專業且親切的語氣\n10. 如果需要提及月份，直接說「10月」「八月」等，不要加「農曆」「陰曆」前綴`,
+						"你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。請按照指定格式測算詳細且實用的分析報告。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如：1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月出生」「10月份」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」「農曆四月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此進行命理分析\n8. 不要在回應中包含字數統計標記\n9. 保持風鈴專業且親切的語氣\n10. 如果需要提及月份，直接說「10月」「八月」等，不要加「農曆」「陰曆」前綴",
 				},
 				{
 					role: "user",
@@ -2915,17 +2885,7 @@ ${this.locale === "zh-CN"
 			}
 		} catch (error) {
 			console.error("❌ 生成詳細八字分析失敗:", error);
-			return this.locale === "zh-CN" 
-				? `🔮 风铃看了你的八字 ${baziString}，很想为你分析${displayTopic}呢！
-
-不过系统暂时有点忙碌，请稍后重试，或者你可以：
-
-📞 联络客服取得人工分析
-💬 重新发送你的八字和问题
-🎯 选择其他分析服务
-
-风铃会尽快为你提供专业的${displayTopic}分析！✨`
-				: `🔮 風鈴看了你的八字 ${baziString}，很想為你分析${displayTopic}呢！
+			return `🔮 風鈴看了你的八字 ${baziString}，很想為你分析${displayTopic}呢！
 
 不過系統暫時有點忙碌，請稍後重試，或者你可以：
 
@@ -3283,15 +3243,15 @@ export async function POST(request) {
 			sessionId: sessionId,
 			conversationState: userIntent?.conversationState,
 			primaryConcern: userIntent?.primaryConcern,
-			message: message?.trim(),
+			message: message?.trim()
 		});
-
+		
 		// 🐛 DEBUG: Add state info to response for debugging
 		const debugInfo = {
 			loadedState: userIntent?.conversationState,
 			loadedConcern: userIntent?.primaryConcern,
 			message: message?.trim(),
-			sessionId: sessionId,
+			sessionId: sessionId
 		};
 
 		// 檢查是否為生日輸入
@@ -3545,7 +3505,7 @@ export async function POST(request) {
 					coupleAnalysisResult.basicAnalysis
 				) {
 					response =
-						formatCoupleAnalysisResponse(coupleAnalysisResult, locale);
+						formatCoupleAnalysisResponse(coupleAnalysisResult);
 					console.log(
 						"🔧 DEBUG - 格式化後的response類型:",
 						typeof response
@@ -4060,28 +4020,23 @@ export async function POST(request) {
 				};
 			}
 		}
-
+		
 		// 🔍 Debug: 檢查 userIntent 狀態
 		if (message?.trim() === "1" || message?.trim() === "2") {
 			console.log("🔍 當前 userIntent 狀態:", {
 				exists: !!userIntent,
 				conversationState: userIntent?.conversationState,
 				message: message?.trim(),
-				sessionId: sessionId,
+				sessionId: sessionId
 			});
 		}
-
+		
 		// 🎂 檢查是否為生日確認選擇 ("1" 或 "2")
 		if (
 			(message.trim() === "1" || message.trim() === "2") &&
 			userIntent?.conversationState === "awaiting_birthday_choice"
 		) {
-			console.log(
-				"🎂 檢測到生日選擇:",
-				message.trim(),
-				"狀態:",
-				userIntent?.conversationState
-			);
+			console.log("🎂 檢測到生日選擇:", message.trim(), "狀態:", userIntent?.conversationState);
 			// 🎂 查詢資料庫中是否有已保存的生日
 			const existingSavedBirthday = await SmartUserIntent.findOne({
 				$or: [{ userEmail: userEmail }, { userId: userId }],
@@ -4206,37 +4161,22 @@ export async function POST(request) {
 						);
 				}
 
-				// 🎯 添加報告選擇部分 (Localized)
-				const isSimplified = locale === "zh-CN";
-				const texts = {
-					deeperAnalysis: isSimplified ? "想要更深入的分析吗？" : "想要更深入的分析嗎？",
-					recommendation: isSimplified ? "根据你的状况，风铃为你推荐：" : "根據你的狀況，風鈴為你推薦：",
-					report1Title: isSimplified ? `一份关于${concern}的详细报告` : `一份關於${concern}的詳細報告`,
-					report1Feature1: isSimplified ? `深入分析你的${concern}运势，提供具体建议和改善方案` : `深入分析你的${concern}運勢，提供具體建議和改善方案`,
-					report1Feature2: isSimplified ? "详细的五行调理方法" : "詳細的五行調理方法",
-					report1Feature3: isSimplified ? "最佳行动时机指导" : "最佳行動時機指導",
-					report2Title: isSimplified ? "一份综合命理报告" : "一份綜合命理報告",
-					report2Feature1: isSimplified ? "全面的八字命盘分析，包含各方面运势预测" : "全面的八字命盤分析，包含各方面運勢預測",
-					report2Feature2: isSimplified ? "流年大运走势分析" : "流年大運走勢分析",
-					report2Feature3: isSimplified ? "人际关系和事业发展建议" : "人際關係和事業發展建議",
-					choosePrompt: isSimplified ? "请回复「1」或「2」选择你想要的报告～" : "請回覆「1」或「2」選擇你想要的報告～"
-				};
-				
+				// 🎯 添加報告選擇部分
 				response += `\n\n───────────────────
-💎 **${texts.deeperAnalysis}**
-${texts.recommendation}
+💎 想要更深入的分析嗎？
+根據你的狀況，風鈴為你推薦：
 
-1️⃣ ${texts.report1Title} 價值HK$88，限時優惠HK$38
-- ${texts.report1Feature1}
-- ${texts.report1Feature2}
-- ${texts.report1Feature3}
+1️⃣ 一份關於${concern}的詳細報告 價值HK$88，限時優惠HK$38
+- 深入分析你的${concern}運勢，提供具體建議和改善方案
+- 詳細的五行調理方法
+- 最佳行動時機指導
 
-2️⃣ ${texts.report2Title} 價值HK$168，限時優惠HK$88
-- ${texts.report2Feature1}
-- ${texts.report2Feature2}
-- ${texts.report2Feature3}
+2️⃣ 一份綜合命理報告 價值HK$168，限時優惠HK$88
+- 全面的八字命盤分析，包含各方面運勢預測
+- 流年大運走勢分析
+- 人際關係和事業發展建議
 
-${texts.choosePrompt}`;
+請回覆「1」或「2」選擇你想要的報告～`;
 
 				// 更新狀態
 				userIntent.conversationState = "asking_detailed_report";
@@ -4262,17 +4202,7 @@ ${texts.choosePrompt}`;
 				// 用戶選擇輸入新生日
 				console.log("🎂 用戶選擇輸入新生日");
 
-				const isSimplified = locale === "zh-CN";
-				response = isSimplified 
-					? `好的！请告诉风铃你的新生日～
-
-📅 生日格式范例：
-• 1999-03-15
-• 1999/3/15  
-• 1999年3月15日
-
-风铃会先给你一个简单的分析，然后你可以选择是否需要更详细的报告！✨`
-					: `好的！請告訴風鈴你的新生日～
+				response = `好的！請告訴風鈴你的新生日～
 
 📅 生日格式範例：
 • 1999-03-15
@@ -4680,7 +4610,7 @@ ${texts.choosePrompt}`;
 			console.log("🔵 進入 isChoiceInput 處理區塊，當前狀態:", {
 				conversationState: userIntent?.conversationState,
 				primaryConcern: userIntent?.primaryConcern,
-				message: message?.trim(),
+				message: message?.trim()
 			});
 			// 🔧 處理用戶選擇回應 (1️⃣2️⃣ 等 + 文字選項) - 僅當不在詢問詳細報告或生日確認狀態
 			let choice = message.match(/[12]/)?.[0];
@@ -5258,11 +5188,10 @@ ${texts.choosePrompt}`;
 					} else {
 						combinedResponse = `💫 已為你切換到${detectedTopic}分析！\n\n${birthdayCheck.message}`;
 					}
-
+					
 					// 🔧 如果找到已保存的生日，設置狀態為等待選擇
 					if (birthdayCheck.hasSavedBirthday) {
-						userIntent.conversationState =
-							"awaiting_birthday_choice";
+						userIntent.conversationState = "awaiting_birthday_choice";
 					}
 				} // 重置會話狀態並更新主要關注點
 				// 🔧 映射 detectedTopic 到有效的 primaryConcern 值 (防止無效枚舉值)
@@ -5400,11 +5329,10 @@ ${texts.choosePrompt}`;
 							} else {
 								combinedResponse = `💫 已為你切換到${aiTopicAnalysis.detectedTopic}分析！\n\n${birthdayCheck.message}`;
 							}
-
+							
 							// 🔧 如果找到已保存的生日，設置狀態為等待選擇
 							if (birthdayCheck.hasSavedBirthday) {
-								userIntent.conversationState =
-									"awaiting_birthday_choice";
+								userIntent.conversationState = "awaiting_birthday_choice";
 							}
 						}
 
@@ -5624,7 +5552,7 @@ ${texts.choosePrompt}`;
 						{
 							role: "system",
 							content:
-								`你是專業的風水命理顧問風鈴，擅長用簡潔易懂的方式解釋傳統概念。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月份」「8月生人」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此分析\n8. 不要在回應中包含字數統計標記\n9. 保持專業且親切的語氣`,
+								"你是專業的風水命理顧問風鈴，擅長用簡潔易懂的方式解釋傳統概念。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月份」「8月生人」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此分析\n8. 不要在回應中包含字數統計標記\n9. 保持專業且親切的語氣",
 						},
 						{
 							role: "user",
@@ -6093,26 +6021,7 @@ ${texts.choosePrompt}`;
 						const classifier = new AITopicClassifier(locale);
 
 						// 為八字分析生成專門的AI回應
-						const baziPrompt = classifier.locale === "zh-CN" 
-? `用户提供八字：${message}
-
-请以风铃的身份，用可爱亲切的语气为用户分析八字。八字资料：
-- 八字：${enhancedResult.baziData?.baziString || ""}
-- 主要分析领域：${enhancedResult.specificProblem || "八字分析"}
-
-请按照以下格式生成回应：
-
-🔮 风铃看了你的八字，发现你有很特别的${enhancedResult.detectedTopic || "运势"}潜质呢！✨
-
-**1. 命盘速读**
-八字：${enhancedResult.baziData?.baziString || ""}
-五行属性：[分析五行属性]
-[主要分析领域]宫主星：[对应主星]
-   - 关键格局：
-     [身强弱分析]
-     用神：[用神分析]
-     大运节点：[当前大运分析]`
-: `用戶提供八字：${message}
+						const baziPrompt = `用戶提供八字：${message}
 
 請以風鈴的身份，用可愛親切的語氣為用戶分析八字。八字資料：
 - 八字：${enhancedResult.baziData?.baziString || ""}
@@ -6129,20 +6038,9 @@ ${texts.choosePrompt}`;
    - 關鍵格局：
      [身強弱分析]
      用神：[用神分析]
-     大運節點：[當前大運分析]`
+     大運節點：[當前大運分析]
 
-${classifier.locale === "zh-CN"
-	? `💖 哈啰亲爱的[五行]命宝宝！风铃来帮你分析${enhancedResult.detectedTopic || "运势"}啦～根据你的五行特质，[年份]年会是[运势特点]的一年呢！(´▽\`ʃ♡ƪ)
-
-**2. 年度预警**  
-✨成就星：[最佳时机]最旺！适合[具体建议]，记得把握[时间点]的黄金期～  
-⚠️小人煞：[注意时期]有[煞星]！要避开[避免事项]，[注意事项]要[具体建议]哦！(๑•̀д•́)
-
-注意：所有月份时间都使用新历（西历），例如：1月、2月、3月等，不要使用农历。
-
-**3. 你的${enhancedResult.detectedTopic || "运势"}分析**  
-最近是不是感觉[观察描述]呀？(歪头) 未来3个月会有[预测内容]～记得发挥[命格优势]的优势，但[时期]后要[注意事项]哟！(๑¯◡¯๑)`
-	: `💖 哈囉親愛的[五行]命寶寶！風鈴來幫你分析${enhancedResult.detectedTopic || "運勢"}啦～根據你的五行特質，[年份]年會是[運勢特點]的一年呢！(´▽\`ʃ♡ƪ)
+💖 哈囉親愛的[五行]命寶寶！風鈴來幫你分析${enhancedResult.detectedTopic || "運勢"}啦～根據你的五行特質，[年份]年會是[運勢特點]的一年呢！(´▽\`ʃ♡ƪ)
 
 **2. 年度預警**  
 ✨成就星：[最佳時機]最旺！適合[具體建議]，記得把握[時間點]的黃金期～  
@@ -6151,42 +6049,27 @@ ${classifier.locale === "zh-CN"
 注意：所有月份時間都使用新歷（西曆），例如：1月、2月、3月等，不要使用農歷。
 
 **3. 你的${enhancedResult.detectedTopic || "運勢"}分析**  
-最近是不是感覺[觀察描述]呀？(歪頭) 未來3個月會有[預測內容]～記得發揮[命格優勢]的優勢，但[時期]後要[注意事項]唷！(๑¯◡¯๑)`}
+最近是不是感覺[觀察描述]呀？(歪頭) 未來3個月會有[預測內容]～記得發揮[命格優勢]的優勢，但[時期]後要[注意事項]唷！(๑¯◡¯๑)
 
-${classifier.locale === "zh-CN"
-? `**4. 开运小秘诀**  
-🏡居家：在[方位]放[开运物品]（[最佳时机]最招运！）  
-👛配件：选[颜色][材质][物品]，里面放[开运配件]～  
-💫行动：每[时间]的[时辰]最利哦！（偷偷说：[具体建议]很适合你）
-
-[五行]命宝宝记得要多用[幸运颜色]系物品增强运气呢～风铃祝你[祝福语]！٩(◕‿◕)۶`
-: `**4. 開運小秘訣**  
+**4. 開運小秘訣**  
 🏡居家：在[方位]放[開運物品]（[最佳時機]最招運！）  
 👛配件：選[顏色][材質][物品]，裡面放[開運配件]～  
 💫行動：每[時間]的[時辰]最利喔！（偷偷說：[具體建議]很適合你）
 
-[五行]命寶寶記得要多用[幸運顏色]系物品增強運氣呢～風鈴祝你[祝福語]！٩(◕‿◕)۶`}
+[五行]命寶寶記得要多用[幸運顏色]系物品增強運氣呢～風鈴祝你[祝福語]！٩(◕‿◕)۶
 
 ───────────────────
-💎 **想要更深入的分析${locale === 'zh-CN' ? '吗' : '嗎'}？**
-**1️⃣ ${locale === 'zh-CN' ? '详细报告' : '詳細報告'}** 價值$88，限時優惠$38
-**2️⃣ ${locale === 'zh-CN' ? '综合命理报告' : '綜合命理報告'}** 價值$168，限時優惠$88  
+💎 **想要更深入的分析嗎？**
+**1️⃣ 详细报告** 價值$88，限時優惠$38
+**2️⃣ 综合命理报告** 價值$168，限時優惠$88  
 
-${classifier.locale === "zh-CN"
-? `要求：
-1. 保持风铃可爱亲切的语气
-2. 使用表情符号和可爱的语助词
-3. 提供具体实用的建议
-4. 约400-500字
-5. 重点分析用户关注的领域（${enhancedResult.detectedTopic || "整体运势"}）
-6. 所有日期和月份都必须使用新历（西历/公历），例如1月、2月、3月等，不要使用农历\`;`
-: `要求：
+要求：
 1. 保持風鈴可愛親切的語氣
 2. 使用表情符號和可愛的語助詞
 3. 提供具體實用的建議
 4. 約400-500字
 5. 重點分析用戶關注的領域（${enhancedResult.detectedTopic || "整體運勢"}）
-6. 所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，不要使用農歷\`;\`}
+6. 所有日期和月份都必須使用新歷（西曆/公曆），例如1月、2月、3月等，不要使用農歷`;
 
 						try {
 							const aiResponse = await classifier.callDeepSeekAPI(
@@ -6194,7 +6077,7 @@ ${classifier.locale === "zh-CN"
 									{
 										role: "system",
 										content:
-											`你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月份」「8月生人」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此分析\n8. 不要在回應中包含字數統計標記\n9. 保持專業且親切的語氣`,
+											"你是專業的風水命理顧問風鈴，擅長八字分析和運勢預測。\n\n⚠️ 重要指示：\n1. ${languageInstruction}\n2. 所有日期和月份都必須嚴格使用西曆（公曆），如1月、2月、3月等\n3. 🚫 絕對禁止使用農曆、陰曆用詞，如「農曆十月」「陰曆八月」等\n4. ✅ 正確示例：「10月出生者」「十月份」「8月生人」\n5. ❌ 錯誤示例：「農曆十月出生者」「陰曆八月」\n6. 當前是2025年10月19日，請確保分析基於2025年，不可提及2024年\n7. 用戶提供的生日是西曆日期，請據此分析\n8. 不要在回應中包含字數統計標記\n9. 保持專業且親切的語氣",
 									},
 									{
 										role: "user",
@@ -6295,7 +6178,7 @@ ${classifier.locale === "zh-CN"
 							{
 								role: "system",
 								content:
-									`你是專業的風水命理顧問，擅長用簡潔易懂的方式解釋傳統概念。重要指示：1. ${languageInstruction} 2. 不要在回應中包含字數統計標記 3. 保持專業且親切的語氣`,
+									"你是專業的風水命理顧問，擅長用簡潔易懂的方式解釋傳統概念。重要指示：1. ${languageInstruction} 2. 不要在回應中包含字數統計標記 3. 保持專業且親切的語氣",
 							},
 							{
 								role: "user",
@@ -6406,36 +6289,25 @@ ${classifier.locale === "zh-CN"
 						} catch (error) {
 							console.log("⚠️ 獲取分析額度信息失敗:", error);
 						}
-
+						
 						// 🔧 設置狀態為等待生日選擇
 						if (userIntent) {
-							userIntent.conversationState =
-								"awaiting_birthday_choice";
+							userIntent.conversationState = "awaiting_birthday_choice";
 							await userIntent.save();
-							console.log(
-								"✅ 已設置 conversationState = awaiting_birthday_choice, sessionId:",
-								sessionId
-							);
+							console.log("✅ 已設置 conversationState = awaiting_birthday_choice, sessionId:", sessionId);
 						} else {
 							// 創建新的 userIntent
-							console.log(
-								"⚠️ userIntent 不存在，創建新的 userIntent, sessionId:",
-								sessionId
-							);
+							console.log("⚠️ userIntent 不存在，創建新的 userIntent, sessionId:", sessionId);
 							const newUserIntent = new SmartUserIntent({
 								sessionId: sessionId,
 								userId: userId,
 								userEmail: userEmail,
-								primaryConcern:
-									analysis.detectedTopic || "財運",
+								primaryConcern: analysis.detectedTopic || "財運",
 								conversationState: "awaiting_birthday_choice",
 								conversationActive: true,
 							});
 							await newUserIntent.save();
-							console.log(
-								"✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice, _id:",
-								newUserIntent._id
-							);
+							console.log("✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice, _id:", newUserIntent._id);
 						}
 					} else {
 						console.log("📝 未找到已保存的生日，使用標準引導訊息");
@@ -6543,20 +6415,15 @@ ${classifier.locale === "zh-CN"
 					} catch (error) {
 						console.log("⚠️ 獲取分析額度信息失敗:", error);
 					}
-
+					
 					// 🔧 設置狀態為等待生日選擇
 					if (userIntent) {
-						userIntent.conversationState =
-							"awaiting_birthday_choice";
+						userIntent.conversationState = "awaiting_birthday_choice";
 						await userIntent.save();
-						console.log(
-							"✅ 已設置 conversationState = awaiting_birthday_choice"
-						);
+						console.log("✅ 已設置 conversationState = awaiting_birthday_choice");
 					} else {
 						// 創建新的 userIntent
-						console.log(
-							"⚠️ userIntent 不存在，創建新的 userIntent"
-						);
+						console.log("⚠️ userIntent 不存在，創建新的 userIntent");
 						const newUserIntent = new SmartUserIntent({
 							sessionId: sessionId,
 							userId: userId,
@@ -6566,9 +6433,7 @@ ${classifier.locale === "zh-CN"
 							conversationActive: true,
 						});
 						await newUserIntent.save();
-						console.log(
-							"✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice"
-						);
+						console.log("✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice");
 					}
 				} else {
 					console.log("📝 未找到已保存的生日，使用標準引導訊息");
@@ -6603,18 +6468,14 @@ ${classifier.locale === "zh-CN"
 		try {
 			if (!userIntent) {
 				// 🎂 檢查是否顯示了已保存生日選單
-				const showedSavedBirthdayMenu =
-					response.includes("你上次的生日是") &&
-					response.includes("請選擇");
-
+				const showedSavedBirthdayMenu = response.includes('你上次的生日是') && response.includes('請選擇');
+				
 				userIntent = new SmartUserIntent({
 					userEmail: userEmail,
 					userId: userId, // 🆕 新增：保存userId
 					sessionId: sessionId,
 					// 🎯 移除 conversationHistory - 改用ChatHistory存儲
-					conversationState: showedSavedBirthdayMenu
-						? "awaiting_birthday_choice"
-						: "birthday_collection", // 🎂 根據是否顯示保存生日選單設置狀態
+					conversationState: showedSavedBirthdayMenu ? "awaiting_birthday_choice" : "birthday_collection", // 🎂 根據是否顯示保存生日選單設置狀態
 					specificQuestion: analysis.specificProblem,
 					primaryConcern: analysis.isWithinScope
 						? analysis.detectedTopic
@@ -6623,12 +6484,7 @@ ${classifier.locale === "zh-CN"
 					originalSpecificProblem: analysis.specificProblem,
 					originalUserMessage: message, // 🆕 永不覆蓋的原始訊息
 				});
-				console.log(
-					"✅ 創建 userIntent，狀態:",
-					userIntent.conversationState,
-					"顯示了保存生日選單:",
-					showedSavedBirthdayMenu
-				);
+				console.log("✅ 創建 userIntent，狀態:", userIntent.conversationState, "顯示了保存生日選單:", showedSavedBirthdayMenu);
 			} else if (isBirthdayInput) {
 				// 更新狀態為詢問詳細報告
 				userIntent.conversationState = "asking_detailed_report";
@@ -7085,7 +6941,7 @@ async function saveToChatHistory(
 			) {
 				console.log("🔧 SAFETY - 在ChatHistory中格式化對象回應");
 				formattedResponse =
-					formatCoupleAnalysisResponse(assistantResponse, locale);
+					formatCoupleAnalysisResponse(assistantResponse);
 			}
 			chatHistory.addMessage("assistant", formattedResponse, aiAnalysis);
 		}

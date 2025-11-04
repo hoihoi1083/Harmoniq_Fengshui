@@ -2436,11 +2436,11 @@ export default function ReportPage({
 					{/* Loading spinner */}
 					<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-					{/* 風水妹 loading image */}
+					{/* 小鈴 loading image */}
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
-							alt="風水妹運算中"
+							alt="小鈴運算中"
 							width={120}
 							height={120}
 							className="object-contain"
@@ -2458,7 +2458,7 @@ export default function ReportPage({
 							}}
 						>
 							{convertByRegion(
-								"風水妹正在為您準備專屬命理分析報告",
+								"小鈴正在為您準備專屬命理分析報告",
 								region
 							)}
 						</div>
@@ -3228,7 +3228,7 @@ export default function ReportPage({
 				{/* 四柱排盤&納音解析 - Tabbed Interface */}
 				<section className="relative w-[95%] sm:w-[95%] lg:w-[85%] mx-auto bg-white rounded-[20px] sm:rounded-[30px] lg:rounded-[40px] p-3 sm:p-6 lg:p-12 mb-6 sm:mb-10 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
 					{/* Background Image at Bottom Right */}
-					<div className="absolute bottom-0 right-0 overflow-hidden rounded-br-[20px] sm:rounded-br-[30px] lg:rounded-br-[40px]">
+					{/* <div className="absolute bottom-0 right-0 overflow-hidden rounded-br-[20px] sm:rounded-br-[30px] lg:rounded-br-[40px]">
 						<Image
 							src="/images/report/pillarbg.png"
 							alt="Pillar Background"
@@ -3237,7 +3237,7 @@ export default function ReportPage({
 							className="hidden object-contain opacity-40 lg:block"
 							style={{ pointerEvents: "none" }}
 						/>
-					</div>
+					</div> */}
 					<div className="relative z-10 mb-4 sm:mb-6 lg:mb-8">
 						<h2
 							className="font-bold text-[#A3B116] text-center lg:text-left"
@@ -3331,106 +3331,108 @@ export default function ReportPage({
 										<div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:gap-3 sm:mb-4 lg:justify-start interactive-tabs">
 											{Object.entries(
 												reportDocData.nianzhuData
-											).map(([key, value], index) => {
-												const isLastButton =
-													index ===
-													Object.entries(
-														reportDocData.nianzhuData
-													).length -
-														1;
+											)
+												.slice(0, 2)
+												.map(([key, value], index) => {
+													const isLastButton =
+														index ===
+														Object.entries(
+															reportDocData.nianzhuData
+														).length -
+															1;
 
-												// Extract element from key - handle new format like 天干金, 地支木, 综合金木
-												const getElementFromKey = (
-													key
-												) => {
-													// Check if key contains any of the wuxing elements
-													const elements = [
-														"土",
-														"木",
-														"水",
-														"火",
-														"金",
-													];
-													for (const element of elements) {
-														if (
-															key.includes(
-																element
-															)
-														) {
-															return element;
+													// Extract element from key - handle new format like 天干金, 地支木, 综合金木
+													const getElementFromKey = (
+														key
+													) => {
+														// Check if key contains any of the wuxing elements
+														const elements = [
+															"土",
+															"木",
+															"水",
+															"火",
+															"金",
+														];
+														for (const element of elements) {
+															if (
+																key.includes(
+																	element
+																)
+															) {
+																return element;
+															}
 														}
-													}
-													// Fallback to last character if no element found
-													return key.slice(-1);
-												};
+														// Fallback to last character if no element found
+														return key.slice(-1);
+													};
 
-												const elementKey =
-													getElementFromKey(key);
+													const elementKey =
+														getElementFromKey(key);
 
-												return (
-													<button
-														key={index}
-														className="flex-shrink-0 transition-all duration-200 hover:border-6"
-														style={{
-															minWidth:
-																"clamp(140px, 30vw, 200px)",
-															height: "clamp(35px, 8vw, 50px)",
-															borderRadius:
-																"clamp(20px, 5vw, 30px)",
-															backgroundColor:
-																isLastButton
-																	? "#FFFFFF"
-																	: wuxingColorMap[
-																			elementKey
-																		],
-															color: isLastButton
-																? "#000000"
-																: "#FFFFFF",
-															border:
-																openedNianzhuIndex ===
-																index
-																	? `3px solid #C9D923`
-																	: "3px solid transparent",
-															fontFamily:
-																"Noto Sans HK, sans-serif",
-															fontWeight: 400,
-															fontSize:
-																"clamp(12px, 3vw, 14px)",
-															cursor: "pointer",
-															boxShadow:
-																"0 2px 6.2px rgba(0, 0, 0, 0.4)",
-														}}
-														onMouseEnter={(e) => {
-															if (
-																openedNianzhuIndex !==
-																index
-															) {
-																e.target.style.border =
-																	"6px solid #C9D923";
-															}
-														}}
-														onMouseLeave={(e) => {
-															if (
-																openedNianzhuIndex !==
-																index
-															) {
-																e.target.style.border =
-																	"6px solid transparent";
-															}
-														}}
-														onClick={() => {
-															setOpenedNianzhuIndex(
-																openedNianzhuIndex ===
+													return (
+														<button
+															key={index}
+															className="flex-shrink-0 transition-all duration-200"
+															style={{
+																minWidth:
+																	"clamp(140px, 30vw, 200px)",
+																height: "clamp(35px, 8vw, 50px)",
+																borderRadius:
+																	"clamp(20px, 5vw, 30px)",
+																backgroundColor:
+																	isLastButton
+																		? "#FFFFFF"
+																		: wuxingColorMap[
+																				elementKey
+																			],
+																color: isLastButton
+																	? "#000000"
+																	: "#FFFFFF",
+																border:
+																	openedNianzhuIndex ===
 																	index
-																	? null
-																	: index
-															);
-														}}
-													>
-														{key}
-													</button>
-												);
-											})}
+																		? `3px solid #C9D923`
+																		: "3px solid transparent",
+																fontFamily:
+																	"Noto Sans HK, sans-serif",
+																fontWeight: 400,
+																fontSize:
+																	"clamp(12px, 3vw, 14px)",
+																cursor: "default",
+																boxShadow:
+																	"0 2px 6.2px rgba(0, 0, 0, 0.4)",
+															}}
+															// onMouseEnter={(e) => {
+															// 	if (
+															// 		openedNianzhuIndex !==
+															// 		index
+															// 	) {
+															// 		e.target.style.border =
+															// 			"6px solid #C9D923";
+															// 	}
+															// }}
+															// onMouseLeave={(e) => {
+															// 	if (
+															// 		openedNianzhuIndex !==
+															// 		index
+															// 	) {
+															// 		e.target.style.border =
+															// 			"6px solid transparent";
+															// 	}
+															// }}
+															// onClick={() => {
+															// 	setOpenedNianzhuIndex(
+															// 		openedNianzhuIndex ===
+															// 			index
+															// 			? null
+															// 			: index
+															// 	);
+															// }}
+														>
+															{key}
+														</button>
+													);
+												})}
 										</div>
 									</div>
 								</div>
@@ -3566,7 +3568,7 @@ export default function ReportPage({
 											<div className="relative mb-4">
 												<Image
 													src={fengshuiLoading}
-													alt="風水妹運算中"
+													alt="小鈴運算中"
 													width={80}
 													height={80}
 													className="object-contain mx-auto"
@@ -3710,106 +3712,108 @@ export default function ReportPage({
 										<div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:gap-3 sm:mb-4 lg:justify-start interactive-tabs">
 											{Object.entries(
 												reportDocData.yuezhuData
-											).map(([key, value], index) => {
-												const isLastButton =
-													index ===
-													Object.entries(
-														reportDocData.yuezhuData
-													).length -
-														1;
+											)
+												.slice(0, 2)
+												.map(([key, value], index) => {
+													const isLastButton =
+														index ===
+														Object.entries(
+															reportDocData.yuezhuData
+														).length -
+															1;
 
-												// Extract element from key - handle new format like 天干金, 地支木, 综合金木
-												const getElementFromKey = (
-													key
-												) => {
-													// Check if key contains any of the wuxing elements
-													const elements = [
-														"土",
-														"木",
-														"水",
-														"火",
-														"金",
-													];
-													for (const element of elements) {
-														if (
-															key.includes(
-																element
-															)
-														) {
-															return element;
+													// Extract element from key - handle new format like 天干金, 地支木, 综合金木
+													const getElementFromKey = (
+														key
+													) => {
+														// Check if key contains any of the wuxing elements
+														const elements = [
+															"土",
+															"木",
+															"水",
+															"火",
+															"金",
+														];
+														for (const element of elements) {
+															if (
+																key.includes(
+																	element
+																)
+															) {
+																return element;
+															}
 														}
-													}
-													// Fallback to last character if no element found
-													return key.slice(-1);
-												};
+														// Fallback to last character if no element found
+														return key.slice(-1);
+													};
 
-												const elementKey =
-													getElementFromKey(key);
+													const elementKey =
+														getElementFromKey(key);
 
-												return (
-													<button
-														key={index}
-														className="flex-shrink-0 transition-all duration-200 hover:border-6"
-														style={{
-															minWidth:
-																"clamp(140px, 30vw, 200px)",
-															height: "clamp(35px, 8vw, 50px)",
-															borderRadius:
-																"clamp(20px, 5vw, 30px)",
-															backgroundColor:
-																isLastButton
-																	? "#FFFFFF"
-																	: wuxingColorMap[
-																			elementKey
-																		],
-															color: isLastButton
-																? "#000000"
-																: "#FFFFFF",
-															border:
-																openedYuezhuIndex ===
-																index
-																	? `3px solid #C9D923`
-																	: "3px solid transparent",
-															fontFamily:
-																"Noto Sans HK, sans-serif",
-															fontWeight: 400,
-															fontSize:
-																"clamp(12px, 3vw, 14px)",
-															cursor: "pointer",
-															boxShadow:
-																"0 2px 6.2px rgba(0, 0, 0, 0.4)",
-														}}
-														onMouseEnter={(e) => {
-															if (
-																openedYuezhuIndex !==
-																index
-															) {
-																e.target.style.border =
-																	"6px solid #C9D923";
-															}
-														}}
-														onMouseLeave={(e) => {
-															if (
-																openedYuezhuIndex !==
-																index
-															) {
-																e.target.style.border =
-																	"6px solid transparent";
-															}
-														}}
-														onClick={() => {
-															setOpenedYuezhuIndex(
-																openedYuezhuIndex ===
+													return (
+														<button
+															key={index}
+															className="flex-shrink-0 transition-all duration-200"
+															style={{
+																minWidth:
+																	"clamp(140px, 30vw, 200px)",
+																height: "clamp(35px, 8vw, 50px)",
+																borderRadius:
+																	"clamp(20px, 5vw, 30px)",
+																backgroundColor:
+																	isLastButton
+																		? "#FFFFFF"
+																		: wuxingColorMap[
+																				elementKey
+																			],
+																color: isLastButton
+																	? "#000000"
+																	: "#FFFFFF",
+																border:
+																	openedYuezhuIndex ===
 																	index
-																	? null
-																	: index
-															);
-														}}
-													>
-														{key}
-													</button>
-												);
-											})}
+																		? `3px solid #C9D923`
+																		: "3px solid transparent",
+																fontFamily:
+																	"Noto Sans HK, sans-serif",
+																fontWeight: 400,
+																fontSize:
+																	"clamp(12px, 3vw, 14px)",
+																cursor: "default",
+																boxShadow:
+																	"0 2px 6.2px rgba(0, 0, 0, 0.4)",
+															}}
+															// onMouseEnter={(e) => {
+															// 	if (
+															// 		openedYuezhuIndex !==
+															// 		index
+															// 	) {
+															// 		e.target.style.border =
+															// 			"6px solid #C9D923";
+															// 	}
+															// }}
+															// onMouseLeave={(e) => {
+															// 	if (
+															// 		openedYuezhuIndex !==
+															// 		index
+															// 	) {
+															// 		e.target.style.border =
+															// 			"6px solid transparent";
+															// 	}
+															// }}
+															// onClick={() => {
+															// 	setOpenedYuezhuIndex(
+															// 		openedYuezhuIndex ===
+															// 			index
+															// 			? null
+															// 			: index
+															// 	);
+															// }}
+														>
+															{key}
+														</button>
+													);
+												})}
 										</div>
 									</div>
 								</div>
@@ -3944,7 +3948,7 @@ export default function ReportPage({
 											<div className="relative mb-4">
 												<Image
 													src={fengshuiLoading}
-													alt="風水妹運算中"
+													alt="小鈴運算中"
 													width={80}
 													height={80}
 													className="object-contain mx-auto"
@@ -4100,106 +4104,108 @@ export default function ReportPage({
 										<div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:gap-3 sm:mb-4 lg:justify-start interactive-tabs">
 											{Object.entries(
 												reportDocData.rizhuData
-											).map(([key, value], index) => {
-												const isLastButton =
-													index ===
-													Object.entries(
-														reportDocData.rizhuData
-													).length -
-														1;
+											)
+												.slice(0, 2)
+												.map(([key, value], index) => {
+													const isLastButton =
+														index ===
+														Object.entries(
+															reportDocData.rizhuData
+														).length -
+															1;
 
-												// Extract element from key - handle new format like 天干金, 地支木, 综合金木
-												const getElementFromKey = (
-													key
-												) => {
-													// Check if key contains any of the wuxing elements
-													const elements = [
-														"土",
-														"木",
-														"水",
-														"火",
-														"金",
-													];
-													for (const element of elements) {
-														if (
-															key.includes(
-																element
-															)
-														) {
-															return element;
+													// Extract element from key - handle new format like 天干金, 地支木, 综合金木
+													const getElementFromKey = (
+														key
+													) => {
+														// Check if key contains any of the wuxing elements
+														const elements = [
+															"土",
+															"木",
+															"水",
+															"火",
+															"金",
+														];
+														for (const element of elements) {
+															if (
+																key.includes(
+																	element
+																)
+															) {
+																return element;
+															}
 														}
-													}
-													// Fallback to last character if no element found
-													return key.slice(-1);
-												};
+														// Fallback to last character if no element found
+														return key.slice(-1);
+													};
 
-												const elementKey =
-													getElementFromKey(key);
+													const elementKey =
+														getElementFromKey(key);
 
-												return (
-													<button
-														key={index}
-														className="flex-shrink-0 transition-all duration-200 hover:border-6"
-														style={{
-															minWidth:
-																"clamp(140px, 30vw, 200px)",
-															height: "clamp(35px, 8vw, 50px)",
-															borderRadius:
-																"clamp(20px, 5vw, 30px)",
-															backgroundColor:
-																isLastButton
-																	? "#FFFFFF"
-																	: wuxingColorMap[
-																			elementKey
-																		],
-															color: isLastButton
-																? "#000000"
-																: "#FFFFFF",
-															border:
-																openedRizhuIndex ===
-																index
-																	? `3px solid #C9D923`
-																	: "3px solid transparent",
-															fontFamily:
-																"Noto Sans HK, sans-serif",
-															fontWeight: 400,
-															fontSize:
-																"clamp(12px, 3vw, 14px)",
-															cursor: "pointer",
-															boxShadow:
-																"0 2px 6.2px rgba(0, 0, 0, 0.4)",
-														}}
-														onMouseEnter={(e) => {
-															if (
-																openedRizhuIndex !==
-																index
-															) {
-																e.target.style.border =
-																	"6px solid #C9D923";
-															}
-														}}
-														onMouseLeave={(e) => {
-															if (
-																openedRizhuIndex !==
-																index
-															) {
-																e.target.style.border =
-																	"6px solid transparent";
-															}
-														}}
-														onClick={() => {
-															setOpenedRizhuIndex(
-																openedRizhuIndex ===
+													return (
+														<button
+															key={index}
+															className="flex-shrink-0 transition-all duration-200 hover:border-6"
+															style={{
+																minWidth:
+																	"clamp(140px, 30vw, 200px)",
+																height: "clamp(35px, 8vw, 50px)",
+																borderRadius:
+																	"clamp(20px, 5vw, 30px)",
+																backgroundColor:
+																	isLastButton
+																		? "#FFFFFF"
+																		: wuxingColorMap[
+																				elementKey
+																			],
+																color: isLastButton
+																	? "#000000"
+																	: "#FFFFFF",
+																border:
+																	openedRizhuIndex ===
 																	index
-																	? null
-																	: index
-															);
-														}}
-													>
-														{key}
-													</button>
-												);
-											})}
+																		? `3px solid #C9D923`
+																		: "3px solid transparent",
+																fontFamily:
+																	"Noto Sans HK, sans-serif",
+																fontWeight: 400,
+																fontSize:
+																	"clamp(12px, 3vw, 14px)",
+																cursor: "default",
+																boxShadow:
+																	"0 2px 6.2px rgba(0, 0, 0, 0.4)",
+															}}
+															// onMouseEnter={(e) => {
+															// 	if (
+															// 		openedRizhuIndex !==
+															// 		index
+															// 	) {
+															// 		e.target.style.border =
+															// 			"6px solid #C9D923";
+															// 	}
+															// }}
+															// onMouseLeave={(e) => {
+															// 	if (
+															// 		openedRizhuIndex !==
+															// 		index
+															// 	) {
+															// 		e.target.style.border =
+															// 			"6px solid transparent";
+															// 	}
+															// }}
+															// onClick={() => {
+															// 	setOpenedRizhuIndex(
+															// 		openedRizhuIndex ===
+															// 			index
+															// 			? null
+															// 			: index
+															// 	);
+															// }}
+														>
+															{key}
+														</button>
+													);
+												})}
 										</div>
 									</div>
 								</div>
@@ -4334,7 +4340,7 @@ export default function ReportPage({
 											<div className="relative mb-4">
 												<Image
 													src={fengshuiLoading}
-													alt="風水妹運算中"
+													alt="小鈴運算中"
 													width={80}
 													height={80}
 													className="object-contain mx-auto"
@@ -4478,106 +4484,108 @@ export default function ReportPage({
 										<div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:gap-3 sm:mb-4 lg:justify-start interactive-tabs">
 											{Object.entries(
 												reportDocData.shizhuData
-											).map(([key, value], index) => {
-												const isLastButton =
-													index ===
-													Object.entries(
-														reportDocData.shizhuData
-													).length -
-														1;
+											)
+												.slice(0, 2)
+												.map(([key, value], index) => {
+													const isLastButton =
+														index ===
+														Object.entries(
+															reportDocData.shizhuData
+														).length -
+															1;
 
-												// Extract element from key - handle new format like 天干金, 地支木, 综合金木
-												const getElementFromKey = (
-													key
-												) => {
-													// Check if key contains any of the wuxing elements
-													const elements = [
-														"土",
-														"木",
-														"水",
-														"火",
-														"金",
-													];
-													for (const element of elements) {
-														if (
-															key.includes(
-																element
-															)
-														) {
-															return element;
+													// Extract element from key - handle new format like 天干金, 地支木, 综合金木
+													const getElementFromKey = (
+														key
+													) => {
+														// Check if key contains any of the wuxing elements
+														const elements = [
+															"土",
+															"木",
+															"水",
+															"火",
+															"金",
+														];
+														for (const element of elements) {
+															if (
+																key.includes(
+																	element
+																)
+															) {
+																return element;
+															}
 														}
-													}
-													// Fallback to last character if no element found
-													return key.slice(-1);
-												};
+														// Fallback to last character if no element found
+														return key.slice(-1);
+													};
 
-												const elementKey =
-													getElementFromKey(key);
+													const elementKey =
+														getElementFromKey(key);
 
-												return (
-													<button
-														key={index}
-														className="flex-shrink-0 transition-all duration-200 hover:border-6"
-														style={{
-															minWidth:
-																"clamp(140px, 30vw, 200px)",
-															height: "clamp(35px, 8vw, 50px)",
-															borderRadius:
-																"clamp(20px, 5vw, 30px)",
-															backgroundColor:
-																isLastButton
-																	? "#FFFFFF"
-																	: wuxingColorMap[
-																			elementKey
-																		],
-															color: isLastButton
-																? "#000000"
-																: "#FFFFFF",
-															border:
-																openedShizhuIndex ===
-																index
-																	? `3px solid #C9D923`
-																	: "3px solid transparent",
-															fontFamily:
-																"Noto Sans HK, sans-serif",
-															fontWeight: 400,
-															fontSize:
-																"clamp(12px, 3vw, 14px)",
-															cursor: "pointer",
-															boxShadow:
-																"0 2px 6.2px rgba(0, 0, 0, 0.4)",
-														}}
-														onMouseEnter={(e) => {
-															if (
-																openedShizhuIndex !==
-																index
-															) {
-																e.target.style.border =
-																	"6px solid #C9D923";
-															}
-														}}
-														onMouseLeave={(e) => {
-															if (
-																openedShizhuIndex !==
-																index
-															) {
-																e.target.style.border =
-																	"6px solid transparent";
-															}
-														}}
-														onClick={() => {
-															setOpenedShizhuIndex(
-																openedShizhuIndex ===
+													return (
+														<button
+															key={index}
+															className="flex-shrink-0 transition-all duration-200 hover:border-6"
+															style={{
+																minWidth:
+																	"clamp(140px, 30vw, 200px)",
+																height: "clamp(35px, 8vw, 50px)",
+																borderRadius:
+																	"clamp(20px, 5vw, 30px)",
+																backgroundColor:
+																	isLastButton
+																		? "#FFFFFF"
+																		: wuxingColorMap[
+																				elementKey
+																			],
+																color: isLastButton
+																	? "#000000"
+																	: "#FFFFFF",
+																border:
+																	openedShizhuIndex ===
 																	index
-																	? null
-																	: index
-															);
-														}}
-													>
-														{key}
-													</button>
-												);
-											})}
+																		? `3px solid #C9D923`
+																		: "3px solid transparent",
+																fontFamily:
+																	"Noto Sans HK, sans-serif",
+																fontWeight: 400,
+																fontSize:
+																	"clamp(12px, 3vw, 14px)",
+																cursor: "default",
+																boxShadow:
+																	"0 2px 6.2px rgba(0, 0, 0, 0.4)",
+															}}
+															// onMouseEnter={(e) => {
+															// 	if (
+															// 		openedShizhuIndex !==
+															// 		index
+															// 	) {
+															// 		e.target.style.border =
+															// 			"6px solid #C9D923";
+															// 	}
+															// }}
+															// onMouseLeave={(e) => {
+															// 	if (
+															// 		openedShizhuIndex !==
+															// 		index
+															// 	) {
+															// 		e.target.style.border =
+															// 			"6px solid transparent";
+															// 	}
+															// }}
+															// onClick={() => {
+															// 	setOpenedShizhuIndex(
+															// 		openedShizhuIndex ===
+															// 			index
+															// 			? null
+															// 			: index
+															// 	);
+															// }}
+														>
+															{key}
+														</button>
+													);
+												})}
 										</div>
 									</div>
 								</div>
@@ -4712,7 +4720,7 @@ export default function ReportPage({
 											<div className="relative mb-4">
 												<Image
 													src={fengshuiLoading}
-													alt="風水妹運算中"
+													alt="小鈴運算中"
 													width={80}
 													height={80}
 													className="object-contain mx-auto"
@@ -5424,7 +5432,7 @@ export default function ReportPage({
 												<div className="relative inline-block mb-4">
 													<Image
 														src={fengshuiLoading}
-														alt="風水妹運算中"
+														alt="小鈴運算中"
 														width={60}
 														height={60}
 														className="object-contain"
@@ -5596,7 +5604,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "red",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5604,7 +5612,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "purple",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5612,7 +5620,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "green",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5642,7 +5650,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "red",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5650,7 +5658,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "purple",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5658,7 +5666,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "green",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5688,7 +5696,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "red",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5696,7 +5704,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "purple",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5704,7 +5712,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "green",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5734,7 +5742,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "red",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5742,7 +5750,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "purple",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5750,7 +5758,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "green",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5780,7 +5788,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "red",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5788,7 +5796,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "purple",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -5796,7 +5804,7 @@ export default function ReportPage({
 															title: "分析中...",
 															color: "green",
 															description:
-																"正在生成個人化分析...",
+																"正在測算個人化分析...",
 															example:
 																"請稍候獲取專屬洞察...",
 														},
@@ -6354,7 +6362,7 @@ export default function ReportPage({
 							</section>
 
 							{/* 化解提示 Section - First Image */}
-							<section className="w-full sm:w-[95%] lg:w-[85%] mx-auto p-4 sm:p-8 lg:p-12 mb-6 sm:mb-10">
+							<section className="w-full sm:w-[95%] lg:w-[85%] mx-auto p-4 sm:p-8 lg:p-12 ">
 								<div className="mb-6 sm:mb-8">
 									<h2
 										className="font-extrabold text-[#A3B116] mb-6 sm:mb-10 text-center lg:text-left"
@@ -6377,7 +6385,7 @@ export default function ReportPage({
 											<div className="relative mb-4">
 												<Image
 													src={fengshuiLoading}
-													alt="風水妹運算中"
+													alt="小鈴運算中"
 													width={100}
 													height={100}
 													className="object-contain mx-auto"
@@ -6394,7 +6402,7 @@ export default function ReportPage({
 												}}
 											>
 												{convertByRegion(
-													"正在生成個人化建議...",
+													"正在測算個人化建議...",
 													region
 												)}
 											</p>
@@ -6406,7 +6414,7 @@ export default function ReportPage({
 												}}
 											>
 												{convertByRegion(
-													"AI正在根據您的八字命理分析，為您量身定制專屬的化解提示",
+													"小鈴正在根據您的八字命理分析，為您量身定制專屬的化解提示",
 													region
 												)}
 											</p>
@@ -6509,1200 +6517,1203 @@ export default function ReportPage({
 									</div>
 								)}
 							</section>
-							{/* 綜合調理与人生建議 - Comprehensive Section */}
-							<section className="w-[95%] sm:w-[95%] lg:w-[85%] mx-auto bg-white rounded-[20px] sm:rounded-[26px] p-4 sm:p-12 lg:p-20 mb-6 sm:mb-10 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
-								<h3
-									className="font-bold text-[#A3B116] flex items-center justify-center lg:justify-start text-center lg:text-left"
-									style={{
-										fontFamily: "Noto Serif TC, serif",
-										fontSize: "clamp(32px, 7vw, 70px)",
-										marginBottom: "clamp(32px, 5vw, 88px)",
-									}}
-								>
-									<span>
-										{convertByRegion(
-											"綜合調理與人生建議",
-											region
-										)}
-									</span>
-								</h3>
+							{/* HIDDEN: 綜合調理与人生建議 - Comprehensive Section */}
+							{false && (
+								<section className="w-[95%] sm:w-[95%] lg:w-[85%] mx-auto bg-white rounded-[20px] sm:rounded-[26px] p-4 sm:p-12 lg:p-20 mb-6 sm:mb-10 shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
+									<h3
+										className="font-bold text-[#A3B116] flex items-center justify-center lg:justify-start text-center lg:text-left"
+										style={{
+											fontFamily: "Noto Serif TC, serif",
+											fontSize: "clamp(32px, 7vw, 70px)",
+											marginBottom:
+												"clamp(32px, 5vw, 88px)",
+										}}
+									>
+										<span>
+											{convertByRegion(
+												"綜合調理與人生建議",
+												region
+											)}
+										</span>
+									</h3>
 
-								{isLoadingComprehensiveLifeAdvice ? (
-									<div className="p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl">
-										<div
-											className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-between"
-											style={{
-												fontFamily:
-													'"Noto Sans HK", sans-serif',
-											}}
-										>
-											<div className="relative">
-												<Image
-													src={fengshuiLoading}
-													alt="風水妹運算中"
-													width={60}
-													height={60}
-													className="object-contain"
-												/>
-												<div className="absolute inset-0 flex items-center justify-center">
-													<div className="w-4 h-4 border-b-2 border-pink-500 rounded-full animate-spin"></div>
-												</div>
-											</div>
-											<span className="text-lg sm:text-xl text-[#8B4513] text-center">
-												{convertByRegion(
-													"AI正在生成綜合人生建議...",
-													region
-												)}
-											</span>
-										</div>
-									</div>
-								) : comprehensiveLifeAdvice ? (
-									<div className="space-y-6 sm:space-y-8">
-										{/* Main Tab Navigation */}
-										<div className="flex flex-row justify-center gap-2 px-0 sm:gap-4 lg:justify-between sm:gap-6 lg:gap-8 sm:px-4 lg:px-25">
-											{[
-												{
-													key: "五行調和",
-													icon: "⭐",
-													image: "/images/report/star.png",
-													bgColor: "#FFD700", // Gold color for star
-												},
-												{
-													key: "身心養護",
-													icon: "❤️",
-													image: "/images/report/heart.png",
-													bgColor: "#FF6B6B", // Red color for heart
-												},
-												{
-													key: "事業方向",
-													icon: "💼",
-													image: "/images/report/bag.png",
-													bgColor: "#4ECDC4", // Teal color for business
-												},
-											].map((tab) => {
-												const isSelected =
-													activeComprehensiveTab ===
-													tab.key;
-												return (
-													<div
-														key={tab.key}
-														className="flex flex-col items-center flex-1 min-w-0 gap-1 sm:gap-2 lg:gap-3"
-													>
-														<button
-															onClick={() =>
-																setActiveComprehensiveTab(
-																	tab.key
-																)
-															}
-															className="flex items-center justify-center w-16 h-16 transition-all duration-300 rounded-full shadow-lg sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32"
-															style={{
-																backgroundColor:
-																	isSelected
-																		? tab.bgColor
-																		: "#EFEFEF",
-															}}
-														>
-															{tab.image && (
-																<div className="flex items-center justify-center w-full h-full overflow-hidden rounded-full">
-																	<img
-																		src={
-																			tab.image
-																		}
-																		alt={
-																			tab.key
-																		}
-																		className="object-contain w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 xl:w-12 xl:h-12"
-																		style={{
-																			filter: isSelected
-																				? "brightness(0) invert(1)"
-																				: "none",
-																		}}
-																		onError={(
-																			e
-																		) => {
-																			e.target.style.display =
-																				"none";
-																			e.target.nextSibling.style.display =
-																				"flex";
-																		}}
-																	/>
-																	<div
-																		className="flex items-center justify-center w-8 h-8 rounded-full sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20"
-																		style={{
-																			display:
-																				"none",
-																			fontSize:
-																				"clamp(16px, 3vw, 28px)",
-																			backgroundColor:
-																				isSelected
-																					? "transparent"
-																					: "#D1D5DB",
-																			color: isSelected
-																				? "white"
-																				: "inherit",
-																		}}
-																	>
-																		{
-																			tab.icon
-																		}
-																	</div>
-																</div>
-															)}
-														</button>
-														<span
-															className={`font-semibold text-center leading-tight ${
-																activeComprehensiveTab ===
-																tab.key
-																	? "text-[#A3B116]"
-																	: "text-gray-600"
-															}`}
-															style={{
-																fontSize:
-																	"clamp(11px, 2.5vw, 18px)",
-															}}
-														>
-															{convertByRegion(
-																tab.key,
-																region
-															)}
-														</span>
-													</div>
-												);
-											})}
-										</div>
-
-										{/* Selected Tab Title */}
-										<div className="mb-6 text-center sm:mb-8">
-											<h4
-												className="font-extrabold"
+									{isLoadingComprehensiveLifeAdvice ? (
+										<div className="p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl">
+											<div
+												className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-between"
 												style={{
 													fontFamily:
-														"Noto Serif TC, serif",
-													fontWeight: 800,
-													fontSize:
-														"clamp(28px, 6vw, 38px)",
+														'"Noto Sans HK", sans-serif',
 												}}
 											>
-												{convertByRegion(
-													activeComprehensiveTab,
-													region
-												)}
-											</h4>
-										</div>
-
-										{/* Tab Content */}
-										{activeComprehensiveTab ===
-											"五行調和" && (
-											<div className="px-2 sm:px-4 md:px-8 lg:px-30">
-												{/* Sub-tab Navigation */}
-												<div className="flex justify-center gap-2 p-3 mb-3 sm:justify-between sm:gap-3 sm:p-6">
-													{[
-														"補益",
-														"强化",
-														"避免",
-													].map((subTab) => (
-														<button
-															key={subTab}
-															onClick={() =>
-																setActiveWuxingTab(
-																	subTab
-																)
-															}
-															className={`flex-1 max-w-[120px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
-																activeWuxingTab ===
-																subTab
-																	? "bg-[#89960A] text-white shadow-lg border-2 border-black"
-																	: "bg-[#EFEFEF] text-[#89960A] border-2 border-transparent"
-															}`}
-															style={{
-																fontSize:
-																	"clamp(12px, 3vw, 18px)",
-																paddingLeft:
-																	"clamp(8px, 4vw, 22px)",
-																paddingRight:
-																	"clamp(8px, 4vw, 22px)",
-															}}
-														>
-															{convertByRegion(
-																subTab,
-																region
-															)}
-														</button>
-													))}
-												</div>
-
-												{/* Sub-tab Content */}
-												<div className="p-6">
-													{activeWuxingTab ===
-														"補益" && (
-														<div className="space-y-4">
-															<h4
-																className="mb-3 sm:mb-4 font-bold text-[#89960A]"
-																style={{
-																	fontSize:
-																		"clamp(20px, 5vw, 36px)",
-																}}
-															>
-																{convertByRegion(
-																	"補益建議",
-																	region
-																)}
-															</h4>
-															<div
-																className="leading-relaxed text-black"
-																style={{
-																	fontSize:
-																		"clamp(14px, 3.5vw, 20px)",
-																}}
-															>
-																{comprehensiveLifeAdvice
-																	.wuxingHarmony
-																	?.summary
-																	?.supplement ? (
-																	Array.isArray(
-																		comprehensiveLifeAdvice
-																			.wuxingHarmony
-																			.summary
-																			.supplement
-																	) ? (
-																		<ul className="space-y-2">
-																			{comprehensiveLifeAdvice.wuxingHarmony.summary.supplement.map(
-																				(
-																					item,
-																					index
-																				) => (
-																					<li
-																						key={
-																							index
-																						}
-																						className="flex items-start gap-3"
-																					>
-																						<span className="font-bold text-green-600">
-																							•
-																						</span>
-																						<span>
-																							{convertByRegion(
-																								item,
-																								region
-																							)}
-																						</span>
-																					</li>
-																				)
-																			)}
-																		</ul>
-																	) : (
-																		<p>
-																			{convertByRegion(
-																				comprehensiveLifeAdvice
-																					.wuxingHarmony
-																					.summary
-																					.supplement,
-																				region
-																			)}
-																		</p>
-																	)
-																) : (
-																	<p className="italic text-gray-500">
-																		{convertByRegion(
-																			"暫無補益建議",
-																			region
-																		)}
-																	</p>
-																)}
-															</div>
-														</div>
-													)}
-
-													{activeWuxingTab ===
-														"强化" && (
-														<div className="space-y-4">
-															<h4
-																className="mb-3 font-bold text-green-700 sm:mb-4"
-																style={{
-																	fontSize:
-																		"clamp(20px, 5vw, 36px)",
-																}}
-															>
-																{convertByRegion(
-																	"强化方法",
-																	region
-																)}
-															</h4>
-															<div
-																className="leading-relaxed text-black"
-																style={{
-																	fontSize:
-																		"clamp(14px, 3.5vw, 20px)",
-																}}
-															>
-																{comprehensiveLifeAdvice
-																	.wuxingHarmony
-																	?.summary
-																	?.strengthen ? (
-																	Array.isArray(
-																		comprehensiveLifeAdvice
-																			.wuxingHarmony
-																			.summary
-																			.strengthen
-																	) ? (
-																		<ul className="space-y-3">
-																			{comprehensiveLifeAdvice.wuxingHarmony.summary.strengthen.map(
-																				(
-																					item,
-																					index
-																				) => (
-																					<li
-																						key={
-																							index
-																						}
-																						className="flex items-start gap-3"
-																					>
-																						<span className="font-bold text-green-600">
-																							•
-																						</span>
-																						<span>
-																							{convertByRegion(
-																								item,
-																								region
-																							)}
-																						</span>
-																					</li>
-																				)
-																			)}
-																		</ul>
-																	) : (
-																		<p>
-																			{convertByRegion(
-																				comprehensiveLifeAdvice
-																					.wuxingHarmony
-																					.summary
-																					.strengthen,
-																				region
-																			)}
-																		</p>
-																	)
-																) : (
-																	<p className="italic text-gray-500">
-																		{convertByRegion(
-																			"暫無强化建議",
-																			region
-																		)}
-																	</p>
-																)}
-															</div>
-														</div>
-													)}
-
-													{activeWuxingTab ===
-														"避免" && (
-														<div className="space-y-4">
-															<h4
-																className="mb-3 font-bold text-green-700 sm:mb-4"
-																style={{
-																	fontSize:
-																		"clamp(20px, 5vw, 36px)",
-																}}
-															>
-																{convertByRegion(
-																	"避免事項",
-																	region
-																)}
-															</h4>
-															<div
-																className="leading-relaxed text-black"
-																style={{
-																	fontSize:
-																		"clamp(14px, 3.5vw, 20px)",
-																}}
-															>
-																{comprehensiveLifeAdvice
-																	.wuxingHarmony
-																	?.summary
-																	?.avoid ? (
-																	Array.isArray(
-																		comprehensiveLifeAdvice
-																			.wuxingHarmony
-																			.summary
-																			.avoid
-																	) ? (
-																		<ul className="space-y-3">
-																			{comprehensiveLifeAdvice.wuxingHarmony.summary.avoid.map(
-																				(
-																					item,
-																					index
-																				) => (
-																					<li
-																						key={
-																							index
-																						}
-																						className="flex items-start gap-3"
-																					>
-																						<span className="font-bold text-red-600">
-																							•
-																						</span>
-																						<span>
-																							{convertByRegion(
-																								item,
-																								region
-																							)}
-																						</span>
-																					</li>
-																				)
-																			)}
-																		</ul>
-																	) : (
-																		<p>
-																			{convertByRegion(
-																				comprehensiveLifeAdvice
-																					.wuxingHarmony
-																					.summary
-																					.avoid,
-																				region
-																			)}
-																		</p>
-																	)
-																) : (
-																	<p className="italic text-gray-500">
-																		{convertByRegion(
-																			"暫無避免事項",
-																			region
-																		)}
-																	</p>
-																)}
-															</div>
-														</div>
-													)}
-												</div>
-
-												{/* Detailed explanation */}
-												{comprehensiveLifeAdvice
-													.wuxingHarmony
-													?.detailed && (
-													<div className="p-4 mt-6 bg-[#EFEFEF]  rounded-xl">
-														<h5
-															className="mb-2 font-semibold text-black"
-															style={{
-																fontSize:
-																	"clamp(16px, 4vw, 24px)",
-															}}
-														>
-															{convertByRegion(
-																"詳細說明",
-																region
-															)}
-														</h5>
-														<p
-															className="leading-relaxed text-black"
-															style={{
-																fontSize:
-																	"clamp(14px, 3.5vw, 20px)",
-															}}
-														>
-															{convertByRegion(
-																comprehensiveLifeAdvice
-																	.wuxingHarmony
-																	.detailed,
-																region
-															)}
-														</p>
+												<div className="relative">
+													<Image
+														src={fengshuiLoading}
+														alt="小鈴運算中"
+														width={60}
+														height={60}
+														className="object-contain"
+													/>
+													<div className="absolute inset-0 flex items-center justify-center">
+														<div className="w-4 h-4 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 													</div>
-												)}
-											</div>
-										)}
-
-										{activeComprehensiveTab ===
-											"身心養護" && (
-											<div className="px-2 sm:px-4 md:px-8 lg:px-30">
-												{/* Sub-tab Navigation */}
-												<div className="flex justify-center gap-2 p-3 mb-3 sm:justify-between sm:gap-3 sm:p-6">
-													{[
-														"運動建議",
-														"情緒調節",
-													].map((subTab) => (
-														<button
-															key={subTab}
-															onClick={() =>
-																setActiveHealthTab(
-																	subTab
-																)
-															}
-															className={`flex-1 max-w-[140px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
-																activeHealthTab ===
-																subTab
-																	? "bg-[#B4003C] text-white shadow-lg border-2 border-black"
-																	: "bg-[#EFEFEF] text-[#B4003C] border-2 border-transparent"
-															}`}
-															style={{
-																fontSize:
-																	"clamp(12px, 3vw, 18px)",
-																paddingLeft:
-																	"clamp(8px, 4vw, 22px)",
-																paddingRight:
-																	"clamp(8px, 4vw, 22px)",
-															}}
-														>
-															{convertByRegion(
-																subTab,
-																region
-															)}
-														</button>
-													))}
 												</div>
-
-												{/* Sub-tab Content */}
-												<div className="p-6">
-													{activeHealthTab ===
-														"運動建議" && (
-														<div className="space-y-4">
-															<h4
-																className="mb-3 sm:mb-4 font-bold text-[#B4003C]"
+												<span className="text-lg sm:text-xl text-[#8B4513] text-center">
+													{convertByRegion(
+														"小鈴正在測算綜合人生建議...",
+														region
+													)}
+												</span>
+											</div>
+										</div>
+									) : comprehensiveLifeAdvice ? (
+										<div className="space-y-6 sm:space-y-8">
+											{/* Main Tab Navigation */}
+											<div className="flex flex-row justify-center gap-2 px-0 sm:gap-4 lg:justify-between sm:gap-6 lg:gap-8 sm:px-4 lg:px-25">
+												{[
+													{
+														key: "五行調和",
+														icon: "⭐",
+														image: "/images/report/star.png",
+														bgColor: "#FFD700", // Gold color for star
+													},
+													{
+														key: "身心養護",
+														icon: "❤️",
+														image: "/images/report/heart.png",
+														bgColor: "#FF6B6B", // Red color for heart
+													},
+													{
+														key: "事業方向",
+														icon: "💼",
+														image: "/images/report/bag.png",
+														bgColor: "#4ECDC4", // Teal color for business
+													},
+												].map((tab) => {
+													const isSelected =
+														activeComprehensiveTab ===
+														tab.key;
+													return (
+														<div
+															key={tab.key}
+															className="flex flex-col items-center flex-1 min-w-0 gap-1 sm:gap-2 lg:gap-3"
+														>
+															<button
+																onClick={() =>
+																	setActiveComprehensiveTab(
+																		tab.key
+																	)
+																}
+																className="flex items-center justify-center w-16 h-16 transition-all duration-300 rounded-full shadow-lg sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32"
+																style={{
+																	backgroundColor:
+																		isSelected
+																			? tab.bgColor
+																			: "#EFEFEF",
+																}}
+															>
+																{tab.image && (
+																	<div className="flex items-center justify-center w-full h-full overflow-hidden rounded-full">
+																		<img
+																			src={
+																				tab.image
+																			}
+																			alt={
+																				tab.key
+																			}
+																			className="object-contain w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 xl:w-12 xl:h-12"
+																			style={{
+																				filter: isSelected
+																					? "brightness(0) invert(1)"
+																					: "none",
+																			}}
+																			onError={(
+																				e
+																			) => {
+																				e.target.style.display =
+																					"none";
+																				e.target.nextSibling.style.display =
+																					"flex";
+																			}}
+																		/>
+																		<div
+																			className="flex items-center justify-center w-8 h-8 rounded-full sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20"
+																			style={{
+																				display:
+																					"none",
+																				fontSize:
+																					"clamp(16px, 3vw, 28px)",
+																				backgroundColor:
+																					isSelected
+																						? "transparent"
+																						: "#D1D5DB",
+																				color: isSelected
+																					? "white"
+																					: "inherit",
+																			}}
+																		>
+																			{
+																				tab.icon
+																			}
+																		</div>
+																	</div>
+																)}
+															</button>
+															<span
+																className={`font-semibold text-center leading-tight ${
+																	activeComprehensiveTab ===
+																	tab.key
+																		? "text-[#A3B116]"
+																		: "text-gray-600"
+																}`}
 																style={{
 																	fontSize:
-																		"clamp(20px, 5vw, 36px)",
+																		"clamp(11px, 2.5vw, 18px)",
 																}}
 															>
 																{convertByRegion(
-																	"運動建議",
+																	tab.key,
 																	region
 																)}
-															</h4>
-															<div
+															</span>
+														</div>
+													);
+												})}
+											</div>
+
+											{/* Selected Tab Title */}
+											<div className="mb-6 text-center sm:mb-8">
+												<h4
+													className="font-extrabold"
+													style={{
+														fontFamily:
+															"Noto Serif TC, serif",
+														fontWeight: 800,
+														fontSize:
+															"clamp(28px, 6vw, 38px)",
+													}}
+												>
+													{convertByRegion(
+														activeComprehensiveTab,
+														region
+													)}
+												</h4>
+											</div>
+
+											{/* Tab Content */}
+											{activeComprehensiveTab ===
+												"五行調和" && (
+												<div className="px-2 sm:px-4 md:px-8 lg:px-30">
+													{/* Sub-tab Navigation */}
+													<div className="flex justify-center gap-2 p-3 mb-3 sm:justify-between sm:gap-3 sm:p-6">
+														{[
+															"補益",
+															"强化",
+															"避免",
+														].map((subTab) => (
+															<button
+																key={subTab}
+																onClick={() =>
+																	setActiveWuxingTab(
+																		subTab
+																	)
+																}
+																className={`flex-1 max-w-[120px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
+																	activeWuxingTab ===
+																	subTab
+																		? "bg-[#89960A] text-white shadow-lg border-2 border-black"
+																		: "bg-[#EFEFEF] text-[#89960A] border-2 border-transparent"
+																}`}
+																style={{
+																	fontSize:
+																		"clamp(12px, 3vw, 18px)",
+																	paddingLeft:
+																		"clamp(8px, 4vw, 22px)",
+																	paddingRight:
+																		"clamp(8px, 4vw, 22px)",
+																}}
+															>
+																{convertByRegion(
+																	subTab,
+																	region
+																)}
+															</button>
+														))}
+													</div>
+
+													{/* Sub-tab Content */}
+													<div className="p-6">
+														{activeWuxingTab ===
+															"補益" && (
+															<div className="space-y-4">
+																<h4
+																	className="mb-3 sm:mb-4 font-bold text-[#89960A]"
+																	style={{
+																		fontSize:
+																			"clamp(20px, 5vw, 36px)",
+																	}}
+																>
+																	{convertByRegion(
+																		"補益建議",
+																		region
+																	)}
+																</h4>
+																<div
+																	className="leading-relaxed text-black"
+																	style={{
+																		fontSize:
+																			"clamp(14px, 3.5vw, 20px)",
+																	}}
+																>
+																	{comprehensiveLifeAdvice
+																		.wuxingHarmony
+																		?.summary
+																		?.supplement ? (
+																		Array.isArray(
+																			comprehensiveLifeAdvice
+																				.wuxingHarmony
+																				.summary
+																				.supplement
+																		) ? (
+																			<ul className="space-y-2">
+																				{comprehensiveLifeAdvice.wuxingHarmony.summary.supplement.map(
+																					(
+																						item,
+																						index
+																					) => (
+																						<li
+																							key={
+																								index
+																							}
+																							className="flex items-start gap-3"
+																						>
+																							<span className="font-bold text-green-600">
+																								•
+																							</span>
+																							<span>
+																								{convertByRegion(
+																									item,
+																									region
+																								)}
+																							</span>
+																						</li>
+																					)
+																				)}
+																			</ul>
+																		) : (
+																			<p>
+																				{convertByRegion(
+																					comprehensiveLifeAdvice
+																						.wuxingHarmony
+																						.summary
+																						.supplement,
+																					region
+																				)}
+																			</p>
+																		)
+																	) : (
+																		<p className="italic text-gray-500">
+																			{convertByRegion(
+																				"暫無補益建議",
+																				region
+																			)}
+																		</p>
+																	)}
+																</div>
+															</div>
+														)}
+
+														{activeWuxingTab ===
+															"强化" && (
+															<div className="space-y-4">
+																<h4
+																	className="mb-3 font-bold text-green-700 sm:mb-4"
+																	style={{
+																		fontSize:
+																			"clamp(20px, 5vw, 36px)",
+																	}}
+																>
+																	{convertByRegion(
+																		"强化方法",
+																		region
+																	)}
+																</h4>
+																<div
+																	className="leading-relaxed text-black"
+																	style={{
+																		fontSize:
+																			"clamp(14px, 3.5vw, 20px)",
+																	}}
+																>
+																	{comprehensiveLifeAdvice
+																		.wuxingHarmony
+																		?.summary
+																		?.strengthen ? (
+																		Array.isArray(
+																			comprehensiveLifeAdvice
+																				.wuxingHarmony
+																				.summary
+																				.strengthen
+																		) ? (
+																			<ul className="space-y-3">
+																				{comprehensiveLifeAdvice.wuxingHarmony.summary.strengthen.map(
+																					(
+																						item,
+																						index
+																					) => (
+																						<li
+																							key={
+																								index
+																							}
+																							className="flex items-start gap-3"
+																						>
+																							<span className="font-bold text-green-600">
+																								•
+																							</span>
+																							<span>
+																								{convertByRegion(
+																									item,
+																									region
+																								)}
+																							</span>
+																						</li>
+																					)
+																				)}
+																			</ul>
+																		) : (
+																			<p>
+																				{convertByRegion(
+																					comprehensiveLifeAdvice
+																						.wuxingHarmony
+																						.summary
+																						.strengthen,
+																					region
+																				)}
+																			</p>
+																		)
+																	) : (
+																		<p className="italic text-gray-500">
+																			{convertByRegion(
+																				"暫無强化建議",
+																				region
+																			)}
+																		</p>
+																	)}
+																</div>
+															</div>
+														)}
+
+														{activeWuxingTab ===
+															"避免" && (
+															<div className="space-y-4">
+																<h4
+																	className="mb-3 font-bold text-green-700 sm:mb-4"
+																	style={{
+																		fontSize:
+																			"clamp(20px, 5vw, 36px)",
+																	}}
+																>
+																	{convertByRegion(
+																		"避免事項",
+																		region
+																	)}
+																</h4>
+																<div
+																	className="leading-relaxed text-black"
+																	style={{
+																		fontSize:
+																			"clamp(14px, 3.5vw, 20px)",
+																	}}
+																>
+																	{comprehensiveLifeAdvice
+																		.wuxingHarmony
+																		?.summary
+																		?.avoid ? (
+																		Array.isArray(
+																			comprehensiveLifeAdvice
+																				.wuxingHarmony
+																				.summary
+																				.avoid
+																		) ? (
+																			<ul className="space-y-3">
+																				{comprehensiveLifeAdvice.wuxingHarmony.summary.avoid.map(
+																					(
+																						item,
+																						index
+																					) => (
+																						<li
+																							key={
+																								index
+																							}
+																							className="flex items-start gap-3"
+																						>
+																							<span className="font-bold text-red-600">
+																								•
+																							</span>
+																							<span>
+																								{convertByRegion(
+																									item,
+																									region
+																								)}
+																							</span>
+																						</li>
+																					)
+																				)}
+																			</ul>
+																		) : (
+																			<p>
+																				{convertByRegion(
+																					comprehensiveLifeAdvice
+																						.wuxingHarmony
+																						.summary
+																						.avoid,
+																					region
+																				)}
+																			</p>
+																		)
+																	) : (
+																		<p className="italic text-gray-500">
+																			{convertByRegion(
+																				"暫無避免事項",
+																				region
+																			)}
+																		</p>
+																	)}
+																</div>
+															</div>
+														)}
+													</div>
+
+													{/* Detailed explanation */}
+													{comprehensiveLifeAdvice
+														.wuxingHarmony
+														?.detailed && (
+														<div className="p-4 mt-6 bg-[#EFEFEF]  rounded-xl">
+															<h5
+																className="mb-2 font-semibold text-black"
+																style={{
+																	fontSize:
+																		"clamp(16px, 4vw, 24px)",
+																}}
+															>
+																{convertByRegion(
+																	"詳細說明",
+																	region
+																)}
+															</h5>
+															<p
 																className="leading-relaxed text-black"
 																style={{
 																	fontSize:
 																		"clamp(14px, 3.5vw, 20px)",
 																}}
 															>
-																{comprehensiveLifeAdvice
-																	.healthWellness
-																	?.exercise ? (
-																	Array.isArray(
-																		comprehensiveLifeAdvice
-																			.healthWellness
-																			.exercise
-																	) ? (
-																		<ul className="space-y-3">
-																			{comprehensiveLifeAdvice.healthWellness.exercise.map(
-																				(
-																					item,
-																					index
-																				) => (
-																					<li
-																						key={
-																							index
-																						}
-																						className="flex items-start gap-3"
-																					>
-																						<span className="font-bold text-[#B4003C]">
-																							•
-																						</span>
-																						<span>
-																							{convertByRegion(
-																								item,
-																								region
-																							)}
-																						</span>
-																					</li>
-																				)
-																			)}
-																		</ul>
+																{convertByRegion(
+																	comprehensiveLifeAdvice
+																		.wuxingHarmony
+																		.detailed,
+																	region
+																)}
+															</p>
+														</div>
+													)}
+												</div>
+											)}
+
+											{activeComprehensiveTab ===
+												"身心養護" && (
+												<div className="px-2 sm:px-4 md:px-8 lg:px-30">
+													{/* Sub-tab Navigation */}
+													<div className="flex justify-center gap-2 p-3 mb-3 sm:justify-between sm:gap-3 sm:p-6">
+														{[
+															"運動建議",
+															"情緒調節",
+														].map((subTab) => (
+															<button
+																key={subTab}
+																onClick={() =>
+																	setActiveHealthTab(
+																		subTab
+																	)
+																}
+																className={`flex-1 max-w-[140px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
+																	activeHealthTab ===
+																	subTab
+																		? "bg-[#B4003C] text-white shadow-lg border-2 border-black"
+																		: "bg-[#EFEFEF] text-[#B4003C] border-2 border-transparent"
+																}`}
+																style={{
+																	fontSize:
+																		"clamp(12px, 3vw, 18px)",
+																	paddingLeft:
+																		"clamp(8px, 4vw, 22px)",
+																	paddingRight:
+																		"clamp(8px, 4vw, 22px)",
+																}}
+															>
+																{convertByRegion(
+																	subTab,
+																	region
+																)}
+															</button>
+														))}
+													</div>
+
+													{/* Sub-tab Content */}
+													<div className="p-6">
+														{activeHealthTab ===
+															"運動建議" && (
+															<div className="space-y-4">
+																<h4
+																	className="mb-3 sm:mb-4 font-bold text-[#B4003C]"
+																	style={{
+																		fontSize:
+																			"clamp(20px, 5vw, 36px)",
+																	}}
+																>
+																	{convertByRegion(
+																		"運動建議",
+																		region
+																	)}
+																</h4>
+																<div
+																	className="leading-relaxed text-black"
+																	style={{
+																		fontSize:
+																			"clamp(14px, 3.5vw, 20px)",
+																	}}
+																>
+																	{comprehensiveLifeAdvice
+																		.healthWellness
+																		?.exercise ? (
+																		Array.isArray(
+																			comprehensiveLifeAdvice
+																				.healthWellness
+																				.exercise
+																		) ? (
+																			<ul className="space-y-3">
+																				{comprehensiveLifeAdvice.healthWellness.exercise.map(
+																					(
+																						item,
+																						index
+																					) => (
+																						<li
+																							key={
+																								index
+																							}
+																							className="flex items-start gap-3"
+																						>
+																							<span className="font-bold text-[#B4003C]">
+																								•
+																							</span>
+																							<span>
+																								{convertByRegion(
+																									item,
+																									region
+																								)}
+																							</span>
+																						</li>
+																					)
+																				)}
+																			</ul>
+																		) : (
+																			<p>
+																				{convertByRegion(
+																					comprehensiveLifeAdvice
+																						.healthWellness
+																						.exercise,
+																					region
+																				)}
+																			</p>
+																		)
 																	) : (
+																		<p className="italic text-gray-500">
+																			{convertByRegion(
+																				"暫無運動建議",
+																				region
+																			)}
+																		</p>
+																	)}
+																</div>
+															</div>
+														)}
+
+														{activeHealthTab ===
+															"情緒調節" && (
+															<div className="space-y-4">
+																<h4
+																	className="mb-3 sm:mb-4 font-bold text-[#B4003C]"
+																	style={{
+																		fontSize:
+																			"clamp(20px, 5vw, 36px)",
+																	}}
+																>
+																	{convertByRegion(
+																		"情緒調節",
+																		region
+																	)}
+																</h4>
+																<div
+																	className="leading-relaxed text-black"
+																	style={{
+																		fontSize:
+																			"clamp(14px, 3.5vw, 20px)",
+																	}}
+																>
+																	{comprehensiveLifeAdvice
+																		.healthWellness
+																		?.emotion ? (
 																		<p>
 																			{convertByRegion(
 																				comprehensiveLifeAdvice
 																					.healthWellness
-																					.exercise,
+																					.emotion,
 																				region
 																			)}
 																		</p>
-																	)
-																) : (
-																	<p className="italic text-gray-500">
-																		{convertByRegion(
-																			"暫無運動建議",
-																			region
-																		)}
-																	</p>
-																)}
+																	) : (
+																		<p className="italic text-gray-500">
+																			{convertByRegion(
+																				"暫無情緒調節建議",
+																				region
+																			)}
+																		</p>
+																	)}
+																</div>
 															</div>
-														</div>
-													)}
+														)}
+													</div>
 
-													{activeHealthTab ===
-														"情緒調節" && (
-														<div className="space-y-4">
-															<h4
-																className="mb-3 sm:mb-4 font-bold text-[#B4003C]"
+													{/* Detailed explanation */}
+													{comprehensiveLifeAdvice
+														.healthWellness
+														?.detailed && (
+														<div className="p-4 mt-6 bg-[#EFEFEF] rounded-xl">
+															<h5
+																className="mb-2 font-semibold text-black"
 																style={{
 																	fontSize:
-																		"clamp(20px, 5vw, 36px)",
+																		"clamp(16px, 4vw, 24px)",
 																}}
 															>
 																{convertByRegion(
-																	"情緒調節",
+																	"詳細說明",
 																	region
 																)}
-															</h4>
-															<div
+															</h5>
+															<p
 																className="leading-relaxed text-black"
 																style={{
 																	fontSize:
 																		"clamp(14px, 3.5vw, 20px)",
 																}}
 															>
-																{comprehensiveLifeAdvice
-																	.healthWellness
-																	?.emotion ? (
-																	<p>
-																		{convertByRegion(
-																			comprehensiveLifeAdvice
-																				.healthWellness
-																				.emotion,
-																			region
-																		)}
-																	</p>
-																) : (
-																	<p className="italic text-gray-500">
-																		{convertByRegion(
-																			"暫無情緒調節建議",
-																			region
-																		)}
-																	</p>
+																{convertByRegion(
+																	comprehensiveLifeAdvice
+																		.healthWellness
+																		.detailed,
+																	region
 																)}
-															</div>
+															</p>
 														</div>
 													)}
 												</div>
+											)}
 
-												{/* Detailed explanation */}
-												{comprehensiveLifeAdvice
-													.healthWellness
-													?.detailed && (
-													<div className="p-4 mt-6 bg-[#EFEFEF] rounded-xl">
-														<h5
-															className="mb-2 font-semibold text-black"
-															style={{
-																fontSize:
-																	"clamp(16px, 4vw, 24px)",
-															}}
-														>
-															{convertByRegion(
-																"詳細說明",
-																region
-															)}
-														</h5>
-														<p
-															className="leading-relaxed text-black"
-															style={{
-																fontSize:
-																	"clamp(14px, 3.5vw, 20px)",
-															}}
-														>
-															{convertByRegion(
-																comprehensiveLifeAdvice
-																	.healthWellness
-																	.detailed,
-																region
-															)}
-														</p>
-													</div>
-												)}
-											</div>
-										)}
-
-										{activeComprehensiveTab ===
-											"事業方向" && (
-											<div className="px-2 sm:px-4 md:px-8 lg:px-30">
-												{/* Sub-tab Navigation */}
-												<div className="flex justify-center gap-2 p-3 mb-3 sm:justify-between sm:gap-3 sm:p-6">
-													{[
-														"近期",
-														"中期",
-														"遠期",
-													].map((subTab) => (
-														<button
-															key={subTab}
-															onClick={() =>
-																setActiveCareerTab(
+											{activeComprehensiveTab ===
+												"事業方向" && (
+												<div className="px-2 sm:px-4 md:px-8 lg:px-30">
+													{/* Sub-tab Navigation */}
+													<div className="flex justify-center gap-2 p-3 mb-3 sm:justify-between sm:gap-3 sm:p-6">
+														{[
+															"近期",
+															"中期",
+															"遠期",
+														].map((subTab) => (
+															<button
+																key={subTab}
+																onClick={() =>
+																	setActiveCareerTab(
+																		subTab
+																	)
+																}
+																className={`flex-1 max-w-[100px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
+																	activeCareerTab ===
 																	subTab
-																)
-															}
-															className={`flex-1 max-w-[100px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
-																activeCareerTab ===
-																subTab
-																	? "bg-[#007BFF] text-white shadow-lg border-2 border-black"
-																	: "bg-[#EFEFEF] text-[#007BFF] border-2 border-transparent"
-															}`}
-															style={{
-																fontSize:
-																	"clamp(12px, 3vw, 18px)",
-																paddingLeft:
-																	"clamp(8px, 4vw, 22px)",
-																paddingRight:
-																	"clamp(8px, 4vw, 22px)",
-															}}
-														>
-															{convertByRegion(
-																subTab,
-																region
-															)}
-														</button>
-													))}
-												</div>
+																		? "bg-[#007BFF] text-white shadow-lg border-2 border-black"
+																		: "bg-[#EFEFEF] text-[#007BFF] border-2 border-transparent"
+																}`}
+																style={{
+																	fontSize:
+																		"clamp(12px, 3vw, 18px)",
+																	paddingLeft:
+																		"clamp(8px, 4vw, 22px)",
+																	paddingRight:
+																		"clamp(8px, 4vw, 22px)",
+																}}
+															>
+																{convertByRegion(
+																	subTab,
+																	region
+																)}
+															</button>
+														))}
+													</div>
 
-												{/* Sub-tab Content */}
-												<div className="p-6">
-													{activeCareerTab ===
-														"近期" &&
-														comprehensiveLifeAdvice
-															.careerDirection
-															?.nearTerm && (
-															<div className="space-y-4">
-																<h4
-																	className="mb-3 sm:mb-4 font-bold text-[#007BFF]"
-																	style={{
-																		fontSize:
-																			"clamp(20px, 5vw, 36px)",
-																	}}
-																>
-																	{convertByRegion(
-																		"近期事業方向",
-																		region
-																	)}
-																</h4>
-																<div
-																	className="leading-relaxed text-black"
-																	style={{
-																		fontSize:
-																			"clamp(14px, 3.5vw, 20px)",
-																	}}
-																>
-																	{typeof comprehensiveLifeAdvice
-																		.careerDirection
-																		.nearTerm ===
-																	"string" ? (
-																		<p className="leading-relaxed">
-																			{convertByRegion(
-																				comprehensiveLifeAdvice
+													{/* Sub-tab Content */}
+													<div className="p-6">
+														{activeCareerTab ===
+															"近期" &&
+															comprehensiveLifeAdvice
+																.careerDirection
+																?.nearTerm && (
+																<div className="space-y-4">
+																	<h4
+																		className="mb-3 sm:mb-4 font-bold text-[#007BFF]"
+																		style={{
+																			fontSize:
+																				"clamp(20px, 5vw, 36px)",
+																		}}
+																	>
+																		{convertByRegion(
+																			"近期事業方向",
+																			region
+																		)}
+																	</h4>
+																	<div
+																		className="leading-relaxed text-black"
+																		style={{
+																			fontSize:
+																				"clamp(14px, 3.5vw, 20px)",
+																		}}
+																	>
+																		{typeof comprehensiveLifeAdvice
+																			.careerDirection
+																			.nearTerm ===
+																		"string" ? (
+																			<p className="leading-relaxed">
+																				{convertByRegion(
+																					comprehensiveLifeAdvice
+																						.careerDirection
+																						.nearTerm,
+																					region
+																				)}
+																			</p>
+																		) : (
+																			<div className="space-y-3">
+																				{comprehensiveLifeAdvice
 																					.careerDirection
-																					.nearTerm,
-																				region
-																			)}
-																		</p>
-																	) : (
-																		<div className="space-y-3">
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.nearTerm
-																				.ageRange && (
-																				<p>
-																					<strong className="text-[#007BFF]">
+																					.nearTerm
+																					.ageRange && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"年齡範圍：",
+																								region
+																							)}
+																						</strong>
 																						{convertByRegion(
-																							"年齡範圍：",
-																							region
-																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.nearTerm
-																							.ageRange,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.nearTerm
-																				.pattern && (
-																				<p>
-																					<strong className="text-[#007BFF]">
-																						{convertByRegion(
-																							"格局：",
-																							region
-																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.nearTerm
-																							.pattern,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.nearTerm
-																				.industries && (
-																				<p>
-																					<strong className="text-[#007BFF]">
-																						{convertByRegion(
-																							"推薦行業：",
-																							region
-																						)}
-																					</strong>
-																					{convertByRegion(
-																						Array.isArray(
 																							comprehensiveLifeAdvice
 																								.careerDirection
 																								.nearTerm
-																								.industries
-																						)
-																							? comprehensiveLifeAdvice.careerDirection.nearTerm.industries.join(
-																									"、"
-																								)
-																							: comprehensiveLifeAdvice
+																								.ageRange,
+																							region
+																						)}
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.nearTerm
+																					.pattern && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"格局：",
+																								region
+																							)}
+																						</strong>
+																						{convertByRegion(
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.nearTerm
+																								.pattern,
+																							region
+																						)}
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.nearTerm
+																					.industries && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"推薦行業：",
+																								region
+																							)}
+																						</strong>
+																						{convertByRegion(
+																							Array.isArray(
+																								comprehensiveLifeAdvice
 																									.careerDirection
 																									.nearTerm
-																									.industries,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.nearTerm
-																				.risk && (
-																				<p>
-																					<strong className="text-[#B4003C]">
-																						{convertByRegion(
-																							"風險預警：",
+																									.industries
+																							)
+																								? comprehensiveLifeAdvice.careerDirection.nearTerm.industries.join(
+																										"、"
+																									)
+																								: comprehensiveLifeAdvice
+																										.careerDirection
+																										.nearTerm
+																										.industries,
 																							region
 																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.nearTerm
-																							.risk,
-																						region
-																					)}
-																				</p>
-																			)}
-																		</div>
-																	)}
-																</div>
-															</div>
-														)}
-
-													{activeCareerTab ===
-														"中期" &&
-														comprehensiveLifeAdvice
-															.careerDirection
-															?.midTerm && (
-															<div className="space-y-4">
-																<h4
-																	className="mb-3 sm:mb-4 font-bold text-[#007BFF]"
-																	style={{
-																		fontSize:
-																			"clamp(20px, 5vw, 36px)",
-																	}}
-																>
-																	{convertByRegion(
-																		"中期事業方向",
-																		region
-																	)}
-																</h4>
-																<div
-																	className="leading-relaxed text-black"
-																	style={{
-																		fontSize:
-																			"clamp(14px, 3.5vw, 20px)",
-																	}}
-																>
-																	{typeof comprehensiveLifeAdvice
-																		.careerDirection
-																		.midTerm ===
-																	"string" ? (
-																		<p className="leading-relaxed">
-																			{convertByRegion(
-																				comprehensiveLifeAdvice
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
 																					.careerDirection
-																					.midTerm,
-																				region
-																			)}
-																		</p>
-																	) : (
-																		<div className="space-y-3">
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.midTerm
-																				.ageRange && (
-																				<p>
-																					<strong className="text-[#007BFF]">
+																					.nearTerm
+																					.risk && (
+																					<p>
+																						<strong className="text-[#B4003C]">
+																							{convertByRegion(
+																								"風險預警：",
+																								region
+																							)}
+																						</strong>
 																						{convertByRegion(
-																							"年齡範圍：",
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.nearTerm
+																								.risk,
 																							region
 																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.midTerm
-																							.ageRange,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.midTerm
-																				.transformation && (
-																				<p>
-																					<strong className="text-[#007BFF]">
-																						{convertByRegion(
-																							"轉化：",
-																							region
-																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.midTerm
-																							.transformation,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.midTerm
-																				.strategy && (
-																				<p>
-																					<strong className="text-[#007BFF]">
-																						{convertByRegion(
-																							"策略：",
-																							region
-																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.midTerm
-																							.strategy,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.midTerm
-																				.decision && (
-																				<p>
-																					<strong className="text-[#007BFF]">
-																						{convertByRegion(
-																							"決策：",
-																							region
-																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.midTerm
-																							.decision,
-																						region
-																					)}
-																				</p>
-																			)}
-																		</div>
-																	)}
+																					</p>
+																				)}
+																			</div>
+																		)}
+																	</div>
 																</div>
-															</div>
-														)}
+															)}
 
-													{activeCareerTab ===
-														"遠期" &&
-														comprehensiveLifeAdvice
-															.careerDirection
-															?.longTerm && (
-															<div className="space-y-4">
-																<h4
-																	className="mb-3 sm:mb-4 font-bold text-[#007BFF]"
-																	style={{
-																		fontSize:
-																			"clamp(20px, 5vw, 36px)",
-																	}}
-																>
-																	{convertByRegion(
-																		"遠期事業方向",
-																		region
-																	)}
-																</h4>
-																<div
-																	className="leading-relaxed text-black"
-																	style={{
-																		fontSize:
-																			"clamp(14px, 3.5vw, 20px)",
-																	}}
-																>
-																	{typeof comprehensiveLifeAdvice
-																		.careerDirection
-																		.longTerm ===
-																	"string" ? (
-																		<p className="leading-relaxed">
-																			{convertByRegion(
-																				comprehensiveLifeAdvice
+														{activeCareerTab ===
+															"中期" &&
+															comprehensiveLifeAdvice
+																.careerDirection
+																?.midTerm && (
+																<div className="space-y-4">
+																	<h4
+																		className="mb-3 sm:mb-4 font-bold text-[#007BFF]"
+																		style={{
+																			fontSize:
+																				"clamp(20px, 5vw, 36px)",
+																		}}
+																	>
+																		{convertByRegion(
+																			"中期事業方向",
+																			region
+																		)}
+																	</h4>
+																	<div
+																		className="leading-relaxed text-black"
+																		style={{
+																			fontSize:
+																				"clamp(14px, 3.5vw, 20px)",
+																		}}
+																	>
+																		{typeof comprehensiveLifeAdvice
+																			.careerDirection
+																			.midTerm ===
+																		"string" ? (
+																			<p className="leading-relaxed">
+																				{convertByRegion(
+																					comprehensiveLifeAdvice
+																						.careerDirection
+																						.midTerm,
+																					region
+																				)}
+																			</p>
+																		) : (
+																			<div className="space-y-3">
+																				{comprehensiveLifeAdvice
 																					.careerDirection
-																					.longTerm,
-																				region
-																			)}
-																		</p>
-																	) : (
-																		<div className="space-y-3">
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.longTerm
-																				.ageRange && (
-																				<p>
-																					<strong className="text-[#007BFF]">
+																					.midTerm
+																					.ageRange && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"年齡範圍：",
+																								region
+																							)}
+																						</strong>
 																						{convertByRegion(
-																							"年齡範圍：",
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.midTerm
+																								.ageRange,
 																							region
 																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.longTerm
-																							.ageRange,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.longTerm
-																				.fortune && (
-																				<p>
-																					<strong className="text-[#007BFF]">
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.midTerm
+																					.transformation && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"轉化：",
+																								region
+																							)}
+																						</strong>
 																						{convertByRegion(
-																							"運勢：",
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.midTerm
+																								.transformation,
 																							region
 																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.longTerm
-																							.fortune,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.longTerm
-																				.knowledge && (
-																				<p>
-																					<strong className="text-[#007BFF]">
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.midTerm
+																					.strategy && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"策略：",
+																								region
+																							)}
+																						</strong>
 																						{convertByRegion(
-																							"知識：",
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.midTerm
+																								.strategy,
 																							region
 																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.longTerm
-																							.knowledge,
-																						region
-																					)}
-																				</p>
-																			)}
-																			{comprehensiveLifeAdvice
-																				.careerDirection
-																				.longTerm
-																				.wellness && (
-																				<p>
-																					<strong className="text-[#007BFF]">
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.midTerm
+																					.decision && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"決策：",
+																								region
+																							)}
+																						</strong>
 																						{convertByRegion(
-																							"養生：",
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.midTerm
+																								.decision,
 																							region
 																						)}
-																					</strong>
-																					{convertByRegion(
-																						comprehensiveLifeAdvice
-																							.careerDirection
-																							.longTerm
-																							.wellness,
-																						region
-																					)}
-																				</p>
-																			)}
-																		</div>
-																	)}
+																					</p>
+																				)}
+																			</div>
+																		)}
+																	</div>
 																</div>
-															</div>
-														)}
-												</div>
+															)}
 
-												{/* Detailed explanation */}
-												{comprehensiveLifeAdvice
-													.careerDirection
-													?.detailed && (
-													<div className="p-4 mt-6 bg-[#EFEFEF] rounded-xl">
-														<h5
-															className="mb-2 font-semibold text-black"
-															style={{
-																fontSize:
-																	"clamp(16px, 4vw, 24px)",
-															}}
-														>
-															{convertByRegion(
-																"詳細說明",
-																region
+														{activeCareerTab ===
+															"遠期" &&
+															comprehensiveLifeAdvice
+																.careerDirection
+																?.longTerm && (
+																<div className="space-y-4">
+																	<h4
+																		className="mb-3 sm:mb-4 font-bold text-[#007BFF]"
+																		style={{
+																			fontSize:
+																				"clamp(20px, 5vw, 36px)",
+																		}}
+																	>
+																		{convertByRegion(
+																			"遠期事業方向",
+																			region
+																		)}
+																	</h4>
+																	<div
+																		className="leading-relaxed text-black"
+																		style={{
+																			fontSize:
+																				"clamp(14px, 3.5vw, 20px)",
+																		}}
+																	>
+																		{typeof comprehensiveLifeAdvice
+																			.careerDirection
+																			.longTerm ===
+																		"string" ? (
+																			<p className="leading-relaxed">
+																				{convertByRegion(
+																					comprehensiveLifeAdvice
+																						.careerDirection
+																						.longTerm,
+																					region
+																				)}
+																			</p>
+																		) : (
+																			<div className="space-y-3">
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.longTerm
+																					.ageRange && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"年齡範圍：",
+																								region
+																							)}
+																						</strong>
+																						{convertByRegion(
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.longTerm
+																								.ageRange,
+																							region
+																						)}
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.longTerm
+																					.fortune && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"運勢：",
+																								region
+																							)}
+																						</strong>
+																						{convertByRegion(
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.longTerm
+																								.fortune,
+																							region
+																						)}
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.longTerm
+																					.knowledge && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"知識：",
+																								region
+																							)}
+																						</strong>
+																						{convertByRegion(
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.longTerm
+																								.knowledge,
+																							region
+																						)}
+																					</p>
+																				)}
+																				{comprehensiveLifeAdvice
+																					.careerDirection
+																					.longTerm
+																					.wellness && (
+																					<p>
+																						<strong className="text-[#007BFF]">
+																							{convertByRegion(
+																								"養生：",
+																								region
+																							)}
+																						</strong>
+																						{convertByRegion(
+																							comprehensiveLifeAdvice
+																								.careerDirection
+																								.longTerm
+																								.wellness,
+																							region
+																						)}
+																					</p>
+																				)}
+																			</div>
+																		)}
+																	</div>
+																</div>
 															)}
-														</h5>
-														<p
-															className="leading-relaxed text-black"
-															style={{
-																fontSize:
-																	"clamp(14px, 3.5vw, 20px)",
-															}}
-														>
-															{convertByRegion(
-																comprehensiveLifeAdvice
-																	.careerDirection
-																	.detailed,
-																region
-															)}
-														</p>
 													</div>
-												)}
-											</div>
-										)}
-									</div>
-								) : (
-									<div className="py-8">
-										<div className="space-y-6">
-											<div>
-												<Skeleton className="w-40 h-5 mb-3" />
-												<div className="space-y-2">
-													<Skeleton className="w-full h-4" />
-													<Skeleton className="w-4/5 h-4" />
-													<Skeleton className="w-5/6 h-4" />
+
+													{/* Detailed explanation */}
+													{comprehensiveLifeAdvice
+														.careerDirection
+														?.detailed && (
+														<div className="p-4 mt-6 bg-[#EFEFEF] rounded-xl">
+															<h5
+																className="mb-2 font-semibold text-black"
+																style={{
+																	fontSize:
+																		"clamp(16px, 4vw, 24px)",
+																}}
+															>
+																{convertByRegion(
+																	"詳細說明",
+																	region
+																)}
+															</h5>
+															<p
+																className="leading-relaxed text-black"
+																style={{
+																	fontSize:
+																		"clamp(14px, 3.5vw, 20px)",
+																}}
+															>
+																{convertByRegion(
+																	comprehensiveLifeAdvice
+																		.careerDirection
+																		.detailed,
+																	region
+																)}
+															</p>
+														</div>
+													)}
 												</div>
-											</div>
-											<div>
-												<Skeleton className="h-5 mb-3 w-36" />
-												<div className="space-y-2">
-													<Skeleton className="w-full h-4" />
-													<Skeleton className="w-3/4 h-4" />
+											)}
+										</div>
+									) : (
+										<div className="py-8">
+											<div className="space-y-6">
+												<div>
+													<Skeleton className="w-40 h-5 mb-3" />
+													<div className="space-y-2">
+														<Skeleton className="w-full h-4" />
+														<Skeleton className="w-4/5 h-4" />
+														<Skeleton className="w-5/6 h-4" />
+													</div>
 												</div>
-											</div>
-											<div>
-												<Skeleton className="h-5 mb-3 w-44" />
-												<div className="space-y-2">
-													<Skeleton className="w-full h-4" />
-													<Skeleton className="w-2/3 h-4" />
-													<Skeleton className="w-4/5 h-4" />
+												<div>
+													<Skeleton className="h-5 mb-3 w-36" />
+													<div className="space-y-2">
+														<Skeleton className="w-full h-4" />
+														<Skeleton className="w-3/4 h-4" />
+													</div>
+												</div>
+												<div>
+													<Skeleton className="h-5 mb-3 w-44" />
+													<div className="space-y-2">
+														<Skeleton className="w-full h-4" />
+														<Skeleton className="w-2/3 h-4" />
+														<Skeleton className="w-4/5 h-4" />
+													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-								)}
-							</section>
+									)}
+								</section>
+							)}
 
 							{/* HIDDEN: 人際調衡要點 - Comprehensive Section */}
 							{false && (
@@ -7731,7 +7742,7 @@ export default function ReportPage({
 												<div className="relative">
 													<Image
 														src={fengshuiLoading}
-														alt="風水妹運算中"
+														alt="小鈴運算中"
 														width={60}
 														height={60}
 														className="object-contain"
@@ -7741,7 +7752,7 @@ export default function ReportPage({
 													</div>
 												</div>
 												<span className="text-lg sm:text-xl text-[#8B4513] text-center">
-													AI正在生成綜合人際關係建議...
+													小鈴正在測算綜合人際關係建議...
 												</span>
 											</div>
 										</div>

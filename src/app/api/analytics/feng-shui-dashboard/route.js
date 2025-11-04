@@ -51,7 +51,7 @@ async function getTopPages() {
 		{
 			page: "/zh-TW",
 			users: 25,
-			title: "風鈴聊天室首頁",
+			title: "小鈴聊天室首頁",
 			bounceRate: 45.2,
 		},
 		{

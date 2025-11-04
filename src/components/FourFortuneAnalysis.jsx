@@ -376,11 +376,11 @@ export default function FourFortuneAnalysis({
 									{/* Loading spinner */}
 									<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-									{/* 風水妹 loading image */}
+									{/* 小鈴 loading image */}
 									<div className="flex items-center justify-center">
 										<Image
 											src={fengshuiLoading}
-											alt="風水妹運算中"
+											alt="小鈴運算中"
 											width={120}
 											height={120}
 											className="object-contain"
@@ -400,7 +400,7 @@ export default function FourFortuneAnalysis({
 											}}
 										>
 											{convertByRegion(
-												"風水妹正在分析您的命理資料",
+												"小鈴正在分析您的命理資料",
 												region
 											)}
 										</div>
@@ -732,11 +732,11 @@ export default function FourFortuneAnalysis({
 									{/* Loading spinner */}
 									<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-									{/* 風水妹 loading image */}
+									{/* 小鈴 loading image */}
 									<div className="flex items-center justify-center">
 										<Image
 											src={fengshuiLoading}
-											alt="風水妹運算中"
+											alt="小鈴運算中"
 											width={120}
 											height={120}
 											className="object-contain"
@@ -756,7 +756,7 @@ export default function FourFortuneAnalysis({
 											}}
 										>
 											{convertByRegion(
-												"風水妹正在生成健康運勢分析",
+												"小鈴正在生成健康運勢分析",
 												region
 											)}
 										</div>
@@ -809,11 +809,11 @@ export default function FourFortuneAnalysis({
 									{/* Loading spinner */}
 									<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-									{/* 風水妹 loading image */}
+									{/* 小鈴 loading image */}
 									<div className="flex items-center justify-center">
 										<Image
 											src={fengshuiLoading}
-											alt="風水妹運算中"
+											alt="小鈴運算中"
 											width={120}
 											height={120}
 											className="object-contain"
@@ -833,7 +833,7 @@ export default function FourFortuneAnalysis({
 											}}
 										>
 											{convertByRegion(
-												"風水妹正在生成事業運勢分析",
+												"小鈴正在生成事業運勢分析",
 												region
 											)}
 										</div>
@@ -886,11 +886,11 @@ export default function FourFortuneAnalysis({
 									{/* Loading spinner */}
 									<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-									{/* 風水妹 loading image */}
+									{/* 小鈴 loading image */}
 									<div className="flex items-center justify-center">
 										<Image
 											src={fengshuiLoading}
-											alt="風水妹運算中"
+											alt="小鈴運算中"
 											width={120}
 											height={120}
 											className="object-contain"
@@ -910,7 +910,7 @@ export default function FourFortuneAnalysis({
 											}}
 										>
 											{convertByRegion(
-												"風水妹正在生成財運運勢分析",
+												"小鈴正在生成財運運勢分析",
 												region
 											)}
 										</div>
@@ -963,11 +963,11 @@ export default function FourFortuneAnalysis({
 									{/* Loading spinner */}
 									<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-									{/* 風水妹 loading image */}
+									{/* 小鈴 loading image */}
 									<div className="flex items-center justify-center">
 										<Image
 											src={fengshuiLoading}
-											alt="風水妹運算中"
+											alt="小鈴運算中"
 											width={120}
 											height={120}
 											className="object-contain"
@@ -987,7 +987,7 @@ export default function FourFortuneAnalysis({
 											}}
 										>
 											{convertByRegion(
-												"風水妹正在生成感情運勢分析",
+												"小鈴正在生成感情運勢分析",
 												region
 											)}
 										</div>

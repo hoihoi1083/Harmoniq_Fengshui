@@ -158,19 +158,19 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 											: "/images/logo/logo-desktop.png"
 									}
 									alt="HarmoniQ Logo"
-									width={62}
-									height={32}
-									className="h-8 mx-2 w-38"
+									width={681}
+									height={132}
+									className="h-8 mx-2 w-auto"
 									style={{
 										filter: "none",
 										backfaceVisibility: "hidden",
 										WebkitFontSmoothing: "antialiased",
 									}}
+									quality={100}
 									priority
 								/>
 							</Link>
-						)}
-
+						)}{" "}
 						{/* Navigation Links */}
 						{!isNavbarMobile && (
 							<div className="flex items-center gap-10 ">

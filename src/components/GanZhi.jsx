@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { getConcernColor } from "../utils/colorTheme";
 import getWuxingData from "../lib/nayin";
+import { convertByRegion } from "@/utils/chineseConverter";
 
 // Helper functions to map stems and branches to their elements
 const getStemElement = (stem) => {
@@ -83,27 +84,71 @@ const getYearlyStems = (year) => {
 };
 
 // Helper function to generate concern-specific fallback content
-const getConcernSpecificContent = (concern, yearStem, yearBranch) => {
+const getConcernSpecificContent = (
+	concern,
+	yearStem,
+	yearBranch,
+	userLocale = "zh-TW"
+) => {
+	// Get region for conversion
+	const region = userLocale === "zh-CN" ? "china" : userLocale;
+
 	const contentMap = {
 		健康: {
-			risks: `健康方面需特別注意：${yearStem}${getStemElement(yearStem)}年易有情緒波動影響睡眠品質，${yearBranch}${getBranchElement(yearBranch)}沖擊可能導致消化系統敏感。建議定期健檢，注意作息規律。`,
-			suggestions: `健康養生建議：適合進行溫和運動如瑜伽、太極，多攝取應季蔬果。避免過度勞累，保持心境平和。可考慮中醫調理體質，增強免疫力。`,
-			conclusion: `2025年健康運勢整體穩定，但需注意防範小病痛累積。${yearStem}${yearBranch}年適合建立長期健康習慣，重視預防勝於治療，身心靈平衡發展將帶來良好體質基礎。`,
+			risks: convertByRegion(
+				`健康方面需特別注意：${yearStem}${getStemElement(yearStem)}年易有情緒波動影響睡眠品質，${yearBranch}${getBranchElement(yearBranch)}沖擊可能導致消化系統敏感。建議定期健檢，注意作息規律。`,
+				region
+			),
+			suggestions: convertByRegion(
+				`健康養生建議：適合進行溫和運動如瑜伽、太極，多攝取應季蔬果。避免過度勞累，保持心境平和。可考慮中醫調理體質，增強免疫力。`,
+				region
+			),
+			conclusion: convertByRegion(
+				`2025年健康運勢整體穩定，但需注意防範小病痛累積。${yearStem}${yearBranch}年適合建立長期健康習慣，重視預防勝於治療，身心靈平衡發展將帶來良好體質基礎。`,
+				region
+			),
 		},
 		事業: {
-			risks: `事業發展風險：${yearStem}${getStemElement(yearStem)}年容易遇到決策分歧或合作夥伴意見不合，${yearBranch}${getBranchElement(yearBranch)}的變動能量可能帶來職場環境變化。需謹慎處理人際關係。`,
-			suggestions: `事業發展建議：適合主動學習新技能，建立專業優勢。把握${yearStem}年的機會拓展業務網絡，但避免過度擴張。穩紮穩打，注重品質勝過速度。`,
-			conclusion: `2025年事業運勢有突破機會，${yearStem}${yearBranch}年帶來新的發展契機。適合轉型升級或開拓新領域，但需平衡理想與現實，謹慎評估風險後再行動。`,
+			risks: convertByRegion(
+				`事業發展風險：${yearStem}${getStemElement(yearStem)}年容易遇到決策分歧或合作夥伴意見不合，${yearBranch}${getBranchElement(yearBranch)}的變動能量可能帶來職場環境變化。需謹慎處理人際關係。`,
+				region
+			),
+			suggestions: convertByRegion(
+				`事業發展建議：適合主動學習新技能，建立專業優勢。把握${yearStem}年的機會拓展業務網絡，但避免過度擴張。穩紮穩打，注重品質勝過速度。`,
+				region
+			),
+			conclusion: convertByRegion(
+				`2025年事業運勢有突破機會，${yearStem}${yearBranch}年帶來新的發展契機。適合轉型升級或開拓新領域，但需平衡理想與現實，謹慎評估風險後再行動。`,
+				region
+			),
 		},
 		財運: {
-			risks: `財運風險提醒：${yearStem}${getStemElement(yearStem)}年易有衝動消費傾向，投資方面需避免跟風操作。${yearBranch}${getBranchElement(yearBranch)}的能量變化可能影響收入穩定性，需做好財務規劃。`,
-			suggestions: `財運提升建議：適合穩健投資策略，分散風險。增加技能投資自己，提升賺錢能力。記帳理財，控制不必要支出。可考慮長期儲蓄計劃。`,
-			conclusion: `2025年財運機會與挑戰並存，${yearStem}${yearBranch}年適合重新檢視財務狀況。通過學習理財知識和謹慎投資，有望建立更穩固的財富基礎。`,
+			risks: convertByRegion(
+				`財運風險提醒：${yearStem}${getStemElement(yearStem)}年易有衝動消費傾向，投資方面需避免跟風操作。${yearBranch}${getBranchElement(yearBranch)}的能量變化可能影響收入穩定性，需做好財務規劃。`,
+				region
+			),
+			suggestions: convertByRegion(
+				`財運提升建議：適合穩健投資策略，分散風險。增加技能投資自己，提升賺錢能力。記帳理財，控制不必要支出。可考慮長期儲蓄計劃。`,
+				region
+			),
+			conclusion: convertByRegion(
+				`2025年財運機會與挑戰並存，${yearStem}${yearBranch}年適合重新檢視財務狀況。通過學習理財知識和謹慎投資，有望建立更穩固的財富基礎。`,
+				region
+			),
 		},
 		感情: {
-			risks: `感情風險警示：${yearStem}${getStemElement(yearStem)}年容易因溝通不當引發誤會，${yearBranch}${getBranchElement(yearBranch)}的變動可能帶來感情考驗。單身者需避免過於挑剔，已婚者需注意包容理解。`,
-			suggestions: `感情經營建議：多關注伴侶的感受，增加互動時間。單身者可通過朋友介紹或參加社交活動認識合適對象。重視溝通技巧，學會表達和傾聽。`,
-			conclusion: `2025年感情運勢需要用心經營，${yearStem}${yearBranch}年帶來感情新機會。無論單身或有伴，都適合反思感情模式，提升情商，建立更成熟穩定的感情關係。`,
+			risks: convertByRegion(
+				`感情風險警示：${yearStem}${getStemElement(yearStem)}年容易因溝通不當引發誤會，${yearBranch}${getBranchElement(yearBranch)}的變動可能帶來感情考驗。單身者需避免過於挑剔，已婚者需注意包容理解。`,
+				region
+			),
+			suggestions: convertByRegion(
+				`感情經營建議：多關注伴侶的感受，增加互動時間。單身者可通過朋友介紹或參加社交活動認識合適對象。重視溝通技巧，學會表達和傾聽。`,
+				region
+			),
+			conclusion: convertByRegion(
+				`2025年感情運勢需要用心經營，${yearStem}${yearBranch}年帶來感情新機會。無論單身或有伴，都適合反思感情模式，提升情商，建立更成熟穩定的感情關係。`,
+				region
+			),
 		},
 	};
 
@@ -119,6 +164,12 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [activeSection, setActiveSection] = useState("tianGan"); // Will be set dynamically
+
+	// Helper to convert text based on locale
+	const convertText = (text) => {
+		const region = locale === "zh-CN" ? "china" : locale;
+		return convertByRegion(text, region);
+	};
 
 	// Generate AI analysis based on user's birth info and current year
 	const generateGanZhiAnalysis = (userInfo, year) => {
@@ -376,6 +427,23 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 
 	// Function to call AI API for real content generation
 	const generateAIAnalysis = async (userInfo, year) => {
+		// Calculate actual day master for this context
+		let actualDayMaster = "乙";
+		try {
+			if (userInfo?.birthDateTime) {
+				const baziData = getWuxingData(
+					userInfo.birthDateTime,
+					userInfo.gender || "male"
+				);
+				actualDayMaster = baziData.dayStem;
+			}
+		} catch (error) {
+			console.error(
+				"Failed to calculate day master in generateAIAnalysis:",
+				error
+			);
+		}
+
 		try {
 			console.log("🌐 GanZhi component sending locale to API:", locale);
 			const response = await fetch("/api/ganzhi-analysis", {
@@ -399,11 +467,17 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			if (data.success) {
 				return parseAIResponse(data, userInfo, year);
 			} else {
-				console.error("❌ AI analysis failed - using fallback:", data.message || "AI analysis failed");
+				console.error(
+					"❌ AI analysis failed - using fallback:",
+					data.message || "AI analysis failed"
+				);
 				throw new Error(data.message || "AI analysis failed");
 			}
 		} catch (error) {
-			console.error("💥 AI Analysis Error - using fallback content:", error);
+			console.error(
+				"💥 AI Analysis Error - using fallback content:",
+				error
+			);
 			// Fallback to mock data if AI fails
 			const fallbackData = generateGanZhiAnalysis(userInfo, year);
 			const yearGanZhi = getYearlyStems(year);
@@ -488,51 +562,61 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			);
 		}
 
-	// Parse the AI analysis to extract structured content
-	const parseAIContent = (text) => {
-		console.log(
-			"🔍 parseAIContent called with text length:",
-			text?.length
-		);
-		
-		// DEBUG: Log the last 500 chars to see what's actually there
-		if (text && text.length > 500) {
-			console.log("📄 Last 500 chars of AI response:");
-			console.log(text.substring(text.length - 500));
-		}
-		
-		// Remove duplicate standalone sections that appear AFTER 【注意事項】
-		// Look for the pattern: after section 5 content, there's a newline followed by plain "建議" or "總結："
-		// We want to keep everything UP TO but NOT INCLUDING these duplicate sections
-		
-		// Find where section 5 ends (after the last content of 總結要點)
-		// Then remove everything after that if there's a standalone "建議" or "總結："
-		const duplicatePatterns = [
-			/\n[建議议]\s*\n/,      // Standalone "建議" with newlines
-			/\n[總总][結结][：:]\s*\n/  // Standalone "總結：" with newlines
-		];
-		
-		let cleanedText = text;
-		const section5Index = cleanedText.indexOf('### 5. 【注意事');
-		console.log(`🔍 Section 5 starts at position: ${section5Index}`);
-		
-		for (const pattern of duplicatePatterns) {
-			const match = cleanedText.search(pattern);
-			console.log(`🔍 Pattern ${pattern} match at position: ${match}`);
-			if (match !== -1 && section5Index !== -1 && match > section5Index) {
-				console.log(`🧹 CUTTING at position ${match}, removing ${text.length - match} chars`);
-				cleanedText = cleanedText.substring(0, match);
-				break; // Cut at first match
+		// Parse the AI analysis to extract structured content
+		const parseAIContent = (text) => {
+			console.log(
+				"🔍 parseAIContent called with text length:",
+				text?.length
+			);
+
+			// DEBUG: Log the last 500 chars to see what's actually there
+			if (text && text.length > 500) {
+				console.log("📄 Last 500 chars of AI response:");
+				console.log(text.substring(text.length - 500));
 			}
-		}
-		
-		if (cleanedText.length < text.length) {
-			console.log(`✂️ Total removed: ${text.length - cleanedText.length} chars of duplicate content`);
-		}
-		
-		text = cleanedText;
-		
-		const result = {
+
+			// Remove duplicate standalone sections that appear AFTER 【注意事項】
+			// Look for the pattern: after section 5 content, there's a newline followed by plain "建議" or "總結："
+			// We want to keep everything UP TO but NOT INCLUDING these duplicate sections
+
+			// Find where section 5 ends (after the last content of 總結要點)
+			// Then remove everything after that if there's a standalone "建議" or "總結："
+			const duplicatePatterns = [
+				/\n[建議议]\s*\n/, // Standalone "建議" with newlines
+				/\n[總总][結结][：:]\s*\n/, // Standalone "總結：" with newlines
+			];
+
+			let cleanedText = text;
+			const section5Index = cleanedText.indexOf("### 5. 【注意事");
+			console.log(`🔍 Section 5 starts at position: ${section5Index}`);
+
+			for (const pattern of duplicatePatterns) {
+				const match = cleanedText.search(pattern);
+				console.log(
+					`🔍 Pattern ${pattern} match at position: ${match}`
+				);
+				if (
+					match !== -1 &&
+					section5Index !== -1 &&
+					match > section5Index
+				) {
+					console.log(
+						`🧹 CUTTING at position ${match}, removing ${text.length - match} chars`
+					);
+					cleanedText = cleanedText.substring(0, match);
+					break; // Cut at first match
+				}
+			}
+
+			if (cleanedText.length < text.length) {
+				console.log(
+					`✂️ Total removed: ${text.length - cleanedText.length} chars of duplicate content`
+				);
+			}
+
+			text = cleanedText;
+
+			const result = {
 				description: "",
 				tianGan: {
 					title: `天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-${getTenGodRelation(yearGanZhi?.stem || "乙", actualDayMaster)}`,
@@ -679,7 +763,9 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				const diZhiText = diZhiSection[1];
 
 				// Extract title - supports both 為 and 为
-				const titleMatch = diZhiText.match(/地支(.+?)[為为]\*\*(.+?)\*\*/);
+				const titleMatch = diZhiText.match(
+					/地支(.+?)[為为]\*\*(.+?)\*\*/
+				);
 				if (titleMatch) {
 					result.diZhi.title = `地支${titleMatch[1].trim()}-${titleMatch[2].trim()}`;
 				} else {
@@ -744,29 +830,36 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			}
 
 			// Extract practical results (supports both Traditional and Simplified)
+			// Note: Section 4 is now the final section after our API prompt update
 			const practicalMatch = text.match(
-				/### 4\. 【[實实][際际]表[現现]】(.*?)(?=### 5\.|---)/s
+				/[實实][際际]表[現现]\s*(.*?)(?=【注意事[項项]】|$)/s
 			);
 			if (practicalMatch) {
 				result.practicalResults = practicalMatch[1].trim();
 			}
 
-		// Extract risks and suggestions with improved parsing (supports both Traditional and Simplified)
-		const noticeMatch = text.match(
-			/### 5\. 【注意事[項项]】(.*?)(?=### |$)/s
-		);
-		console.log("🔍 Notice section match result:", noticeMatch ? "FOUND" : "NOT FOUND");
-		if (noticeMatch) {
-			console.log("📋 Notice text length:", noticeMatch[1]?.length);
-			console.log("📋 Notice text preview (first 200 chars):", noticeMatch[1]?.substring(0, 200));
-			
-			let noticeText = noticeMatch[1];				// Cut off any standalone duplicate sections
+			// Extract risks and suggestions with improved parsing (supports both Traditional and Simplified)
+			const noticeMatch = text.match(
+				/### 4\. 【注意事[項项]】(.*?)(?=### |$)/s
+			);
+			console.log(
+				"🔍 Notice section match result:",
+				noticeMatch ? "FOUND" : "NOT FOUND"
+			);
+			if (noticeMatch) {
+				console.log("📋 Notice text length:", noticeMatch[1]?.length);
+				console.log(
+					"📋 Notice text preview (first 200 chars):",
+					noticeMatch[1]?.substring(0, 200)
+				);
+
+				let noticeText = noticeMatch[1]; // Cut off any standalone duplicate sections
 				// Look for lines that are JUST "建議" or "總結：" without being part of "建议指引" or "总结要点"
 				const cutoffPatterns = [
-					/\n[建議议]\s*\n(?![指引導导])/s,  // Plain "建議" not followed by "指引"
-					/\n[總总][結结][：:]\s*\n/s         // "總結：" as standalone heading
+					/\n[建議议]\s*\n(?![指引導导])/s, // Plain "建議" not followed by "指引"
+					/\n[總总][結结][：:]\s*\n/s, // "總結：" as standalone heading
 				];
-				
+
 				for (const pattern of cutoffPatterns) {
 					const cutIndex = noticeText.search(pattern);
 					if (cutIndex !== -1) {
@@ -777,61 +870,74 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 
 				// Look for specific subsections (supports both Traditional and Simplified)
 				console.log("🔍 Testing regex patterns against noticeText...");
-				
-				// Risk pattern - handle both Traditional and Simplified
+
+				// Risk pattern - match simple headings from API prompt: "风险" or "風險"
 				const riskMatch = noticeText.match(
-					/\*\*(风险提醒|風險提醒)\*\*[：:]?(.*?)(?=\*\*(建议指引|建議指引|總结要点|總結要點)\*\*)/s
+					/[风風][险險]\s*\n(.*?)(?=[建議议]\s*\n|[总總][结結]|$)/s
 				);
 				if (riskMatch) {
-					result.risks = riskMatch[2]
+					result.risks = riskMatch[1]
 						.trim()
 						.replace(/\*\*/g, "")
 						.replace(/^\s*[\-\*]\s*/gm, "")
 						.trim();
-					console.log(`✅ Extracted risks (${result.risks.length} chars):`, result.risks.substring(0, 200));
+					console.log(
+						`✅ Extracted risks (${result.risks.length} chars):`,
+						result.risks.substring(0, 200)
+					);
 				} else {
 					console.log(`❌ No risks match found in noticeText`);
 					console.log("🔍 Looking for patterns manually...");
-					if (noticeText.includes("风险提醒")) console.log("✓ Found: 风险提醒");
-					if (noticeText.includes("風險提醒")) console.log("✓ Found: 風險提醒");
-					if (noticeText.includes("建议指引")) console.log("✓ Found: 建议指引");
-					if (noticeText.includes("建議指引")) console.log("✓ Found: 建議指引");
+					if (noticeText.includes("风险"))
+						console.log("✓ Found: 风险");
+					if (noticeText.includes("風險"))
+						console.log("✓ Found: 風險");
+					if (noticeText.includes("建议"))
+						console.log("✓ Found: 建议");
+					if (noticeText.includes("建議"))
+						console.log("✓ Found: 建議");
 				}
 
-				// Suggestion pattern - handle both Traditional and Simplified
+				// Suggestion pattern - match simple "建议" or "建議" heading
 				const suggestionMatch = noticeText.match(
-					/\*\*(建议指引|建議指引)\*\*[：:]?(.*?)(?=\*\*(总结要点|總结要点|總結要點)\*\*|$)/s
+					/[建議议]\s*\n(.*?)(?=[总總][结結]|$)/s
 				);
 				if (suggestionMatch) {
-					result.suggestions = suggestionMatch[2]
+					result.suggestions = suggestionMatch[1]
 						.trim()
 						.replace(/\*\*/g, "")
 						.replace(/^\s*[\-\*]\s*/gm, "")
 						.trim();
-					console.log(`✅ Extracted suggestions (${result.suggestions.length} chars):`, result.suggestions.substring(0, 200));
+					console.log(
+						`✅ Extracted suggestions (${result.suggestions.length} chars):`,
+						result.suggestions.substring(0, 200)
+					);
 				} else {
 					console.log(`❌ No suggestions match found in noticeText`);
 				}
 
+				// Conclusion pattern - match "总结" or "總結" with optional colon
 				const conclusionMatch = noticeText.match(
-					/\*\*(总结|總結)\*\*[：:]?(.*?)$/s
+					/[总總][结結][：:]?\s*\n(.*?)$/s
 				);
 				if (conclusionMatch) {
-					result.conclusion = conclusionMatch[2]
+					result.conclusion = conclusionMatch[1]
 						.trim()
 						.replace(/\*\*/g, "")
 						.replace(/^\s*[\-\*]\s*/gm, "")
 						.trim();
-					console.log(`✅ Extracted conclusion (${result.conclusion.length} chars):`, result.conclusion.substring(0, 200));
+					console.log(
+						`✅ Extracted conclusion (${result.conclusion.length} chars):`,
+						result.conclusion.substring(0, 200)
+					);
 				} else {
 					console.log(`❌ No conclusion match found in noticeText`);
-				}
-
-				// Fallback: if no specific subsections found, try to extract risks and suggestions differently
+				} // Fallback: if no specific subsections found, try to extract risks and suggestions differently
 				if (!result.risks && !result.suggestions) {
 					// Match plain "風險" or "风险" heading until "建议指引" or "建議指引"
-					const riskFallback =
-						noticeText.match(/[風风][險险]\s*\n(?:.*?[：:]\s*\n)?(.*?)(?=\n[建議议][指引導导][：:])/s);
+					const riskFallback = noticeText.match(
+						/[風风][險险]\s*\n(?:.*?[：:]\s*\n)?(.*?)(?=\n[建議议][指引導导][：:])/s
+					);
 					if (riskFallback) {
 						result.risks = riskFallback[1]
 							.trim()
@@ -839,17 +945,19 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 					}
 
 					// Match "建议指引：" or "建議指引：" until "总结要点" or "總結要點"
-					const suggestionFallback =
-						noticeText.match(/[建議议][指引導导][：:]\s*\n(?:.*?[：:]\s*\n)?(.*?)(?=\n[總总][結结]要点點[：:])/s);
+					const suggestionFallback = noticeText.match(
+						/[建議议][指引導导][：:]\s*\n(?:.*?[：:]\s*\n)?(.*?)(?=\n[總总][結结]要点點[：:])/s
+					);
 					if (suggestionFallback) {
 						result.suggestions = suggestionFallback[1]
 							.trim()
 							.replace(/\*\*/g, "");
 					}
-					
+
 					// Match "总结要点：" or "總結要點：" until end
-					const conclusionFallback =
-						noticeText.match(/[總总][結结]要点點[：:]\s*\n(.*?)$/s);
+					const conclusionFallback = noticeText.match(
+						/[總总][結结]要点點[：:]\s*\n(.*?)$/s
+					);
 					if (conclusionFallback) {
 						result.conclusion = conclusionFallback[1]
 							.trim()
@@ -858,16 +966,17 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 				}
 			}
 
-		// Extract conclusion
-		const conclusionMatch = text.match(
-			/(?:### [總总][結结]|[總总][結结]要点點)[：:]?(.*?)$/s
-		);
-		if (conclusionMatch) {
-			result.conclusion = conclusionMatch[1].trim();
-		} else {
-			// Fallback conclusion
-			result.conclusion = `2025年為${concern}突破年，雖有壓力卻暗藏機遇，需平衡「官星責任」與「印星自信」，並以金水調候避免過燥。主動爭取機會、強化專業表現，有望獲得實質進展。`;
-		}			return result;
+			// Extract conclusion
+			const conclusionMatch = text.match(
+				/(?:### [總总][結结]|[總总][結结]要点點)[：:]?(.*?)$/s
+			);
+			if (conclusionMatch) {
+				result.conclusion = conclusionMatch[1].trim();
+			} else {
+				// Fallback conclusion
+				result.conclusion = `2025年為${concern}突破年，雖有壓力卻暗藏機遇，需平衡「官星責任」與「印星自信」，並以金水調候避免過燥。主動爭取機會、強化專業表現，有望獲得實質進展。`;
+			}
+			return result;
 		};
 
 		const parsedContent = parseAIContent(analysis);
@@ -876,35 +985,42 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 		const concernContent = getConcernSpecificContent(
 			concern,
 			yearGanZhi?.stem || "乙",
-			yearGanZhi?.branch || "巳"
+			yearGanZhi?.branch || "巳",
+			locale
 		);
-
 		const safeParsedContent = {
 			description:
 				parsedContent.description ||
-				`針對${concern}領域的專業分析，基於您的八字和流年${yearGanZhi?.stem || "乙"}${yearGanZhi?.branch || "巳"}的相互作用。`,
+				convertText(
+					`針對${concern}領域的專業分析，基於您的八字和流年${yearGanZhi?.stem || "乙"}${yearGanZhi?.branch || "巳"}的相互作用。`
+				),
 			tianGan: {
 				title:
 					parsedContent.tianGan?.title ||
-					`天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-${getTenGodRelation(yearGanZhi?.stem || "乙", actualDayMaster)}`,
+					convertText(
+						`天干${yearGanZhi?.stem || "乙"}${getStemElement(yearGanZhi?.stem || "乙")}-${getTenGodRelation(yearGanZhi?.stem || "乙", actualDayMaster)}`
+					),
 				effects:
 					parsedContent.tianGan?.effects?.length > 0
 						? parsedContent.tianGan.effects
 						: [
 								{
-									title: "職權提升",
-									content:
-										"天干在事業方面的正面影響，帶來升職機會和責任提升。",
+									title: convertText("職權提升"),
+									content: convertText(
+										"天干在事業方面的正面影響，帶來升職機會和責任提升。"
+									),
 								},
 								{
-									title: "合庚減洩",
-									content:
-										"需要注意創意發揮受限，建議以穩健執行為主。",
+									title: convertText("合庚減洩"),
+									content: convertText(
+										"需要注意創意發揮受限，建議以穩健執行為主。"
+									),
 								},
 								{
-									title: "官星透出",
-									content:
-										"利於求名考績，但需防過於保守而錯失機會。",
+									title: convertText("官星透出"),
+									content: convertText(
+										"利於求名考績，但需防過於保守而錯失機會。"
+									),
 								},
 							],
 				keyActions: parsedContent.tianGan?.keyActions || [],
@@ -912,38 +1028,44 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 			diZhi: {
 				title:
 					parsedContent.diZhi?.title ||
-					`地支${yearGanZhi?.branch || "巳"}${getBranchElement(yearGanZhi?.branch || "巳")}-偏印`,
+					convertText(
+						`地支${yearGanZhi?.branch || "巳"}${getBranchElement(yearGanZhi?.branch || "巳")}-偏印`
+					),
 				effects:
 					parsedContent.diZhi?.effects?.length > 0
 						? parsedContent.diZhi.effects
 						: [
 								{
-									title: "火旺生土",
-									content:
-										"增強日主能量，利於扛壓與長期項目推進，但需防固執己見。",
+									title: convertText("火旺生土"),
+									content: convertText(
+										"增強日主能量，利於扛壓與長期項目推進，但需防固執己見。"
+									),
 								},
 								{
-									title: "巳酉半合",
-									content:
-										"技術專業能力易受肯定，但需避免與同事的意見衝突。",
+									title: convertText("巳酉半合"),
+									content: convertText(
+										"技術專業能力易受肯定，但需避免與同事的意見衝突。"
+									),
 								},
 								{
-									title: "伏吟月支",
-									content:
-										"原有工作環境可能重複挑戰，需主動尋求突破。",
+									title: convertText("伏吟月支"),
+									content: convertText(
+										"原有工作環境可能重複挑戰，需主動尋求突破。"
+									),
 								},
 							],
 				keyActions: parsedContent.diZhi?.keyActions || [],
 			},
 			practicalResults:
 				parsedContent.practicalResults ||
-				`在${concern}領域將呈現階段性變化，結合流年${yearGanZhi?.stem || "乙"}${yearGanZhi?.branch || "巳"}的影響，建議關注具體表現時機和調整策略。`,
+				convertText(
+					`在${concern}領域將呈現階段性變化，結合流年${yearGanZhi?.stem || "乙"}${yearGanZhi?.branch || "巳"}的影響，建議關注具體表現時機和調整策略。`
+				),
 			risks: parsedContent.risks || concernContent.risks,
 			suggestions:
 				parsedContent.suggestions || concernContent.suggestions,
 			conclusion: parsedContent.conclusion || concernContent.conclusion,
 		};
-
 		return {
 			title: `${year}年流年詳解`,
 			description: safeParsedContent.description,
@@ -1171,7 +1293,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 					{/* Loading spinner */}
 					<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-					{/* 風水妹 loading image */}
+					{/* 小鈴 loading image */}
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
@@ -1247,9 +1369,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 					>
 						{t("title")}
 					</h2>
-					<p className="mb-4 text-lg">
-						{t("subtitle")}
-					</p>
+					<p className="mb-4 text-lg">{t("subtitle")}</p>
 
 					{/* Description */}
 					<p
@@ -1326,7 +1446,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 									{getStemElement(
 										analysisData?.yearGanZhi?.stem || "乙"
 									)}
-									觸發三重效應
+									{convertText("觸發三重效應")}
 								</h3>
 
 								{/* Content from AI analysis */}
@@ -1461,7 +1581,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 									{getBranchElement(
 										analysisData?.yearGanZhi?.branch || "巳"
 									)}
-									觸發三重效應
+									{convertText("觸發三重效應")}
 								</h3>
 
 								{/* Content from AI analysis */}
@@ -1554,7 +1674,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 								lineHeight: 1.2,
 							}}
 						>
-							實際表現
+							{convertText("實際表現")}
 						</h3>
 						<div
 							className="leading-relaxed text-black"
@@ -1611,7 +1731,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 											"clamp(1.125rem, 3.5vw, 1.5625rem)",
 									}}
 								>
-									風險
+									{convertText("風險")}
 								</h4>
 							</div>
 							<div
@@ -1654,7 +1774,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 											"clamp(1.125rem, 3.5vw, 1.5625rem)",
 									}}
 								>
-									建議
+									{convertText("建議")}
 								</h4>
 							</div>
 							<div
@@ -1697,7 +1817,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 								lineHeight: 1.2,
 							}}
 						>
-							總結：
+							{convertText("總結：")}
 						</h3>
 						<p
 							className="leading-relaxed text-black"

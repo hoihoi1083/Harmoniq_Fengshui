@@ -16,6 +16,17 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 	// Generate AI analysis based on user's birth info and concern
 	const generateCoreSuggestionAnalysis = async (userInfo, year) => {
 		try {
+			// Use birthTime if available, otherwise extract from birthDateTime
+			const birthDateTime =
+				userInfo?.birthDateTime || userInfo?.birthday || "";
+			const timeMatch = birthDateTime.match(/\d{1,2}:\d{2}/);
+			const extractedTime = timeMatch ? timeMatch[0] : "";
+			const finalTime =
+				userInfo?.birthTime ||
+				userInfo?.time ||
+				extractedTime ||
+				"未知";
+
 			const response = await fetch("/api/core-suggestion-analysis", {
 				method: "POST",
 				headers: {
@@ -23,10 +34,9 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 				},
 				body: JSON.stringify({
 					userInfo: {
-						birthday:
-							userInfo?.birthDateTime || userInfo?.birthday || "",
+						birthday: birthDateTime,
 						gender: userInfo?.gender || "male",
-						time: userInfo?.time || "",
+						time: finalTime,
 						concern: userInfo?.concern || "財運",
 					},
 					locale: locale,
@@ -356,11 +366,11 @@ export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
 					{/* Loading spinner */}
 					<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-					{/* 風水妹 loading image */}
+					{/* 小鈴 loading image */}
 					<div className="flex items-center justify-center">
 						<Image
 							src="/images/風水妹/風水妹-loading.png"
-							alt="風水妹運算中"
+							alt="小鈴運算中"
 							width={120}
 							height={120}
 							className="object-contain"

@@ -1,0 +1,967 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { generateWealthFortunePrompt } from "@/lib/wealthFortunePrompt";
+import {
+	getCurrentFortunePeriods,
+	formatFortunePeriod,
+} from "@/lib/fortunePeriodCalculator";
+import Image from "next/image";
+import fengshuiLoading from "../../public/images/風水妹/風水妹-loading.png";
+import { convertByRegion } from "@/utils/chineseConverter";
+import { useRegionDetection } from "@/hooks/useRegionDetection";
+
+const WealthFortuneAnalysis = ({
+	userInfo,
+	wuxingData,
+	sessionId,
+	onDataUpdate,
+	showHistorical,
+	historicalData,
+}) => {
+	const { region } = useRegionDetection();
+	const [activeTab, setActiveTab] = useState("奠基期");
+	const [wealthAnalysis, setWealthAnalysis] = useState(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isAIGenerated, setIsAIGenerated] = useState(false);
+	const [hasGenerated, setHasGenerated] = useState(false);
+
+	// Calculate dynamic fortune periods based on birth date
+	const fortunePeriods = userInfo?.birthDateTime
+		? getCurrentFortunePeriods(userInfo.birthDateTime, userInfo.gender)
+		: null;
+
+	// Generate AI analysis on component mount
+	useEffect(() => {
+		// ✅ Load historical data when showing historical report
+		if (showHistorical && historicalData) {
+			setWealthAnalysis(historicalData.analysis || historicalData);
+			setIsAIGenerated(historicalData.isAIGenerated || false);
+			setIsLoading(false);
+			setHasGenerated(true);
+			return;
+		}
+
+		// ✅ Skip generation when showing historical data but no data available
+		if (showHistorical) {
+			setIsLoading(false);
+			return;
+		}
+
+		// ✅ Only generate once for new reports, prevent infinite loops
+		if (userInfo && wuxingData && !showHistorical && !hasGenerated) {
+			console.log("💰 WealthFortuneAnalysis: Starting generation");
+			generateWealthAnalysis();
+		} else {
+			console.log("💰 WealthFortuneAnalysis: Skipping generation", {
+				userInfo: !!userInfo,
+				wuxingData: !!wuxingData,
+				showHistorical,
+				hasGenerated,
+			});
+		}
+	}, [userInfo, wuxingData, showHistorical, historicalData, hasGenerated]);
+
+	const generateWealthAnalysis = async () => {
+		try {
+			setIsLoading(true);
+			const prompt = generateWealthFortunePrompt(userInfo, wuxingData);
+
+			// Call the AI API
+			const response = await fetch("/api/wealth-fortune-analysis", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ prompt, userInfo, wuxingData }),
+			});
+
+			const result = await response.json();
+
+			if (result.success) {
+				setWealthAnalysis(result.analysis);
+				setIsAIGenerated(result.isAIGenerated || false);
+				setHasGenerated(true);
+				console.log(
+					`🎯 Using ${result.isAIGenerated ? "DeepSeek AI" : "Structured Mock"} wealth data`
+				);
+
+				// ✅ NEW: Auto-save wealth fortune data
+				if (onDataUpdate && result.analysis) {
+					console.log("💾 Saving wealth fortune analysis data");
+					onDataUpdate({
+						analysis: result.analysis,
+						isAIGenerated: result.isAIGenerated || false,
+						generatedAt: new Date().toISOString(),
+						sessionId,
+						userInfo,
+						wuxingData,
+					});
+				}
+			} else {
+				// Fallback to mock data if API fails
+				console.warn(
+					"Wealth API failed, using mock data:",
+					result.error
+				);
+				const mockAnalysis = generateMockWealthAnalysis(
+					userInfo,
+					wuxingData
+				);
+				setWealthAnalysis(mockAnalysis);
+				setIsAIGenerated(false);
+				setHasGenerated(true);
+
+				// ✅ NEW: Auto-save mock wealth fortune data
+				if (onDataUpdate && mockAnalysis) {
+					console.log("💾 Saving mock wealth fortune analysis data");
+					onDataUpdate({
+						analysis: mockAnalysis,
+						isAIGenerated: false,
+						generatedAt: new Date().toISOString(),
+						sessionId,
+						userInfo,
+						wuxingData,
+					});
+				}
+			}
+		} catch (error) {
+			console.error("Error generating wealth analysis:", error);
+			// Fallback to mock data on error
+			const mockAnalysis = generateMockWealthAnalysis(
+				userInfo,
+				wuxingData
+			);
+			setWealthAnalysis(mockAnalysis);
+			setHasGenerated(true);
+
+			// ✅ NEW: Auto-save mock wealth fortune data on error
+			if (onDataUpdate && mockAnalysis) {
+				console.log(
+					"💾 Saving mock wealth fortune analysis data (error fallback)"
+				);
+				onDataUpdate({
+					analysis: mockAnalysis,
+					isAIGenerated: false,
+					generatedAt: new Date().toISOString(),
+					sessionId,
+					userInfo,
+					wuxingData,
+				});
+			}
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const generateMockWealthAnalysis = (userInfo, wuxingData) => {
+		const birthDate = new Date(userInfo.birthDateTime);
+		const currentYear = new Date().getFullYear();
+		const age = currentYear - birthDate.getFullYear();
+		const dayMaster = wuxingData.dayStem || "壬";
+		const dayMasterElement = wuxingData.dayStemWuxing || "水";
+
+		// Get dynamic fortune periods
+		const periods = fortunePeriods?.periods || [];
+		const foundationPeriod = periods[0] || {
+			dayun: "丙寅",
+			yearRange: "2025-2034",
+			ageRange: "25-34歲",
+		};
+		const explosivePeriod = periods[1] || {
+			dayun: "丁卯",
+			yearRange: "2035-2044",
+			ageRange: "35-44歲",
+		};
+		const conservativePeriod = periods[2] || {
+			dayun: "壬戌",
+			yearRange: "2045-2054",
+			ageRange: "45-54歲",
+		};
+
+		return {
+			summary: {
+				title: `劫財奪財，置業守成為上`,
+				description: `月干${wuxingData.monthStem}土七殺透出，時柱${dayMaster}${wuxingData.dayBranch}劫財坐旺，全局無明財星，財富需通過制殺獲取（金製木→木疏土→土生金循環）。`,
+			},
+			threeStages: {
+				奠基期: {
+					title: "奠基期",
+					ageRange: foundationPeriod.ageRange,
+					fortune: `${foundationPeriod.dayun}運`,
+					content: {
+						phase1: {
+							name: formatFortunePeriod(foundationPeriod),
+							description: `${foundationPeriod.dayun[0]}火偏財虛透，${foundationPeriod.dayun[1]}木食神生財，主勞力得財`,
+							keyYear: `${foundationPeriod.startYear + 3}年：利考金融證照（證券/基金從業資格）`,
+							trapYear: `致命陷阱：${foundationPeriod.startYear + 6}年慎防P2P理財`,
+						},
+						phase2: {
+							name: `次階段（${foundationPeriod.startYear + 5} - ${foundationPeriod.endYear}）`,
+							description: `${foundationPeriod.dayun[0]}火正財合身，${foundationPeriod.dayun[1]}木傷官生財，收入躍升但開支激增`,
+							warning: `${foundationPeriod.endYear - 2}年：合作投資需謹慎`,
+						},
+					},
+				},
+				爆發期: {
+					title: "爆發期",
+					ageRange: explosivePeriod.ageRange,
+					fortune: `${explosivePeriod.dayun}運`,
+					content: {
+						description: `${explosivePeriod.dayun[0]}木傷官制殺，${explosivePeriod.dayun[1]}水祿神助身`,
+						keyYear: `${explosivePeriod.startYear + 5}年：不動產增值收益可觀`,
+						industries: `核心領域：${explosivePeriod.dayun[1] === "子" ? "水處理工程" : "相關行業"}、法律服務`,
+						peakYear: `財富峰值：${explosivePeriod.endYear - 2}年，利資源貿易`,
+					},
+				},
+				守成期: {
+					title: "守成期",
+					ageRange: conservativePeriod.ageRange,
+					fortune: `${conservativePeriod.dayun}運`,
+					content: {
+						description: `${conservativePeriod.dayun[1]}土制劫財開財庫，財運穩定`,
+						keyYear: `${conservativePeriod.startYear + 5}年：金水相生，可建立家族信託基金`,
+						avoidIndustries: "忌諱產業：餐飲（火）、林業（木剋土）",
+					},
+				},
+			},
+			wealthRules: {
+				assetAllocation: {
+					title: "資產配比",
+					realEstate: "70%不動產：投資房地產，確保穩健回報",
+					preciousMetals:
+						"20%貴金屬：購買黃金、銀條或相關ETF，作為抗通脹保值資產",
+					cash: "10%流動現金：保留現金或貨幣基金，應對緊急需求或短期投資機會",
+				},
+				partnerships: {
+					title: "合作禁忌",
+					zodiacA: {
+						animal: "生肖馬（午沖子）",
+						description:
+							"屬馬者五行屬火，與子鼠相沖，合作易生衝突，導致決策分歧或財務損失。",
+					},
+					zodiacB: {
+						animal: "生肖兔（卯刑子）",
+						description:
+							"屬兔者五行屬木，與子鼠相刑，易引發信任危機或隱性競爭，影響財運。",
+					},
+				},
+				wealthDirection: {
+					title: "催財方位",
+					location: "臥室西北角（戌位）",
+					description:
+						"西北角屬乾卦，主財運與貴人運。擺放白水晶簇，可聚財旺氣，增強正財運勢。",
+					warning:
+						"注意事項：西北角避免堆放雜物，保持通風明亮；忌擺放尖銳物品或電子產品，以免破壞財氣場。",
+				},
+			},
+		};
+	};
+
+	if (isLoading) {
+		return (
+			<div
+				className="py-20 text-center"
+				style={{ fontFamily: '"Noto Sans HK", sans-serif' }}
+			>
+				<div className="relative inline-block mb-4">
+					<Image
+						src={fengshuiLoading}
+						alt="風鈴運算中"
+						width={100}
+						height={100}
+						className="object-contain"
+					/>
+					<div className="absolute inset-0 flex items-center justify-center">
+						<div className="w-6 h-6 border-b-2 border-pink-500 rounded-full animate-spin"></div>
+					</div>
+				</div>
+				<p className="text-lg text-[#5A5A5A]">
+					{convertByRegion("正在生成財運運勢分析...", region)}
+				</p>
+			</div>
+		);
+	}
+
+	if (!wealthAnalysis) {
+		return (
+			<div className="py-20 text-center">
+				<p className="text-lg text-[#5A5A5A]">
+					{convertByRegion(
+						"財運分析生成失敗，請重新整理頁面",
+						region
+					)}
+				</p>
+			</div>
+		);
+	}
+
+	const tabs = ["奠基期", "爆發期", "守成期"];
+
+	return (
+		<div className="w-full">
+			{/* Header */}
+			<div className="mb-4 sm:mb-8">
+				<div className="flex items-center gap-2 mb-3 sm:gap-3 sm:mb-4">
+					<h2
+						className="font-bold text-[#374A37]"
+						style={{
+							fontFamily: "Noto Serif TC, serif",
+							fontSize: "clamp(24px, 5vw, 36px)",
+						}}
+					>
+						{convertByRegion("財運運勢分析", region)}
+					</h2>
+				</div>
+
+				{/* Summary Section */}
+				<div className="bg-gradient-to-r from-[#D09900] to-[#BD4800] rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-4 sm:mb-6 inline-block">
+					<h3
+						className="font-bold text-white"
+						style={{
+							fontFamily: "Noto Serif TC, serif",
+							fontSize: "clamp(16px, 3.5vw, 20px)",
+						}}
+					>
+						{convertByRegion("總結", region)}：
+						{convertByRegion(wealthAnalysis.summary.title, region)}
+					</h3>
+				</div>
+
+				<p
+					className="text-[#374A37] leading-relaxed mb-4 sm:mb-8"
+					style={{
+						fontFamily: "Noto Sans HK, sans-serif",
+						fontSize: "clamp(14px, 3vw, 18px)",
+						lineHeight: 1.6,
+					}}
+				>
+					{convertByRegion(
+						wealthAnalysis.summary.description,
+						region
+					)}
+				</p>
+			</div>
+
+			{/* Three Stages Wealth Analysis */}
+			<div
+				className="bg-[#EFEFEF] rounded-xl p-3 sm:p-6 mb-4 sm:mb-6"
+				style={{ boxShadow: "inset 0 4px 4px rgba(0, 0, 0, 0.25)" }}
+			>
+				<h3
+					className="font-bold text-[#D09900] mb-4 sm:mb-6"
+					style={{
+						fontFamily: "Noto Serif TC, serif",
+						fontSize: "clamp(20px, 4vw, 28px)",
+					}}
+				>
+					{convertByRegion("三階段財運密碼", region)}
+				</h3>
+
+				{/* Tab Navigation */}
+				<div className="flex flex-col justify-center gap-3 mb-6 sm:flex-row sm:gap-6 sm:mb-8">
+					{tabs.map((tab) => (
+						<button
+							key={tab}
+							onClick={() => setActiveTab(tab)}
+							className={`px-4 sm:px-8 py-2 sm:py-4 rounded-full font-semibold transition-all duration-200 ${
+								activeTab === tab
+									? "bg-[#D09900] text-white"
+									: "bg-white text-[#757575] hover:bg-gray-50"
+							}`}
+							style={{
+								fontFamily: "Noto Serif TC, serif",
+								fontSize: "clamp(14px, 3vw, 18px)",
+								boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
+							}}
+						>
+							{convertByRegion(tab, region)}
+						</button>
+					))}
+				</div>
+
+				{/* Age Range Banner */}
+				<div className="bg-gradient-to-r from-[#D09900] to-[#BD4800] rounded-full px-4 sm:px-6 py-1.5 sm:py-2 mb-4 sm:mb-6 text-center">
+					<h4
+						className="font-bold text-white"
+						style={{
+							fontFamily: "Noto Serif TC, serif",
+							fontSize: "clamp(14px, 3vw, 18px)",
+						}}
+					>
+						{convertByRegion(
+							wealthAnalysis.threeStages[activeTab].ageRange,
+							region
+						)}
+						·
+						{convertByRegion(
+							wealthAnalysis.threeStages[activeTab].fortune,
+							region
+						)}
+					</h4>
+				</div>
+
+				{/* Tab Content */}
+				<div className="mb-4 sm:mb-8">
+					{activeTab === "奠基期" && (
+						<div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+							<div className="p-4 bg-white rounded-lg shadow-md sm:p-6">
+								<div className="bg-gradient-to-r from-[#D09900] to-[#BD4800] rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-3 sm:mb-4 inline-block">
+									<h5
+										className="font-bold text-white"
+										style={{
+											fontFamily: "Noto Serif TC, serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 16px)",
+										}}
+									>
+										{convertByRegion(
+											wealthAnalysis.threeStages["奠基期"]
+												.fortune,
+											region
+										)}
+									</h5>
+								</div>
+								<div className="space-y-3 sm:space-y-4">
+									<p
+										className="text-[#374A37]"
+										style={{
+											fontFamily:
+												"Noto Sans HK, sans-serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 14px)",
+											lineHeight: 1.5,
+										}}
+									>
+										{convertByRegion(
+											wealthAnalysis.threeStages["奠基期"]
+												.content.phase1.description,
+											region
+										)}
+									</p>
+									<div className="bg-[#F5F5F5] rounded-lg p-2 sm:p-3">
+										<p
+											className="font-medium text-[#374A37]"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(12px, 2.5vw, 14px)",
+												lineHeight: 1.4,
+											}}
+										>
+											{convertByRegion(
+												wealthAnalysis.threeStages[
+													"奠基期"
+												].content.phase1.keyYear,
+												region
+											)}
+										</p>
+									</div>
+									<div className="p-2 rounded-lg sm:p-3 bg-red-50">
+										<p
+											className="text-red-700"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(12px, 2.5vw, 14px)",
+												lineHeight: 1.4,
+											}}
+										>
+											{convertByRegion(
+												wealthAnalysis.threeStages[
+													"奠基期"
+												].content.phase1.trapYear,
+												region
+											)}
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div className="p-4 bg-white rounded-lg shadow-md sm:p-6">
+								<div className="bg-[#D09900] rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-3 sm:mb-4 inline-block">
+									<h5
+										className="font-bold text-white"
+										style={{
+											fontFamily: "Noto Serif TC, serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 16px)",
+										}}
+									>
+										{convertByRegion(
+											wealthAnalysis.threeStages[
+												"奠基期"
+											].content.phase2.name.split(
+												"（"
+											)[0],
+											region
+										)}
+									</h5>
+								</div>
+								<div className="space-y-3 sm:space-y-4">
+									<p
+										className="text-[#374A37]"
+										style={{
+											fontFamily:
+												"Noto Sans HK, sans-serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 14px)",
+											lineHeight: 1.5,
+										}}
+									>
+										{convertByRegion(
+											wealthAnalysis.threeStages["奠基期"]
+												.content.phase2.description,
+											region
+										)}
+									</p>
+									<div className="p-2 rounded-lg sm:p-3 bg-red-50">
+										<p
+											className="text-red-700"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(12px, 2.5vw, 14px)",
+												lineHeight: 1.4,
+											}}
+										>
+											{convertByRegion(
+												wealthAnalysis.threeStages[
+													"奠基期"
+												].content.phase2.warning,
+												region
+											)}
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{activeTab === "爆發期" && (
+						<div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+							<div className="p-4 bg-white rounded-lg shadow-md sm:p-6">
+								<div className="bg-[#D09900] rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-3 sm:mb-4 inline-block">
+									<h5
+										className="font-bold text-white"
+										style={{
+											fontFamily: "Noto Serif TC, serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 16px)",
+										}}
+									>
+										{convertByRegion("甲木傷官", region)}
+									</h5>
+								</div>
+								<div className="space-y-3 sm:space-y-4">
+									<p
+										className="text-[#374A37]"
+										style={{
+											fontFamily:
+												"Noto Sans HK, sans-serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 14px)",
+											lineHeight: 1.5,
+										}}
+									>
+										{convertByRegion(
+											wealthAnalysis.threeStages["爆發期"]
+												.content.description,
+											region
+										)}
+									</p>
+									<div className="bg-[#F5F5F5] rounded-lg p-2 sm:p-3">
+										<p
+											className="font-medium text-[#374A37]"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(12px, 2.5vw, 14px)",
+												lineHeight: 1.4,
+											}}
+										>
+											{convertByRegion(
+												wealthAnalysis.threeStages[
+													"爆發期"
+												].content.keyYear,
+												region
+											)}
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div className="p-4 bg-white rounded-lg shadow-md sm:p-6">
+								<div className="bg-[#D09900] rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-3 sm:mb-4 inline-block">
+									<h5
+										className="font-bold text-white"
+										style={{
+											fontFamily: "Noto Serif TC, serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 16px)",
+										}}
+									>
+										{convertByRegion("財富峰值", region)}
+									</h5>
+								</div>
+								<div className="space-y-3 sm:space-y-4">
+									<p
+										className="text-[#374A37]"
+										style={{
+											fontFamily:
+												"Noto Sans HK, sans-serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 14px)",
+											lineHeight: 1.5,
+										}}
+									>
+										{convertByRegion(
+											wealthAnalysis.threeStages["爆發期"]
+												.content.industries,
+											region
+										)}
+									</p>
+									<div className="bg-[#F5F5F5] rounded-lg p-2 sm:p-3">
+										<p
+											className="font-medium text-[#374A37]"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(12px, 2.5vw, 14px)",
+												lineHeight: 1.4,
+											}}
+										>
+											{convertByRegion(
+												wealthAnalysis.threeStages[
+													"爆發期"
+												].content.peakYear,
+												region
+											)}
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{activeTab === "守成期" && (
+						<div className="p-4 bg-white rounded-lg shadow-md sm:p-6">
+							<div className="bg-[#D09900] rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-3 sm:mb-4 inline-block">
+								<h5
+									className="font-bold text-white"
+									style={{
+										fontFamily: "Noto Serif TC, serif",
+										fontSize: "clamp(12px, 2.5vw, 16px)",
+									}}
+								>
+									{convertByRegion(
+										wealthAnalysis.threeStages["守成期"]
+											.ageRange,
+										region
+									)}
+									·
+									{convertByRegion(
+										wealthAnalysis.threeStages["守成期"]
+											.fortune,
+										region
+									)}
+								</h5>
+							</div>
+							<div className="space-y-3 sm:space-y-4">
+								<p
+									className="text-[#374A37]"
+									style={{
+										fontFamily: "Noto Sans HK, sans-serif",
+										fontSize: "clamp(12px, 2.5vw, 14px)",
+										lineHeight: 1.5,
+									}}
+								>
+									{convertByRegion(
+										wealthAnalysis.threeStages["守成期"]
+											.content.description,
+										region
+									)}
+								</p>
+								<div className="bg-[#F5F5F5] rounded-lg p-2 sm:p-3">
+									<p
+										className="font-medium text-[#374A37]"
+										style={{
+											fontFamily:
+												"Noto Sans HK, sans-serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 14px)",
+											lineHeight: 1.4,
+										}}
+									>
+										{convertByRegion(
+											wealthAnalysis.threeStages["守成期"]
+												.content.keyYear,
+											region
+										)}
+									</p>
+								</div>
+								<div className="p-2 rounded-lg sm:p-3 bg-red-50">
+									<p
+										className="text-red-700"
+										style={{
+											fontFamily:
+												"Noto Sans HK, sans-serif",
+											fontSize:
+												"clamp(12px, 2.5vw, 14px)",
+											lineHeight: 1.4,
+										}}
+									>
+										{convertByRegion(
+											wealthAnalysis.threeStages["守成期"]
+												.content.avoidIndustries,
+											region
+										)}
+									</p>
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+
+			{/* Wealth Rules Section */}
+			<div className="p-4 sm:p-6">
+				<h3
+					className="font-bold text-[#D09900] mb-4 sm:mb-6"
+					style={{
+						fontFamily: "Noto Serif TC, serif",
+						fontSize: "clamp(20px, 5vw, 30px)",
+					}}
+				>
+					{convertByRegion("財富法則", region)}
+				</h3>
+
+				<div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+					{/* Asset Allocation */}
+					<div
+						className="bg-[#EFEFEF] rounded-lg p-3 sm:p-4"
+						style={{
+							boxShadow: "inset 0 4px 4px rgba(0, 0, 0, 0.25)",
+						}}
+					>
+						<div className="bg-[#D09900] rounded-full px-3 sm:px-6 py-1.5 sm:py-3 mb-2 sm:mb-3 inline-block">
+							<h4
+								className="font-bold text-white"
+								style={{
+									fontFamily: "Noto Serif TC, serif",
+									fontSize: "clamp(12px, 2.5vw, 16px)",
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.assetAllocation
+										.title,
+									region
+								)}
+							</h4>
+						</div>
+						<div className="space-y-2 sm:space-y-3">
+							<p
+								className="text-[#374A37]"
+								style={{
+									fontFamily: "Noto Sans HK, sans-serif",
+									fontSize: "clamp(12px, 2.5vw, 14px)",
+									lineHeight: 1.5,
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.assetAllocation
+										.realEstate,
+									region
+								)}
+							</p>
+							<p
+								className="text-[#374A37]"
+								style={{
+									fontFamily: "Noto Sans HK, sans-serif",
+									fontSize: "clamp(12px, 2.5vw, 14px)",
+									lineHeight: 1.5,
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.assetAllocation
+										.preciousMetals,
+									region
+								)}
+							</p>
+							<p
+								className="text-[#374A37]"
+								style={{
+									fontFamily: "Noto Sans HK, sans-serif",
+									fontSize: "clamp(12px, 2.5vw, 14px)",
+									lineHeight: 1.5,
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.assetAllocation
+										.cash,
+									region
+								)}
+							</p>
+						</div>
+					</div>
+
+					{/* Partnership Taboos */}
+					<div
+						className="bg-[#EFEFEF] rounded-lg p-3 sm:p-4"
+						style={{
+							boxShadow: "inset 0 4px 4px rgba(0, 0, 0, 0.25)",
+						}}
+					>
+						<div className="bg-[#D09900] rounded-full px-3 sm:px-6 py-1.5 sm:py-3 mb-2 sm:mb-3 inline-block">
+							<h4
+								className="font-bold text-white"
+								style={{
+									fontFamily: "Noto Serif TC, serif",
+									fontSize: "clamp(12px, 2.5vw, 16px)",
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.partnerships
+										.title,
+									region
+								)}
+							</h4>
+						</div>
+						<div className="space-y-2 sm:space-y-3">
+							<div>
+								<p
+									className="font-medium text-[#374A37] mb-1"
+									style={{
+										fontFamily: "Noto Serif TC, serif",
+										fontSize: "clamp(12px, 2.5vw, 14px)",
+									}}
+								>
+									{convertByRegion(
+										wealthAnalysis.wealthRules.partnerships
+											.zodiacA.animal,
+										region
+									)}
+								</p>
+								<p
+									className="text-[#757575]"
+									style={{
+										fontFamily: "Noto Sans HK, sans-serif",
+										fontSize: "clamp(11px, 2vw, 12px)",
+										lineHeight: 1.4,
+									}}
+								>
+									{convertByRegion(
+										wealthAnalysis.wealthRules.partnerships
+											.zodiacA.description,
+										region
+									)}
+								</p>
+							</div>
+							<div>
+								<p
+									className="font-medium text-[#374A37] mb-1"
+									style={{
+										fontFamily: "Noto Serif TC, serif",
+										fontSize: "clamp(12px, 2.5vw, 14px)",
+									}}
+								>
+									{convertByRegion(
+										wealthAnalysis.wealthRules.partnerships
+											.zodiacB.animal,
+										region
+									)}
+								</p>
+								<p
+									className="text-[#757575]"
+									style={{
+										fontFamily: "Noto Sans HK, sans-serif",
+										fontSize: "clamp(11px, 2vw, 12px)",
+										lineHeight: 1.4,
+									}}
+								>
+									{convertByRegion(
+										wealthAnalysis.wealthRules.partnerships
+											.zodiacB.description,
+										region
+									)}
+								</p>
+							</div>
+						</div>
+					</div>
+
+					{/* Wealth Direction */}
+					<div
+						className="bg-[#EFEFEF] rounded-lg p-3 sm:p-4 md:col-span-2 lg:col-span-1"
+						style={{
+							boxShadow: "inset 0 4px 4px rgba(0, 0, 0, 0.25)",
+						}}
+					>
+						<div className="bg-[#D09900] rounded-full px-3 sm:px-6 py-1.5 sm:py-3 mb-2 sm:mb-3 inline-block">
+							<h4
+								className="font-bold text-white"
+								style={{
+									fontFamily: "Noto Serif TC, serif",
+									fontSize: "clamp(12px, 2.5vw, 16px)",
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.wealthDirection
+										.title,
+									region
+								)}
+							</h4>
+						</div>
+						<div className="space-y-2 sm:space-y-3">
+							<p
+								className="font-medium text-[#374A37]"
+								style={{
+									fontFamily: "Noto Serif TC, serif",
+									fontSize: "clamp(12px, 2.5vw, 14px)",
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.wealthDirection
+										.location,
+									region
+								)}
+							</p>
+							<p
+								className="text-[#374A37]"
+								style={{
+									fontFamily: "Noto Sans HK, sans-serif",
+									fontSize: "clamp(12px, 2.5vw, 14px)",
+									lineHeight: 1.5,
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.wealthDirection
+										.description,
+									region
+								)}
+							</p>
+							<p
+								className="text-[#757575]"
+								style={{
+									fontFamily: "Noto Sans HK, sans-serif",
+									fontSize: "clamp(11px, 2vw, 12px)",
+									lineHeight: 1.4,
+								}}
+							>
+								{convertByRegion(
+									wealthAnalysis.wealthRules.wealthDirection
+										.warning,
+									region
+								)}
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default WealthFortuneAnalysis;

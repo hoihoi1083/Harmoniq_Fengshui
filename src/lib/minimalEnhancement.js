@@ -215,10 +215,10 @@ class EnhancedSmartChat2 {
             
 分析結果: ${analysis.specificProblem}
 
-請以風鈴的身份，針對這個具體的工作/生意問題，提供相關的風水建議和回應。
+請以小鈴的身份，針對這個具體的工作/生意問題，提供相關的風水建議和回應。
 
 回應要求:
-1. 要親切友善，用風鈴的語氣
+1. 要親切友善，用小鈴的語氣
 2. 針對具體問題給出相關風水建議
 3. 包含實用的風水佈局建議
 4. 保持正面積極的態度
@@ -226,7 +226,7 @@ class EnhancedSmartChat2 {
 
 ${promptAddition}
 
-風鈴語氣特點: 親切、專業、帶有一點可愛的語氣，會用✨💼🌱等emoji`;
+小鈴語氣特點: 親切、專業、帶有一點可愛的語氣，會用✨💼🌱等emoji`;
 
 			const aiResponse = await this.generateAIResponse(enhancedPrompt);
 
@@ -234,14 +234,14 @@ ${promptAddition}
 				aiResponse +
 				`
 
-告訴風鈴你的生日，我可以幫你看看事業運勢和最佳發展時機！
+告訴小鈴你的生日，我可以幫你看看事業運勢和最佳發展時機！
 
 📅 **生日格式範例：**
 • 1999-03-15
 • 1999/3/15  
 • 1999年3月15日
 
-風鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`
+小鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`
 			);
 		} catch (error) {
 			console.error("Enhanced career flow failed:", error);

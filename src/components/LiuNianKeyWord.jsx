@@ -544,11 +544,11 @@ export default function LiuNianKeyWord({ userInfo, currentYear = 2025 }) {
 						{/* Loading spinner */}
 						<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-						{/* 風水妹 loading image */}
+						{/* 小鈴 loading image */}
 						<div className="flex items-center justify-center">
 							<Image
 								src="/images/風水妹/風水妹-loading.png"
-								alt="風水妹運算中"
+								alt="小鈴運算中"
 								width={120}
 								height={120}
 								className="object-contain"
@@ -564,7 +564,7 @@ export default function LiuNianKeyWord({ userInfo, currentYear = 2025 }) {
 									fontSize: "clamp(14px, 3.5vw, 16px)",
 								}}
 							>
-								風水妹已經在運算流年分析中，請稍候
+								小鈴已經在運算流年分析中，請稍候
 							</div>
 						</div>
 					</div>

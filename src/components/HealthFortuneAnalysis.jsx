@@ -250,7 +250,7 @@ const HealthFortuneAnalysis = ({
 				<div className="relative inline-block mb-4">
 					<Image
 						src={fengshuiLoading}
-						alt="風水妹運算中"
+						alt="小鈴運算中"
 						width={100}
 						height={100}
 						className="object-contain"
