@@ -2,7 +2,7 @@
 	"apps": [
 		{
 			"name": "fengshui-app",
-			"script": ".next/standalone/server.js",
+			"script": "server.js",
 			"cwd": "/home/ec2-user/fengshui-layout",
 			"env_file": ".env",
 			"instances": 2,
