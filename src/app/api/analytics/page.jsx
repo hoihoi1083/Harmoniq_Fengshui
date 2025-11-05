@@ -19,11 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import BirthdayModal from "@/components/BirthdayModal";
 import Navbar from "@/components/Navbar";
 
-// Tell Next.js this page should not be statically generated
-export const dynamic = "force-dynamic";
-export const dynamicParams = true;
-export const revalidate = 0;
-
 export default function SmartChat2() {
 	const { data: session, status } = useSession();
 	const pathname = usePathname();
