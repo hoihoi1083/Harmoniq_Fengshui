@@ -1995,8 +1995,8 @@ export default function Home() {
 														<div className="text-sm font-medium text-black md:text-base">
 															{currentLocale ===
 															"zh-CN"
-																? "风铃"
-																: "風鈴"}
+																? "小铃"
+																: "小鈴"}
 														</div>
 													</div>
 												</div>
