@@ -28,7 +28,31 @@ function cleanMarkdownFormatting(text) {
 	return cleaned;
 }
 
-// 🔧 生日解析工具函數 - 複製自 Smart-Chat
+// � 根據區域獲取貨幣符號和價格
+function getCurrencyAndPrices(region) {
+	const pricingMap = {
+		china: {
+			currency: "¥",
+			concernReport: { original: "88", discount: "38" },
+			fullReport: { original: "168", discount: "88" },
+		},
+		hongkong: {
+			currency: "HK$",
+			concernReport: { original: "88", discount: "38" },
+			fullReport: { original: "168", discount: "88" },
+		},
+		taiwan: {
+			currency: "NT$",
+			concernReport: { original: "368", discount: "168" },
+			fullReport: { original: "668", discount: "368" },
+		},
+	};
+
+	// 默認使用香港價格
+	return pricingMap[region] || pricingMap.hongkong;
+}
+
+// �🔧 生日解析工具函數 - 複製自 Smart-Chat
 function parseFlexibleDate(dateString) {
 	if (!dateString || typeof dateString !== "string") {
 		return null;
@@ -4450,18 +4474,24 @@ export async function POST(request) {
 				}
 
 				// 🎯 添加報告選擇部分
+				// 💰 獲取當前區域的貨幣和價格
+				const pricing = getCurrencyAndPrices(region);
+				const { currency } = pricing;
+				const concernPrices = pricing.concernReport;
+				const fullPrices = pricing.fullReport;
+
 				response +=
 					locale === "zh-CN"
 						? `\n\n───────────────────
 💎 想要更深入的分析吗？
 根据你的状况，小铃为你推荐：
 
-1️⃣ 一份关于${concern}的详细报告 价值HK$88，限时优惠HK$38
+1️⃣ 一份关于${concern}的详细报告 价值${currency}${concernPrices.original}，限时优惠${currency}${concernPrices.discount}
 - 深入分析你的${concern}运势，提供具体建议和改善方案
 - 详细的五行调理方法
 - 最佳行动时机指导
 
-2️⃣ 一份综合命理报告 价值HK$168，限时优惠HK$88
+2️⃣ 一份综合命理报告 价值${currency}${fullPrices.original}，限时优惠${currency}${fullPrices.discount}
 - 全面的八字命盘分析，包含各方面运势预测
 - 流年大运走势分析
 - 人际关系和事业发展建议
@@ -4471,12 +4501,12 @@ export async function POST(request) {
 💎 想要更深入的分析嗎？
 根據你的狀況，小鈴為你推薦：
 
-1️⃣ 一份關於${concern}的詳細報告 價值HK$88，限時優惠HK$38
+1️⃣ 一份關於${concern}的詳細報告 價值${currency}${concernPrices.original}，限時優惠${currency}${concernPrices.discount}
 - 深入分析你的${concern}運勢，提供具體建議和改善方案
 - 詳細的五行調理方法
 - 最佳行動時機指導
 
-2️⃣ 一份綜合命理報告 價值HK$168，限時優惠HK$88
+2️⃣ 一份綜合命理報告 價值${currency}${fullPrices.original}，限時優惠${currency}${fullPrices.discount}
 - 全面的八字命盤分析，包含各方面運勢預測
 - 流年大運走勢分析
 - 人際關係和事業發展建議
