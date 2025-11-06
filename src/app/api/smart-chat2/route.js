@@ -3432,18 +3432,6 @@ export async function POST(request) {
 		if (specificServiceRequest) {
 			console.log("✅ 檢測到具體服務要求，引導用戶提供生日");
 
-			response = classifier.generateSpecificServiceGuide(
-				specificServiceRequest.serviceName,
-				specificServiceRequest.detectedTopic
-			);
-
-			// 記錄到會話歷史
-			classifier.updateConversationMemory(sessionId, message, response, {
-				requestedService: specificServiceRequest.serviceName,
-				detectedTopic: specificServiceRequest.detectedTopic,
-				awaitingBirthday: true,
-			});
-
 			// 🔧 映射 detectedTopic 到有效的 primaryConcern 值
 			const topicMapping = {
 				命理: "其他",
@@ -3458,17 +3446,103 @@ export async function POST(request) {
 				topicMapping[specificServiceRequest.detectedTopic] ||
 				specificServiceRequest.detectedTopic;
 
-			// 🔧 更新 UserIntent 以保持主題上下文一致性
-			if (userIntent) {
+			// 🔧 創建或更新 UserIntent 以保持主題上下文一致性
+			if (!userIntent) {
+				// 如果 userIntent 不存在，創建新的
+				userIntent = new SmartUserIntent({
+					sessionId: sessionId,
+					userId: userId,
+					userEmail: userEmail,
+					primaryConcern: mappedTopic,
+					specificQuestion: `用戶請求${specificServiceRequest.serviceName}`,
+					originalSpecificProblem: `用戶請求${specificServiceRequest.serviceName}`,
+					conversationActive: true,
+					conversationState: "birthday_collection",
+				});
+				console.log("✅ 創建新的 userIntent（具體服務請求）");
+			} else {
+				// 如果 userIntent 存在，更新它
 				console.log(
 					`📝 更新 UserIntent: ${userIntent.primaryConcern} -> ${specificServiceRequest.detectedTopic} (mapped to: ${mappedTopic})`
 				);
 				userIntent.primaryConcern = mappedTopic;
 				userIntent.specificQuestion = `用戶請求${specificServiceRequest.serviceName}`;
 				userIntent.originalSpecificProblem = `用戶請求${specificServiceRequest.serviceName}`;
-				userIntent.conversationState = "birthday_collection";
-				await userIntent.save();
+				userIntent.conversationActive = true;
 			}
+
+			// 🎂 檢查是否有已保存的生日
+			const existingSavedBirthday = await SmartUserIntent.findOne({
+				$or: [{ userEmail: userEmail }, { userId: userId }],
+				userBirthday: { $exists: true, $ne: null },
+				birthdayConfirmed: true,
+			}).sort({ updatedAt: -1 });
+
+			if (existingSavedBirthday?.userBirthday) {
+				// ✅ 找到已保存生日，詢問是否使用
+				const savedDate = new Date(existingSavedBirthday.userBirthday);
+				const formattedDate =
+					locale === "zh-CN"
+						? `${savedDate.getFullYear()}年${savedDate.getMonth() + 1}月${savedDate.getDate()}日`
+						: `${savedDate.getFullYear()}年${savedDate.getMonth() + 1}月${savedDate.getDate()}日`;
+
+				const topicText =
+					specificServiceRequest.detectedTopic || "命理";
+
+				response =
+					locale === "zh-CN"
+						? `太好了！小铃最擅长${specificServiceRequest.serviceName}呢～✨
+
+小铃发现你之前提供过生日资料呢！📅
+
+你上次的生日是：${formattedDate}
+
+请选择：
+1️⃣ 使用这个生日进行${topicText}分析
+2️⃣ 我想使用其他生日
+
+请回复「1」或「2」～`
+						: `太好了！小鈴最擅長${specificServiceRequest.serviceName}呢～✨
+
+小鈴發現你之前提供過生日資料呢！📅
+
+你上次的生日是：${formattedDate}
+
+請選擇：
+1️⃣ 使用這個生日進行${topicText}分析
+2️⃣ 我想使用其他生日
+
+請回覆「1」或「2」～`;
+
+				// 設置狀態為等待生日選擇
+				if (userIntent) {
+					userIntent.conversationState = "awaiting_birthday_choice";
+					await userIntent.save();
+				}
+
+				console.log(
+					"✅ 找到已保存生日，詢問用戶是否使用（具體服務請求）"
+				);
+			} else {
+				// ❌ 沒有已保存生日，直接詢問
+				response = classifier.generateSpecificServiceGuide(
+					specificServiceRequest.serviceName,
+					specificServiceRequest.detectedTopic
+				);
+
+				// 設置狀態為收集生日
+				if (userIntent) {
+					userIntent.conversationState = "birthday_collection";
+					await userIntent.save();
+				}
+			}
+
+			// 記錄到會話歷史
+			classifier.updateConversationMemory(sessionId, message, response, {
+				requestedService: specificServiceRequest.serviceName,
+				detectedTopic: specificServiceRequest.detectedTopic,
+				awaitingBirthday: true,
+			});
 
 			// 保存到數據庫
 			try {
@@ -3482,7 +3556,7 @@ export async function POST(request) {
 						userEmail: userEmail,
 						title: `${specificServiceRequest.serviceName}諮詢`,
 						primaryConcern: mappedTopic,
-						conversationState: "awaiting_birthday",
+						conversationState: "birthday_collection",
 						messages: [],
 						context: {
 							topics: [mappedTopic],
@@ -3490,9 +3564,7 @@ export async function POST(request) {
 						},
 						userData: {},
 					});
-				}
-
-				// 添加用戶消息和助手回應
+				} // 添加用戶消息和助手回應
 				chatHistory.addMessage("user", message);
 				chatHistory.addMessage("assistant", response);
 
@@ -4456,7 +4528,9 @@ export async function POST(request) {
 							specificQuestion,
 							locale
 						);
-				} else if (concern === "命理") {
+				} else if (concern === "命理" || concern === "其他") {
+					// 🔧 修復：當 concern 是 "其他" 時，也使用 generateFateAnalysis
+					// 因為 "命理分析" 被映射為 "其他"
 					response =
 						await EnhancedInitialAnalysis.generateFateAnalysis(
 							existingSavedBirthday.userBirthday,
@@ -4471,14 +4545,18 @@ export async function POST(request) {
 							specificQuestion,
 							locale
 						);
-				}
-
-				// 🎯 添加報告選擇部分
+				} // 🎯 添加報告選擇部分
 				// 💰 獲取當前區域的貨幣和價格
 				const pricing = getCurrencyAndPrices(region);
 				const { currency } = pricing;
 				const concernPrices = pricing.concernReport;
 				const fullPrices = pricing.fullReport;
+
+				// 🔧 修復：將"其他"或"命理"等映射到"工作"，因為我們只提供4種concern報告
+				const validConcerns = ["感情", "財運", "工作", "事業", "健康"];
+				const displayConcern = validConcerns.includes(concern)
+					? concern
+					: "工作";
 
 				response +=
 					locale === "zh-CN"
@@ -4486,8 +4564,8 @@ export async function POST(request) {
 💎 想要更深入的分析吗？
 根据你的状况，小铃为你推荐：
 
-1️⃣ 一份关于${concern}的详细报告 价值${currency}${concernPrices.original}，限时优惠${currency}${concernPrices.discount}
-- 深入分析你的${concern}运势，提供具体建议和改善方案
+1️⃣ 一份关于${displayConcern}的详细报告 价值${currency}${concernPrices.original}，限时优惠${currency}${concernPrices.discount}
+- 深入分析你的${displayConcern}运势，提供具体建议和改善方案
 - 详细的五行调理方法
 - 最佳行动时机指导
 
@@ -4501,8 +4579,8 @@ export async function POST(request) {
 💎 想要更深入的分析嗎？
 根據你的狀況，小鈴為你推薦：
 
-1️⃣ 一份關於${concern}的詳細報告 價值${currency}${concernPrices.original}，限時優惠${currency}${concernPrices.discount}
-- 深入分析你的${concern}運勢，提供具體建議和改善方案
+1️⃣ 一份關於${displayConcern}的詳細報告 價值${currency}${concernPrices.original}，限時優惠${currency}${concernPrices.discount}
+- 深入分析你的${displayConcern}運勢，提供具體建議和改善方案
 - 詳細的五行調理方法
 - 最佳行動時機指導
 

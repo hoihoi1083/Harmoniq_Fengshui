@@ -142,8 +142,9 @@ export class EnhancedInitialAnalysis {
 	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
-			"因緣",
-			specificQuestion
+			locale === "zh-CN" ? "其他" : "其他",
+			specificQuestion,
+			locale
 		);
 	}
 
