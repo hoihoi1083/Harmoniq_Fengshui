@@ -8,7 +8,7 @@ const ServiceSection = () => {
 	const steps = [
 		{
 			num: "1",
-			title: "小鈴聊天室",
+			title: "風鈴聊天室",
 			subtitle: "免費測評房間/命理",
 			image: "/images/hero/hero-1.png",
 		},
@@ -46,8 +46,8 @@ const ServiceSection = () => {
 			</div>
 
 			{/* Divider line */}
-			<div className="w-full flex justify-center mb-8 md:mb-16">
-				<hr className="w-3/4 md:w-1/2 border-t border-gray-300" />
+			<div className="flex justify-center w-full mb-8 md:mb-16">
+				<hr className="w-3/4 border-t border-gray-300 md:w-1/2" />
 			</div>
 
 			<div className="w-full px-4 mx-auto sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80">

@@ -135,7 +135,7 @@ export default function Hero() {
 		{
 			num: 1,
 			image: "/images/hero/hero-1-white.png",
-			title: "小鈴聊天室",
+			title: "風鈴聊天室",
 			subtitle: "免費測評房間/命理",
 		},
 		{
@@ -147,8 +147,8 @@ export default function Hero() {
 		{
 			num: 3,
 			image: "/images/hero/hero-3-white.png",
-			title: "填寫信息移動模組",
-			subtitle: "輸入生辰八字 提交平面圖",
+			title: "填寫信息",
+			subtitle: "輸入生辰八字",
 		},
 		{
 			num: 4,

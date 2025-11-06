@@ -115,7 +115,7 @@ export class AIAnalysisService {
 			type: analysisType,
 		};
 		// Convert to base64 with proper UTF-8 encoding for Chinese characters
-		return Buffer.from(JSON.stringify(keyData), 'utf-8').toString('base64');
+		return Buffer.from(JSON.stringify(keyData), "utf-8").toString("base64");
 	}
 
 	getFromCache(key) {

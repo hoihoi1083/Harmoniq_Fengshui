@@ -16,31 +16,31 @@ import "./css/embla.css";
 const slideData = [
 	{
 		img: "/images/hero/slide1.jpg",
-		author: "Amanda",
+		author: "Mr. & Mrs Wong",
 		profileKey: "p1",
 		commentKey: "c1",
 	},
 	{
 		img: "/images/hero/slide2.jpg",
-		author: "Mr & Mrs Cheng",
+		author: "Patrick & Sharon",
 		profileKey: "p2",
 		commentKey: "c2",
 	},
 	{
 		img: "/images/hero/slide3.jpg",
-		author: "Patrick & Sharon",
+		author: "Amanda",
 		profileKey: "p3",
 		commentKey: "c3",
 	},
 	{
 		img: "/images/hero/slide4.jpg",
-		author: "Steven",
+		author: "Mr & Mrs Cheng ",
 		profileKey: "p4",
 		commentKey: "c4",
 	},
 	{
 		img: "/images/hero/slide5.jpg",
-		author: "Mr. & Mrs Wong",
+		author: "Steven",
 		profileKey: "p5",
 		commentKey: "c5",
 	},

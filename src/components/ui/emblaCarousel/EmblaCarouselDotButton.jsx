@@ -97,7 +97,7 @@ export const CarouselControls = ({
 	onPrevButtonClick,
 	onNextButtonClick,
 }) => (
-	<div className="flex flex-row items-center gap-6">
+	<div className="flex flex-row items-center gap-6 mt-10">
 		{/* Top Arrow (Previous) */}
 		<ArrowButton direction="up" onClick={onPrevButtonClick} />
 

@@ -40,6 +40,36 @@ export default function FortuneEntryPage({ params }) {
 		}
 	}, [fromChat, specificProblem]);
 
+	// Fetch and prefill user birthday data
+	useEffect(() => {
+		const fetchUserBirthday = async () => {
+			try {
+				const response = await fetch("/api/get-user-birthday");
+				if (response.ok) {
+					const data = await response.json();
+					if (data.success && data.birthday) {
+						setFormData((prev) => ({
+							...prev,
+							birthday: data.birthday,
+							birthTime: data.birthTime || "",
+							gender: data.gender || prev.gender,
+						}));
+						console.log(
+							"✅ Pre-filled birthday from database:",
+							data.birthday,
+							data.birthTime
+						);
+					}
+				}
+			} catch (error) {
+				console.error("Error fetching user birthday:", error);
+				// Don't show error to user, just fail silently
+			}
+		};
+
+		fetchUserBirthday();
+	}, []);
+
 	// Verify payment on component mount
 	useEffect(() => {
 		const verifyPayment = async () => {
