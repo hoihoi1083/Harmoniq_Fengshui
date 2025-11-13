@@ -2217,9 +2217,11 @@ ${
 			人際關係: "人際關係",
 			子女: "子女",
 			因緣: "因緣",
+			命理: "財運", // 命理分析映射到財運報告
+			其他: "財運", // 其他分類映射到財運報告
 		};
 
-		const concernName = categoryNames[category] || "運勢";
+		const concernName = categoryNames[category] || "財運";
 
 		// Regional pricing configuration
 		const getRegionalPricing = (region) => {

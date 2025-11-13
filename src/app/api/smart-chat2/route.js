@@ -893,17 +893,49 @@ class AITopicClassifier {
 	detectSpecificServiceRequest(message) {
 		const cleanMessage = message.trim();
 
-		// 精確的服務名稱匹配
+		// 精確的服務名稱匹配 (包含簡體和繁體變體)
 		const serviceKeywords = {
+			// 命理相關
 			流年運勢分析: "命理",
-			工作事業分析: "事業",
-			感情運勢分析: "感情",
-			感情分析: "感情",
-			健康運勢: "健康",
-			健康分析: "健康",
-			財運分析: "財運",
+			流年运势分析: "命理",
 			命理分析: "命理",
 			八字分析: "命理",
+
+			// 事業相關 (繁體)
+			工作事業分析: "事業",
+			事業運勢分析: "事業",
+			事業運勢: "事業",
+			事業分析: "事業",
+			// 事業相關 (簡體)
+			工作事业分析: "事業",
+			事业运势分析: "事業",
+			事业运势: "事業",
+			事业分析: "事業",
+
+			// 感情相關 (繁體)
+			感情運勢分析: "感情",
+			感情運勢: "感情",
+			感情分析: "感情",
+			// 感情相關 (簡體)
+			感情运势分析: "感情",
+			感情运势: "感情",
+
+			// 健康相關 (繁體)
+			健康運勢分析: "健康",
+			健康運勢: "健康",
+			健康分析: "健康",
+			// 健康相關 (簡體)
+			健康运势分析: "健康",
+			健康运势: "健康",
+
+			// 財運相關 (繁體)
+			財運運勢分析: "財運",
+			財運運勢: "財運",
+			財運分析: "財運",
+			// 財運相關 (簡體)
+			财运运势分析: "財運",
+			财运运势: "財運",
+			财运分析: "財運",
 		};
 
 		// 檢查是否包含具體服務名稱
@@ -3467,9 +3499,18 @@ export async function POST(request) {
 			: null;
 
 		// 🔧 新增：檢查是否同時包含主題和生日 - 使用AI分析
-		const topicAndBirthdayData = message
-			? await detectTopicAndBirthday(message, locale)
-			: null;
+		// ⚠️ 重要：如果用戶正在選擇是否使用已保存生日（狀態為 awaiting_birthday_choice），
+		// 則不要執行 topic+birthday 檢測，因為 "1" 和 "2" 不是生日輸入！
+		let topicAndBirthdayData = null;
+		if (
+			message &&
+			userIntent?.conversationState !== "awaiting_birthday_choice"
+		) {
+			topicAndBirthdayData = await detectTopicAndBirthday(
+				message,
+				locale
+			);
+		}
 
 		// 🔧 檢查是否為選擇回應 (1, 2, 3, 1️⃣, 2️⃣, 3️⃣ 等 + 文字選項)
 		const choicePattern =
@@ -3514,13 +3555,12 @@ export async function POST(request) {
 			console.log("✅ 檢測到具體服務要求，引導用戶提供生日");
 
 			// 🔧 映射 detectedTopic 到有效的 primaryConcern 值
+			// Note: "命理" 現在是有效的主題，不需要映射到 "其他"
 			const topicMapping = {
-				命理: "其他",
-				命理分析: "其他",
-				八字: "其他",
-				紫微斗數: "其他",
-				占卜: "其他",
-				運勢: "其他",
+				八字: "命理", // 八字分析歸類為命理
+				紫微斗數: "命理", // 紫微斗數歸類為命理
+				占卜: "命理", // 占卜歸類為命理
+				運勢: "命理", // 一般運勢歸類為命理
 			};
 
 			const mappedTopic =
@@ -3550,6 +3590,11 @@ export async function POST(request) {
 				userIntent.specificQuestion = `用戶請求${specificServiceRequest.serviceName}`;
 				userIntent.originalSpecificProblem = `用戶請求${specificServiceRequest.serviceName}`;
 				userIntent.conversationActive = true;
+				userIntent.conversationState = "birthday_collection"; // 重置為生日收集狀態
+				await userIntent.save(); // 💾 保存更新後的 userIntent
+				console.log(
+					`✅ UserIntent 已更新並保存: primaryConcern = ${mappedTopic}`
+				);
 			}
 
 			// 🎂 檢查是否有已保存的生日
@@ -3988,11 +4033,21 @@ export async function POST(request) {
 					"../../../lib/enhancedInitialAnalysis.js"
 				);
 
-				// 🎯 使用用戶原始主題，而不是 AI 重新檢測的主題
+				// 🎯 當用戶處於生日相關狀態時，優先使用用戶原始意圖（因為他們已經說過想分析什麼）
+				// 只有當用戶沒有明確意圖時，才使用 AI 檢測的主題
+				const isBirthdayRelatedState =
+					userIntent.conversationState === "birthday_collection" ||
+					userIntent.conversationState === "asking_detailed_report";
+
 				const analysisTopic =
-					userIntent.primaryConcern || topicAndBirthdayData.topic;
+					isBirthdayRelatedState &&
+					userIntent.primaryConcern &&
+					userIntent.primaryConcern !== "其他"
+						? userIntent.primaryConcern // 用戶已明確說想分析什麼（如：健康、財運等）
+						: topicAndBirthdayData.topic ||
+							userIntent.primaryConcern; // 否則用 AI 檢測
 				console.log(
-					`🎯 使用主題進行分析: ${analysisTopic} (原始: ${userIntent.primaryConcern}, AI檢測: ${topicAndBirthdayData.topic})`
+					`🎯 使用主題進行分析: ${analysisTopic} (原始: ${userIntent.primaryConcern}, AI檢測: ${topicAndBirthdayData.topic}, 狀態: ${userIntent.conversationState})`
 				);
 
 				if (analysisTopic === "感情") {
@@ -4100,7 +4155,14 @@ export async function POST(request) {
 				};
 				console.log("✅ 主題+生日分析生成成功");
 
-				// 🚫 記錄分析次數
+				// � 更新 userIntent 的 primaryConcern 為正確的分析主題
+				userIntent.primaryConcern = analysisTopic;
+				await userIntent.save();
+				console.log(
+					`✅ userIntent.primaryConcern 已更新為: ${analysisTopic}`
+				);
+
+				// �🚫 記錄分析次數
 				await DailyAnalysisRateLimit.recordAnalysis(
 					userEmail,
 					userId,
@@ -4648,11 +4710,17 @@ export async function POST(request) {
 				const concernPrices = pricing.concernReport;
 				const fullPrices = pricing.fullReport;
 
-				// 🔧 修復：將"其他"或"命理"等映射到"事業"，因為我們只提供4種concern報告
+				// 🔧 修復：將"其他"或"命理"等映射到對應的報告類型
+				// "命理" 映射到 "財運"，因為命理分析主要影響財運決策
 				const validConcerns = ["感情", "財運", "事業", "事業", "健康"];
-				const displayConcern = validConcerns.includes(concern)
-					? concern
-					: "事業";
+				let displayConcern;
+				if (validConcerns.includes(concern)) {
+					displayConcern = concern;
+				} else if (concern === "命理" || concern === "其他") {
+					displayConcern = "財運"; // 命理/其他 → 財運報告
+				} else {
+					displayConcern = "財運"; // 默認財運
+				}
 
 				response +=
 					locale === "zh-CN"
@@ -5283,9 +5351,10 @@ export async function POST(request) {
 						msg.role === "assistant" &&
 						(msg.content.includes("八字") ||
 							msg.content.includes("小鈴看了你的八字") ||
-							msg.content.includes("🔮 八字命盤"))
+							msg.content.includes("🔮 八字命盤") ||
+							msg.content.includes("📊 你的命理基礎分析") ||
+							msg.content.includes("🔮 根據你的生日分析"))
 				);
-
 				console.log(
 					`🔍 檢查八字分析狀態: hasBaziAnalysis=${hasBaziAnalysis}, choice=${choice}`
 				);
@@ -5766,10 +5835,14 @@ export async function POST(request) {
 
 				userIntent.primaryConcern = mappedDetectedTopic;
 				// 🌸 感情主題需要先選擇分析類型
-				if (detectedTopic === "感情") {
-					userIntent.conversationState = "asking_relationship_type";
-				} else {
-					userIntent.conversationState = "birthday_collection";
+				// ⚠️ 只有在沒有已保存生日時才設置狀態，避免覆蓋 awaiting_birthday_choice
+				if (!birthdayCheck.hasSavedBirthday) {
+					if (detectedTopic === "感情") {
+						userIntent.conversationState =
+							"asking_relationship_type";
+					} else {
+						userIntent.conversationState = "birthday_collection";
+					}
 				}
 				userIntent.reportType = null;
 				// 🔧 更新具體問題為新主題的問題，避免使用舊主題的問題
@@ -5903,12 +5976,15 @@ export async function POST(request) {
 						userIntent.primaryConcern =
 							aiTopicAnalysis.detectedTopic;
 						// 🌸 感情主題需要先選擇分析類型
-						if (aiTopicAnalysis.detectedTopic === "感情") {
-							userIntent.conversationState =
-								"asking_relationship_type";
-						} else {
-							userIntent.conversationState =
-								"birthday_collection";
+						// ⚠️ 只有在沒有已保存生日時才設置狀態，避免覆蓋 awaiting_birthday_choice
+						if (!birthdayCheck.hasSavedBirthday) {
+							if (aiTopicAnalysis.detectedTopic === "感情") {
+								userIntent.conversationState =
+									"asking_relationship_type";
+							} else {
+								userIntent.conversationState =
+									"birthday_collection";
+							}
 						}
 						userIntent.reportType = null;
 						// 🔧 更新具體問題為新主題的問題，避免使用舊主題的問題
@@ -7574,9 +7650,11 @@ export async function POST(request) {
 				}
 
 				// 🔧 重要修復：當從一個話題切換到另一個話題時，重置原始問題
+				// ⚠️ 但不要覆蓋 awaiting_birthday_choice 狀態！
 				if (
 					previousConcern && // 之前有關注領域
-					previousConcern !== mappedTopic // 主題發生變化
+					previousConcern !== mappedTopic && // 主題發生變化
+					userIntent.conversationState !== "awaiting_birthday_choice" // 不覆蓋生日選擇狀態
 				) {
 					console.log(
 						`🔄 主題從 ${previousConcern} 切換到 ${mappedTopic}，重置原始問題和關係分析類型`
@@ -7588,7 +7666,8 @@ export async function POST(request) {
 					userIntent.conversationState = "concern_detected"; // 重置對話狀態
 				} else if (
 					previousConcern === "感情" &&
-					analysis.detectedTopic !== "感情"
+					analysis.detectedTopic !== "感情" &&
+					userIntent.conversationState !== "awaiting_birthday_choice" // 不覆蓋生日選擇狀態
 				) {
 					console.log(`🔄 從感情切換到其他領域，重置關係分析類型`);
 					userIntent.relationshipAnalysisType = "individual";

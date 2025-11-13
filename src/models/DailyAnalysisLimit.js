@@ -53,6 +53,7 @@ const DailyAnalysisLimitSchema = new mongoose.Schema(
 						"子女",
 						"人際關係",
 						"健康",
+						"命理",
 						"因緣",
 						"風水佈局",
 						"其他",

@@ -44,6 +44,7 @@ const ChatHistorySchema = new mongoose.Schema(
 				"人際關係",
 				"健康",
 				"因緣",
+				"命理", // Added for 命理 topic
 				"風水佈局",
 				"其他",
 			],
@@ -57,6 +58,7 @@ const ChatHistorySchema = new mongoose.Schema(
 				"birthday_collection",
 				"awaiting_birthday_choice", // 🎂 等待用戶選擇使用已保存或輸入新生日
 				"asking_detailed_report",
+				"concern_detected", // Added for topic detection state
 				// 新增：支持感情流程中選擇 A/B/C/D 之後的狀態
 				"asking_relationship_type",
 				"ready_for_detailed_report",
@@ -64,9 +66,7 @@ const ChatHistorySchema = new mongoose.Schema(
 				"completed",
 			],
 			default: "initial",
-		},
-
-		// Messages array
+		}, // Messages array
 		messages: [
 			{
 				messageId: {
