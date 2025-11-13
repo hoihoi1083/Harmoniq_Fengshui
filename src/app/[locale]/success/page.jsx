@@ -206,9 +206,12 @@ export default function Success({ searchParams }) {
 				/>
 			)}
 
-			{/* Only show CountdownTimer for non-fortune and non-couple payments */}
+			{/* Only show CountdownTimer for non-fortune, non-couple, and non-expert payments */}
 			{(!params.type ||
-				(params.type !== "fortune" && params.type !== "couple")) && (
+				(params.type !== "fortune" &&
+					params.type !== "couple" &&
+					params.type !== "expert188" &&
+					params.type !== "expert88")) && (
 				<CountdownTimer
 					time={5}
 					status={
