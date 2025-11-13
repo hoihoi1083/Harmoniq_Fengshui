@@ -541,22 +541,16 @@ export default function YourPage() {
 		try {
 			// Get fresh locale and region from localStorage to ensure consistency
 			const storedRegion = localStorage.getItem("userRegion");
-			const regionToLocaleMap = {
-				china: "zh-CN",
-				hongkong: "zh-TW",
-				taiwan: "zh-TW",
-			};
-			const freshLocale =
-				regionToLocaleMap[storedRegion] || locale || "zh-TW";
+			// 🔧 FIX: Use URL locale as source of truth
+			const freshLocale = locale || "zh-TW";
 
 			console.log(
 				"💰 Price page life payment - Using fresh locale:",
 				freshLocale,
-				"from stored region:",
-				storedRegion
-			);
-
-			// Create checkout session for expert88
+				"from URL (region:",
+				storedRegion,
+				"is for pricing only)"
+			); // Create checkout session for expert88
 			const response = await fetch("/api/checkoutSessions/payment4", {
 				method: "POST",
 				headers: {
@@ -1533,12 +1527,11 @@ export default function YourPage() {
 											✨ Coming Soon ✨
 										</div>
 										<div className="text-sm text-[#374A37] font-medium">
-											敬請期待
+											{t("comingSoon")}
 										</div>
 									</div>
 								</div>
-							</div>
-
+							</div>{" "}
 							{/* Title */}
 							<h3
 								className=" text-[#073e31] mb-6 text-left text-3xl font-bold"
@@ -1546,7 +1539,6 @@ export default function YourPage() {
 							>
 								{t("fengShuiCalculation")}
 							</h3>
-
 							{/* Content Layout - Features left, Image right */}
 							<div className="flex flex-row gap-2 mb-6 sm:justify-center md:justify-center">
 								{/* Left side - Features List */}
@@ -1594,7 +1586,6 @@ export default function YourPage() {
 									/>
 								</div>
 							</div>
-
 							{/* Pricing Cards */}
 							<div className="relative max-w-sm mx-auto">
 								{/* Green Limited Time Offer Card - On Top */}
@@ -1681,15 +1672,14 @@ export default function YourPage() {
 											✨ Coming Soon ✨
 										</div>
 										<div className="text-lg text-[#374A37] font-medium mb-2">
-											敬請期待
+											{t("comingSoon")}
 										</div>
 										<div className="text-sm text-[#2D3A2D] opacity-80">
 											New Features Loading...
 										</div>
 									</div>
 								</div>
-							</div>
-
+							</div>{" "}
 							{/* Left side - Image (50% width) */}
 							<div className="relative flex flex-col items-center justify-center w-full lg:w-1/2">
 								<div className="relative max-w-[600px] w-full">
@@ -1720,7 +1710,6 @@ export default function YourPage() {
 									</div>
 								</div>
 							</div>
-
 							{/* Right side - 3D Hover Rotating Price Cards (50% width) */}
 							<div className="flex justify-center w-full lg:w-1/2">
 								{/* Left Side - Cards Container */}

@@ -249,7 +249,7 @@ const coupleAnalysisReportSchema = new mongoose.Schema(
 // Instance methods
 coupleAnalysisReportSchema.methods.getFormattedReport = function () {
 	return {
-		title: "增強版合婚配對分析報告",
+		title: "增強版合盤配對分析報告",
 		reportId: this._id,
 		userElement: this.userProfile.element,
 		partnerElement: this.partnerProfile.element,

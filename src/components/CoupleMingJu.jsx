@@ -2488,7 +2488,7 @@ export function CoupleMingJu({
 												fontWeight: 400,
 											}}
 										>
-											請稍候，正在生成專屬合婚建議
+											請稍候，正在生成專屬合盤建議
 										</div>
 									</div>
 								</div>

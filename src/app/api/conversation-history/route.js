@@ -11,25 +11,34 @@ export async function GET(request) {
 		const userId = searchParams.get("userId");
 		const limit = parseInt(searchParams.get("limit")) || 20;
 
-		// 支援兩種用戶識別方式：userEmail 或 userId
-		const userIdentifier = userEmail || userId;
-		if (!userIdentifier) {
+		// 支援兩種用戶識別方式：userEmail 或 userId（或兩者）
+		if (!userEmail && !userId) {
 			return NextResponse.json(
 				{ error: "用戶識別參數不能為空 (userEmail 或 userId)" },
 				{ status: 400 }
 			);
 		}
 
-		console.log("📚 從ChatHistory獲取用戶對話歷史:", userIdentifier);
+		console.log("📚 從ChatHistory獲取用戶對話歷史:", {
+			userEmail,
+			userId,
+			limit,
+		});
 
-		// 從ChatHistory獲取對話歷史
-		const query = userEmail ? { userEmail: userEmail } : { userId: userId };
+		// 從ChatHistory獲取對話歷史 - 查詢兩者以確保跨瀏覽器一致性
+		const query = {
+			$or: [
+				...(userEmail ? [{ userEmail: userEmail }] : []),
+				...(userId ? [{ userId: userId }] : []),
+			],
+		};
+
+		console.log("🔍 Query:", JSON.stringify(query));
 
 		const chatHistories = await ChatHistory.find(query)
 			.sort({ updatedAt: -1 })
 			.limit(limit)
 			.lean();
-
 		console.log(`📊 找到 ${chatHistories.length} 個對話記錄`);
 
 		const conversationSummaries = chatHistories.map((chat) => {
@@ -62,7 +71,8 @@ export async function GET(request) {
 
 		return NextResponse.json({
 			success: true,
-			userIdentifier: userIdentifier,
+			userEmail: userEmail,
+			userId: userId,
 			totalConversations: conversationSummaries.length,
 			conversations: conversationSummaries,
 		});
@@ -96,7 +106,8 @@ function generateConversationTitle(primaryConcern, lastMessage) {
 	// 備用方案：使用傳統的分類標題
 	const concernTitles = {
 		感情: "感情諮詢",
-		工作: "工作運勢",
+		工作: "事業運勢",
+		事業: "事業運勢",
 		財運: "財運分析",
 		健康: "健康運勢",
 		人際: "人際關係",
@@ -133,7 +144,7 @@ function extractTopics(primaryConcern, lastMessage) {
 	if (lastMessage) {
 		const topicKeywords = {
 			感情: ["感情", "愛情", "桃花", "姻緣", "戀愛", "分手", "結婚"],
-			工作: ["工作", "事業", "職場", "升職", "跳槽", "創業"],
+			事業: ["工作", "事業", "職場", "升職", "跳槽", "創業"],
 			財運: ["財運", "賺錢", "投資", "理財", "收入", "金錢"],
 			健康: ["健康", "身體", "養生", "病痛", "醫療"],
 			人際: ["人際", "朋友", "同事", "合作", "社交"],

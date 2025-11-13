@@ -226,20 +226,15 @@ export default function SmartChat2() {
 
 				// Get fresh locale from localStorage to ensure consistency
 				const storedRegion = localStorage.getItem("userRegion");
-				const regionToLocaleMap = {
-					china: "zh-CN",
-					hongkong: "zh-TW",
-					taiwan: "zh-TW",
-				};
-				const freshLocale =
-					regionToLocaleMap[storedRegion] || currentLocale;
+				// 🔧 FIX: Use URL locale as source of truth
+				const freshLocale = currentLocale;
 				console.log(
 					"💳 Couple payment - Using fresh locale:",
 					freshLocale,
-					"from stored region:",
-					storedRegion
+					"from URL (region:",
+					storedRegion,
+					"is for pricing only)"
 				);
-
 				console.log("🚀 Sending to payment-couple API:", {
 					locale: freshLocale,
 					specificProblem: problemToUse,
@@ -1101,7 +1096,10 @@ export default function SmartChat2() {
 																key={index}
 																className="text-xs bg-[#c0c0c0] text-gray-800 px-2 py-0.5 rounded"
 															>
-																{topic}
+																{topic ===
+																"工作"
+																	? "事業"
+																	: topic}
 															</span>
 														))}
 													{conversation.topics

@@ -179,15 +179,15 @@
 		"comments": {
 			"title": "甜蜜的家",
 			"description": "在各个交流平台与反馈渠道上，用户对我们的称赞不绝于耳，无论是产品品质还是服务态度，都得到充分肯定。",
-			"p1": "Mr. & Mrs Wong",
+			"p1": "一家三口",
 			"c1": "面对巨大工作压力，导致身心失衡，两夫妻会因为芝麻绿豆小事吵架。发现风铃聊天室后，透过工作事业分析，建议了先生调整办公布局。现在睡眠得以改善、工作顺遂，3分钟就洞悉压力源头，让我们重获运势与和谐。",
-			"p2": "Patrick & Sharon",
+			"p2": "同居情侣，有宠物",
 			"c2": "同居了半年，却因家务分工、作息差异衍生无尽争执，感情濒临崩溃。咨询了感情合盘后，我们可以匿名上传生辰分析两人命理互动，揭示合盘中的冲突点与化解之道。短短三周，依照合盘建议，缓解「土克水」的能量冲突；争执减少，亲密度提升，甚至重拾浪漫约会。强烈推荐给情侣！",
-			"p3": "Amanda",
+			"p3": "自由工作者",
 			"c3": "自由工作者需要面对不稳定的订单与截止期限，导致身心俱疲：失眠、肠胃不适，压力。透过流年健康测算，剖析健康隐忧，开出化解方法，如家居布局调整能量和食疗食谱都一应俱全。除了身体疲惫的问题得以解决，心理压力也得以改善。",
-			"p4": "Mr & Mrs Cheng",
+			"p4": "在职专业人士",
 			"c4": "因为儿子出国读书的巨额学费，让家庭开支增加。试过财运流年测算后，生意的方向得到新方向，转型成功。另外获得投资建议大大减轻财务压力。",
-			"p5": "Steven",
+			"p5": "Z世代",
 			"c5": "Gen Z的我原本都不太认识以及相信命理，刚毕业就迷失在职场选择与感情纠葛，每天刷社交媒体却更觉混乱。风铃命理给予清晰的十年蓝图，揭示我命格潜在的困难与机遇，给予明灯般的指引。现在我重拾动力开始追梦，希望你们也可以重获方向与自信！ "
 		},
 		"features": {
@@ -672,6 +672,7 @@
 		"destinyFeature_6": "人际调衡要点",
 		"personalFortuneAnalysis": "个人流年测算",
 		"coupleFortuneAnalysis": "双人合盘流年测算",
+		"comingSoon": "敬请期待",
 		"wealthFortune": "财运流年测算",
 		"loveFortune": "感情流年测算",
 		"healthFortune": "健康流年测算",
@@ -691,7 +692,7 @@
 		"lightPlan": "限时优惠",
 		"processing2": "处理中...",
 		"coupleFeature_1": "姻缘配对分析",
-		"coupleFeature_2": "合婚核心要素交互",
+		"coupleFeature_2": "合盤核心要素交互",
 		"coupleFeature_3": "流年解析",
 		"coupleFeature_4": "流年季节解析",
 		"coupleFeature_5": "流年开运建议",
@@ -1060,7 +1061,7 @@
 			"exclusivePlan": "专属方案",
 			"coupleCompatibilityReport": "感情合盘报告",
 			"exclusivePlanReport": "专属方案报告",
-			"comingSoon": "敬請期待"
+			"comingSoon": "敬请期待"
 		},
 		"sections": {
 			"materialsNeeded": "所需物料"
@@ -1183,13 +1184,13 @@
 		"generalCoupleAnalysis": "一般情侣关系分析"
 	},
 	"coupleReport": {
-		"loadingTitle": "小铃正在为你们准备专属合婚分析报告",
+		"loadingTitle": "小铃正在为你们准备专属合盤分析报告",
 		"loadingSubtitle": "请稍候，正在分析两人的姻缘配对",
 		"backToConsultation": "返回智能咨询",
 		"noReportData": "未找到报告数据",
 		"loadingHistoricalData": "正在载入历史报告数据...",
 		"historicalBannerNotice": "注意：",
-		"historicalBannerText": "您正在查看已保存的夫妻合婚历史报告内容",
+		"historicalBannerText": "您正在查看已保存的夫妻合盤历史报告内容",
 		"calculationTime": "(测算时间:",
 		"generateNewReport": "点击生成新报告",
 		"analysisReportTab": "姻缘合盘分析报告",

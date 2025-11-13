@@ -67,7 +67,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 
 	return (
 		<nav
-			className={`${isHome ? "fixed" : "absolute"} top-0 left-0 right-0 z-[70] h-16 ${isHome ? "backdrop-blur-[3px]" : "backdrop-blur-[0px]"}  ${
+			className={`${isHome && !isNavbarMobile ? "fixed" : "absolute"} top-0 left-0 right-0 z-[70] h-16 ${isHome ? "backdrop-blur-[3px]" : "backdrop-blur-[0px]"}  ${
 				!isHome && !isContact ? "bg-white shadow-sm" : ""
 			}`}
 			style={{

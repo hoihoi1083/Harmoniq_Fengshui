@@ -105,11 +105,13 @@ export default function RegionLanguageSelector({
 		setSwitching(true);
 
 		try {
+			// Check if locale is different
+			const needsLocaleChange = regionConfig.locale !== currentLocale;
+
 			// Update region state immediately (for instant pricing updates)
 			await changeRegion(selectedRegion);
 
-			// Check if locale is different
-			const needsLocaleChange = regionConfig.locale !== currentLocale;
+			console.log(`✅ Region state updated to: ${selectedRegion}`);
 
 			if (needsLocaleChange) {
 				console.log(
@@ -129,12 +131,16 @@ export default function RegionLanguageSelector({
 				// Keep switching state visible for a brief moment for user feedback
 				setTimeout(() => setSwitching(false), 150);
 			} else {
-				// Same locale but different region (HK vs TW) - instant update complete
+				// Same locale but different region (HK vs TW) - need to refresh for pricing updates
 				console.log(
-					`✅ Same locale (${regionConfig.locale}), region switched instantly`
+					`✅ Same locale (${regionConfig.locale}), refreshing page for region change (${region} → ${selectedRegion})`
 				);
-				// Reset switching state immediately for instant feedback
-				setSwitching(false);
+
+				// Wait a bit for localStorage to be fully updated
+				await new Promise((resolve) => setTimeout(resolve, 100));
+
+				// Force a hard refresh to ensure all components reload with new region
+				window.location.reload();
 			}
 		} catch (error) {
 			console.error("❌ Region change error:", error);

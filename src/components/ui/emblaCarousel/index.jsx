@@ -34,7 +34,7 @@ const slideData = [
 	},
 	{
 		img: "/images/hero/slide4.jpg",
-		author: "Mr & Mrs Cheng ",
+		author: "Mr & Mrs Cheng",
 		profileKey: "p4",
 		commentKey: "c4",
 	},

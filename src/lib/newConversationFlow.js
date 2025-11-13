@@ -626,7 +626,7 @@ export class ImprovedConversationFlow {
 				}
 			}
 
-			// 特別處理合婚分析 - 已有兩個生日但需要具體問題
+			// 特別處理合盤分析 - 已有兩個生日但需要具體問題
 			if (
 				primaryConcern === "感情" &&
 				relationshipAnalysisType === "couple" &&
@@ -640,7 +640,7 @@ export class ImprovedConversationFlow {
 				);
 			}
 
-			// 特別處理合婚分析 - 已有兩個生日和具體問題，提供合婚分析報告
+			// 特別處理合盤分析 - 已有兩個生日和具體問題，提供合盤分析報告
 			if (
 				primaryConcern === "感情" &&
 				relationshipAnalysisType === "couple" &&
@@ -651,7 +651,7 @@ export class ImprovedConversationFlow {
 				return this.generateOfferDetailedAnalysis(
 					primaryConcern,
 					emotion,
-					"couple" // 指示這是合婚分析
+					"couple" // 指示這是合盤分析
 				);
 			}
 
@@ -687,7 +687,7 @@ export class ImprovedConversationFlow {
 				const analysisType =
 					relationshipAnalysisType === "individual"
 						? "個人感情分析"
-						: "合婚配對分析";
+						: "合盤配對分析";
 				return (
 					`好！我已經記錄咗你嘅生日資料，會進行${analysisType}。\n\n` +
 					`現在請詳細告訴我你嘅感情問題，比如：\n` +
@@ -709,7 +709,7 @@ export class ImprovedConversationFlow {
 					);
 				} else if (relationshipAnalysisType === "couple") {
 					return (
-						"為咗進行合婚配對分析 💕，我需要兩個人嘅出生資料。\n\n" +
+						"為咗進行合盤配對分析 💕，我需要兩個人嘅出生資料。\n\n" +
 						"請先提供你嘅出生年月日（例如：1990年5月15日）\n" +
 						"之後會請你提供伴侶嘅出生資料。"
 					);
@@ -719,12 +719,12 @@ export class ImprovedConversationFlow {
 			return "為咗提供準確嘅分析，我需要你嘅出生年月日。請提供：出生年月日（例如：1990年5月15日）";
 		}
 
-		// 階段2.7：等待伴侶生日信息 - 合婚分析專用
+		// 階段2.7：等待伴侶生日信息 - 合盤分析專用
 		if (conversationState === "asking_partner_birthday") {
 			return (
 				"好！我已經記錄咗你嘅生日資料。\n\n" +
 				"現在請提供你伴侶嘅出生年月日（例如：1992年8月20日）\n" +
-				"有咗兩個人嘅八字資料，我就可以進行合婚配對分析 💕"
+				"有咗兩個人嘅八字資料，我就可以進行合盤配對分析 💕"
 			);
 		}
 
@@ -822,8 +822,8 @@ export class ImprovedConversationFlow {
 				question:
 					"我可以為你提供兩種分析選擇：\n\n" +
 					"🌸 **個人感情分析** - 分析你個人嘅感情運勢、桃花運、感情障礙等\n" +
-					"💕 **合婚配對分析** - 如果你有伴侶，我可以分析你哋嘅八字合配度、感情相容性\n\n" +
-					"你想要邊種分析？請回覆「個人分析」或者「合婚分析」",
+					"💕 **合盤配對分析** - 如果你有伴侶，我可以分析你哋嘅八字合配度、感情相容性\n\n" +
+					"你想要邊種分析？請回覆「個人分析」或者「合盤分析」",
 			},
 			財運: {
 				comfort:
@@ -874,11 +874,11 @@ export class ImprovedConversationFlow {
 		emotion,
 		analysisType = null
 	) {
-		// 特別處理感情關注的合婚分析
+		// 特別處理感情關注的合盤分析
 		if (concern === "感情" && analysisType === "couple") {
 			return (
-				"我已經為你哋進行咗基本嘅合婚配對分析 💕\n\n" +
-				"想要更詳細嘅合婚報告嗎？包括：\n" +
+				"我已經為你哋進行咗基本嘅合盤配對分析 💕\n\n" +
+				"想要更詳細嘅合盤報告嗎？包括：\n" +
 				"• 詳細嘅八字合配度分析\n" +
 				"• 感情發展時機建議\n" +
 				"• 化解感情障礙嘅風水方法\n" +
@@ -892,8 +892,8 @@ export class ImprovedConversationFlow {
 			感情:
 				"感情問題最需要細心處理。我可以為你提供兩種詳細分析：\n\n" +
 				"🌸 **個人感情分析** - 深入分析你個人嘅感情運勢、桃花運、最佳脫單時機等\n" +
-				"💕 **合婚配對分析** - 如果你有伴侶，可以分析你哋嘅八字合配度、感情發展建議等\n\n" +
-				"你想要邊種詳細分析？請回覆「個人分析」或者「合婚分析」",
+				"💕 **合盤配對分析** - 如果你有伴侶，可以分析你哋嘅八字合配度、感情發展建議等\n\n" +
+				"你想要邊種詳細分析？請回覆「個人分析」或者「合盤分析」",
 			財運: "財運分析需要詳細嘅八字計算。我可以為你分析財運走勢同埋提供催財風水建議。你想要完整嘅財運分析報告嗎？",
 			健康: "健康係最重要嘅。我可以根據你嘅八字分析健康運勢同埋提供養生風水建議。你想要詳細嘅健康分析報告嗎？",
 		};
@@ -909,7 +909,7 @@ export class ImprovedConversationFlow {
 		const comfort = this.generateEmotionalComfort(emotion);
 		const responses = {
 			工作: "工作問題確實令人困擾。如果你願意提供生日資料，我可以根據你嘅八字為你分析職場運勢，提供具體嘅改善方向。",
-			感情: "感情路上總有起伏，我明白你嘅感受。如果你提供生日資料，我可以為你做詳細嘅感情分析，甚至合婚建議。",
+			感情: "感情路上總有起伏，我明白你嘅感受。如果你提供生日資料，我可以為你做詳細嘅感情分析，甚至合盤建議。",
 			財運: "財務壓力確實影響心情。提供生日資料後，我可以為你分析財運走向同埋提供催財建議。",
 			健康: "健康問題最需要重視。如果你提供生日資料，我可以根據八字為你分析健康運勢同養生建議。",
 		};
@@ -964,17 +964,17 @@ export class ImprovedConversationFlow {
 
 		// 🚨 重要：首先檢查是否是分析類型選擇，如果是則不視為具體問題
 		const analysisTypeChoices = [
-			"合婚分析",
+			"合盤分析",
 			"個人分析",
 			"個人感情分析",
-			"合婚",
+			"合盤",
 			"個人",
 			"單人分析",
 			"雙人分析",
 			"情侶分析",
 			"夫妻分析",
 			"配對分析",
-			"八字合婚",
+			"八字合盤",
 			"婚配分析",
 		];
 
@@ -1009,10 +1009,10 @@ export class ImprovedConversationFlow {
 
 		// 🎯 檢查詳細分析請求 - 這些表明用戶要深度分析
 		const detailedAnalysisRequests = [
-			"流年合婚",
-			"流年合婚詳解",
-			"合婚分析",
-			"八字合婚",
+			"流年合盤",
+			"流年合盤詳解",
+			"合盤分析",
+			"八字合盤",
 			"婚配分析",
 			"詳細分析",
 			"深入分析",
@@ -1238,11 +1238,11 @@ export class ImprovedConversationFlow {
 		];
 
 		const couplePatterns = [
-			"合婚分析",
-			"合婚",
-			"合婚配對分析",
-			"合婚深度分析",
-			"雙方合婚深度分析",
+			"合盤分析",
+			"合盤",
+			"合盤配對分析",
+			"合盤深度分析",
+			"雙方合盤深度分析",
 			"配對",
 			"配对",
 			"兩人",
@@ -1303,8 +1303,8 @@ export class ImprovedConversationFlow {
 
 		// 🎯 修改：只在明確表達選擇意圖時才識別為分析類型選擇
 		const coupleChoicePatterns = [
-			"合婚分析",
-			"合婚",
+			"合盤分析",
+			"合盤",
 			"配對",
 			"配对",
 			"兩人",
@@ -1361,7 +1361,7 @@ export class ImprovedConversationFlow {
 		if (
 			message.includes("詳細報告") ||
 			message.includes("感情的詳細") ||
-			message.includes("合婚的詳細")
+			message.includes("合盤的詳細")
 		) {
 			return "detailed_concern";
 		} else if (
@@ -1602,7 +1602,7 @@ export class BaziAnalysisSystem {
 		return months[element] || "適當";
 	}
 
-	// 合婚分析
+	// 合盤分析
 	static generateCoupleAnalysis(userBirthday, partnerBirthday) {
 		const elements = ["金", "木", "水", "火", "土"];
 		const userElement = elements[userBirthday.getFullYear() % 5];
@@ -1777,11 +1777,11 @@ export class BaziAnalysisSystem {
 		}
 	}
 
-	// 解釋合婚分析如何運作
+	// 解釋合盤分析如何運作
 	static generateCoupleAnalysisExplanation() {
-		return `**💕 合婚配對分析係點樣運作嘅？**
+		return `**💕 合盤配對分析係點樣運作嘅？**
 
-我嘅專業合婚分析會幫你了解兩個人嘅感情配對度，包括：
+我嘅專業合盤分析會幫你了解兩個人嘅感情配對度，包括：
 
 **🔮 八字五行分析**
 • 根據雙方出生年月日，計算各自嘅五行屬性
@@ -1800,12 +1800,12 @@ export class BaziAnalysisSystem {
 
 **📊 詳細分析報告**
 基本分析免費提供，詳細報告會包含：
-• 完整八字合婚圖表
+• 完整八字合盤圖表
 • 個人化感情建議
 • 未來一年感情運勢
 • 專業風水調整方案
 
-想開始合婚分析嗎？我需要你同伴侶嘅出生年月日。`;
+想開始合盤分析嗎？我需要你同伴侶嘅出生年月日。`;
 	}
 
 	// 感情特質分析

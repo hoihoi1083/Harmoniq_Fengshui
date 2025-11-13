@@ -72,7 +72,7 @@ async function generateAnnualStrategyWithAI(
 
 		// Create detailed prompt for AI analysis with language support
 		const prompt = isSimplified
-			? `作为专业的八字合婚分析师，请根据以下信息生成详细的流年应对策略：
+			? `作为专业的八字合盤分析师，请根据以下信息生成详细的流年应对策略：
 
 **基本信息：**
 - 男方生日：${user1Birthday}，${user1Element}命
@@ -107,7 +107,7 @@ async function generateAnnualStrategyWithAI(
 - 专业术语与通俗解释并重
 
 请用简体中文回答，格式要清晰专业。`
-			: `作為專業的八字合婚分析師，請根據以下信息生成詳細的流年應對策略：
+			: `作為專業的八字合盤分析師，請根據以下信息生成詳細的流年應對策略：
 
 **基本信息：**
 - 男方生日：${user1Birthday}，${user1Element}命

@@ -11,7 +11,7 @@ const BirthdayModal = ({
 	const [birthday, setBirthday] = useState("");
 	const [gender, setGender] = useState("");
 
-	// 雙人資料（合婚分析用）
+	// 雙人資料（合盤分析用）
 	const [userBirthday, setUserBirthday] = useState("");
 	const [userGender, setUserGender] = useState("");
 	const [partnerBirthday, setPartnerBirthday] = useState("");
@@ -28,7 +28,7 @@ const BirthdayModal = ({
 		console.log("partnerGender:", partnerGender);
 
 		if (isCoupleAnalysis) {
-			// 合婚分析：需要雙方資料
+			// 合盤分析：需要雙方資料
 			if (
 				userBirthday &&
 				userGender &&
@@ -82,7 +82,7 @@ const BirthdayModal = ({
 		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 			<div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
 				<h3 className="text-xl font-bold mb-4 text-center">
-					📅 {isCoupleAnalysis ? "合婚分析資料收集" : "生辰資料收集"}
+					📅 {isCoupleAnalysis ? "合盤分析資料收集" : "生辰資料收集"}
 				</h3>
 
 				<p className="text-gray-600 mb-6 text-center">
@@ -92,7 +92,7 @@ const BirthdayModal = ({
 
 				<form onSubmit={handleSubmit} className="space-y-4">
 					{isCoupleAnalysis ? (
-						// 合婚分析：雙人表單
+						// 合盤分析：雙人表單
 						<>
 							{/* 用戶資料 */}
 							<div className="border-l-4 border-blue-500 pl-4">

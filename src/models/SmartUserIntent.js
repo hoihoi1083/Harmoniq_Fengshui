@@ -30,20 +30,19 @@ const SmartUserIntentSchema = new mongoose.Schema(
 		primaryConcern: {
 			type: String,
 			enum: [
-				"工作",
+				"事業",
 				"感情",
 				"財運",
 				"子女",
 				"人際關係",
 				"健康",
 				"因緣",
+				"命理",
 				"風水佈局",
 				"其他",
 			],
 			required: false,
-		},
-
-		// 🆕 新增：非核心領域的用戶輸入處理
+		}, // 🆕 新增：非核心領域的用戶輸入處理
 		nonCoreUserInput: {
 			type: String,
 			maxlength: 500,
@@ -65,6 +64,7 @@ const SmartUserIntentSchema = new mongoose.Schema(
 					"人際關係",
 					"健康",
 					"因緣",
+					"命理",
 					"風水佈局",
 					"其他",
 				],
@@ -120,6 +120,7 @@ const SmartUserIntentSchema = new mongoose.Schema(
 						"人際關係",
 						"子女",
 						"因緣",
+						"命理",
 						"風水佈局",
 						"其他",
 					],

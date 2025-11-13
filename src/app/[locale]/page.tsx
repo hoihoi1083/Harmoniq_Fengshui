@@ -146,11 +146,20 @@ export default function Home() {
 		let shouldTransferConversations = false;
 		let oldAnonymousId: string | null = null;
 
+		console.log("🔍 DEBUG - Session info:", {
+			hasSession: !!session,
+			userEmail: session?.user?.email,
+			userName: session?.user?.name,
+		});
+
 		if (session?.user?.email) {
 			userId = session.user.email;
+			console.log("✅ Using session email as userId:", userId);
 
 			// 檢查是否有舊的匿名ID需要轉移
 			const storedAnonymousId = localStorage.getItem("feng-shui-user-id");
+			console.log("🔍 Stored anonymous ID:", storedAnonymousId);
+
 			if (
 				storedAnonymousId &&
 				storedAnonymousId.startsWith("user-") &&
@@ -166,16 +175,17 @@ export default function Home() {
 				);
 			}
 		} else {
+			console.log("⚠️ No session email found, using localStorage");
 			const storedUserId = localStorage.getItem("feng-shui-user-id");
 			if (!storedUserId) {
 				userId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 				localStorage.setItem("feng-shui-user-id", userId);
+				console.log("🆕 Created new anonymous userId:", userId);
 			} else {
 				userId = storedUserId;
+				console.log("📦 Using stored userId:", userId);
 			}
-		}
-
-		// 如果用戶ID沒有變化，不需要重新初始化
+		} // 如果用戶ID沒有變化，不需要重新初始化
 		if (currentUserId === userId && messages.length > 1) {
 			console.log("👤 用戶未變化，跳過重新初始化");
 			return;
@@ -516,17 +526,10 @@ export default function Home() {
 				localStorage.getItem("userRegion") || "hongkong";
 			console.log("🌍 Sending region to smart-chat2:", currentRegion);
 
-			// Map region to locale for AI response language
-			const regionToLocaleMap = {
-				china: "zh-CN",
-				hongkong: "zh-TW",
-				taiwan: "zh-TW",
-			};
-			const aiLocale =
-				regionToLocaleMap[
-					currentRegion as keyof typeof regionToLocaleMap
-				] || currentLocale;
-			console.log("🌐 AI response locale:", aiLocale);
+			// 🔧 FIX: Use URL locale as source of truth, not localStorage region
+			// This ensures navbar and content language stay in sync
+			const aiLocale = currentLocale; // Always use URL-based locale
+			console.log("🌐 AI response locale (from URL):", aiLocale);
 
 			const response = await fetch("/api/smart-chat2", {
 				method: "POST",
@@ -727,23 +730,16 @@ export default function Home() {
 							// Get fresh locale for comprehensive/premium payments too
 							const storedRegion =
 								localStorage.getItem("userRegion");
-							const regionToLocaleMap = {
-								china: "zh-CN",
-								hongkong: "zh-TW",
-								taiwan: "zh-TW",
-							};
-							const freshLocale =
-								regionToLocaleMap[storedRegion || "hongkong"] ||
-								currentLocale;
+							// 🔧 FIX: Use URL locale as source of truth
+							const freshLocale = currentLocale;
 
 							console.log(
 								`💰 Main page ${useComprehensivePayment ? "comprehensive" : "premium"} payment - Using fresh locale:`,
 								freshLocale,
-								"from stored region:",
-								storedRegion
-							);
-
-							// 使用 Stripe Checkout Session APIs (payment4 或 payment2)
+								"from URL (region:",
+								storedRegion,
+								"is for pricing only)"
+							); // 使用 Stripe Checkout Session APIs (payment4 或 payment2)
 							paymentResponse = await fetch(paymentEndpoint, {
 								method: "POST",
 								headers: {
@@ -1064,30 +1060,92 @@ export default function Home() {
 		try {
 			setIsLoadingHistory(true);
 
-			// 如果userId看起來像email，使用userEmail參數，否則使用userId參數
-			const isEmail = userId.includes("@");
-			const queryParam = isEmail
-				? `userEmail=${encodeURIComponent(userId)}`
-				: `userId=${encodeURIComponent(userId)}`;
+			console.log("📚 Loading conversation history for userId:", userId);
+			console.log("🔍 Session state:", {
+				hasSession: !!session,
+				sessionEmail: session?.user?.email,
+			});
 
-			const response = await fetch(
-				`/api/conversation-history?${queryParam}`
-			);
+			// 發送兩個參數以確保跨瀏覽器查詢一致性
+			const queryParams = new URLSearchParams();
+
+			// 🔥 CRITICAL FIX FOR SAFARI: Always try session email first if available
+			// Try to get session email from multiple sources
+			const sessionEmail = session?.user?.email;
+
+			console.log("🔍 Checking for session email:", sessionEmail);
+
+			if (sessionEmail) {
+				queryParams.append("userEmail", sessionEmail);
+				console.log("📧 [PRIMARY] Added session email:", sessionEmail);
+			} else {
+				// If no session email in state, try fetching current session
+				console.log(
+					"⚠️ No session email in state, trying to fetch session..."
+				);
+				try {
+					const sessionResponse = await fetch("/api/auth/session");
+					if (sessionResponse.ok) {
+						const sessionData = await sessionResponse.json();
+						console.log("📦 Fetched session data:", sessionData);
+						if (sessionData?.user?.email) {
+							queryParams.append(
+								"userEmail",
+								sessionData.user.email
+							);
+							console.log(
+								"📧 [PRIMARY-FETCHED] Added fetched email:",
+								sessionData.user.email
+							);
+						}
+					}
+				} catch (e) {
+					console.error("❌ Failed to fetch session:", e);
+				}
+			}
+
+			// Then add the userId (which might be email or anonymous ID)
+			const isEmail = userId.includes("@");
+			if (isEmail && userId !== sessionEmail) {
+				queryParams.append("userEmail", userId);
+				console.log("📧 [SECONDARY] Added userEmail:", userId);
+			} else if (!isEmail) {
+				queryParams.append("userId", userId);
+				console.log("🆔 Added anonymous userId:", userId);
+			}
+
+			const url = `/api/conversation-history?${queryParams.toString()}`;
+			console.log("🌐 Fetching from:", url);
+			const response = await fetch(url);
+
+			console.log("📡 Response status:", response.status);
 
 			if (response.ok) {
 				const data = await response.json();
+				console.log("✅ Received data:", {
+					success: data.success,
+					totalConversations: data.totalConversations,
+					conversationsCount: data.conversations?.length,
+					firstConversation: data.conversations?.[0],
+				});
 				setConversationHistory(data.conversations || []);
+				console.log(
+					`📚 載入了 ${data.conversations?.length || 0} 個對話記錄`
+				);
 			} else {
-				console.error("加載對話歷史失敗:", response.statusText);
+				const errorText = await response.text();
+				console.error(
+					"❌ 加載對話歷史失敗:",
+					response.status,
+					errorText
+				);
 			}
 		} catch (error) {
-			console.error("加載對話歷史錯誤:", error);
+			console.error("❌ 加載對話歷史錯誤:", error);
 		} finally {
 			setIsLoadingHistory(false);
 		}
-	};
-
-	// 轉移匿名對話記錄到註冊用戶
+	}; // 轉移匿名對話記錄到註冊用戶
 	const transferAnonymousConversations = async (
 		oldAnonymousId: string,
 		newUserEmail: string
@@ -1418,7 +1476,10 @@ export default function Home() {
 																		}
 																		className="text-xs bg-[#c0c0c0] text-gray-800 px-2 py-0.5 rounded"
 																	>
-																		{topic}
+																		{topic ===
+																		"工作"
+																			? "事業"
+																			: topic}
 																	</span>
 																)
 															)}

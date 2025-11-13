@@ -91,7 +91,7 @@ const coupleReportSchema = new mongoose.Schema(
 // 添加實例方法
 coupleReportSchema.methods.getFormattedReport = function () {
 	return {
-		title: "合婚配對分析報告",
+		title: "合盤配對分析報告",
 		userElement: this.userProfile.element,
 		partnerElement: this.partnerProfile.element,
 		compatibility: this.compatibilityAnalysis.overallScore,

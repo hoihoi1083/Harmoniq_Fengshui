@@ -276,7 +276,7 @@ export const ANALYSIS_CONFIG = {
 };
 
 // ================================
-// 合婚分析配置
+// 合盤分析配置
 // ================================
 
 export const COUPLE_ANALYSIS_CONFIG = {
@@ -381,7 +381,7 @@ export function getCustomAnalysis(element, concern, specificType = "通用") {
 	};
 }
 
-// 獲取合婚分析
+// 獲取合盤分析
 export function getCustomCoupleAnalysis(userElement, partnerElement) {
 	const compatibility =
 		COUPLE_ANALYSIS_CONFIG.compatibility[userElement]?.[partnerElement] ||

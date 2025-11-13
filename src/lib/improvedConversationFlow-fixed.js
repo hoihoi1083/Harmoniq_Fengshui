@@ -234,11 +234,11 @@ export class ImprovedConversationFlow {
 		];
 
 		const couplePatterns = [
-			"合婚分析",
-			"合婚",
-			"合婚配對分析",
-			"合婚深度分析",
-			"雙方合婚深度分析",
+			"合盤分析",
+			"合盤",
+			"合盤配對分析",
+			"合盤深度分析",
+			"雙方合盤深度分析",
 			"配對",
 			"配对",
 			"兩人",
@@ -277,6 +277,6 @@ export class ImprovedConversationFlow {
 	}
 
 	static generateCoupleAnalysisExplanation() {
-		return "合婚分析是根據兩人的八字來看關係配對度的風水方法。";
+		return "合盤分析是根據兩人的八字來看關係配對度的風水方法。";
 	}
 }

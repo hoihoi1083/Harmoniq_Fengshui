@@ -42,7 +42,7 @@ const commands = {
 
 		console.log("\n✅ What gets tracked:");
 		console.log("• Individual fortune analysis (感情、財運、工作、健康等)");
-		console.log("• Couple compatibility analysis (合婚配對分析)");
+		console.log("• Couple compatibility analysis (合盤配對分析)");
 		console.log("• Topic + birthday combinations");
 		console.log("• Modal form submissions");
 

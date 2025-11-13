@@ -5,7 +5,7 @@
  * 1. 命盤速讀 (基礎計算)
  * 2. 年度預警 (AI生成)
  * 3. 你的運勢分析 (AI生成)
- * 4. 簡單的事業風水建議 (AI生成)
+ * 4. 簡單的工作風水建議 (AI生成)
  * 5. 針對具體問題的建議 (AI生成)
  */
 
@@ -77,7 +77,7 @@ export class EnhancedInitialAnalysis {
 	) {
 		return await this.generatePersonalAnalysis(
 			birthday,
-			"事業",
+			"工作",
 			specificQuestion,
 			locale
 		);
@@ -229,7 +229,9 @@ export class EnhancedInitialAnalysis {
 		}
 
 		// 1. 雙方基礎分析（類似個人分析的基礎部分）
-		const basicAnalysis = `📊 你們的命理基礎分析\n${userLabel}：${year1}年${month1}月，生肖屬相：${zodiacAnimal1}\n${partnerLabel}：${year2}年${month2}月，生肖屬相：${zodiacAnimal2}\n配對類型：${this.getCoupleType(element1, element2)}\n緣分指數：${this.getCompatibilityScore(element1, element2)}%`; // 2. 針對具體問題回應 - 合盤分析不需要單獨的問題回應區段
+		const basicAnalysis = `**📊 你們的命理基礎分析**\n${userLabel}：${year1}年${month1}月，生肖屬相：${zodiacAnimal1}\n${partnerLabel}：${year2}年${month2}月，生肖屬相：${zodiacAnimal2}\n配對類型：${this.getCoupleType(element1, element2)}\n緣分指數：${this.getCompatibilityScore(element1, element2)}%`;
+
+		// 2. 針對具體問題回應 - 合盤分析不需要單獨的問題回應區段
 		let problemResponse = "";
 
 		// 3. 配對分析 - AI生成的主要配對分析內容
@@ -268,12 +270,16 @@ export class EnhancedInitialAnalysis {
 		// 4. 實用解決方案 - 添加實際內容
 		const practicalSolutions =
 			locale === "zh-CN"
-				? `🔧 实用解决方案\n1. 优先建议 - 根据你们双方的五行特质，建议在居家布置上加强五行平衡：${element1}命者可在个人空间增加对应元素装饰，${element2}命者则适合调整房间布局增进相容性。\n\n2. 时机掌握- 每月農曆初一、十五是感情能量最旺的时期，适合进行深度沟通或规划未来。\n\n3. 日常互动 - 善用各自的五行优势，${element1}命的稳定特质搭配${element2}命的活力，形成互补的相处模式。`
-				: `🔧 實用解決方案\n1. 優先建議 - 根據你們雙方的五行特質，建議在居家佈置上加強五行平衡：${element1}命者可在個人空間增加對應元素裝飾，${element2}命者則適合調整房間佈局增進相容性。\n\n2. 時機掌握- 每月農曆初一、十五是感情能量最旺的時期，適合進行深度溝通或規劃未來。\n\n3. 日常互動 - 善用各自的五行優勢，${element1}命的穩定特質搭配${element2}命的活力，形成互補的相處模式。`; // 5. 專屬感情解析 - 提供具體的感情建議
+				? `🔧 实用解决方案\n1. 优先建议 - 根据你们双方的五行特质，建议在居家布置上加强五行平衡：${element1}命者可在个人空间增加对应元素装饰，${element2}命者则适合调整房间布局增进相容性。\n\n2. 时机掌握- 每月农历初一、十五是感情能量最旺的时期，适合进行深度沟通或规划未来。\n\n3. 日常互动 - 善用各自的五行优势，${element1}命的稳定特质搭配${element2}命的活力，形成互补的相处模式。`
+				: `🔧 實用解決方案\n1. 優先建議 - 根據你們雙方的五行特質，建議在居家佈置上加強五行平衡：${element1}命者可在個人空間增加對應元素裝飾，${element2}命者則適合調整房間佈局增進相容性。\n\n2. 時機掌握- 每月農曆初一、十五是感情能量最旺的時期，適合進行深度溝通或規劃未來。\n\n3. 日常互動 - 善用各自的五行優勢，${element1}命的穩定特質搭配${element2}命的活力，形成互補的相處模式。`;
+
+		// 5. 專屬感情解析 - 提供具體的感情建議
 		const exclusiveInsights =
 			locale === "zh-CN"
-				? `✨ 专属感情解析\n根据你们${element1}命和${element2}命的配对特质，以下是专属的感情发展建议：\n\n🌸 感情发展阶段建议\n• 初期相处：着重建立信任基础，${element1}命宜展现包容，${element2}命可主动分享\n• 深化关系：利用双方五行互补优势，在生活细节中体现相互支持\n• 长期规划：结合各自的命理特质，制定共同目标和成长方向\n\n🎯 最佳互动时机\n每月農曆初一、十五感情能量最旺，适合深度沟通。${month1}月和${month2}月出生的你们，在对方生日月份前后特别容易产生共鸣。\n\n✨ 进阶指引说明\n以上分析仅基于年月框架，若要精准锁定：\n- 双方个人桃花宫位与最佳方位\n- 2025-2026具体感情发展时间点\n- 专属你们的相处节奏与沟通策略\n需提供完整出生时辰（几点几分），透过八字排盘解析「夫妻宫格局」与「大运流年」的互动，才能制定个人化感情发展策略。小铃可为你们制作专属合盤报告，助你们掌握感情升温的关键契机点。`
-				: `✨ 專屬感情解析\n根據你們${element1}命和${element2}命的配對特質，以下是專屬的感情發展建議：\n\n🌸 感情發展階段建議\n• 初期相處：著重建立信任基礎，${element1}命宜展現包容，${element2}命可主動分享\n• 深化關係：利用雙方五行互補優勢，在生活細節中體現相互支持\n• 長期規劃：結合各自的命理特質，制定共同目標和成長方向\n\n🎯 最佳互動時機\n每月農曆初一、十五感情能量最旺，適合深度溝通。${month1}月和${month2}月出生的你們，在對方生日月份前後特別容易產生共鳴。\n\n✨ 進階指引說明\n以上分析僅基於年月框架，若要精準鎖定：\n- 雙方個人桃花宮位與最佳方位\n- 2025-2026具體感情發展時間點\n- 專屬你們的相處節奏與溝通策略\n需提供完整出生時辰（幾點幾分），透過八字排盤解析「夫妻宮格局」與「大運流年」的互動，才能制定個人化感情發展策略。小鈴可為你們製作專屬合盤報告，助你們掌握感情升溫的關鍵契機點。`; // 6. 合盤報告推薦
+				? `✨ 专属感情解析\n根据你们${element1}命和${element2}命的配对特质，以下是专属的感情发展建议：\n\n🌸 感情发展阶段建议**\n• 初期相处：着重建立信任基础，${element1}命宜展现包容，${element2}命可主动分享\n• 深化关系：利用双方五行互补优势，在生活细节中体现相互支持\n• 长期规划：结合各自的命理特质，制定共同目标和成长方向\n\n🎯 最佳互动时机\n每月农历初一、十五感情能量最旺，适合深度沟通。${month1}月和${month2}月出生的你们，在对方生日月份前后特别容易产生共鸣。\n\n✨ 进阶指引说明\n以上分析仅基于年月框架，若要精准锁定：\n- 双方个人桃花宫位与最佳方位\n- 2025-2026具体感情发展时间点\n- 专属你们的相处节奏与沟通策略\n需提供完整出生时辰（几点几分），透过八字排盘解析「夫妻宫格局」与「大运流年」的互动，才能制定个人化感情发展策略。小铃可为你们制作专属合盤报告，助你们掌握感情升温的关键契机点。`
+				: `✨ 專屬感情解析\n根據你們${element1}命和${element2}命的配對特質，以下是專屬的感情發展建議：\n\n🌸 感情發展階段建議**\n• 初期相處：著重建立信任基礎，${element1}命宜展現包容，${element2}命可主動分享\n• 深化關係：利用雙方五行互補優勢，在生活細節中體現相互支持\n• 長期規劃：結合各自的命理特質，制定共同目標和成長方向\n\n🎯 最佳互動時機\n每月農曆初一、十五感情能量最旺，適合深度溝通。${month1}月和${month2}月出生的你們，在對方生日月份前後特別容易產生共鳴。\n\n✨ 進階指引說明\n以上分析僅基於年月框架，若要精準鎖定：\n- 雙方個人桃花宮位與最佳方位\n- 2025-2026具體感情發展時間點\n- 專屬你們的相處節奏與溝通策略\n需提供完整出生時辰（幾點幾分），透過八字排盤解析「夫妻宮格局」與「大運流年」的互動，才能制定個人化感情發展策略。小鈴可為你們製作專屬合盤報告，助你們掌握感情升溫的關鍵契機點。`;
+
+		// 6. 合盤報告推薦
 		const reportRecommendation = this.getCoupleReportRecommendations(
 			region,
 			locale
@@ -299,9 +305,6 @@ export class EnhancedInitialAnalysis {
 		specificQuestion = "",
 		locale = "zh-TW"
 	) {
-		// Map 工作 to 事業 for display consistency
-		if (category === "工作") category = "事業";
-
 		const year = birthday.getFullYear();
 		const month = birthday.getMonth() + 1;
 		const day = birthday.getDate();
@@ -397,32 +400,31 @@ export class EnhancedInitialAnalysis {
 - 具體問題：${specificQuestion || "無特定問題"}
 
 ⚠️ 重要提醒：
-- 用戶生日是西曆日期（公曆），請據此進行命理分析
+- 用戶生日是西曆日期，請據此進行命理分析
 - 當前時間是${currentYear}年${currentMonth}月，請基於${currentYear}年時間軸進行分析
-- 🚫 嚴格禁止：農曆、陰曆、農曆十月、農曆九月、亥月、子月、寅月等任何農曆相關詞彙
-- ✅ 正確表達：10月出生、9月出生、秋季出生、冬季出生
+- 絕對不可使用農曆、陰曆相關詞彙
 - 不要提及${currentYear - 1}年或更早的年份
 
 請生成以下三個部分的內容，要求個人化、具體、實用：
 
-2. 年度預警
+**2. 年度預警**
 根據${element}命在${currentYear}年的${category}運勢，並結合出生日期${year}年${month}月${day}日的特質，提供：
 - 成就星：${categoryConfig.achievementGuide}
 - 小人煞：${categoryConfig.obstacleGuide}
 
-3. ${categoryConfig.analysisTitle}
+**3. ${categoryConfig.analysisTitle}**
 根據${element}命特質和完整出生日期${year}年${month}月${day}日，分析用戶最近${category}狀況和未來3-6個月趨勢，要具體描述：
 - ${categoryConfig.recentSituation}
 - ${categoryConfig.futureTrend}
 - ${categoryConfig.personalAdvantage}
 
-4. ${categoryConfig.adviceTitle}
+**4. ${categoryConfig.adviceTitle}**
 根據${element}命提供3個具體可行的${category}建議：
 - ${categoryConfig.advicePoint1}
 - ${categoryConfig.advicePoint2}
 - ${categoryConfig.advicePoint3}
 
-5. 💡 專屬問題解析
+**5. 💡 專屬問題解析**
 ${
 	specificQuestion
 		? `針對你的具體問題「${specificQuestion}」，根據${element}命特質提供：
@@ -449,7 +451,7 @@ ${
 		const messages = [
 			{
 				role: "system",
-				content: `你是小鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。\n\n⚠️ 重要指示：\n1. 當前是${currentYear}年${currentMonth}月${currentDay}日，請確保分析基於${currentYear}年時間軸\n2. 🚫 嚴格禁止使用任何農曆用詞：農曆、陰曆、農曆十月、農曆九月、亥月、子月、寅月等\n3. ✅ 正確用法：10月出生、9月出生、秋季出生等\n4. 用戶提供的生日是西曆日期（公曆），請據此分析\n5. 不可提及${currentYear - 1}年或過去年份`,
+				content: `你是小鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。\n\n⚠️ 重要指示：\n1. 當前是${currentYear}年${currentMonth}月${currentDay}日，請確保分析基於${currentYear}年時間軸\n2. 所有日期必須使用西曆（公曆），絕對不可使用農曆用詞\n3. 用戶提供的生日是西曆日期，請據此分析\n4. 不可提及${currentYear - 1}年或過去年份`,
 			},
 			{
 				role: "user",
@@ -507,7 +509,7 @@ ${
 
 		const prompt = `你是專業的風水師「小鈴」，請根據以下信息生成個人化的合盤配對分析：
 
-重要語言要求：${languageInstruction}
+**重要語言要求：${languageInstruction}**
 
 雙方信息：
 - ${userGenderLabel}：${year1}年${month1}月${day1}日，${element1}命，${age1}歲
@@ -515,18 +517,18 @@ ${
 - 當前時間：${currentYear}年${currentMonth}月
 - 具體問題：${specificQuestion || "無特定問題"}
 
-重要：請優先針對用戶的具體問題「${specificQuestion}」進行直接回應和提供相關建議！
+**重要：請優先針對用戶的具體問題「${specificQuestion}」進行直接回應和提供相關建議！**
 
 請生成配對分析的內容，要求個人化、具體、實用：
 
-🎯 配對分析
+**🎯 配對分析**
 根據${element1}命和${element2}命的配對特質，詳細分析你們在感情方面的特質和運勢，內容包括：
 - 結合雙方生肖和出生季節的性格特質分析
 - 你們的相處狀況和互動模式評估  
 - 未來3-6個月的感情發展趨勢
 - 雙方性格優勢如何互補和需要注意的磨合點
 
-重要要求：
+**重要要求：**
 - 不要包含任何評分或分數（如85/100、星星評分等），因為基礎分析已有緣分指數
 - 不要說「親愛的，小鈴特別想告訴你」這類開頭語
 - 不要提及「悄悄話：因為缺少具體出生時辰」這類內容
@@ -536,7 +538,7 @@ ${
 	specificQuestion &&
 	!specificQuestion.includes("選擇:") &&
 	!specificQuestion.includes("選項")
-		? `針對你們的具體問題： 請特別關注用戶的問題「${specificQuestion}」，在配對分析中提供相關的命理見解和建議。`
+		? `**針對你們的具體問題：** 請特別關注用戶的問題「${specificQuestion}」，在配對分析中提供相關的命理見解和建議。`
 		: `請重點分析雙方的配對契合度和感情發展潛力。`
 }
 
@@ -572,16 +574,16 @@ ${
 
 	static getCategoryConfig(category) {
 		const configs = {
-			事業: {
+			工作: {
 				emoji: "💼",
 				palace: "事業宮主星",
-				analysisTitle: "你的事業運勢分析",
-				adviceTitle: "簡單的事業風水建議",
+				analysisTitle: "你的工作運勢分析",
+				adviceTitle: "簡單的工作風水建議",
 				achievementGuide:
 					"具體的突破領域和時機（例如：將星：X季主導專案）",
 				obstacleGuide:
 					"具體的防範對象和建議（例如：指背：遠離[生肖]同事）",
-				recentSituation: "最近可能遇到的事業情況",
+				recentSituation: "最近可能遇到的工作情況",
 				futureTrend: "未來幾個月的發展機會",
 				personalAdvantage: "個人優勢和需要注意的地方",
 				advicePoint1: "辦公環境佈置",
@@ -686,11 +688,11 @@ ${
 			},
 		};
 
-		return configs[category] || configs["事業"];
+		return configs[category] || configs["工作"];
 	}
 
 	static getPalaceStar(element, category) {
-		if (category === "事業") {
+		if (category === "工作") {
 			return this.getCareerStar(element);
 		}
 
@@ -844,7 +846,7 @@ ${
 		const categoryConfig = this.getCategoryConfig(category);
 
 		// 2. 年度預警 (簡化版)
-		response += `2. 年度預警\n`;
+		response += `**2. 年度預警**\n`;
 		const yearlyForecast = this.getYearlyForecast(
 			element,
 			new Date().getFullYear(),
@@ -854,7 +856,7 @@ ${
 		response += `   - 小人煞：${yearlyForecast.obstacle}\n\n`;
 
 		// 3. 運勢分析 (簡化版)
-		response += `3. ${categoryConfig.analysisTitle}\n`;
+		response += `**3. ${categoryConfig.analysisTitle}**\n`;
 		response +=
 			this.getCategoryFortune(
 				element,
@@ -864,7 +866,7 @@ ${
 			) + `\n\n`;
 
 		// 4. 風水建議 (簡化版)
-		response += `4. ${categoryConfig.adviceTitle}\n`;
+		response += `**4. ${categoryConfig.adviceTitle}**\n`;
 		const fengShuiAdvice = this.getCategoryFengShuiAdvice(
 			element,
 			category
@@ -875,7 +877,7 @@ ${
 		response += `\n`;
 
 		// 5. 專屬問題解析 (簡化版)
-		response += `5. 💡 專屬問題解析\n`;
+		response += `**5. 💡 專屬問題解析**\n`;
 		if (specificQuestion) {
 			response += `針對你的具體問題「${specificQuestion}」：\n`;
 			response += `• 問題核心：${this.getSpecificCategoryAdvice(element, category, specificQuestion)}\n`;
@@ -898,11 +900,11 @@ ${
 		let response = "";
 
 		// 3. 配對分析 (簡化版)
-		response += `3. 配對分析\n`;
+		response += `**3. 配對分析**\n`;
 		response += this.getCoupleAnalysisDetail(element1, element2) + `\n\n`;
 
 		// 4. 感情風水建議 (簡化版)
-		response += `4. 簡單的感情風水建議\n`;
+		response += `**4. 簡單的感情風水建議**\n`;
 		const coupleAdvice = this.getCoupleFengShuiAdvice(element1, element2);
 		coupleAdvice.forEach((advice) => {
 			response += `• ${advice}\n`;
@@ -910,7 +912,7 @@ ${
 		response += `\n`;
 
 		// 5. 專屬感情解析 (簡化版)
-		response += `5. 💕 專屬感情解析\n`;
+		response += `**5. 💕 專屬感情解析**\n`;
 		if (specificQuestion) {
 			response += `針對你們的具體問題「${specificQuestion}」：\n`;
 			response += `• 問題分析：${this.getSpecificCoupleAdvice(element1, element2, specificQuestion)}\n`;
@@ -930,10 +932,10 @@ ${
 	}
 
 	static getFallbackAnalysis(element, specificQuestion) {
-		// 保持向後兼容，重定向到事業分析
+		// 保持向後兼容，重定向到工作分析
 		return this.getFallbackPersonalAnalysis(
 			element,
-			"事業",
+			"工作",
 			specificQuestion
 		);
 	}
@@ -1072,11 +1074,11 @@ ${
 	// ⚠️ 年度預警相關方法
 	// ==========================================
 
-	static getYearlyForecast(element, year, category = "事業") {
+	static getYearlyForecast(element, year, category = "工作") {
 		const currentMonth = new Date().getMonth() + 1;
 
 		const categoryForecasts = {
-			事業: {
+			工作: {
 				金: {
 					achievement: "將星：秋季主導重要專案（9-11月突破期）",
 					obstacle: "指背煞：遠離屬虎同事，避免背後議論",
@@ -1233,7 +1235,7 @@ ${
 		};
 
 		const forecasts =
-			categoryForecasts[category] || categoryForecasts["事業"];
+			categoryForecasts[category] || categoryForecasts["工作"];
 		return (
 			forecasts[element] || {
 				achievement: "吉星高照：適時把握機會",
@@ -1251,7 +1253,7 @@ ${
 		const currentMonth = new Date().getMonth() + 1;
 
 		const fortunes = {
-			金: `金命的你最近事業運勢呈現穩中有升的趨勢。過去幾個月可能在職場上遇到一些決策挑戰，但你的理性分析能力幫助你渡過難關。接下來的3-6個月，特別是秋季期間，會有重要的升遷或項目機會出現。建議你主動爭取管理職位，你的領導才能將得到充分發揮。`,
+			金: `金命的你最近工作運勢呈現穩中有升的趨勢。過去幾個月可能在職場上遇到一些決策挑戰，但你的理性分析能力幫助你渡過難關。接下來的3-6個月，特別是秋季期間，會有重要的升遷或項目機會出現。建議你主動爭取管理職位，你的領導才能將得到充分發揮。`,
 
 			木: `木命的你創意能量充沛，最近在工作上可能產生了很多新想法，但執行上還需要更多耐心。春季是你的旺季，創新項目容易獲得認可。未來幾個月要特別注意與團隊的溝通協調，你的成長性思維將為公司帶來新的發展方向。`,
 
@@ -1263,12 +1265,12 @@ ${
 		};
 
 		return (
-			fortunes[element] || "你的事業運勢整體穩定，適合積極規劃未來發展。"
+			fortunes[element] || "你的工作運勢整體穩定，適合積極規劃未來發展。"
 		);
 	}
 
 	// ==========================================
-	// 🏢 事業風水建議方法
+	// 🏢 工作風水建議方法
 	// ==========================================
 
 	static getWorkFengShuiAdvice(element) {
@@ -1413,7 +1415,7 @@ ${
 
 	static getCategoryFortune(element, category, birthYear, birthMonth) {
 		const fortunes = {
-			事業: this.getCareerFortune(element, birthYear, birthMonth),
+			工作: this.getCareerFortune(element, birthYear, birthMonth),
 			財運: this.getFinanceFortune(element, birthYear, birthMonth),
 			健康: this.getHealthFortune(element, birthYear, birthMonth),
 			人際關係: this.getRelationshipFortune(
@@ -1426,7 +1428,7 @@ ${
 			感情: this.getLoveFortune(element, birthYear, birthMonth),
 		};
 
-		return fortunes[category] || fortunes["事業"];
+		return fortunes[category] || fortunes["工作"];
 	}
 
 	static getFinanceFortune(element, birthYear, birthMonth) {
@@ -1505,7 +1507,7 @@ ${
 
 	static getCategoryFengShuiAdvice(element, category) {
 		const adviceMap = {
-			事業: this.getWorkFengShuiAdvice(element),
+			工作: this.getWorkFengShuiAdvice(element),
 			財運: this.getFinanceFengShuiAdvice(element),
 			健康: this.getHealthFengShuiAdvice(element),
 			人際關係: this.getRelationshipFengShuiAdvice(element),
@@ -1514,7 +1516,7 @@ ${
 			感情: this.getLoveFengShuiAdvice(element),
 		};
 
-		return adviceMap[category] || adviceMap["事業"];
+		return adviceMap[category] || adviceMap["工作"];
 	}
 
 	static getFinanceFengShuiAdvice(element) {
@@ -1870,7 +1872,7 @@ ${
 	static getSpecificCategoryAdvice(element, category, question) {
 		// 根據不同類別分發到具體的建議方法
 		switch (category) {
-			case "事業":
+			case "工作":
 				return this.getSpecificWorkAdvice(element, question);
 			case "財運":
 				return this.getSpecificFinanceAdvice(element, question);
@@ -2141,7 +2143,7 @@ ${
 
 	static getBasicSolution(element, category) {
 		const solutions = {
-			事業: `${element}命適合在穩定的環境中發展，建議先完善基礎技能`,
+			工作: `${element}命適合在穩定的環境中發展，建議先完善基礎技能`,
 			財運: `${element}命的你要穩健理財，避免高風險投資`,
 			健康: `${element}命需要注意作息規律，多休息少熬夜`,
 			感情: `${element}命要真誠待人，用行動表達關心`,
@@ -2156,7 +2158,7 @@ ${
 
 	static getOpportunityHint(element, category) {
 		const hints = {
-			事業: `${element}命在秋季容易有突破機會`,
+			工作: `${element}命在秋季容易有突破機會`,
 			財運: `${element}命適合在穩定期投資理財`,
 			健康: `${element}命要把握調養身體的好時機`,
 			感情: `${element}命的桃花運在人際活動中較旺`,
@@ -2169,7 +2171,7 @@ ${
 
 	static getCautionHint(element, category) {
 		const cautions = {
-			事業: `${element}命要留意職場人際關係`,
+			工作: `${element}命要留意職場人際關係`,
 			財運: `${element}命要謹慎處理金錢問題`,
 			健康: `${element}命要注意身體警訊`,
 			感情: `${element}命要避免情緒化溝通`,
@@ -2202,7 +2204,7 @@ ${
 		locale = "zh-TW"
 	) {
 		const categoryNames = {
-			事業: "事業",
+			工作: "工作",
 			財運: "財運",
 			健康: "健康",
 			感情: "感情",
@@ -2483,8 +2485,8 @@ ${currentMonth === birthMonth ? "生日月份是感情運勢的黃金期，適�
 
 		const prompt = `你是專業的命理師風鈴，為用戶提供詳細實用的${category}分析和解決方案。
 
-重要語言要求：${languageInstruction}
-當前時間：${currentYear}年${currentMonth}月 - 請基於${currentYear}年進行所有分析，不要提及過去的年份如2024年或2023年
+**重要語言要求：${languageInstruction}**
+**當前時間：${currentYear}年${currentMonth}月 - 請基於${currentYear}年進行所有分析，不要提及過去的年份如2024年或2023年**
 
 用戶資料：
 - 出生年份：${birthYear}年
@@ -2494,31 +2496,31 @@ ${currentMonth === birthMonth ? "生日月份是感情運勢的黃金期，適�
 - 關注領域：${category}
 - 具體問題：${specificQuestion || "想改善" + category + "運勢"}
 
-重要：請優先針對用戶的具體問題「${specificQuestion}」進行直接回應和提供相關建議！
+**重要：請優先針對用戶的具體問題「${specificQuestion}」進行直接回應和提供相關建議！**
 
 請提供非常詳細豐富的${category}分析和解決方案，要比一般的回答更深入更實用：
 
-🎯 針對你的具體問題回應
+**🎯 針對你的具體問題回應**
 直接回答用戶的問題「${specificQuestion}」，不需要問候語或自我介紹：
 - 理解用戶的需求和期望
 - 從命理角度分析這個問題
 - 提供切實可行的建議和方法
 - 說明為什麼這個問題與${category}運勢相關
 
-🎯 ${category}運勢深度分析
+**🎯 ${category}運勢深度分析**
 根據你的出生年月（${birthYear}年${birthMonth}月），詳細分析你在${category}方面的特質和運勢：
 - 結合生肖和出生季節的性格特質分析
 - 當前時期的機遇與挑戰評估
 - 關鍵轉折期和發展潛力預測
 - 具體的命理解讀和專業指導建議
 
-🔧 實用解決方案
-1. 優先建議 - 根據你的出生月份特質，提供最重要的一個可立即執行的建議
+**🔧 實用解決方案**
+**1. 優先建議** - 根據你的出生月份特質，提供最重要的一個可立即執行的建議
 
-💡 完整解決方案需要詳細分析
-這僅是基於年月的初步建議，專屬報告中還有更多實用的${category}提升策略。若需精準定位個人化${category === "財運" ? "財庫方位、最佳投資時機" : category === "健康" ? "五行體質調理、養生時機" : category === "感情" ? "桃花方位、感情時機" : category === "事業" || category === "事業" ? "事業方位、升職時機" : "運勢方位、行動時機"}等深入指導，需要完整的出生時辰（幾點幾分）才能透過八字排盤提供個人化專業分析。
+💡 **完整解決方案需要詳細分析**
+這僅是基於年月的初步建議，專屬報告中還有更多實用的${category}提升策略。若需精準定位個人化${category === "財運" ? "財庫方位、最佳投資時機" : category === "健康" ? "五行體質調理、養生時機" : category === "感情" ? "桃花方位、感情時機" : category === "工作" || category === "事業" ? "事業方位、升職時機" : "運勢方位、行動時機"}等深入指導，需要完整的出生時辰（幾點幾分）才能透過八字排盤提供個人化專業分析。
 
-✨ 專屬報告預告
+**✨ 專屬報告預告**
 ${category}運勢如風，需知風向與風力。若你希望進一步掌握更多專業建議和個人化策略，歡迎提供詳細出生時辰，小鈴會為你製作專屬${category}報告！🌟
 
 要求：
@@ -2561,14 +2563,14 @@ ${category}運勢如風，需知風向與風力。若你希望進一步掌握更
 	static getFallbackSolutions(element, category, specificQuestion) {
 		const currentMonth = new Date().getMonth() + 1;
 
-		if (category === "事業" || category === "事業") {
+		if (category === "事業" || category === "工作") {
 			let specificAnswerSection = "";
 			if (
 				specificQuestion &&
-				specificQuestion !== "想改善事業運勢" &&
+				specificQuestion !== "想改善工作運勢" &&
 				specificQuestion !== "想改善事業運勢"
 			) {
-				specificAnswerSection = `🎯 針對你的問題「${specificQuestion}」
+				specificAnswerSection = `**🎯 針對你的問題「${specificQuestion}」**
 從命理角度來看，這個問題與你的職場運勢密切相關。基於你的出生月份分析，我建議你可以從心態調整和實際行動兩方面來處理這個問題。重要的是要相信自己的能力，同時也要在適當的時機展現你的專業和價值。
 
 `;
@@ -2576,18 +2578,18 @@ ${category}運勢如風，需知風向與風力。若你希望進一步掌握更
 
 			return (
 				specificAnswerSection +
-				`🔍 事業運勢深度分析
+				`**🔍 事業運勢深度分析**
 基於你的出生年月分析，你在職場上展現出穩重可靠的特質，這是升職發展的重要優勢。你不是那種會急功近利的人，而是更注重長期的職業發展和技能積累。當前${currentMonth}月正值秋季，是展示工作成果和爭取升職機會的絕佳時機。
 
 你的職場風格偏向務實和負責任，這讓你在團隊中往往扮演著重要的協調者角色。上司和同事都會信賴你的判斷力和執行能力，這為你的升職之路奠定了很好的基礎。
 
-🔧 實用解決方案
-1. 主動展示成果策略：整理過去6個月的重要工作成就，製作一份詳細的成果報告，在與主管的定期會議中主動分享這些成果，讓你的努力被看見。
+**🔧 實用解決方案**
+**1. 主動展示成果策略**：整理過去6個月的重要工作成就，製作一份詳細的成果報告，在與主管的定期會議中主動分享這些成果，讓你的努力被看見。
 
-💡 完整解決方案需要詳細分析
+💡 **完整解決方案需要詳細分析**
 這僅是基於年月的初步建議，專屬報告中還有更多實用的事業提升策略。若需精準定位最佳升職時機、職場人際關係處理等深入指導，需要完整的出生時辰（幾點幾分）才能透過八字排盤提供個人化專業分析。
 
-✨ 專屬報告預告
+**✨ 專屬報告預告**
 事業運勢如風，需知風向與風力。若你希望進一步掌握更多專業建議和個人化策略，歡迎提供詳細出生時辰，小鈴會為你製作專屬事業報告！🌟`
 			);
 		}
@@ -2601,14 +2603,14 @@ ${category}運勢如風，需知風向與風力。若你希望進一步掌握更
 					specificQuestion.includes("中獎") ||
 					specificQuestion.includes("彩票")
 				) {
-					specificAnswerSection = `🎯 針對你的問題「${specificQuestion}」
+					specificAnswerSection = `**🎯 針對你的問題「${specificQuestion}」**
 哇～想中六合彩呀！我完全理解這種渴望財富的心情呢！✨ 從風水命理角度來看，偏財運確實是存在的，但真正的財富更多來自於正財運的積累。六合彩這類偏財雖然誘人，但不應該作為主要的財富策略。
 
 我建議你把買彩票當作小娛樂就好，真正的重點是培養良好的理財習慣和提升正財運。這樣既能享受偶爾的小驚喜，又能確保財務的穩健發展。
 
 `;
 				} else {
-					specificAnswerSection = `🎯 針對你的問題「${specificQuestion}」
+					specificAnswerSection = `**🎯 針對你的問題「${specificQuestion}」**
 從命理角度來看，這個財運問題很值得深入分析。基於你的出生月份，我發現你在理財方面有自己的獨特優勢。重要的是要找到適合你的財富累積方式，並在合適的時機做出明智的財務決策。
 
 `;
@@ -2617,18 +2619,18 @@ ${category}運勢如風，需知風向與風力。若你希望進一步掌握更
 
 			return (
 				specificAnswerSection +
-				`🔍 財運運勢深度分析
+				`**🔍 財運運勢深度分析**
 根據你的出生年月分析，你在財富管理方面具備天生的謹慎和穩健特質。你不是那種會盲目投資或衝動消費的人，而是更傾向於長期規劃和穩定增長。當前${currentMonth}月正值收穫季節，是檢視財務狀況和制定理財策略的最佳時機。
 
 你的理財風格偏向保守穩健，雖然可能不會有爆發性的財富增長，但能夠確保資產的穩定積累。這種特質在當前經濟環境下是非常明智的，能夠幫你避免很多不必要的風險。
 
-🔧 實用解決方案
-1. 收入提升策略：考慮發展一項與你專業相關的副業，如諮詢服務、線上課程或自由接案，利用你的專業知識建立額外收入來源。
+**🔧 實用解決方案**
+**1. 收入提升策略**：考慮發展一項與你專業相關的副業，如諮詢服務、線上課程或自由接案，利用你的專業知識建立額外收入來源。
 
-💡 完整解決方案需要詳細分析
+💡 **完整解決方案需要詳細分析**
 這僅是基於年月的初步建議，專屬報告中還有更多實用的財運提升策略。若需精準定位個人財庫方位、最佳投資時機等深入指導，需要完整的出生時辰（幾點幾分）才能透過八字排盤提供個人化專業分析。
 
-✨ 專屬報告預告
+**✨ 專屬報告預告**
 財運如風，需知風向與風力。若你希望進一步掌握更多專業建議和個人化策略，歡迎提供詳細出生時辰，小鈴會為你製作專屬財運報告！🌟`
 			);
 		}
@@ -2636,7 +2638,7 @@ ${category}運勢如風，需知風向與風力。若你希望進一步掌握更
 		if (category === "健康") {
 			let specificAnswerSection = "";
 			if (specificQuestion && specificQuestion !== "想改善健康運勢") {
-				specificAnswerSection = `🎯 針對你的問題「${specificQuestion}」
+				specificAnswerSection = `**🎯 針對你的問題「${specificQuestion}」**
 從健康運勢的角度來看，這個問題反映了你對身心健康的關注，這是很好的。基於你的出生月份分析，你的體質有其特點，需要特別注意某些方面的調理。重要的是要保持身心平衡，並採用適合你體質的養生方法。
 
 `;
@@ -2644,16 +2646,16 @@ ${category}運勢如風，需知風向與風力。若你希望進一步掌握更
 
 			return (
 				specificAnswerSection +
-				`🔍 健康運勢深度分析
+				`**🔍 健康運勢深度分析**
 根據你的出生年月分析，你的體質整體上是比較穩定健康的。你不是那種容易生病或體質虛弱的人，但也需要注意保持良好的生活習慣來維護健康。當前${currentMonth}月正值季節轉換期，是調理體質和建立健康習慣的最佳時機。
 
-🔧 實用解決方案
-1. 作息規律建立：制定固定的睡眠時間，每天11點前就寢，7點起床。保持充足的睡眠對你的體質非常重要。
+**🔧 實用解決方案**
+**1. 作息規律建立**：制定固定的睡眠時間，每天11點前就寢，7點起床。保持充足的睡眠對你的體質非常重要。
 
-💡 完整解決方案需要詳細分析
+💡 **完整解決方案需要詳細分析**
 這僅是基於年月的初步建議，專屬報告中還有更多實用的健康調理策略。若需精準的五行體質養生計劃、個人化飲食調理等深入指導，需要完整的出生時辰（幾點幾分）才能透過八字排盤提供個人化專業分析。
 
-✨ 專屬報告預告
+**✨ 專屬報告預告**
 健康運勢如風，需知風向與風力。若你希望進一步掌握更多專業建議和個人化策略，歡迎提供詳細出生時辰，小鈴會為你製作專屬健康報告！🌟`
 			);
 		}
@@ -2661,7 +2663,7 @@ ${category}運勢如風，需知風向與風力。若你希望進一步掌握更
 		if (category === "感情") {
 			let specificAnswerSection = "";
 			if (specificQuestion && specificQuestion !== "想改善感情運勢") {
-				specificAnswerSection = `🎯 針對你的問題「${specificQuestion}」
+				specificAnswerSection = `**🎯 針對你的問題「${specificQuestion}」**
 從感情運勢角度來看，這個問題反映了你內心對感情的渴望和關注。基於你的出生月份分析，你在感情方面有著獨特的魅力和吸引力。重要的是要相信自己的感情價值，並在適當的時機展現真實的自我。
 
 `;
@@ -2669,31 +2671,31 @@ ${category}運勢如風，需知風向與風力。若你希望進一步掌握更
 
 			return (
 				specificAnswerSection +
-				`🔍 感情運勢深度分析
+				`**🔍 感情運勢深度分析**
 根據你的出生特質分析，你在感情方面是一個非常專一和認真的人。你不會輕易開始一段關係，但一旦投入就會全心全意。這種特質讓你在感情中能夠建立深層而穩定的連結。
 
-🔧 實用解決方案
-1. 情感表達技巧：學習更好地表達自己的情感和需求，通過言語和行動讓對方感受到你的愛意。
+**🔧 實用解決方案**
+**1. 情感表達技巧**：學習更好地表達自己的情感和需求，通過言語和行動讓對方感受到你的愛意。
 
-💡 完整解決方案需要詳細分析
+💡 **完整解決方案需要詳細分析**
 這僅是基於年月的初步建議，專屬報告中還有更多實用的感情提升策略。若需精準的桃花運時期、最適合的伴侶類型等深入指導，需要完整的出生時辰（幾點幾分）才能透過八字排盤提供個人化專業分析。
 
-✨ 專屬報告預告
+**✨ 專屬報告預告**
 感情運勢如風，需知風向與風力。若你希望進一步掌握更多專業建議和個人化策略，歡迎提供詳細出生時辰，小鈴會為你製作專屬感情報告！🌟`
 			);
 		}
 
 		// 默認返回
-		return `🔍 ${category}運勢深度分析
+		return `**🔍 ${category}運勢深度分析**
 根據你的出生年月分析，你在${category}方面具備穩定發展的潛力。你是一個做事認真負責的人，不會輕易放棄，這種特質讓你在任何領域都能取得不錯的成果。
 
-🔧 實用解決方案
-1. 目標設定：為自己在${category}方面設定清晰具體的目標，並制定達成計劃。
+**🔧 實用解決方案**
+**1. 目標設定**：為自己在${category}方面設定清晰具體的目標，並制定達成計劃。
 
-💡 完整解決方案需要詳細分析
+💡 **完整解決方案需要詳細分析**
 這僅是基於年月的初步建議，專屬報告中還有更多實用的${category}提升策略。若需精準的行動時機、個人化能量調理等深入指導，需要完整的出生時辰（幾點幾分）才能透過八字排盤提供個人化專業分析。
 
-✨ 專屬報告預告
+**✨ 專屬報告預告**
 ${category}運勢如風，需知風向與風力。若你希望進一步掌握更多專業建議和個人化策略，歡迎提供詳細出生時辰，小鈴會為你製作專屬${category}報告！🌟`;
 	}
 

@@ -5078,8 +5078,8 @@ export default function ReportPage({
 																					"clamp(12px, 3vw, 14px)",
 																			}}
 																		>
-																			{count.toFixed(
-																				1
+																			{Math.round(
+																				count
 																			)}
 																		</span>
 																	</div>
@@ -5337,8 +5337,8 @@ export default function ReportPage({
 																							"clamp(14px, 1.5vw, 18px)",
 																					}}
 																				>
-																					{count.toFixed(
-																						1
+																					{Math.round(
+																						count
 																					)}
 																				</div>
 
