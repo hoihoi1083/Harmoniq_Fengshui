@@ -630,8 +630,15 @@ export default function Home() {
 					setConcern(data.concern);
 				}
 
-				// 注意：移除不必要的對話歷史重新載入，這會造成過多的API呼叫
-				// 只有在創建新對話時才需要更新歷史列表
+				// 🔄 Refresh conversation history after message is saved
+				// Add a delay to ensure database save completes
+				setTimeout(() => {
+					console.log("🔄 Refreshing conversation history...", {
+						currentUserId,
+						sessionEmail: session?.user?.email,
+					});
+					loadConversationHistory(currentUserId);
+				}, 2000); // 2 seconds delay for reliable database sync
 
 				// Payment 觸發邏輯 - Check for couple analysis from API response
 				console.log(
@@ -1469,19 +1476,98 @@ export default function Home() {
 																(
 																	topic,
 																	index
-																) => (
-																	<span
-																		key={
-																			index
-																		}
-																		className="text-xs bg-[#c0c0c0] text-gray-800 px-2 py-0.5 rounded"
-																	>
-																		{topic ===
+																) => {
+																	// Convert topic based on current locale
+																	let displayTopic =
+																		topic;
+
+																	// First convert "工作" to "事業"
+																	if (
+																		topic ===
 																		"工作"
-																			? "事業"
-																			: topic}
-																	</span>
-																)
+																	) {
+																		displayTopic =
+																			"事業";
+																	}
+
+																	// Then convert to appropriate locale
+																	const topicMap: Record<
+																		string,
+																		{
+																			"zh-TW": string;
+																			"zh-CN": string;
+																		}
+																	> = {
+																		財運: {
+																			"zh-TW":
+																				"財運",
+																			"zh-CN":
+																				"财运",
+																		},
+																		财运: {
+																			"zh-TW":
+																				"財運",
+																			"zh-CN":
+																				"财运",
+																		},
+																		健康: {
+																			"zh-TW":
+																				"健康",
+																			"zh-CN":
+																				"健康",
+																		},
+																		事業: {
+																			"zh-TW":
+																				"事業",
+																			"zh-CN":
+																				"事业",
+																		},
+																		事业: {
+																			"zh-TW":
+																				"事業",
+																			"zh-CN":
+																				"事业",
+																		},
+																		感情: {
+																			"zh-TW":
+																				"感情",
+																			"zh-CN":
+																				"感情",
+																		},
+																		其他: {
+																			"zh-TW":
+																				"其他",
+																			"zh-CN":
+																				"其他",
+																		},
+																	};
+
+																	const localeKey =
+																		currentLocale ===
+																		"zh-CN"
+																			? "zh-CN"
+																			: "zh-TW";
+																	displayTopic =
+																		topicMap[
+																			displayTopic
+																		]?.[
+																			localeKey
+																		] ||
+																		displayTopic;
+
+																	return (
+																		<span
+																			key={
+																				index
+																			}
+																			className="text-xs bg-[#c0c0c0] text-gray-800 px-2 py-0.5 rounded"
+																		>
+																			{
+																				displayTopic
+																			}
+																		</span>
+																	);
+																}
 															)}
 														{conversation.topics
 															.length > 2 && (

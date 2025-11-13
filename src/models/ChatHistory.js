@@ -37,6 +37,7 @@ const ChatHistorySchema = new mongoose.Schema(
 			type: String,
 			enum: [
 				"工作",
+				"事業",
 				"感情",
 				"財運",
 				"子女",

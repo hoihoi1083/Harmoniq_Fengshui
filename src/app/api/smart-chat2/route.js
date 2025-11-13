@@ -3148,6 +3148,19 @@ export async function POST(request) {
 		userIntent,
 		locale;
 
+	// 🔧 FIX: Helper function to capture response before returning
+	const returnWithResponse = (jsonData) => {
+		// Extract and save response content before returning
+		if (jsonData.response && typeof jsonData.response === "string") {
+			response = jsonData.response;
+			console.log(
+				"✅ Response captured for saving:",
+				response.substring(0, 100) + "..."
+			);
+		}
+		return NextResponse.json(jsonData);
+	};
+
 	try {
 		await connectMongo();
 
@@ -3266,7 +3279,8 @@ export async function POST(request) {
 				});
 			}
 
-			let userIntent = await SmartUserIntent.findOne({
+			// 🔧 FIX: Use top-level userIntent variable instead of declaring new local one
+			userIntent = await SmartUserIntent.findOne({
 				sessionId: sessionId,
 				conversationActive: true,
 			}).sort({ createdAt: -1 });
@@ -3419,7 +3433,8 @@ export async function POST(request) {
 		}
 
 		// 檢查會話歷史和上下文
-		let userIntent = await SmartUserIntent.findOne({
+		// 🔧 FIX: Use top-level userIntent variable instead of declaring new local one
+		userIntent = await SmartUserIntent.findOne({
 			sessionId: sessionId,
 			conversationActive: true,
 		}).sort({ createdAt: -1 });
@@ -5789,10 +5804,13 @@ export async function POST(request) {
 					? `\n\n📊 今日分析額度: 你每日可進行 ${rateLimitInfo.limit} 次初步分析，目前還剩 ${rateLimitInfo.remaining} 次機會哦～`
 					: "";
 
-				return NextResponse.json({
-					response: cleanMarkdownFormatting(
-						combinedResponse + quotaMessage
-					),
+				// 🔧 FIX: Assign to top-level response variable before returning
+				response = cleanMarkdownFormatting(
+					combinedResponse + quotaMessage
+				);
+
+				return returnWithResponse({
+					response: response,
 					conversationState:
 						detectedTopic === "感情"
 							? "asking_relationship_type"
@@ -7061,6 +7079,13 @@ export async function POST(request) {
 						sessionId
 					);
 
+					// 🔍 DEBUG: Verify analysis was assigned
+					console.log("🔍 Line 7076 - analysis assigned:", {
+						hasAnalysis: !!analysis,
+						detectedTopic: analysis?.detectedTopic,
+						isWithinScope: analysis?.isWithinScope,
+					});
+
 					// 如果 AI 分析失敗，才使用關鍵詞匹配作為後備
 					if (!analysis || !analysis.isWithinScope) {
 						console.log("⚡ AI 分析失敗，使用關鍵詞匹配後備");
@@ -7175,7 +7200,7 @@ export async function POST(request) {
 								"⚠️ userIntent 不存在，創建新的 userIntent, sessionId:",
 								sessionId
 							);
-							const newUserIntent = new SmartUserIntent({
+							userIntent = new SmartUserIntent({
 								sessionId: sessionId,
 								userId: userId,
 								userEmail: userEmail,
@@ -7184,10 +7209,10 @@ export async function POST(request) {
 								conversationState: "awaiting_birthday_choice",
 								conversationActive: true,
 							});
-							await newUserIntent.save();
+							await userIntent.save();
 							console.log(
 								"✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice, _id:",
-								newUserIntent._id
+								userIntent._id
 							);
 						}
 					} else {
@@ -7342,7 +7367,7 @@ export async function POST(request) {
 						console.log(
 							"⚠️ userIntent 不存在，創建新的 userIntent"
 						);
-						const newUserIntent = new SmartUserIntent({
+						userIntent = new SmartUserIntent({
 							sessionId: sessionId,
 							userId: userId,
 							userEmail: userEmail,
@@ -7350,7 +7375,7 @@ export async function POST(request) {
 							conversationState: "awaiting_birthday_choice",
 							conversationActive: true,
 						});
-						await newUserIntent.save();
+						await userIntent.save();
 						console.log(
 							"✅ 已創建新 userIntent 並設置 conversationState = awaiting_birthday_choice"
 						);
@@ -7736,7 +7761,11 @@ export async function POST(request) {
 		);
 
 		// 🔢 獲取用戶當前分析額度信息並添加到 analysis
+		// 🔧 FIX: Assign finalAnalysis to analysis to preserve for finally block
 		let finalAnalysis = analysis;
+		if (analysis) {
+			analysis = { ...analysis }; // Clone to prevent mutation
+		}
 		try {
 			const userStats = await DailyAnalysisRateLimit.getUserStats(
 				userEmail,
@@ -7756,12 +7785,37 @@ export async function POST(request) {
 				...analysis,
 				rateLimitInfo: rateLimitInfo,
 			};
+			// 🔧 FIX: Update analysis to include rate limit info for finally block
+			analysis = finalAnalysis;
 		} catch (error) {
 			console.log("⚠️ 獲取用戶分析額度信息失敗:", error);
 		}
 
-		return NextResponse.json({
-			response: cleanMarkdownFormatting(response),
+		// 🔍 DEBUG: Check response before return
+		console.log("🔍 MAIN RETURN - response value:", {
+			hasResponse: !!response,
+			responseType: typeof response,
+			responseLength: response?.length || 0,
+			responsePreview: response?.substring(0, 100),
+		});
+
+		// 🔍 DEBUG: Check analysis before return
+		console.log("🔍 MAIN RETURN - analysis value:", {
+			hasAnalysis: !!analysis,
+			analysisType: typeof analysis,
+			detectedTopic: analysis?.detectedTopic,
+			isWithinScope: analysis?.isWithinScope,
+		});
+
+		// 🔧 FIX: Ensure response is assigned before returning
+		if (!response || response.trim() === "") {
+			console.log("⚠️ Response is empty, using fallback");
+			response = "我收到你的訊息了～讓我為你提供更好的服務！";
+		}
+		response = cleanMarkdownFormatting(response);
+
+		return returnWithResponse({
+			response: response,
 			aiAnalysis: finalAnalysis,
 			conversationState: userIntent?.conversationState || "ai_analyzed",
 			systemType: "smart-chat2",
@@ -7797,12 +7851,36 @@ export async function POST(request) {
 			{ status: 500 }
 		);
 	} finally {
-		// 🔧 FIX: Always save conversation history, even on errors or early returns
+		// � DEBUG: Check all variables in finally block
+		console.log("🔍 Finally block variables:", {
+			hasMessage: !!message,
+			hasResponse: !!response,
+			responseType: typeof response,
+			responsePreview: response?.substring(0, 100),
+			hasSessionId: !!sessionId,
+			hasUserId: !!userId,
+		});
+
+		console.log("🔍 Finally block - analysis check:", {
+			hasAnalysis: !!analysis,
+			analysisType: typeof analysis,
+			detectedTopic: analysis?.detectedTopic,
+		});
+
+		// �🔧 FIX: Always save conversation history, even on errors or early returns
 		if ((message || response) && sessionId && userId) {
 			try {
 				console.log(
 					"💾 Finally block - Attempting to save conversation..."
 				);
+				console.log("💾 saveToChatHistory called with:", {
+					sessionId,
+					userId,
+					userEmail,
+					userMessage: message,
+					assistantResponse: response,
+					hasAiAnalysis: !!analysis,
+				});
 				await saveToChatHistory(
 					sessionId,
 					userId,
@@ -7912,12 +7990,43 @@ async function saveToChatHistory(
 			chatHistory.addMessage("assistant", formattedResponse, aiAnalysis);
 		}
 
-		// 更新上下文
-		if (aiAnalysis && aiAnalysis.detectedTopic) {
-			chatHistory.updateContext(
-				aiAnalysis.detectedTopic,
-				aiAnalysis.emotionalState
+		// � DEBUG: Check all topic sources
+		console.log("🔍 Topic detection sources:", {
+			aiAnalysisDetectedTopic: aiAnalysis?.detectedTopic,
+			userIntentPrimaryConcern: userIntent?.primaryConcern,
+			chatHistoryPrimaryConcern: chatHistory.primaryConcern,
+			hasAiAnalysis: !!aiAnalysis,
+			hasUserIntent: !!userIntent,
+		});
+
+		// �🔧 FIX: Update primaryConcern if it's currently "其他" and we have a better topic
+		const betterTopic =
+			aiAnalysis?.detectedTopic || userIntent?.primaryConcern;
+		console.log(`🔍 betterTopic calculated: "${betterTopic}"`);
+
+		if (
+			betterTopic &&
+			betterTopic !== "其他" &&
+			chatHistory.primaryConcern === "其他"
+		) {
+			console.log(
+				`🔄 Upgrading primaryConcern from "其他" to "${betterTopic}"`
 			);
+			chatHistory.primaryConcern = betterTopic;
+		}
+
+		// 更新上下文 - 🔧 FIX: Ensure topics are always added
+		const topicToAdd =
+			aiAnalysis?.detectedTopic ||
+			userIntent?.primaryConcern ||
+			chatHistory.primaryConcern;
+		console.log(`🔍 topicToAdd calculated: "${topicToAdd}"`);
+
+		if (topicToAdd) {
+			chatHistory.updateContext(topicToAdd, aiAnalysis?.emotionalState);
+			console.log(`✅ Topic added to context: ${topicToAdd}`);
+		} else {
+			console.log("⚠️ No topic available to add to context");
 		}
 
 		// 更新對話狀態

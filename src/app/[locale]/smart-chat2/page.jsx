@@ -379,8 +379,15 @@ export default function SmartChat2() {
 					setConcern(data.concern);
 				}
 
-				// 注意：移除不必要的對話歷史重新載入，這會造成過多的API呼叫
-				// 只有在創建新對話時才需要更新歷史列表
+				// 🔄 Refresh conversation history after message is saved
+				// Add a small delay to ensure database save completes
+				setTimeout(() => {
+					console.log("🔄 Refreshing conversation history...", {
+						currentUserId,
+						sessionEmail: session?.user?.email,
+					});
+					loadConversationHistory(currentUserId);
+				}, 2000); // Increased to 2 seconds for reliable database sync
 
 				// Payment 觸發邏輯 - Check for couple analysis from API response
 				console.log(

@@ -201,6 +201,8 @@ export class EnhancedInitialAnalysis {
 		const year2 = birthday2.getFullYear();
 		const month1 = birthday1.getMonth() + 1;
 		const month2 = birthday2.getMonth() + 1;
+		const day1 = birthday1.getDate();
+		const day2 = birthday2.getDate();
 
 		// 計算兩人的八字和五行
 		const bazi1 = this.calculateBazi(birthday1);
@@ -213,23 +215,29 @@ export class EnhancedInitialAnalysis {
 		// 根據實際性別確定顯示標籤
 		let userLabel, partnerLabel;
 		if (userGender === "female") {
-			userLabel = "👩 您（女方）";
+			userLabel = locale === "zh-CN" ? "👩 您（女方）" : "👩 您（女方）";
 		} else if (userGender === "male") {
-			userLabel = "👨 您（男方）";
+			userLabel = locale === "zh-CN" ? "👨 您（男方）" : "👨 您（男方）";
 		} else {
-			userLabel = "👤 您";
+			userLabel = locale === "zh-CN" ? "👤 您" : "👤 您";
 		}
 
 		if (partnerGender === "male") {
-			partnerLabel = "👨 對方（男方）";
+			partnerLabel =
+				locale === "zh-CN" ? "👨 对方（男方）" : "👨 對方（男方）";
 		} else if (partnerGender === "female") {
-			partnerLabel = "👩 對方（女方）";
+			partnerLabel =
+				locale === "zh-CN" ? "👩 对方（女方）" : "👩 對方（女方）";
 		} else {
-			partnerLabel = "👤 對方";
+			partnerLabel = locale === "zh-CN" ? "👤 对方" : "👤 對方";
 		}
 
 		// 1. 雙方基礎分析（類似個人分析的基礎部分）
-		const basicAnalysis = `📊 你們的命理基礎分析\n${userLabel}：${year1}年${month1}月，生肖屬相：${zodiacAnimal1}\n${partnerLabel}：${year2}年${month2}月，生肖屬相：${zodiacAnimal2}\n配對類型：${this.getCoupleType(element1, element2)}\n緣分指數：${this.getCompatibilityScore(element1, element2)}%`; // 2. 針對具體問題回應 - 合盤分析不需要單獨的問題回應區段
+		const basicAnalysis =
+			locale === "zh-CN"
+				? `📊 你们的命理基础分析\n小铃以下分析是基于年月日(欠时)\n\n${userLabel}：${year1}年${month1}月${day1}日，生肖属相：${zodiacAnimal1}\n${partnerLabel}：${year2}年${month2}月${day2}日，生肖属相：${zodiacAnimal2}\n配对类型：${this.getCoupleType(element1, element2)}\n缘分指数：${this.getCompatibilityScore(element1, element2)}%`
+				: `📊 你們的命理基礎分析\n小鈴以下分析是基於年月日(欠時)\n\n${userLabel}：${year1}年${month1}月${day1}日，生肖屬相：${zodiacAnimal1}\n${partnerLabel}：${year2}年${month2}月${day2}日，生肖屬相：${zodiacAnimal2}\n配對類型：${this.getCoupleType(element1, element2)}\n緣分指數：${this.getCompatibilityScore(element1, element2)}%`;
+		// 2. 針對具體問題回應 - 合盤分析不需要單獨的問題回應區段
 		let problemResponse = "";
 
 		// 3. 配對分析 - AI生成的主要配對分析內容
@@ -323,10 +331,9 @@ export class EnhancedInitialAnalysis {
 		const zodiacAnimal = this.getChineseZodiac(year);
 		response +=
 			locale === "zh-CN"
-				? `📊 你的命理基础分析\n`
-				: `📊 你的命理基礎分析\n`;
-		response += `出生年份：${year}年\n`;
-		response += `出生月份：${birthday.getMonth() + 1}月\n`;
+				? `📊 你的命理基础分析\n小铃以下分析是基于年月日(欠时)\n\n`
+				: `📊 你的命理基礎分析\n小鈴以下分析是基於年月日(欠時)\n\n`;
+		response += `出生日期：${year}年${birthday.getMonth() + 1}月${birthday.getDate()}日\n`;
 		response +=
 			locale === "zh-CN"
 				? `生肖属相：${zodiacAnimal}\n\n`
@@ -544,13 +551,14 @@ ${
 - ${languageInstruction}
 - 內容適中，約500-700字即可
 - 語言要親切專業，像小鈴在一對一指導
-- 重點強調需要完整出生時辰才能提供更精確分析`;
+- 重點強調需要完整出生時辰才能提供更精確分析
+- 🚫 絕對不可使用 ** 或其他markdown格式標記（如 ## 或 --），請使用純文字和emoji`;
 
 		const messages = [
 			{
 				role: "system",
 				content:
-					"你是小鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。",
+					"你是小鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。🚫 重要：絕對不可使用任何markdown格式標記（** ## -- 等），只能使用純文字和emoji。",
 			},
 			{
 				role: "user",
@@ -2473,6 +2481,7 @@ ${currentMonth === birthMonth ? "生日月份是感情運勢的黃金期，適�
 		const currentMonth = new Date().getMonth() + 1;
 		const birthYear = birthday.getFullYear();
 		const birthMonth = birthday.getMonth() + 1;
+		const birthDay = birthday.getDate();
 		const currentYear = new Date().getFullYear(); // 🔥 Get current year
 
 		// 🌐 Determine language instruction based on locale
@@ -2487,8 +2496,7 @@ ${currentMonth === birthMonth ? "生日月份是感情運勢的黃金期，適�
 當前時間：${currentYear}年${currentMonth}月 - 請基於${currentYear}年進行所有分析，不要提及過去的年份如2024年或2023年
 
 用戶資料：
-- 出生年份：${birthYear}年
-- 出生月份：${birthMonth}月  
+- 出生日期：${birthYear}年${birthMonth}月${birthDay}日
 - 當前月份：${currentMonth}月
 - 當前年份：${currentYear}年
 - 關注領域：${category}
