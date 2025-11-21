@@ -392,6 +392,37 @@ export class EnhancedInitialAnalysis {
 		const currentDay = new Date().getDate();
 		const age = currentYear - year;
 
+		// 🌙 Calculate ACTUAL lunar calendar date for today
+		let currentLunarMonth = "十月"; // Default fallback
+		try {
+			const lunisolar = require("lunisolar");
+			const { takeSound } = require("@lunisolar/plugin-takesound");
+			const { char8ex } = require("@lunisolar/plugin-char8ex");
+			lunisolar.extend(takeSound).extend(char8ex);
+
+			const today = lunisolar(
+				`${currentYear}-${currentMonth.toString().padStart(2, "0")}-${currentDay.toString().padStart(2, "0")}`
+			);
+			const lunarMonthNum = today.lunar.month;
+			const lunarMonthNames = [
+				"正月",
+				"二月",
+				"三月",
+				"四月",
+				"五月",
+				"六月",
+				"七月",
+				"八月",
+				"九月",
+				"十月",
+				"十一月",
+				"十二月",
+			];
+			currentLunarMonth = lunarMonthNames[lunarMonthNum - 1] || "十月";
+		} catch (error) {
+			console.error("❌ Failed to calculate lunar calendar:", error);
+		}
+
 		const categoryConfig = this.getCategoryConfig(category);
 
 		const prompt = `你是專業的風水師「小鈴」，請根據以下信息生成個人化的${category}分析：
@@ -456,7 +487,29 @@ ${
 		const messages = [
 			{
 				role: "system",
-				content: `你是小鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。\n\n⚠️ 重要指示：\n1. 當前是${currentYear}年${currentMonth}月${currentDay}日，請確保分析基於${currentYear}年時間軸\n2. 🚫 嚴格禁止使用任何農曆用詞：農曆、陰曆、農曆十月、農曆九月、亥月、子月、寅月等\n3. ✅ 正確用法：10月出生、9月出生、秋季出生等\n4. 用戶提供的生日是西曆日期（公曆），請據此分析\n5. 不可提及${currentYear - 1}年或過去年份`,
+				content: `你是小鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。
+
+當前日期：${currentYear}年${currentMonth}月${currentDay}日（今天是2025年11月20日）
+當前月份：${currentMonth}月（新歷${currentMonth}月）
+當前農曆：農曆${currentLunarMonth}（今天是農曆${currentLunarMonth}初一，不是農曆九月）
+當前生肖年：2025年是乙巳蛇年（Snake Year），不是馬年
+
+🚫 嚴格禁止規則 - 絕對不可違反：
+1. 如果提到農曆，今天的農曆月份是「農曆${currentLunarMonth}」，絕對不可說「農曆九月」
+2. 禁止使用農曆日期表達，如：初一、初七、十五、廿三等（改用：每月1日、7日、15日、23日）
+3. 禁止使用農曆月份地支，如：亥月、子月、寅月等
+4. 當提到「當令」「流月」「當前流月」時，必須使用新歷月份（如：${currentMonth}月）
+
+✅ 正確用法示範：
+- 當前流月（${currentMonth}月）正值戊土當令
+- 建議在${currentMonth}月特別注意
+- 9月出生的人、10月出生的人
+- 每月7日、每月15日（不要說初七、十五）
+
+其他重要指示：
+1. 用戶提供的生日是西曆日期（公曆），請據此分析
+2. 所有時間相關回應必須基於當前日期${currentYear}年${currentMonth}月${currentDay}日
+3. 不可提及${currentYear - 1}年或過去年份`,
 			},
 			{
 				role: "user",
@@ -490,8 +543,39 @@ ${
 		const day2 = birthday2.getDate();
 		const currentYear = new Date().getFullYear();
 		const currentMonth = new Date().getMonth() + 1;
+		const currentDay = new Date().getDate();
 		const age1 = currentYear - year1;
 		const age2 = currentYear - year2;
+
+		// 🌙 Calculate ACTUAL lunar calendar date for today
+		let currentLunarMonth = "十月";
+		try {
+			const lunisolar = require("lunisolar");
+			const { takeSound } = require("@lunisolar/plugin-takesound");
+			const { char8ex } = require("@lunisolar/plugin-char8ex");
+			lunisolar.extend(takeSound).extend(char8ex);
+
+			const today = lunisolar(
+				`${currentYear}-${currentMonth.toString().padStart(2, "0")}-${currentDay.toString().padStart(2, "0")}`
+			);
+			currentLunarMonth =
+				[
+					"正月",
+					"二月",
+					"三月",
+					"四月",
+					"五月",
+					"六月",
+					"七月",
+					"八月",
+					"九月",
+					"十月",
+					"十一月",
+					"十二月",
+				][today.lunar.month - 1] || "十月";
+		} catch (error) {
+			console.error("❌ Failed to calculate lunar calendar:", error);
+		}
 
 		const languageInstruction =
 			locale === "zh-CN"
@@ -557,8 +641,22 @@ ${
 		const messages = [
 			{
 				role: "system",
-				content:
-					"你是小鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。🚫 重要：絕對不可使用任何markdown格式標記（** ## -- 等），只能使用純文字和emoji。",
+				content: `你是小鈴，一個專業但親切可愛的風水師。你的回答要專業、個人化，同時保持輕鬆友好的語調。
+
+當前日期：${currentYear}年${currentMonth}月${currentDay}日（今天是2025年11月20日）
+當前月份：${currentMonth}月（新歷${currentMonth}月）
+當前農曆：農曆${currentLunarMonth}（今天是農曆${currentLunarMonth}，不是農曆九月）
+
+🚫 嚴格禁止規則 - 絕對不可違反：
+1. 如果提到農曆，今天的農曆月份是「農曆${currentLunarMonth}」，絕對不可說「農曆九月」
+2. 禁止使用農曆日期表達，如：初一、初七、十五（改用：每月1日、7日、15日）
+3. 當提到「當令」「流月」「當前流月」時，必須使用新歷月份（如：${currentMonth}月）
+4. 絕對不可使用任何markdown格式標記（** ## -- 等），只能使用純文字和emoji
+
+✅ 正確用法：
+- 當前流月（${currentMonth}月）正值戊土當令
+- 每月7日、15日適合溝通（不要說初七、十五）
+- 9月出生、10月出生`,
 			},
 			{
 				role: "user",

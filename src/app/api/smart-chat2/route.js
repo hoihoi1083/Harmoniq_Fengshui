@@ -125,6 +125,9 @@ function cleanLunarCalendarTerms(text) {
 				/農曆(正月|二月|三月|四月|五月|六月|七月|八月|九月|十月|十一月|十二月)/g,
 				"$1"
 			)
+			// Remove 農曆 from parentheses like （農曆九月）-> （九月）
+			.replace(/（農曆([^）]+)）/g, "（$1）")
+			.replace(/\(農曆([^)]+)\)/g, "（$1）")
 			// Remove 農曆 prefix from specific days
 			.replace(/農曆(初[一二三四五六七八九十]+)/g, "每月$1")
 			.replace(/農曆(十[一二三四五六七八九]+)/g, "每月$1")
@@ -200,24 +203,16 @@ async function checkSavedBirthdayAndGenerateMessage(
 			// 如果有 AI 分析回應，先顯示分析，再顯示生日確認
 			let fullMessage = "";
 			if (aiResponse && aiResponse.trim()) {
-				// 🔧 清理 AI 回應中的生日請求部分（因為我們會顯示生日確認菜單）
+				// 🔧 只移除生日格式範例，保留"對了，如果你願意分享生日"等自然對話
 				let cleanedAiResponse = aiResponse
 					// 移除生日格式範例部分
 					.replace(
 						/📅\s*生日格式範例[：:][^風]*小鈴會[^💕]*💕?/gs,
 						""
 					)
-					// 移除生日請求相關句子
-					.replace(
-						/如果你願意分享生日[^。！？\n]*(。|！|？|\n|$)/g,
-						""
-					)
-					.replace(/告訴.*?你的生日[^。！？\n]*(。|！|？|\n|$)/g, "")
-					.replace(/請.*?提供.*?生日[^。！？\n]*(。|！？|\n|$)/g, "")
 					// 清理多餘空行
 					.replace(/\n{3,}/g, "\n\n")
 					.trim();
-
 				fullMessage = `${cleanedAiResponse}
 
 ───────────────────
@@ -249,18 +244,11 @@ ${texts.pleaseReply}`;
 			};
 		}
 
-		// 沒有保存的生日，返回標準請求消息
+		// 沒有保存的生日，返回空消息（AI response 已經包含自然的生日請求）
 		return {
 			hasSavedBirthday: false,
 			savedBirthday: null,
-			message: `告訴小鈴你的生日，我可以幫你看看${topic || "命理"}方面的運勢哦！
-
-📅 生日格式範例：
-• 1999-03-15
-• 1999/3/15  
-• 1999年3月15日
-
-小鈴會先給你一個簡單的分析，如果你覺得有幫助，還可以做更詳細的完整報告哦～💕`,
+			message: "", // 空字串，避免與 AI 的"對了，如果你願意分享生日"重複
 		};
 	} catch (error) {
 		console.error("🚨 檢查已保存生日失敗:", error);
@@ -1080,8 +1068,8 @@ class AITopicClassifier {
 				userEmail,
 				userId
 			);
-			const remainingAnalyses = userStats.remaining || 10;
-			const dailyLimit = 10;
+			const remainingAnalyses = userStats.remaining || 5;
+			const dailyLimit = 5;
 
 			rateLimitInfo = `\n\n📊 今日分析額度: 你每日可進行 ${dailyLimit} 次專業分析，目前還剩 ${remainingAnalyses} 次機會哦～`;
 		} catch (error) {
@@ -2005,7 +1993,7 @@ ${baseServices}
 			model: "deepseek-chat",
 			messages: messages,
 			temperature: options.temperature || 0.3,
-			max_tokens: options.max_tokens || 1000,
+			max_tokens: options.max_tokens || 2000,
 			stream: false,
 		};
 
@@ -2060,10 +2048,28 @@ ${baseServices}
 						role: "system",
 						content: `你是專業且親切的小鈴，請根據用戶的具體問題提供相關的風水建議。
 
-當前日期：${currentDateStr}（請在回應中使用這個準確的日期作為參考，不要提及過時的年份如2024年等）
+當前日期：${currentDateStr}（今天是2025年11月20日）
+當前月份：11月（新歷11月，不是農曆九月）
 當前生肖年：2025年是乙巳蛇年（Snake Year），不是馬年（Horse Year）
 
-重要指示：1. ${languageInstruction} 2. 所有日期和月份都必須使用新歷（西曆/公曆），不要使用農歷。例如：1月、2月、3月等，避免使用農曆1月、農曆8月等表達方式 3. 🚫 嚴格禁止任何農曆用詞：農曆九月、農曆十月、農曆初七、農曆十五等 4. ✅ 正確用法：9月出生、10月出生、每月7日、15日等 5. 不要在回應中包含字數統計如（72字）等標記 6. 保持小鈴親切可愛的語氣風格 7. 請確保所有時間相關的回應都基於當前日期${currentDateStr}，避免提及2024年或過去的時間 8. 2025年是蛇年，不要誤稱為馬年或其他生肖年。`,
+🚫 嚴格禁止規則 - 絕對不可違反：
+1. 禁止使用「農曆」這個詞，包括：農曆九月、農曆十月、農曆戊土、當前流月（農曆九月）等
+2. 禁止使用農曆月份表達，如：正月、二月、三月到十二月
+3. 禁止使用農曆日期表達，如：初一、初七、十五、廿三等
+4. 當提到「當令」「流月」「當前流月」時，必須使用新歷月份（如：11月、10月、9月）
+
+✅ 正確用法示範：
+- 當前流月（11月）正值戊土當令
+- 建議在11月特別注意
+- 9月出生的人、10月出生的人
+- 每月7日、每月15日
+
+其他重要指示：
+1. ${languageInstruction}
+2. 所有時間相關回應必須基於當前日期2025年11月20日
+3. 不要提及2024年或過去的時間
+4. 不要在回應中包含字數統計標記
+5. 保持小鈴親切可愛的語氣風格`,
 					},
 					{
 						role: "user",
@@ -2072,7 +2078,7 @@ ${baseServices}
 				],
 				{
 					temperature: 0.7,
-					max_tokens: 400,
+					max_tokens: 1500,
 				}
 			);
 
@@ -3458,7 +3464,7 @@ export async function POST(request) {
 					analysisStats: {
 						currentCount: updatedStats.analysisCount,
 						remaining: updatedStats.remaining,
-						limit: 10,
+						limit: 5,
 					},
 				});
 			}
@@ -3706,8 +3712,8 @@ export async function POST(request) {
 					userEmail,
 					userId
 				);
-				const remainingAnalyses = userStats.remaining || 10;
-				const dailyLimit = 10;
+				const remainingAnalyses = userStats.remaining || 5;
+				const dailyLimit = 5;
 
 				// 在原回應後添加額度信息
 				const rateLimitInfo = `\n\n📊 今日分析額度: 你每日可進行 ${dailyLimit} 次專業分析，目前還剩 ${remainingAnalyses} 次機會哦～`;
@@ -5859,16 +5865,16 @@ export async function POST(request) {
 					);
 					rateLimitInfo = {
 						current: userStats.analysisCount || 0,
-						limit: 10,
-						remaining: userStats.remaining || 10,
+						limit: 5,
+						remaining: userStats.remaining || 5,
 					};
 				} catch (error) {
 					console.log("⚠️ 獲取用戶分析額度信息失敗:", error);
 					// 🔧 即使獲取失敗，也顯示預設額度
 					rateLimitInfo = {
 						current: 0,
-						limit: 10,
-						remaining: 10,
+						limit: 5,
+						remaining: 5,
 					};
 				}
 
@@ -6004,16 +6010,16 @@ export async function POST(request) {
 								);
 							rateLimitInfo = {
 								current: userStats.analysisCount || 0,
-								limit: 10,
-								remaining: userStats.remaining || 10,
+								limit: 5,
+								remaining: userStats.remaining || 5,
 							};
 						} catch (error) {
 							console.log("⚠️ 獲取用戶分析額度信息失敗:", error);
 							// 🔧 即使獲取失敗，也顯示預設額度
 							rateLimitInfo = {
 								current: 0,
-								limit: 10,
-								remaining: 10,
+								limit: 5,
+								remaining: 5,
 							};
 						}
 
@@ -6894,8 +6900,8 @@ export async function POST(request) {
 								);
 							rateLimitInfo = {
 								current: userStats.analysisCount || 0,
-								limit: 10,
-								remaining: userStats.remaining || 10,
+								limit: 5,
+								remaining: userStats.remaining || 5,
 							};
 						} catch (error) {
 							console.log("⚠️ 獲取用戶分析額度信息失敗:", error);
@@ -7250,8 +7256,8 @@ export async function POST(request) {
 									userEmail,
 									userId
 								);
-							const remainingAnalyses = userStats.remaining || 10;
-							const dailyLimit = 10;
+							const remainingAnalyses = userStats.remaining || 5;
+							const dailyLimit = 5;
 							const rateLimitInfo =
 								locale === "zh-CN"
 									? `\n\n📊 今日分析额度: 你每日可进行 ${dailyLimit} 次初步分析，目前还剩 ${remainingAnalyses} 次机会哦～`
@@ -7308,8 +7314,8 @@ export async function POST(request) {
 									userEmail,
 									userId
 								);
-							const remainingAnalyses = userStats.remaining || 10;
-							const dailyLimit = 10;
+							const remainingAnalyses = userStats.remaining || 5;
+							const dailyLimit = 5;
 
 							const rateLimitInfo = `\n\n📊 今日分析額度: 你每日可進行 ${dailyLimit} 次初步分析，目前還剩 ${remainingAnalyses} 次機會哦～`;
 							response = response + rateLimitInfo;
@@ -7419,8 +7425,8 @@ export async function POST(request) {
 								userEmail,
 								userId
 							);
-						const remainingAnalyses = userStats.remaining || 10;
-						const dailyLimit = 10;
+						const remainingAnalyses = userStats.remaining || 5;
+						const dailyLimit = 5;
 						const rateLimitInfo =
 							locale === "zh-CN"
 								? `\n\n📊 今日分析额度: 你每日可进行 ${dailyLimit} 次初步分析，目前还剩 ${remainingAnalyses} 次机会哦～`
@@ -7473,8 +7479,8 @@ export async function POST(request) {
 								userEmail,
 								userId
 							);
-						const remainingAnalyses = userStats.remaining || 10;
-						const dailyLimit = 10;
+						const remainingAnalyses = userStats.remaining || 5;
+						const dailyLimit = 5;
 
 						const rateLimitInfo = `\n\n📊 今日分析額度: 你每日可進行 ${dailyLimit} 次專業分析，目前還剩 ${remainingAnalyses} 次機會哦～`;
 						response = response + rateLimitInfo;
@@ -7852,8 +7858,8 @@ export async function POST(request) {
 			);
 			const rateLimitInfo = {
 				current: userStats.analysisCount || 0,
-				limit: 10,
-				remaining: userStats.remaining || 10,
+				limit: 5,
+				remaining: userStats.remaining || 5,
 			};
 
 			console.log("🔢 Debug - Rate Limit Info:", rateLimitInfo);

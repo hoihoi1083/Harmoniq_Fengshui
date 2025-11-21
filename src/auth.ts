@@ -95,7 +95,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			if (account && user) {
 				token.accessToken = account.access_token;
 				token.id = user.id;
-				token.userId = user.userId || user.email;
+				token.userId = (user as any).userId || user.email;
 			}
 			return token;
 		},

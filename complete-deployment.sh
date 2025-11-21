@@ -66,7 +66,8 @@ upload_source() {
         --exclude '.next' \
         --exclude '.git' \
         --exclude '*.log' \
-        --exclude '.env*' \
+        --exclude '.env.local' \
+        --exclude '.env.development' \
         --exclude 'logs/' \
         --exclude '.DS_Store' \
         --progress \

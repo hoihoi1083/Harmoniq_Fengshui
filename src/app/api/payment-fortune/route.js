@@ -90,12 +90,7 @@ export async function POST(req) {
 		}
 
 		const session = await stripe.checkout.sessions.create({
-			payment_method_types: ["card", "wechat_pay", "alipay"],
-			payment_method_options: {
-				wechat_pay: {
-					client: "web",
-				},
-			},
+			payment_method_types: ["card"],
 			line_items: [
 				{
 					price: priceId, // Use regional price ID instead of hardcoded PRICE_ID5

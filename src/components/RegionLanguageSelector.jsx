@@ -76,21 +76,27 @@ export default function RegionLanguageSelector({
 		if (!mounted) return compact ? "…" : "🌍 Loading...";
 		if (isLoading || switching) return compact ? "…" : "🔄 Switching...";
 
-		// Find region that matches current locale
+		// Find region that matches current locale (URL-based, not storage-based)
 		const matchingRegion = regions.find((r) => r.locale === currentLocale);
 
 		if (compact) {
-			// Return simplified Chinese character based on locale, with region indicator
+			// Return simplified Chinese character based on ACTUAL URL locale
 			if (currentLocale === "zh-CN") {
 				return "簡";
 			} else {
-				// For Traditional Chinese, show different indicators based on region
+				// For Traditional Chinese, show region-specific indicator
+				// Priority: stored region value
 				if (region === "hongkong") return "港";
 				if (region === "taiwan") return "台";
-				return "繁"; // Default
+				// Fallback: try to detect from matchingRegion
+				if (matchingRegion?.key === "hongkong") return "港";
+				if (matchingRegion?.key === "taiwan") return "台";
+				// Default to Taiwan for traditional Chinese
+				return "台";
 			}
 		}
 
+		// Always show display text based on CURRENT URL LOCALE, not stored region
 		return matchingRegion
 			? matchingRegion.displayText
 			: currentRegionConfig.displayText;
@@ -196,32 +202,45 @@ export default function RegionLanguageSelector({
 					avoidCollisions={true}
 					sticky="always"
 				>
-					{regions.map((regionConfig) => (
-						<DropdownMenuItem
-							key={regionConfig.key}
-							className="p-0 focus:bg-inherit"
-							onClick={() => handleRegionChange(regionConfig.key)}
-							disabled={switching}
-						>
-							<div
-								className={cn(
-									"w-full text-left px-4 py-2 text-sm hover:text-primary rounded text-foreground flex items-center justify-between cursor-pointer transition-all duration-150",
-									region === regionConfig.key
-										? "bg-green-50 text-green-600 font-medium"
-										: "",
-									switching && "opacity-50 cursor-wait"
-								)}
+					{regions.map((regionConfig) => {
+						// Check if this region matches the current locale AND region
+						const isCurrentSelection =
+							regionConfig.locale === currentLocale &&
+							(regionConfig.locale === "zh-CN" ||
+								regionConfig.key === region);
+
+						return (
+							<DropdownMenuItem
+								key={regionConfig.key}
+								className="p-0 focus:bg-inherit"
+								onClick={() =>
+									handleRegionChange(regionConfig.key)
+								}
+								disabled={switching}
 							>
-								<span>{regionConfig.displayText}</span>
-								<span className="ml-2 text-xs text-gray-500">
-									{regionConfig.symbol}
-								</span>
-								{switching && region === regionConfig.key && (
-									<span className="ml-1 text-xs">⏳</span>
-								)}
-							</div>
-						</DropdownMenuItem>
-					))}
+								<div
+									className={cn(
+										"w-full text-left px-4 py-2 text-sm hover:text-primary rounded text-foreground flex items-center justify-between cursor-pointer transition-all duration-150",
+										isCurrentSelection
+											? "bg-green-50 text-green-600 font-medium"
+											: "",
+										switching && "opacity-50 cursor-wait"
+									)}
+								>
+									<span>{regionConfig.displayText}</span>
+									<span className="ml-2 text-xs text-gray-500">
+										{regionConfig.symbol}
+									</span>
+									{switching && isCurrentSelection && (
+										<span className="ml-1 text-xs">⏳</span>
+									)}
+									{isCurrentSelection && !switching && (
+										<span className="ml-1 text-xs">✓</span>
+									)}
+								</div>
+							</DropdownMenuItem>
+						);
+					})}
 
 					{/* Debug info in development */}
 					{process.env.NODE_ENV === "development" && (

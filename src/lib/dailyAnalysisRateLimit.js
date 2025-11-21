@@ -7,7 +7,7 @@ export class DailyAnalysisRateLimit {
 	// 🔧 Configuration: Daily analysis limit per user
 	static DAILY_LIMIT = process.env.DAILY_ANALYSIS_LIMIT
 		? parseInt(process.env.DAILY_ANALYSIS_LIMIT)
-		: 10;
+		: 5;
 
 	/**
 	 * Check if user can perform analysis today

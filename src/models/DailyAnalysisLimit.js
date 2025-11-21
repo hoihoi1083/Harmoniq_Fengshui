@@ -93,7 +93,7 @@ DailyAnalysisLimitSchema.statics.getTodayDateString = function () {
 DailyAnalysisLimitSchema.statics.canUserAnalyze = async function (
 	userEmail,
 	userId,
-	limit = 10
+	limit = 5
 ) {
 	const today = this.getTodayDateString();
 
@@ -183,7 +183,7 @@ DailyAnalysisLimitSchema.statics.getUserDailyStats = async function (
 			analysisCount: 0,
 			analyses: [],
 			canAnalyze: true,
-			remaining: 10,
+			remaining: 5,
 		};
 	}
 
@@ -191,8 +191,8 @@ DailyAnalysisLimitSchema.statics.getUserDailyStats = async function (
 		date: record.date,
 		analysisCount: record.analysisCount,
 		analyses: record.analyses,
-		canAnalyze: record.analysisCount < 10,
-		remaining: Math.max(0, 10 - record.analysisCount),
+		canAnalyze: record.analysisCount < 5,
+		remaining: Math.max(0, 5 - record.analysisCount),
 		lastUpdated: record.lastUpdated,
 	};
 };
