@@ -114,7 +114,7 @@ export function getLocaleAndRegionFromRequest(request) {
 		if (locale === "zh-CN") {
 			region = "china";
 		} else if (locale === "zh-TW") {
-			region = "taiwan"; // Default zh-TW to taiwan (was hongkong)
+			region = "hongkong"; // Default zh-TW to Hong Kong for HKD pricing
 		} else {
 			region = "hongkong"; // Default fallback
 		}

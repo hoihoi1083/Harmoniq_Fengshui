@@ -4,23 +4,49 @@ import { connectDB } from "@/lib/mongoose";
 import User from "@/models/User";
 import SmartUserIntent from "@/models/SmartUserIntent";
 
+// Required for static export with Capacitor
+export const dynamic = "force-static";
+
 export async function GET(request) {
 	try {
-		// Get user session
+		// 🔥 MOBILE FIX: Try multiple auth methods
+		// 1. Check mobile session headers (for mobile app)
+		const mobileUserEmail = request.headers.get("X-User-Email");
+		const mobileUserId = request.headers.get("X-User-ID");
+
+		// 2. Get web session (for browser)
 		const session = await auth();
 
-		if (!session?.user?.email) {
-			return NextResponse.json(
-				{ error: "Not authenticated" },
-				{ status: 401 }
+		// 3. Use whichever is available
+		const userEmail = mobileUserEmail || session?.user?.email;
+
+		if (!userEmail) {
+			// 🔥 Don't fail with 401 - just return empty data
+			// This allows the birthday-entry page to load without prefilled data
+			console.log(
+				"📱 get-user-birthday: No auth session, returning empty data"
 			);
+			return NextResponse.json({
+				success: true,
+				birthday: "",
+				birthTime: "",
+				gender: "",
+				source: "none",
+			});
 		}
+
+		console.log(
+			"📱 get-user-birthday: userEmail=",
+			userEmail,
+			"mobile=",
+			!!mobileUserEmail
+		);
 
 		// Connect to database
 		await connectDB();
 
 		// Find user by email
-		const user = await User.findOne({ userId: session.user.email });
+		const user = await User.findOne({ userId: userEmail });
 
 		if (!user) {
 			return NextResponse.json(
@@ -37,7 +63,7 @@ export async function GET(request) {
 
 		// PRIORITY 1: Check SmartUserIntent from chatbox first (most recent)
 		const smartUserIntent = await SmartUserIntent.findOne({
-			userId: session.user.email,
+			userId: userEmail,
 			userBirthday: { $exists: true, $ne: null },
 			birthdayConfirmed: true,
 		}).sort({ updatedAt: -1 }); // Get the most recently updated confirmed birthday

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import Stripe from "stripe";
 import {
 	getRegionalPriceId,
@@ -6,6 +7,9 @@ import {
 } from "@/utils/regionalPricing";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Required for static export with Capacitor
+export const dynamic = "force-static";
 
 export async function POST(request) {
 	try {
@@ -16,7 +20,14 @@ export async function POST(request) {
 			specificProblem,
 			concern,
 			fromChat,
+			// 🔥 MOBILE FIX: Get mobile flag from request body instead of headers
+			isMobile,
+			userEmail,
+			userId,
 		} = body;
+
+		// Check if this is a mobile request (from body flag or presence of user info)
+		const isMobileRequest = isMobile === true || !!(userEmail || userId);
 
 		console.log("🔍 Payment-couple API received data:", {
 			requestLocale,
@@ -24,6 +35,10 @@ export async function POST(request) {
 			specificProblem,
 			concern,
 			fromChat,
+			isMobileRequest,
+			isMobileFlag: isMobile,
+			userEmail,
+			userId,
 		});
 
 		// Detect user's locale and region (prioritize request body, then headers)
@@ -49,6 +64,10 @@ export async function POST(request) {
 		// Build success URL with chat context if available
 		let successUrl = `${process.env.NEXTAUTH_URL}/${detectedLocale}/success?session_id={CHECKOUT_SESSION_ID}&type=couple`;
 
+		if (isMobileRequest) {
+			successUrl += "&mobile=true";
+		}
+
 		if (fromChat && (specificProblem || concern)) {
 			if (specificProblem) {
 				successUrl += `&specificProblem=${encodeURIComponent(specificProblem)}`;
@@ -61,7 +80,12 @@ export async function POST(request) {
 
 		// Create Stripe checkout session for couple analysis with regional pricing
 		const session = await stripe.checkout.sessions.create({
-			payment_method_types: ["card"],
+			payment_method_types: ["card", "wechat_pay", "alipay"],
+			payment_method_options: {
+				wechat_pay: {
+					client: "web",
+				},
+			},
 			line_items: [
 				{
 					price: priceId, // Use regional price ID instead of hardcoded PRICE_ID6

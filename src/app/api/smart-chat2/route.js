@@ -3914,6 +3914,15 @@ export async function POST(request) {
 						userIntent.originalSpecificProblem ||
 						userIntent.specificQuestion
 				);
+
+				// 🔧 重要修復：在返回前保存 userIntent，確保 conversationState 被保存
+				if (userIntent) {
+					await userIntent.save();
+					console.log(
+						"✅ 合盤分析完成後保存 userIntent，conversationState =",
+						userIntent.conversationState
+					);
+				}
 			} catch (error) {
 				// 🔧 保存 userIntent 更新（relationshipAnalysisType 等）
 				if (userIntent) {
@@ -5661,6 +5670,15 @@ export async function POST(request) {
 						reportChoice: true,
 						paymentType: "premium", // 🔥 新增：標記使用 premium payment API (payment2)
 					};
+				}
+
+				// 🔧 重要：保存 userIntent 狀態變更
+				if (userIntent) {
+					await userIntent.save();
+					console.log(
+						"✅ 報告選擇後保存 userIntent，conversationState =",
+						userIntent.conversationState
+					);
 				}
 
 				// 直接返回結果，不進行其他處理

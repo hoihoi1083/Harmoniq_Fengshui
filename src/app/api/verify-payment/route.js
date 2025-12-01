@@ -7,9 +7,15 @@ import {
 } from "../utils/gen-res-data";
 import { getUserInfo } from "@/lib/session";
 
+// Required for static export with Capacitor
+export const dynamic = "force-static";
+
 export async function POST(request) {
+	// 🔥 MOBILE FIX: Don't require auth for payment verification
+	// The payment session ID itself is sufficient validation
+	// This allows mobile users to verify payments without NextAuth session
 	const userInfo = await getUserInfo();
-	if (userInfo == null) return NextResponse.json(genUnAuthData());
+	console.log("📱 verify-payment: userInfo=", !!userInfo);
 
 	try {
 		const body = await request.json();

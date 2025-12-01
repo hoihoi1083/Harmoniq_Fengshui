@@ -230,11 +230,12 @@ export default function Home() {
 			transferAnonymousConversations(oldAnonymousId, userId).then(() => {
 				// 轉移完成後更新localStorage並加載對話歷史
 				localStorage.setItem("feng-shui-user-id", userId);
-				loadConversationHistory(userId);
+				// 🔧 添加延遲確保API可用
+				setTimeout(() => loadConversationHistory(userId), 1000);
 			});
 		} else {
-			// 正常加載對話歷史
-			loadConversationHistory(userId);
+			// 正常加載對話歷史 - 添加延遲以避免過早調用
+			setTimeout(() => loadConversationHistory(userId), 500);
 		}
 
 		setIsInitialized(true);
@@ -734,19 +735,19 @@ export default function Home() {
 						let paymentResponse;
 
 						if (useComprehensivePayment || usePremiumPayment) {
-							// Get fresh locale for comprehensive/premium payments too
+							// Get stored region for consistent pricing
 							const storedRegion =
 								localStorage.getItem("userRegion");
-							// 🔧 FIX: Use URL locale as source of truth
 							const freshLocale = currentLocale;
 
 							console.log(
-								`💰 Main page ${useComprehensivePayment ? "comprehensive" : "premium"} payment - Using fresh locale:`,
+								`💰 Main page ${useComprehensivePayment ? "comprehensive" : "premium"} payment - Using locale:`,
 								freshLocale,
-								"from URL (region:",
-								storedRegion,
-								"is for pricing only)"
-							); // 使用 Stripe Checkout Session APIs (payment4 或 payment2)
+								"region:",
+								storedRegion
+							);
+
+							// 使用 Stripe Checkout Session APIs (payment4 或 payment2)
 							paymentResponse = await fetch(paymentEndpoint, {
 								method: "POST",
 								headers: {
@@ -755,8 +756,8 @@ export default function Home() {
 								body: JSON.stringify({
 									quantity: 1, // 固定數量
 									directPayment: true, // 標記為直接付款
-									locale: freshLocale, // 🔥 Fix: Add locale parameter for comprehensive/premium too
-									region: storedRegion, // 🔥 Add region parameter for NTD support
+									locale: freshLocale,
+									region: storedRegion, // Pass region for consistent pricing
 								}),
 							});
 						} else if (isCouplePayment) {
@@ -848,7 +849,21 @@ export default function Home() {
 								paymentData
 							);
 
-							if (isCouplePayment) {
+							// 🔥 FIX: Check payment type priority - comprehensive/premium should be checked first
+							// because they can coexist with couple birthdays but use different payment APIs
+							if (useComprehensivePayment || usePremiumPayment) {
+								// 處理 comprehensive/premium 付款回應 - 直接重定向到 Stripe URL (使用 data.url 格式)
+								if (paymentData.data?.url) {
+									console.log(
+										`🚀 Redirecting to ${useComprehensivePayment ? "comprehensive" : "premium"} payment checkout`
+									);
+									window.location.href = paymentData.data.url;
+								} else {
+									throw new Error(
+										`No checkout URL received from ${useComprehensivePayment ? "Expert88" : "Premium"} payment`
+									);
+								}
+							} else if (isCouplePayment) {
 								// 🎯 Handle couple payment response (uses sessionId structure)
 								if (paymentData.sessionId) {
 									const stripe = await import(
@@ -877,17 +892,16 @@ export default function Home() {
 										"No session ID received from couple payment"
 									);
 								}
-							} else if (
-								useComprehensivePayment ||
-								usePremiumPayment ||
-								!useComprehensivePayment
-							) {
-								// 處理其他付款回應 - 直接重定向到 Stripe URL (fortune category API 也返回 data.url)
+							} else {
+								// 處理 fortune 付款回應 - 直接重定向到 Stripe URL (fortune category API 也返回 data.url)
 								if (paymentData.data?.url) {
+									console.log(
+										"🚀 Redirecting to fortune payment checkout"
+									);
 									window.location.href = paymentData.data.url;
 								} else {
 									throw new Error(
-										`No checkout URL received from ${useComprehensivePayment ? "Expert88" : usePremiumPayment ? "Premium" : "Fortune"} payment`
+										"No checkout URL received from Fortune payment"
 									);
 								}
 							}
@@ -1064,6 +1078,20 @@ export default function Home() {
 
 	// 加載對話歷史
 	const loadConversationHistory = async (userId) => {
+		// 🔧 防止在組件未掛載或userId無效時執行
+		if (!userId || typeof userId !== "string" || userId.trim() === "") {
+			console.log("⚠️ loadConversationHistory: Invalid userId, skipping");
+			return;
+		}
+
+		// 🔧 檢查是否在瀏覽器環境且 fetch 可用
+		if (typeof window === "undefined" || typeof fetch === "undefined") {
+			console.log(
+				"⚠️ loadConversationHistory: Not in browser or fetch unavailable"
+			);
+			return;
+		}
+
 		try {
 			setIsLoadingHistory(true);
 
@@ -1091,7 +1119,9 @@ export default function Home() {
 					"⚠️ No session email in state, trying to fetch session..."
 				);
 				try {
-					const sessionResponse = await fetch("/api/auth/session");
+					const sessionResponse = await fetch("/api/auth/session", {
+						signal: AbortSignal.timeout(5000), // 5 second timeout
+					});
 					if (sessionResponse.ok) {
 						const sessionData = await sessionResponse.json();
 						console.log("📦 Fetched session data:", sessionData);
@@ -1108,6 +1138,7 @@ export default function Home() {
 					}
 				} catch (e) {
 					console.error("❌ Failed to fetch session:", e);
+					// Don't throw, continue with userId only
 				}
 			}
 
@@ -1123,32 +1154,65 @@ export default function Home() {
 
 			const url = `/api/conversation-history?${queryParams.toString()}`;
 			console.log("🌐 Fetching from:", url);
-			const response = await fetch(url);
 
-			console.log("📡 Response status:", response.status);
+			// 🔧 添加超時控制和錯誤處理
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-			if (response.ok) {
-				const data = await response.json();
-				console.log("✅ Received data:", {
-					success: data.success,
-					totalConversations: data.totalConversations,
-					conversationsCount: data.conversations?.length,
-					firstConversation: data.conversations?.[0],
+			try {
+				const response = await fetch(url, {
+					signal: controller.signal,
+					headers: {
+						"Content-Type": "application/json",
+					},
+					cache: "no-store", // 🔧 禁用緩存避免舊數據
 				});
-				setConversationHistory(data.conversations || []);
-				console.log(
-					`📚 載入了 ${data.conversations?.length || 0} 個對話記錄`
-				);
-			} else {
-				const errorText = await response.text();
-				console.error(
-					"❌ 加載對話歷史失敗:",
-					response.status,
-					errorText
-				);
+
+				clearTimeout(timeoutId);
+
+				console.log("📡 Response status:", response.status);
+
+				if (response.ok) {
+					const data = await response.json();
+					console.log("✅ Received data:", {
+						success: data.success,
+						totalConversations: data.totalConversations,
+						conversationsCount: data.conversations?.length,
+						firstConversation: data.conversations?.[0],
+					});
+					setConversationHistory(data.conversations || []);
+					console.log(
+						`📚 載入了 ${data.conversations?.length || 0} 個對話記錄`
+					);
+				} else {
+					const errorText = await response.text();
+					console.error(
+						"❌ 加載對話歷史失敗:",
+						response.status,
+						errorText
+					);
+				}
+			} catch (fetchError) {
+				clearTimeout(timeoutId);
+				if (fetchError.name === "AbortError") {
+					console.error("❌ 請求超時: conversation-history API");
+				} else if (
+					fetchError instanceof TypeError &&
+					fetchError.message.includes("fetch")
+				) {
+					console.error(
+						"❌ 網絡錯誤: 無法連接到API",
+						fetchError.message
+					);
+				} else {
+					console.error("❌ Fetch failed:", fetchError.message);
+				}
+				// 不要 throw，靜默失敗
 			}
 		} catch (error) {
 			console.error("❌ 加載對話歷史錯誤:", error);
+			// 🔧 不要讓錯誤中斷應用運行，靜默失敗
+			setConversationHistory([]); // 設置為空數組而不是崩潰
 		} finally {
 			setIsLoadingHistory(false);
 		}

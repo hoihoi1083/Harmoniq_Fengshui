@@ -13,15 +13,43 @@ import {
 } from "@/utils/regionalPricing";
 
 export async function POST(request) {
-	const userInfo = await getUserInfo();
+	// Get request body first
+	const body = await request.json();
+
+	// 🔥 MOBILE FIX: Read mobile flag from request body
+	const { isMobile, userEmail, userId } = body;
+	console.log("[payment4] 📱 Mobile detection from body:", {
+		isMobile,
+		userEmail,
+		userId,
+	});
+
+	// Check if it's a mobile request
+	const isMobileRequest = isMobile === true || !!(userEmail || userId);
+	console.log("[payment4] 🔍 Is mobile request:", isMobileRequest);
+
+	// Try to get user info from NextAuth first
+	let userInfo = await getUserInfo();
+
+	// If no NextAuth session but mobile info exists in body, create user info object
+	if (!userInfo && (userEmail || userId)) {
+		console.log("📱 Using mobile session from body:", {
+			userEmail,
+			userId,
+		});
+		userInfo = {
+			email: userEmail,
+			userId: userId || userEmail,
+		};
+	}
+
 	if (userInfo == null) return NextResponse.json(genUnAuthData());
 
 	try {
 		const headersList = await headers();
 		const origin = headersList.get("origin");
 
-		// Get request body
-		const body = await request.json();
+		// Get request body parameters
 		const quantity = Number(body.quantity) || 1;
 		const requestLocale = body.locale;
 		const requestRegion = body.region;
@@ -62,6 +90,16 @@ export async function POST(request) {
 			locale: locale,
 		});
 
+		// 📱 MOBILE FIX: Use mobile flag from request body for success URL
+		let successUrl = `${origin}/success?session_id={CHECKOUT_SESSION_ID}&type=expert88`;
+
+		if (isMobileRequest) {
+			successUrl += "&mobile=true";
+			console.log(
+				"📱 Adding mobile=true to success URL for mobile request"
+			);
+		}
+
 		// Create Checkout Sessions for $88 Expert Card using regional price ID
 		const session = await stripe.checkout.sessions.create({
 			line_items: [
@@ -72,7 +110,7 @@ export async function POST(request) {
 			],
 			mode: "payment",
 			allow_promotion_codes: true,
-			success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}&type=expert88`,
+			success_url: successUrl,
 			cancel_url: `${origin}/price?payment=cancelled`,
 			metadata: {
 				userId: userInfo.userId || userInfo.id,

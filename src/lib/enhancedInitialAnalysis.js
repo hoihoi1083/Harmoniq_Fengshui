@@ -395,7 +395,8 @@ export class EnhancedInitialAnalysis {
 		// 🌙 Calculate ACTUAL lunar calendar date for today
 		let currentLunarMonth = "十月"; // Default fallback
 		try {
-			const lunisolar = require("lunisolar");
+			const lunisolarModule = require("lunisolar");
+			const lunisolar = lunisolarModule.default || lunisolarModule;
 			const { takeSound } = require("@lunisolar/plugin-takesound");
 			const { char8ex } = require("@lunisolar/plugin-char8ex");
 			lunisolar.extend(takeSound).extend(char8ex);
@@ -550,7 +551,8 @@ ${
 		// 🌙 Calculate ACTUAL lunar calendar date for today
 		let currentLunarMonth = "十月";
 		try {
-			const lunisolar = require("lunisolar");
+			const lunisolarModule = require("lunisolar");
+			const lunisolar = lunisolarModule.default || lunisolarModule;
 			const { takeSound } = require("@lunisolar/plugin-takesound");
 			const { char8ex } = require("@lunisolar/plugin-char8ex");
 			lunisolar.extend(takeSound).extend(char8ex);
