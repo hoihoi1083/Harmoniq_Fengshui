@@ -2029,6 +2029,7 @@ ${baseServices}
 		try {
 			// Get current date for context
 			const currentDate = new Date();
+			const currentMonth = currentDate.getMonth() + 1; // 1-12
 			const currentDateStr = currentDate.toLocaleDateString("zh-TW", {
 				year: "numeric",
 				month: "long",
@@ -2451,7 +2452,12 @@ ${analysis.aiResponse}
 		originalMessage = "",
 		sessionId = null
 	) {
-		// � Determine language instruction based on locale
+		// Get current date variables
+		const currentDate = new Date();
+		const currentYear = currentDate.getFullYear();
+		const currentMonth = currentDate.getMonth() + 1; // 1-12
+
+		// 🌐 Determine language instruction based on locale
 		const languageInstruction =
 			this.locale === "zh-CN"
 				? "必須使用簡體中文回應，不可使用繁體中文"
