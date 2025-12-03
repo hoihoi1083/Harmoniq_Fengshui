@@ -2,11 +2,49 @@ import { NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { getToken } from "next-auth/jwt";
 import { routing } from "./i18n/routing";
+
+// Allowed origins for CORS
+const allowedOrigins = [
+        'https://www.harmoniqfengshui.com',
+        'capacitor://localhost',
+        'http://localhost:3000',
+        'http://localhost:3001',
+];
+
 // Create the internationalization middleware
 const intlMiddleware = createMiddleware(routing);
 
 export default async function middleware(request) {
-	const { pathname } = request.nextUrl;
+        const { pathname } = request.nextUrl;
+        
+        // Handle CORS for API routes
+        if (pathname.startsWith('/api')) {
+                const origin = request.headers.get('origin');
+                
+                // Handle preflight OPTIONS request
+                if (request.method === 'OPTIONS') {
+                        return new NextResponse(null, {
+                                status: 200,
+                                headers: {
+                                        'Access-Control-Allow-Origin': allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
+                                        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                                        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                                        'Access-Control-Max-Age': '86400',
+                                },
+                        });
+                }
+                
+                // Continue with the request and add CORS headers to response
+                const response = NextResponse.next();
+                
+                if (origin && allowedOrigins.includes(origin)) {
+                        response.headers.set('Access-Control-Allow-Origin', origin);
+                        response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+                        response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+                }
+                
+                return response;
+        }
 	// Skip auth check for public routes
 	const isPublicRoute =
 		pathname === "/" ||
@@ -65,6 +103,9 @@ export default async function middleware(request) {
 }
 
 export const config = {
-	// 匹配所有路径
-	matcher: ["/((?!api|_next|.*\\..*).*)", "/"],
+        // Match all paths including API routes
+        matcher: [
+                '/((?!_next|.*\\..*|favicon.ico).*)',
+                '/api/:path*',
+        ],
 };
