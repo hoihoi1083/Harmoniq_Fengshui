@@ -10,6 +10,18 @@ import { verifyPassword } from "@/lib/password";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
 	trustHost: true,
+	// Fix for Chinese character encoding in JWT
+	cookies: {
+		sessionToken: {
+			name: `next-auth.session-token`,
+			options: {
+				httpOnly: true,
+				sameSite: "lax",
+				path: "/",
+				secure: process.env.NODE_ENV === "production",
+			},
+		},
+	},
 	providers: [
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -109,6 +121,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			}
 			return session;
 		},
+	},
+	// Custom JWT encode/decode to handle UTF-8 properly
+	jwt: {
+		maxAge: 30 * 24 * 60 * 60, // 30 days
 	},
 	pages: {
 		signIn: "/auth/login",

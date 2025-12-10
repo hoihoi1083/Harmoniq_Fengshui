@@ -19,7 +19,26 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
 	const server = createServer((req, res) => {
 		const parsedUrl = parse(req.url, true);
-		handle(req, res, parsedUrl);
+
+		// Add request timeout to prevent hanging - increased for AI API calls
+		req.setTimeout(120000); // 120 second timeout for AI responses
+
+		// Handle request errors
+		req.on("error", (err) => {
+			console.error("❌ Request error:", err.message);
+			if (!res.headersSent) {
+				res.statusCode = 500;
+				res.end("Internal Server Error");
+			}
+		});
+
+		handle(req, res, parsedUrl).catch((err) => {
+			console.error("❌ Handler error:", err.message);
+			if (!res.headersSent) {
+				res.statusCode = 500;
+				res.end("Internal Server Error");
+			}
+		});
 	});
 
 	// Optimize server for AWS Load Balancer
@@ -29,10 +48,22 @@ app.prepare().then(() => {
 	// Increase max connections
 	server.maxConnections = 1000;
 
-	// Enable TCP keepalive
+	// Enable TCP keepalive and handle hung connections
 	server.on("connection", (socket) => {
 		socket.setKeepAlive(true, 60000); // Enable keepalive, initial delay 60s
-		socket.setTimeout(180000); // Socket timeout 180s
+		socket.setTimeout(120000); // Increase timeout to 120s for AI API calls
+
+		// Force close socket on timeout to prevent buildup
+		socket.on("timeout", () => {
+			console.warn("⚠️ Socket timeout - forcing close");
+			socket.destroy();
+		});
+
+		// Handle errors gracefully
+		socket.on("error", (err) => {
+			console.error("❌ Socket error:", err.message);
+			socket.destroy();
+		});
 	});
 
 	server.listen(port, hostname, (err) => {
