@@ -241,6 +241,34 @@ export default function Home() {
 		setIsInitialized(true);
 	}, [session?.user?.email, isInitialized, currentUserId, messages.length]); // 只在用戶email變化時重新初始化，而不是整個session對象
 
+	// 🔐 Check for pending payment after login
+	useEffect(() => {
+		if (session?.user && isClient) {
+			const pendingPaymentStr = localStorage.getItem('pendingPayment');
+			if (pendingPaymentStr) {
+				try {
+					const paymentContext = JSON.parse(pendingPaymentStr);
+					// Check if pending payment is recent (within 30 minutes)
+					const timeDiff = Date.now() - paymentContext.timestamp;
+					const thirtyMinutes = 30 * 60 * 1000;
+					
+					if (timeDiff < thirtyMinutes) {
+						console.log('🔄 Resuming payment after login:', paymentContext);
+						localStorage.removeItem('pendingPayment');
+						// Resume payment with saved context
+						resumePayment(paymentContext);
+					} else {
+						console.log('⏱️ Pending payment expired, clearing');
+						localStorage.removeItem('pendingPayment');
+					}
+				} catch (error) {
+					console.error('❌ Error parsing pending payment:', error);
+					localStorage.removeItem('pendingPayment');
+				}
+			}
+		}
+	}, [session?.user, isClient]);
+
 	// Auto-scroll to bottom only for new user messages or completed AI responses
 	useEffect(() => {
 		if (messages.length > 0 && !isTyping) {
@@ -364,17 +392,118 @@ export default function Home() {
 		}
 	};
 
+	// 🔐 Resume payment after login
+	const resumePayment = async (paymentContext: any) => {
+		try {
+			setIsLoading(true);
+			console.log('🚀 Resuming payment with context:', paymentContext);
+
+			let paymentEndpoint;
+			const { type, locale, concern, specificProblem, sessionId } = paymentContext;
+
+			// Determine payment endpoint based on type
+			if (type === 'comprehensive') {
+				paymentEndpoint = '/api/checkoutSessions/payment4';
+			} else if (type === 'premium') {
+				paymentEndpoint = '/api/checkoutSessions/payment2';
+			} else if (type === 'couple') {
+				paymentEndpoint = '/api/payment-couple';
+			} else {
+				paymentEndpoint = '/api/checkoutSessions/payment-fortune-category';
+			}
+
+			const storedRegion = localStorage.getItem('userRegion');
+			let paymentResponse;
+
+			if (type === 'comprehensive' || type === 'premium') {
+				paymentResponse = await fetch(paymentEndpoint, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						quantity: 1,
+						directPayment: true,
+						locale: locale,
+						region: storedRegion,
+					}),
+				});
+			} else if (type === 'couple') {
+				paymentResponse = await fetch(paymentEndpoint, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						locale: locale,
+						specificProblem: specificProblem,
+						concern: concern,
+						fromChat: true,
+						sessionId: sessionId,
+					}),
+				});
+			} else {
+				// Fortune payment
+				const concernMapping: Record<string, string> = {
+					財運: 'financial',
+					健康: 'health',
+					事業: 'career',
+					工作: 'career',
+					感情: 'love',
+				};
+				const concernType = concernMapping[concern] || 'financial';
+
+				paymentResponse = await fetch(paymentEndpoint, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						concernType: concernType,
+						locale: locale,
+						region: storedRegion,
+						quantity: 1,
+						specificProblem: specificProblem,
+						fromChat: true,
+					}),
+				});
+			}
+
+			if (paymentResponse.ok) {
+				const paymentData = await paymentResponse.json();
+				console.log('💳 Payment response:', paymentData);
+
+				// Handle different response formats
+				if (type === 'couple') {
+					// Couple payment uses sessionId format
+					if (paymentData.sessionId) {
+						const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+						if (!stripePublicKey) throw new Error('Stripe public key not configured');
+
+						const stripe = await import('@stripe/stripe-js').then(mod => 
+							mod.loadStripe(stripePublicKey)
+						);
+
+						if (stripe) {
+							await stripe.redirectToCheckout({ sessionId: paymentData.sessionId });
+						}
+					}
+				} else {
+					// Other payments use data.url format
+					if (paymentData.data?.url) {
+						window.location.href = paymentData.data.url;
+					}
+				}
+			}
+		} catch (error) {
+			console.error('❌ Error resuming payment:', error);
+			const errorMessage = {
+				role: 'assistant',
+				content: '抱歉，付款處理時發生錯誤，請稍後再試。',
+				timestamp: new Date(),
+			};
+			setMessages((prev) => [...prev, errorMessage]);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	const handleSendMessage = async () => {
 		if (!inputMessage.trim() || isLoading) return;
-
-		// Check if user is logged in before sending message
-		if (!session) {
-			// Save the current question to localStorage before redirecting
-			localStorage.setItem("pendingChatMessage", inputMessage.trim());
-			localStorage.setItem("pendingChatTimestamp", Date.now().toString());
-			router.push("/auth/login");
-			return;
-		}
 
 		// 隱藏落地頁，顯示正常聊天界面
 		if (showLandingPage) {
@@ -728,6 +857,27 @@ export default function Home() {
 						`💳 使用付款端點: ${paymentEndpoint} (comprehensive: ${useComprehensivePayment}, premium: ${usePremiumPayment}, couple: ${isCouplePayment})`
 					);
 
+					// 🔐 Check if user is logged in before payment
+					if (!session) {
+						console.log("⚠️ User not logged in, saving payment context and redirecting to login");
+						
+						// Save payment context to localStorage
+						const paymentContext = {
+							type: useComprehensivePayment ? 'comprehensive' : 
+							      usePremiumPayment ? 'premium' : 
+							      isCouplePayment ? 'couple' : 'fortune',
+							locale: currentLocale,
+							concern: data.concern,
+							specificProblem: problemToUse,
+							sessionId: sessionId,
+							timestamp: Date.now(),
+						};
+						
+						localStorage.setItem('pendingPayment', JSON.stringify(paymentContext));
+						router.push('/auth/login');
+						return;
+					}
+
 					// 直接觸發付款 API
 					try {
 						setIsLoading(true);
@@ -954,15 +1104,6 @@ export default function Home() {
 
 	// 處理快捷標籤點擊
 	const handleShortcutClick = (shortcutText) => {
-		// Check if user is logged in
-		if (!session) {
-			// Save the shortcut text before redirecting to login
-			localStorage.setItem("pendingChatMessage", shortcutText);
-			localStorage.setItem("pendingChatTimestamp", Date.now().toString());
-			router.push("/auth/login");
-			return;
-		}
-
 		setInputMessage(shortcutText);
 		// 自動聚焦到輸入框
 		setTimeout(() => {
@@ -1267,6 +1408,13 @@ export default function Home() {
 
 	// 加載特定對話
 	const loadSpecificConversation = async (conversationId) => {
+		// 🔐 Check if user is logged in before loading conversation history
+		if (!session) {
+			console.log("⚠️ User not logged in, redirecting to login");
+			router.push('/auth/login');
+			return;
+		}
+
 		try {
 			setIsLoading(true);
 			const response = await fetch(

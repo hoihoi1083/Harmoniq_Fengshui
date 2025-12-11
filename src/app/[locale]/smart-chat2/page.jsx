@@ -97,6 +97,10 @@ export default function SmartChat2() {
 	const [showLandingPage, setShowLandingPage] = useState(true);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+	// 🔐 Payment context preservation for login flow
+	const [pendingPayment, setPendingPayment] = useState(null);
+	const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
 	// 客戶端初始化 - 添加防重複初始化邏輯
 	useEffect(() => {
 		// 防止重複初始化
@@ -140,6 +144,37 @@ export default function SmartChat2() {
 		loadConversationHistory(userId);
 		setIsInitialized(true);
 	}, [session?.user?.email, isInitialized, currentUserId, messages.length]); // 只在用戶email變化時重新初始化，而不是整個session對象
+
+	// 🔐 Check for pending payment after login and auto-resume
+	useEffect(() => {
+		if (!session || !isClient) return;
+
+		const pendingPaymentData = localStorage.getItem("pendingPayment");
+		if (pendingPaymentData) {
+			try {
+				const paymentContext = JSON.parse(pendingPaymentData);
+				console.log("💳 Found pending payment after login:", paymentContext);
+				
+				// Clear the pending payment
+				localStorage.removeItem("pendingPayment");
+				
+				// Show resuming message
+				setMessages(prev => [...prev, {
+					role: "assistant",
+					content: "歡迎回來！正在為您繼續處理付款...",
+					timestamp: new Date(),
+				}]);
+				
+				// Resume payment after a short delay
+				setTimeout(() => {
+					resumePayment(paymentContext);
+				}, 1000);
+			} catch (error) {
+				console.error("❌ Failed to parse pending payment:", error);
+				localStorage.removeItem("pendingPayment");
+			}
+		}
+	}, [session, isClient]);
 
 	// Auto-scroll to bottom when new messages are added
 	useEffect(() => {
@@ -219,6 +254,43 @@ export default function SmartChat2() {
 					contentPreview: msg.content?.substring(0, 50) + "...",
 				}))
 			);
+
+			// 🔐 Check if user is logged in before payment
+			if (!session) {
+				console.log("🔒 User not logged in, saving payment context");
+				
+				// Save payment context to localStorage
+				const paymentContext = {
+					type: "couple",
+					locale: currentLocale,
+					specificProblem: problemToUse,
+					concern: concern,
+					sessionId: sessionId,
+					timestamp: Date.now(),
+				};
+				
+				localStorage.setItem("pendingPayment", JSON.stringify(paymentContext));
+				
+				// Show login prompt message
+				const loginPromptMessage = {
+					role: "assistant",
+					content: "請先登入以繼續付款。登入後將自動為您繼續處理。",
+					timestamp: new Date(),
+				};
+				
+				setMessages((prev) => [...prev, loginPromptMessage]);
+				
+				// Redirect to login page with callback
+				const loginUrl = `/${currentLocale}/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+				console.log("🔐 Redirecting to login:", loginUrl);
+				
+				setTimeout(() => {
+					window.location.href = loginUrl;
+				}, 1500);
+				
+				setIsLoading(false);
+				return;
+			}
 
 			// Call couple payment API directly
 			try {
@@ -475,6 +547,48 @@ export default function SmartChat2() {
 					// 直接觸發付款 API
 					try {
 						setIsLoading(true);
+
+						// 🔐 Check if user is logged in before payment
+						if (!session) {
+							console.log("🔒 User not logged in, saving payment context");
+							
+							// Determine payment type
+							const paymentType = useComprehensivePayment ? "comprehensive" 
+								: usePremiumPayment ? "premium" 
+								: "fortune";
+							
+							// Save payment context to localStorage
+							const paymentContext = {
+								type: paymentType,
+								locale: currentLocale,
+								concern: data.concern,
+								specificProblem: problemToUse,
+								sessionId: sessionId,
+								timestamp: Date.now(),
+							};
+							
+							localStorage.setItem("pendingPayment", JSON.stringify(paymentContext));
+							
+							// Show login prompt message
+							const loginPromptMessage = {
+								role: "assistant",
+								content: "請先登入以繼續付款。登入後將自動為您繼續處理。",
+								timestamp: new Date(),
+							};
+							
+							setMessages((prev) => [...prev, loginPromptMessage]);
+							
+							// Redirect to login page with callback
+							const loginUrl = `/${currentLocale}/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+							console.log("🔐 Redirecting to login:", loginUrl);
+							
+							setTimeout(() => {
+								window.location.href = loginUrl;
+							}, 1500);
+							
+							setIsLoading(false);
+							return;
+						}
 
 						let paymentResponse;
 
@@ -811,6 +925,147 @@ export default function SmartChat2() {
 					timestamp: new Date(),
 				},
 			]);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	// 🔐 Resume payment after login
+	const resumePayment = async (paymentContext) => {
+		try {
+			setIsLoading(true);
+			console.log("💳 Resuming payment with context:", paymentContext);
+
+			const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+			if (!stripePublicKey) {
+				throw new Error("Stripe public key not configured");
+			}
+
+			if (paymentContext.type === "couple") {
+				// Resume couple payment
+				const paymentResponse = await fetch("/api/payment-couple", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						locale: paymentContext.locale,
+						specificProblem: paymentContext.specificProblem,
+						concern: paymentContext.concern,
+						fromChat: true,
+						sessionId: paymentContext.sessionId,
+					}),
+				});
+
+				if (paymentResponse.ok) {
+					const paymentData = await paymentResponse.json();
+					console.log("💳 Resumed Couple Payment Response:", paymentData);
+
+					if (paymentData.sessionId) {
+						const stripe = await import("@stripe/stripe-js").then(
+							(mod) => mod.loadStripe(stripePublicKey)
+						);
+
+						if (stripe) {
+							console.log("🚀 Redirecting to Stripe checkout");
+							await stripe.redirectToCheckout({
+								sessionId: paymentData.sessionId,
+							});
+						}
+					}
+				} else {
+					throw new Error(`Payment API error: ${paymentResponse.status}`);
+				}
+			} else if (paymentContext.type === "comprehensive") {
+				// Resume comprehensive ($88) payment
+				const paymentResponse = await fetch("/api/checkoutSessions/payment4", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						quantity: 1,
+						directPayment: true,
+						locale: paymentContext.locale,
+						region: localStorage.getItem("userRegion"),
+					}),
+				});
+
+				if (paymentResponse.ok) {
+					const paymentData = await paymentResponse.json();
+					if (paymentData.data?.url) {
+						window.location.href = paymentData.data.url;
+					}
+				}
+			} else if (paymentContext.type === "premium") {
+				// Resume premium ($188) payment
+				const paymentResponse = await fetch("/api/checkoutSessions/payment2", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						quantity: 1,
+						directPayment: true,
+						locale: paymentContext.locale,
+						region: localStorage.getItem("userRegion"),
+					}),
+				});
+
+				if (paymentResponse.ok) {
+					const paymentData = await paymentResponse.json();
+					if (paymentData.data?.url) {
+						window.location.href = paymentData.data.url;
+					}
+				}
+			} else if (paymentContext.type === "fortune") {
+				// Resume fortune ($38) payment
+				const concernMapping = {
+					財運: "financial",
+					健康: "health",
+					事業: "career",
+					工作: "career",
+					感情: "love",
+				};
+				
+				const englishConcern = concernMapping[paymentContext.concern] || "financial";
+				
+				const paymentResponse = await fetch("/api/checkoutSessions/payment-fortune-category", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						concernType: englishConcern,
+						specificProblem: paymentContext.specificProblem,
+						fromChat: true,
+						locale: paymentContext.locale,
+						region: localStorage.getItem("userRegion"),
+					}),
+				});
+
+				if (paymentResponse.ok) {
+					const paymentData = await paymentResponse.json();
+					const sessionId = paymentData.sessionId || paymentData.data?.id;
+					
+					if (sessionId) {
+						const stripe = await import("@stripe/stripe-js").then(
+							(mod) => mod.loadStripe(stripePublicKey)
+						);
+
+						if (stripe) {
+							await stripe.redirectToCheckout({ sessionId });
+						}
+					}
+				}
+			}
+		} catch (error) {
+			console.error("❌ Resume payment error:", error);
+			setMessages(prev => [...prev, {
+				role: "assistant",
+				content: "抱歉，恢復付款時出現錯誤。請重新選擇報告。",
+				timestamp: new Date(),
+			}]);
 		} finally {
 			setIsLoading(false);
 		}

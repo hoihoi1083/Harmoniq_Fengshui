@@ -18,6 +18,43 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
 	const server = createServer((req, res) => {
+		// 🛡️ Block malicious requests immediately
+		const suspiciousPatterns = [
+			/ellison\.st/i,
+			/xmrig/i,
+			/cpuminer/i,
+			/stratum\+tcp/i,
+			/\/\.env/i,
+			/\/phpMyAdmin/i,
+			/\/wp-admin/i,
+			/eval\(/i,
+			/system\(/i,
+			/exec\(/i,
+		];
+
+		const isSuspicious = suspiciousPatterns.some(
+			(pattern) =>
+				pattern.test(req.url) ||
+				pattern.test(req.headers["user-agent"] || "") ||
+				pattern.test(req.headers["referer"] || "")
+		);
+
+		if (isSuspicious) {
+			console.warn(`🚫 Blocked suspicious request: ${req.url}`);
+			res.statusCode = 403;
+			res.end("Forbidden");
+			return;
+		}
+
+		// 🛡️ Validate HTTP method
+		const validMethods = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"];
+		if (!validMethods.includes(req.method)) {
+			console.warn(`🚫 Invalid HTTP method: ${req.method}`);
+			res.statusCode = 405;
+			res.end("Method Not Allowed");
+			return;
+		}
+
 		const parsedUrl = parse(req.url, true);
 
 		// Add request timeout to prevent hanging - increased for AI API calls
