@@ -81,8 +81,19 @@ else
 fi
 echo ""
 
-# 6. Check hugepages (crypto miner trick)
-echo "6️⃣ Checking hugepages allocation..."
+# 6. Check for suspicious systemd services
+echo "6️⃣ Checking systemd services..."
+SUSPICIOUS=$(systemctl list-units --all | grep -iE 'miner|xmrig|crypto|ocean' | grep -v 'miner-detection')
+if [ -z "$SUSPICIOUS" ]; then
+    echo "   ✅ No suspicious services"
+else
+    echo "   🚨 ALERT: Suspicious services found!"
+    echo "$SUSPICIOUS"
+fi
+echo ""
+
+# 7. Check hugepages (crypto miner trick)
+echo "7️⃣ Checking hugepages allocation..."
 HUGEPAGES=$(sysctl vm.nr_hugepages | awk '{print $3}')
 if [ "$HUGEPAGES" -gt 0 ]; then
     echo "   🚨 ALERT: Hugepages allocated: $HUGEPAGES (crypto miner indicator!)"
@@ -91,8 +102,50 @@ else
 fi
 echo ""
 
-# 7. Check PM2 status
-echo "7️⃣ Application Status:"
+# 8. Check cron monitoring
+echo "8️⃣ Checking automated monitoring..."
+CRON_CHECK=$(crontab -l 2>/dev/null | grep -c detect-miners)
+if [ "$CRON_CHECK" -gt 0 ]; then
+    echo "   ✅ Miner detection cron job active"
+    crontab -l | grep detect-miners
+else
+    echo "   🚨 ALERT: Miner detection cron job not found!"
+fi
+echo ""
+
+# 9. Check mining port blocks
+echo "9️⃣ Checking firewall rules..."
+BLOCKED_PORTS=$(sudo firewall-cmd --list-rich-rules 2>/dev/null | grep -c "reject")
+if [ "$BLOCKED_PORTS" -ge 7 ]; then
+    echo "   ✅ Mining ports blocked ($BLOCKED_PORTS rules active)"
+else
+    echo "   ⚠️  WARNING: Mining port blocks incomplete ($BLOCKED_PORTS/7)"
+fi
+echo ""
+
+# 10. Check /tmp noexec mount
+echo "🔟 Checking /tmp security..."
+TMP_NOEXEC=$(mount | grep "/tmp" | grep -c "noexec")
+if [ "$TMP_NOEXEC" -gt 0 ]; then
+    echo "   ✅ /tmp mounted with noexec"
+else
+    echo "   ⚠️  WARNING: /tmp not mounted with noexec"
+fi
+echo ""
+
+# 11. Check hugepages (crypto miner trick)
+echo "1️⃣1️⃣ Checking network connectivity..."
+HTTP_TEST=$(timeout 3 curl -s -o /dev/null -w "%{http_code}" http://api.deepseek.com 2>/dev/null || echo "timeout")
+HTTPS_TEST=$(timeout 3 curl -s -o /dev/null -w "%{http_code}" https://api.deepseek.com 2>/dev/null || echo "timeout")
+if [ "$HTTP_TEST" != "timeout" ] && [ "$HTTPS_TEST" != "timeout" ]; then
+    echo "   ✅ Outbound connectivity working (HTTP: $HTTP_TEST, HTTPS: $HTTPS_TEST)"
+else
+    echo "   🚨 ALERT: Outbound connectivity blocked!"
+fi
+echo ""
+
+# 12. Check PM2 status
+echo "1️⃣2️⃣ Application Status:"
 pm2 list | grep -E 'online|status'
 PM2_ERRORS=$(pm2 list | grep -c 'errored\|stopped')
 if [ "$PM2_ERRORS" -gt 0 ]; then
@@ -102,8 +155,8 @@ else
 fi
 echo ""
 
-# 8. Check for failed SSH login attempts
-echo "8️⃣ Recent failed SSH logins (last 24 hours):"
+# 13. Check for failed SSH login attempts
+echo "1️⃣3️⃣ Recent failed SSH logins (last 24 hours):"
 FAILED_LOGINS=$(sudo journalctl -u sshd --since "24 hours ago" | grep -c "Failed password")
 echo "   Failed attempts: $FAILED_LOGINS"
 if [ "$FAILED_LOGINS" -gt 50 ]; then
@@ -115,17 +168,19 @@ else
 fi
 echo ""
 
-# 9. Check log sizes
-echo "9️⃣ Log directory size:"
+# 14. Check log sizes
+echo "1️⃣4️⃣ Log directory size:"
 LOG_SIZE=$(du -sh ~/fengshui-layout/logs 2>/dev/null | awk '{print $1}')
 echo "   Current size: $LOG_SIZE"
 echo ""
 
-# 10. Check website accessibility
-echo "🔟 Website Health Check:"
+# 15. Check website accessibility & response time
+echo "1️⃣5️⃣ Website Health Check:"
 RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/health 2>/dev/null)
+RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}s" https://www.harmoniqfengshui.com 2>/dev/null)
 if [ "$RESPONSE" = "200" ]; then
     echo "   ✅ Website responding (HTTP $RESPONSE)"
+    echo "   ⏱️  Response time: $RESPONSE_TIME"
 else
     echo "   🚨 ALERT: Website not responding (HTTP $RESPONSE)"
 fi
