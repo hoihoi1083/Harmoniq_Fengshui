@@ -47,7 +47,14 @@ app.prepare().then(() => {
 		}
 
 		// 🛡️ Validate HTTP method
-		const validMethods = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"];
+		const validMethods = [
+			"GET",
+			"POST",
+			"PUT",
+			"DELETE",
+			"OPTIONS",
+			"HEAD",
+		];
 		if (!validMethods.includes(req.method)) {
 			console.warn(`🚫 Invalid HTTP method: ${req.method}`);
 			res.statusCode = 405;
@@ -88,7 +95,7 @@ app.prepare().then(() => {
 	// Enable TCP keepalive and handle hung connections
 	server.on("connection", (socket) => {
 		socket.setKeepAlive(true, 60000); // Enable keepalive, initial delay 60s
-		socket.setTimeout(120000); // Increase timeout to 120s for AI API calls
+		socket.setTimeout(170000); // Must be MORE than keepAliveTimeout to prevent stuck connections
 
 		// Force close socket on timeout to prevent buildup
 		socket.on("timeout", () => {

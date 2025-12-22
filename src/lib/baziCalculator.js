@@ -65,10 +65,18 @@ export class BaziCalculator {
 	};
 
 	// 計算年柱（使用lunisolar精確計算）
-	static getYearPillar(year) {
+	static getYearPillar(dateInput) {
 		try {
-			// Create a date in the given year for lunisolar calculation
-			const dateStr = `${year}-06-15 12:00:00`;
+			// Accept both date object and year number for backward compatibility
+			let dateStr;
+			if (dateInput instanceof Date) {
+				// Use the exact date to properly handle dates before/after CNY
+				dateStr = moment(dateInput).format('YYYY-MM-DD HH:mm:ss');
+			} else {
+				// If only year is provided, use mid-year date (June 15)
+				dateStr = `${dateInput}-06-15 12:00:00`;
+			}
+			
 			const lsr = lunisolar(dateStr);
 
 			return {
@@ -79,6 +87,7 @@ export class BaziCalculator {
 		} catch (error) {
 			console.error("BaziCalculator.getYearPillar error:", error);
 			// Fallback to original calculation
+			const year = dateInput instanceof Date ? dateInput.getFullYear() : dateInput;
 			return this.getYearPillarFallback(year);
 		}
 	}
@@ -167,10 +176,18 @@ export class BaziCalculator {
 	}
 
 	// 計算月柱（使用傳統五虎遁法）
-	static getMonthPillar(year, month) {
+	static getMonthPillar(dateOrYear, month) {
 		try {
-			// 獲取年干
-			const yearPillar = this.getYearPillar(year);
+			// 獲取年干 - 支持傳入Date對象或年份數字
+			let yearPillar;
+			if (dateOrYear instanceof Date) {
+				yearPillar = this.getYearPillar(dateOrYear);
+			} else {
+				// If only year number is provided, create a date for that year
+				const year = dateOrYear;
+				const tempDate = new Date(year, month - 1, 15); // Use mid-month date
+				yearPillar = this.getYearPillar(tempDate);
+			}
 			const yearStem = yearPillar.tianGan;
 
 			// 五虎遁法對應表

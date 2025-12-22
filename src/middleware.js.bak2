@@ -17,6 +17,11 @@ const intlMiddleware = createMiddleware(routing);
 export default async function middleware(request) {
 	const { pathname } = request.nextUrl;
 
+	// Skip middleware for health check (for AWS load balancer)
+	if (pathname === "/api/health") {
+		return NextResponse.next();
+	}
+
 	// Handle CORS for API routes
 	if (pathname.startsWith("/api")) {
 		const origin = request.headers.get("origin");
@@ -26,10 +31,11 @@ export default async function middleware(request) {
 			return new NextResponse(null, {
 				status: 200,
 				headers: {
-					"Access-Control-Allow-Origin":
-						origin && allowedOrigins.includes(origin)
-							? origin
-							: allowedOrigins[0],
+					"Access-Control-Allow-Origin": allowedOrigins.includes(
+						origin
+					)
+						? origin
+						: allowedOrigins[0],
 					"Access-Control-Allow-Methods":
 						"GET, POST, PUT, DELETE, OPTIONS",
 					"Access-Control-Allow-Headers":
@@ -42,12 +48,8 @@ export default async function middleware(request) {
 		// Continue with the request and add CORS headers to response
 		const response = NextResponse.next();
 
-		const hasValidOrigin = !origin || allowedOrigins.includes(origin);
-		if (hasValidOrigin) {
-			response.headers.set(
-				"Access-Control-Allow-Origin",
-				origin || allowedOrigins[0]
-			);
+		if (origin && allowedOrigins.includes(origin)) {
+			response.headers.set("Access-Control-Allow-Origin", origin);
 			response.headers.set(
 				"Access-Control-Allow-Methods",
 				"GET, POST, PUT, DELETE, OPTIONS"
@@ -63,6 +65,8 @@ export default async function middleware(request) {
 	// Skip auth check for public routes
 	const isPublicRoute =
 		pathname === "/" ||
+		pathname === "/zh-TW" || // 🔓 允許繁體中文首頁匿名訪問
+		pathname === "/zh-CN" || // 🔓 允許簡體中文首頁匿名訪問
 		pathname.startsWith("/auth") ||
 		pathname.startsWith("/api") ||
 		pathname.startsWith("/_next") ||
@@ -72,12 +76,16 @@ export default async function middleware(request) {
 		pathname === "/favicon.ico" ||
 		pathname.includes("/price") || // 添加 price 頁面為公共路由
 		pathname.includes("/customer") || // 允許 customer 頁面
-		pathname.includes("/free"); // 允許 free 頁面
+		pathname.includes("/free") || // 允許 free 頁面
+		pathname.includes("/smart-chat2"); // 🔓 允許匿名使用聊天功能
+
+	console.log("🔍 Middleware check:", { pathname, isPublicRoute });
 
 	// Handle internationalization first
 	const response = intlMiddleware(request);
 	// If it's a public route, no need to check authentication
 	if (isPublicRoute) {
+		console.log("✅ Public route, allowing access");
 		return response;
 	}
 

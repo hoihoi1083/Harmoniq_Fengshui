@@ -42,7 +42,7 @@ const calculateBaZi = (birthDate) => {
 	import("../../../lib/baziCalculator.js").then(({ BaziCalculator }) => {
 		// Now BaziCalculator.getDayPillar uses accurate lunisolar calculation
 		const dayPillar = BaziCalculator.getDayPillar(date);
-		const yearPillar = BaziCalculator.getYearPillar(year);
+		const yearPillar = BaziCalculator.getYearPillar(date); // Pass date to handle CNY correctly
 
 		return {
 			year: `${yearPillar.tianGan}${yearPillar.diZhi}`,

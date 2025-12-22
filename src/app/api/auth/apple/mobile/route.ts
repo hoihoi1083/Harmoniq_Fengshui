@@ -29,7 +29,7 @@ function getApplePublicKey(header: any, callback: any) {
  */
 
 // Required for static export with Capacitor
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 
 export async function POST(request: Request) {
 	try {
@@ -55,11 +55,15 @@ export async function POST(request: Request) {
 				getApplePublicKey,
 				{
 					issuer: "https://appleid.apple.com",
-					audience: process.env.APPLE_ID,
+					// Skip audience validation here, do it manually below
+					ignoreAudience: true,
 				},
 				(err, decoded) => {
 					if (err) {
-						console.error("❌ Apple token verification failed:", err);
+						console.error(
+							"❌ Apple token verification failed:",
+							err
+						);
 						reject(err);
 					} else {
 						resolve(decoded);
@@ -76,10 +80,23 @@ export async function POST(request: Request) {
 			);
 		}
 
+		// Manually validate audience (accept Service ID and all Bundle IDs)
+		const validAudiences = [
+			process.env.APPLE_ID, // Service ID: com.harmoniqfengshui
+			"com.harmoniqfenghsui", // Bundle ID with typo
+			"com.harmoniq.windbell", // Actual mobile app Bundle ID
+		];
+		if (!validAudiences.includes(decoded.aud)) {
+			console.error("❌ Invalid audience:", decoded.aud);
+			return NextResponse.json(
+				{ success: false, error: "Invalid token audience" },
+				{ status: 401 }
+			);
+		}
+
 		console.log("✅ Apple token verified for user:", decoded.sub);
 
 		await dbConnect();
-
 		// Apple user identifier
 		const appleUserId = decoded.sub;
 		const userEmail = email || decoded.email;
@@ -90,7 +107,10 @@ export async function POST(request: Request) {
 		});
 
 		if (!dbUser) {
-			console.log("👤 Creating new Apple user:", userEmail || appleUserId);
+			console.log(
+				"👤 Creating new Apple user:",
+				userEmail || appleUserId
+			);
 
 			// Construct user name from fullName object
 			let userName = "User";

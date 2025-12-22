@@ -157,10 +157,11 @@ async function checkSavedBirthdayAndGenerateMessage(
 	try {
 		// 🔒 Privacy fix: For anonymous users, only search by unique userId
 		// For logged-in users, search by both email and userId
-		const searchQuery = userEmail === 'anonymous' || !userEmail
-			? { userId: userId }  // Anonymous: ONLY match this specific userId
-			: { $or: [{ userEmail: userEmail }, { userId: userId }] };  // Logged in: match either
-		
+		const searchQuery =
+			userEmail === "anonymous" || !userEmail
+				? { userId: userId } // Anonymous: ONLY match this specific userId
+				: { $or: [{ userEmail: userEmail }, { userId: userId }] }; // Logged in: match either
+
 		// 搜索該用戶是否有已保存且確認的生日
 		const existingBirthdayData = await SmartUserIntent.findOne({
 			...searchQuery,

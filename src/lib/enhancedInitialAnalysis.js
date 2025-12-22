@@ -1056,12 +1056,12 @@ ${
 		const day = birthday.getDate();
 		const hour = birthday.getHours();
 
-		// 使用BaziCalculator計算年柱和日柱
-		const yearPillar = BaziCalculator.getYearPillar(year);
+		// 使用BaziCalculator計算年柱和日柱 - 傳遞完整日期以正確處理春節前後
+		const yearPillar = BaziCalculator.getYearPillar(birthday);
 		const dayPillar = BaziCalculator.getDayPillar(birthday);
 
-		// 使用傳統五虎遁法計算月柱
-		const monthPillar = BaziCalculator.getMonthPillar(year, month);
+		// 使用傳統五虎遁法計算月柱 - 傳遞完整日期以正確處理春節前後
+		const monthPillar = BaziCalculator.getMonthPillar(birthday, month);
 
 		// 計算時柱（如果有時間信息）
 		const hourPillar = this.getHourPillar(dayPillar, hour);

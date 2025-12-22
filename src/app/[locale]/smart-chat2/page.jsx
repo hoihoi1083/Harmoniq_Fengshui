@@ -153,18 +153,24 @@ export default function SmartChat2() {
 		if (pendingPaymentData) {
 			try {
 				const paymentContext = JSON.parse(pendingPaymentData);
-				console.log("💳 Found pending payment after login:", paymentContext);
-				
+				console.log(
+					"💳 Found pending payment after login:",
+					paymentContext
+				);
+
 				// Clear the pending payment
 				localStorage.removeItem("pendingPayment");
-				
+
 				// Show resuming message
-				setMessages(prev => [...prev, {
-					role: "assistant",
-					content: "歡迎回來！正在為您繼續處理付款...",
-					timestamp: new Date(),
-				}]);
-				
+				setMessages((prev) => [
+					...prev,
+					{
+						role: "assistant",
+						content: "歡迎回來！正在為您繼續處理付款...",
+						timestamp: new Date(),
+					},
+				]);
+
 				// Resume payment after a short delay
 				setTimeout(() => {
 					resumePayment(paymentContext);
@@ -258,7 +264,7 @@ export default function SmartChat2() {
 			// 🔐 Check if user is logged in before payment
 			if (!session) {
 				console.log("🔒 User not logged in, saving payment context");
-				
+
 				// Save payment context to localStorage
 				const paymentContext = {
 					type: "couple",
@@ -268,26 +274,29 @@ export default function SmartChat2() {
 					sessionId: sessionId,
 					timestamp: Date.now(),
 				};
-				
-				localStorage.setItem("pendingPayment", JSON.stringify(paymentContext));
-				
+
+				localStorage.setItem(
+					"pendingPayment",
+					JSON.stringify(paymentContext)
+				);
+
 				// Show login prompt message
 				const loginPromptMessage = {
 					role: "assistant",
 					content: "請先登入以繼續付款。登入後將自動為您繼續處理。",
 					timestamp: new Date(),
 				};
-				
+
 				setMessages((prev) => [...prev, loginPromptMessage]);
-				
+
 				// Redirect to login page with callback
 				const loginUrl = `/${currentLocale}/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
 				console.log("🔐 Redirecting to login:", loginUrl);
-				
+
 				setTimeout(() => {
 					window.location.href = loginUrl;
 				}, 1500);
-				
+
 				setIsLoading(false);
 				return;
 			}
@@ -550,13 +559,17 @@ export default function SmartChat2() {
 
 						// 🔐 Check if user is logged in before payment
 						if (!session) {
-							console.log("🔒 User not logged in, saving payment context");
-							
+							console.log(
+								"🔒 User not logged in, saving payment context"
+							);
+
 							// Determine payment type
-							const paymentType = useComprehensivePayment ? "comprehensive" 
-								: usePremiumPayment ? "premium" 
-								: "fortune";
-							
+							const paymentType = useComprehensivePayment
+								? "comprehensive"
+								: usePremiumPayment
+									? "premium"
+									: "fortune";
+
 							// Save payment context to localStorage
 							const paymentContext = {
 								type: paymentType,
@@ -566,26 +579,33 @@ export default function SmartChat2() {
 								sessionId: sessionId,
 								timestamp: Date.now(),
 							};
-							
-							localStorage.setItem("pendingPayment", JSON.stringify(paymentContext));
-							
+
+							localStorage.setItem(
+								"pendingPayment",
+								JSON.stringify(paymentContext)
+							);
+
 							// Show login prompt message
 							const loginPromptMessage = {
 								role: "assistant",
-								content: "請先登入以繼續付款。登入後將自動為您繼續處理。",
+								content:
+									"請先登入以繼續付款。登入後將自動為您繼續處理。",
 								timestamp: new Date(),
 							};
-							
-							setMessages((prev) => [...prev, loginPromptMessage]);
-							
+
+							setMessages((prev) => [
+								...prev,
+								loginPromptMessage,
+							]);
+
 							// Redirect to login page with callback
 							const loginUrl = `/${currentLocale}/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
 							console.log("🔐 Redirecting to login:", loginUrl);
-							
+
 							setTimeout(() => {
 								window.location.href = loginUrl;
 							}, 1500);
-							
+
 							setIsLoading(false);
 							return;
 						}
@@ -936,7 +956,8 @@ export default function SmartChat2() {
 			setIsLoading(true);
 			console.log("💳 Resuming payment with context:", paymentContext);
 
-			const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+			const stripePublicKey =
+				process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 			if (!stripePublicKey) {
 				throw new Error("Stripe public key not configured");
 			}
@@ -959,7 +980,10 @@ export default function SmartChat2() {
 
 				if (paymentResponse.ok) {
 					const paymentData = await paymentResponse.json();
-					console.log("💳 Resumed Couple Payment Response:", paymentData);
+					console.log(
+						"💳 Resumed Couple Payment Response:",
+						paymentData
+					);
 
 					if (paymentData.sessionId) {
 						const stripe = await import("@stripe/stripe-js").then(
@@ -974,22 +998,27 @@ export default function SmartChat2() {
 						}
 					}
 				} else {
-					throw new Error(`Payment API error: ${paymentResponse.status}`);
+					throw new Error(
+						`Payment API error: ${paymentResponse.status}`
+					);
 				}
 			} else if (paymentContext.type === "comprehensive") {
 				// Resume comprehensive ($88) payment
-				const paymentResponse = await fetch("/api/checkoutSessions/payment4", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						quantity: 1,
-						directPayment: true,
-						locale: paymentContext.locale,
-						region: localStorage.getItem("userRegion"),
-					}),
-				});
+				const paymentResponse = await fetch(
+					"/api/checkoutSessions/payment4",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							quantity: 1,
+							directPayment: true,
+							locale: paymentContext.locale,
+							region: localStorage.getItem("userRegion"),
+						}),
+					}
+				);
 
 				if (paymentResponse.ok) {
 					const paymentData = await paymentResponse.json();
@@ -999,18 +1028,21 @@ export default function SmartChat2() {
 				}
 			} else if (paymentContext.type === "premium") {
 				// Resume premium ($188) payment
-				const paymentResponse = await fetch("/api/checkoutSessions/payment2", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						quantity: 1,
-						directPayment: true,
-						locale: paymentContext.locale,
-						region: localStorage.getItem("userRegion"),
-					}),
-				});
+				const paymentResponse = await fetch(
+					"/api/checkoutSessions/payment2",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							quantity: 1,
+							directPayment: true,
+							locale: paymentContext.locale,
+							region: localStorage.getItem("userRegion"),
+						}),
+					}
+				);
 
 				if (paymentResponse.ok) {
 					const paymentData = await paymentResponse.json();
@@ -1027,27 +1059,32 @@ export default function SmartChat2() {
 					工作: "career",
 					感情: "love",
 				};
-				
-				const englishConcern = concernMapping[paymentContext.concern] || "financial";
-				
-				const paymentResponse = await fetch("/api/checkoutSessions/payment-fortune-category", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						concernType: englishConcern,
-						specificProblem: paymentContext.specificProblem,
-						fromChat: true,
-						locale: paymentContext.locale,
-						region: localStorage.getItem("userRegion"),
-					}),
-				});
+
+				const englishConcern =
+					concernMapping[paymentContext.concern] || "financial";
+
+				const paymentResponse = await fetch(
+					"/api/checkoutSessions/payment-fortune-category",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							concernType: englishConcern,
+							specificProblem: paymentContext.specificProblem,
+							fromChat: true,
+							locale: paymentContext.locale,
+							region: localStorage.getItem("userRegion"),
+						}),
+					}
+				);
 
 				if (paymentResponse.ok) {
 					const paymentData = await paymentResponse.json();
-					const sessionId = paymentData.sessionId || paymentData.data?.id;
-					
+					const sessionId =
+						paymentData.sessionId || paymentData.data?.id;
+
 					if (sessionId) {
 						const stripe = await import("@stripe/stripe-js").then(
 							(mod) => mod.loadStripe(stripePublicKey)
@@ -1061,11 +1098,14 @@ export default function SmartChat2() {
 			}
 		} catch (error) {
 			console.error("❌ Resume payment error:", error);
-			setMessages(prev => [...prev, {
-				role: "assistant",
-				content: "抱歉，恢復付款時出現錯誤。請重新選擇報告。",
-				timestamp: new Date(),
-			}]);
+			setMessages((prev) => [
+				...prev,
+				{
+					role: "assistant",
+					content: "抱歉，恢復付款時出現錯誤。請重新選擇報告。",
+					timestamp: new Date(),
+				},
+			]);
 		} finally {
 			setIsLoading(false);
 		}

@@ -244,26 +244,29 @@ export default function Home() {
 	// 🔐 Check for pending payment after login
 	useEffect(() => {
 		if (session?.user && isClient) {
-			const pendingPaymentStr = localStorage.getItem('pendingPayment');
+			const pendingPaymentStr = localStorage.getItem("pendingPayment");
 			if (pendingPaymentStr) {
 				try {
 					const paymentContext = JSON.parse(pendingPaymentStr);
 					// Check if pending payment is recent (within 30 minutes)
 					const timeDiff = Date.now() - paymentContext.timestamp;
 					const thirtyMinutes = 30 * 60 * 1000;
-					
+
 					if (timeDiff < thirtyMinutes) {
-						console.log('🔄 Resuming payment after login:', paymentContext);
-						localStorage.removeItem('pendingPayment');
+						console.log(
+							"🔄 Resuming payment after login:",
+							paymentContext
+						);
+						localStorage.removeItem("pendingPayment");
 						// Resume payment with saved context
 						resumePayment(paymentContext);
 					} else {
-						console.log('⏱️ Pending payment expired, clearing');
-						localStorage.removeItem('pendingPayment');
+						console.log("⏱️ Pending payment expired, clearing");
+						localStorage.removeItem("pendingPayment");
 					}
 				} catch (error) {
-					console.error('❌ Error parsing pending payment:', error);
-					localStorage.removeItem('pendingPayment');
+					console.error("❌ Error parsing pending payment:", error);
+					localStorage.removeItem("pendingPayment");
 				}
 			}
 		}
@@ -396,29 +399,31 @@ export default function Home() {
 	const resumePayment = async (paymentContext: any) => {
 		try {
 			setIsLoading(true);
-			console.log('🚀 Resuming payment with context:', paymentContext);
+			console.log("🚀 Resuming payment with context:", paymentContext);
 
 			let paymentEndpoint;
-			const { type, locale, concern, specificProblem, sessionId } = paymentContext;
+			const { type, locale, concern, specificProblem, sessionId } =
+				paymentContext;
 
 			// Determine payment endpoint based on type
-			if (type === 'comprehensive') {
-				paymentEndpoint = '/api/checkoutSessions/payment4';
-			} else if (type === 'premium') {
-				paymentEndpoint = '/api/checkoutSessions/payment2';
-			} else if (type === 'couple') {
-				paymentEndpoint = '/api/payment-couple';
+			if (type === "comprehensive") {
+				paymentEndpoint = "/api/checkoutSessions/payment4";
+			} else if (type === "premium") {
+				paymentEndpoint = "/api/checkoutSessions/payment2";
+			} else if (type === "couple") {
+				paymentEndpoint = "/api/payment-couple";
 			} else {
-				paymentEndpoint = '/api/checkoutSessions/payment-fortune-category';
+				paymentEndpoint =
+					"/api/checkoutSessions/payment-fortune-category";
 			}
 
-			const storedRegion = localStorage.getItem('userRegion');
+			const storedRegion = localStorage.getItem("userRegion");
 			let paymentResponse;
 
-			if (type === 'comprehensive' || type === 'premium') {
+			if (type === "comprehensive" || type === "premium") {
 				paymentResponse = await fetch(paymentEndpoint, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						quantity: 1,
 						directPayment: true,
@@ -426,10 +431,10 @@ export default function Home() {
 						region: storedRegion,
 					}),
 				});
-			} else if (type === 'couple') {
+			} else if (type === "couple") {
 				paymentResponse = await fetch(paymentEndpoint, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						locale: locale,
 						specificProblem: specificProblem,
@@ -441,17 +446,17 @@ export default function Home() {
 			} else {
 				// Fortune payment
 				const concernMapping: Record<string, string> = {
-					財運: 'financial',
-					健康: 'health',
-					事業: 'career',
-					工作: 'career',
-					感情: 'love',
+					財運: "financial",
+					健康: "health",
+					事業: "career",
+					工作: "career",
+					感情: "love",
 				};
-				const concernType = concernMapping[concern] || 'financial';
+				const concernType = concernMapping[concern] || "financial";
 
 				paymentResponse = await fetch(paymentEndpoint, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						concernType: concernType,
 						locale: locale,
@@ -465,21 +470,25 @@ export default function Home() {
 
 			if (paymentResponse.ok) {
 				const paymentData = await paymentResponse.json();
-				console.log('💳 Payment response:', paymentData);
+				console.log("💳 Payment response:", paymentData);
 
 				// Handle different response formats
-				if (type === 'couple') {
+				if (type === "couple") {
 					// Couple payment uses sessionId format
 					if (paymentData.sessionId) {
-						const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-						if (!stripePublicKey) throw new Error('Stripe public key not configured');
+						const stripePublicKey =
+							process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+						if (!stripePublicKey)
+							throw new Error("Stripe public key not configured");
 
-						const stripe = await import('@stripe/stripe-js').then(mod => 
-							mod.loadStripe(stripePublicKey)
+						const stripe = await import("@stripe/stripe-js").then(
+							(mod) => mod.loadStripe(stripePublicKey)
 						);
 
 						if (stripe) {
-							await stripe.redirectToCheckout({ sessionId: paymentData.sessionId });
+							await stripe.redirectToCheckout({
+								sessionId: paymentData.sessionId,
+							});
 						}
 					}
 				} else {
@@ -490,10 +499,10 @@ export default function Home() {
 				}
 			}
 		} catch (error) {
-			console.error('❌ Error resuming payment:', error);
+			console.error("❌ Error resuming payment:", error);
 			const errorMessage = {
-				role: 'assistant',
-				content: '抱歉，付款處理時發生錯誤，請稍後再試。',
+				role: "assistant",
+				content: "抱歉，付款處理時發生錯誤，請稍後再試。",
 				timestamp: new Date(),
 			};
 			setMessages((prev) => [...prev, errorMessage]);
@@ -859,22 +868,31 @@ export default function Home() {
 
 					// 🔐 Check if user is logged in before payment
 					if (!session) {
-						console.log("⚠️ User not logged in, saving payment context and redirecting to login");
-						
+						console.log(
+							"⚠️ User not logged in, saving payment context and redirecting to login"
+						);
+
 						// Save payment context to localStorage
 						const paymentContext = {
-							type: useComprehensivePayment ? 'comprehensive' : 
-							      usePremiumPayment ? 'premium' : 
-							      isCouplePayment ? 'couple' : 'fortune',
+							type: useComprehensivePayment
+								? "comprehensive"
+								: usePremiumPayment
+									? "premium"
+									: isCouplePayment
+										? "couple"
+										: "fortune",
 							locale: currentLocale,
 							concern: data.concern,
 							specificProblem: problemToUse,
 							sessionId: sessionId,
 							timestamp: Date.now(),
 						};
-						
-						localStorage.setItem('pendingPayment', JSON.stringify(paymentContext));
-						router.push('/auth/login');
+
+						localStorage.setItem(
+							"pendingPayment",
+							JSON.stringify(paymentContext)
+						);
+						router.push("/auth/login");
 						return;
 					}
 
@@ -1411,7 +1429,7 @@ export default function Home() {
 		// 🔐 Check if user is logged in before loading conversation history
 		if (!session) {
 			console.log("⚠️ User not logged in, redirecting to login");
-			router.push('/auth/login');
+			router.push("/auth/login");
 			return;
 		}
 

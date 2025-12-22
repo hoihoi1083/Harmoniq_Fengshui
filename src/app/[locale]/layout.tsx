@@ -80,8 +80,8 @@ export async function generateMetadata({
 			title: currentMetadata.title,
 			description: currentMetadata.description,
 			images: ["/images/hero/hero-bg.png"],
-			creator: `@${currentMetadata.author}`,
-			site: `@${currentMetadata.author}`,
+			creator: "@HarmoniqFengShui",
+			site: "@HarmoniqFengShui",
 		},
 	};
 }

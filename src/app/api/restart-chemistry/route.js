@@ -10,12 +10,12 @@ function calculateBaZi(birthDate) {
 		const year = date.getFullYear();
 		const month = date.getMonth() + 1;
 
-		// Use BaziCalculator for accurate year and day pillars
-		const yearPillar = BaziCalculator.getYearPillar(year);
+		// Use BaziCalculator for accurate year and day pillars - pass date object to handle CNY correctly
+		const yearPillar = BaziCalculator.getYearPillar(date);
 		const dayPillar = BaziCalculator.getDayPillar(date);
 
-		// Use traditional 五虎遁法 for month pillar
-		const monthPillarResult = BaziCalculator.getMonthPillar(year, month);
+		// Use traditional 五虎遁法 for month pillar - pass date object to handle CNY correctly
+		const monthPillarResult = BaziCalculator.getMonthPillar(date, month);
 
 		// Hour pillar would need actual birth hour
 		const hourPillar = "甲子"; // Default for now

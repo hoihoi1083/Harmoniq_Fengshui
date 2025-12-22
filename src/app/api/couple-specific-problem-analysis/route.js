@@ -38,17 +38,17 @@ export async function POST(request) {
 				const date = new Date(birthDateTime);
 				const year = date.getFullYear();
 
-				// Use the fixed BaziCalculator methods
-				const yearPillar = BaziCalculator.getYearPillar(year);
+				// Use the fixed BaziCalculator methods - pass date object to handle CNY correctly
+				const yearPillar = BaziCalculator.getYearPillar(date);
 				const dayPillar = BaziCalculator.getDayPillar(date);
 
 				// Calculate month and hour using the same approach as EnhancedInitialAnalysis
 				const month = date.getMonth() + 1;
 				const hour = date.getHours();
 
-				// Calculate month using traditional 五虎遁法
+				// Calculate month using traditional 五虎遁法 - pass date object to handle CNY correctly
 				const monthPillarResult = BaziCalculator.getMonthPillar(
-					year,
+					date,
 					month
 				);
 				const monthPillar = monthPillarResult.combined;

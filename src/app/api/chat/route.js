@@ -501,14 +501,21 @@ export async function POST(request) {
 				);
 
 				if (birthdayAnalysis) {
-					return NextResponse.json({
+				return NextResponse.json(
+					{
 						content: birthdayAnalysis,
 						suggestions: [],
 						emotion: "supportive",
 						timestamp: new Date().toISOString(),
 						birthdayAnalyzed: true,
 						parsedBirthday: parsedDate.toISOString().split("T")[0],
-					});
+					},
+					{
+						headers: {
+							"Content-Type": "application/json; charset=utf-8",
+						},
+					}
+					);
 				}
 			}
 		}
@@ -603,13 +610,20 @@ export async function POST(request) {
 
 		// 如果有意圖回應，直接返回
 		if (intentResponse) {
-			return NextResponse.json({
-				content: intentResponse,
-				suggestions: [],
-				emotion: "professional",
-				timestamp: new Date().toISOString(),
-				intentTracked: true,
-			});
+			return NextResponse.json(
+				{
+					content: intentResponse,
+					suggestions: [],
+					emotion: "professional",
+					timestamp: new Date().toISOString(),
+					intentTracked: true,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json; charset=utf-8",
+					},
+				}
+			);
 		}
 
 		// 繼續原有的AI對話邏輯
@@ -747,12 +761,19 @@ export async function POST(request) {
 			topicAnalysis
 		);
 
-		return NextResponse.json({
-			content: enhancedResponse,
-			suggestions,
-			emotion: detailedEmotion,
-			timestamp: new Date().toISOString(),
-		});
+		return NextResponse.json(
+			{
+				content: enhancedResponse,
+				suggestions,
+				emotion: detailedEmotion,
+				timestamp: new Date().toISOString(),
+			},
+			{
+				headers: {
+					"Content-Type": "application/json; charset=utf-8",
+				},
+			}
+		);
 	} catch (error) {
 		console.error("DeepSeek Chat API error:", error);
 
@@ -782,11 +803,18 @@ export async function POST(request) {
 		const fallbackContent =
 			fallbackResponses[emotion] || fallbackResponses.neutral;
 
-		return NextResponse.json({
-			content: fallbackContent,
-			suggestions: ["我需要情感支持", "教我放鬆嘅方法", "查看風水報告"],
-			emotion: "supportive",
-			timestamp: new Date().toISOString(),
-		});
+		return NextResponse.json(
+			{
+				content: fallbackContent,
+				suggestions: ["我需要情感支持", "教我放鬆嘅方法", "查看風水報告"],
+				emotion: "supportive",
+				timestamp: new Date().toISOString(),
+			},
+			{
+				headers: {
+					"Content-Type": "application/json; charset=utf-8",
+				},
+			}
+		);
 	}
 }
