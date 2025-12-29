@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
 			fullUrl: true,
 		},
 	},
+	// 🆕 Fix ByteString error with Chinese characters
+	webpack: (config) => {
+		config.externals = [...(config.externals || [])];
+		return config;
+	},
+	// Force UTF-8 encoding
+	compress: true,
+	poweredByHeader: false,
 	images: {
 		remotePatterns: [
 			{

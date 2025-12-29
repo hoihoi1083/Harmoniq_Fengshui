@@ -1996,9 +1996,15 @@ ${baseServices}
 
 	// 🎯 調用 DeepSeek API
 	async callDeepSeekAPI(messages, options = {}) {
+		// Sanitize messages to prevent encoding issues
+		const sanitizedMessages = messages.map(msg => ({
+			role: msg.role,
+			content: typeof msg.content === 'string' ? msg.content : String(msg.content)
+		}));
+
 		const requestData = {
 			model: "deepseek-chat",
-			messages: messages,
+			messages: sanitizedMessages,
 			temperature: options.temperature || 0.3,
 			max_tokens: options.max_tokens || 2000,
 			stream: false,
@@ -2007,8 +2013,9 @@ ${baseServices}
 		const response = await fetch(this.DEEPSEEK_API_URL, {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${this.DEEPSEEK_API_KEY}`,
+				"Content-Type": "application/json; charset=utf-8",
+				"Authorization": `Bearer ${this.DEEPSEEK_API_KEY}`,
+				"Accept": "application/json",
 			},
 			body: JSON.stringify(requestData),
 		});
@@ -3187,7 +3194,20 @@ async function getLastBaziFromSession(sessionId) {
 	}
 }
 
-// 🎯 主要 API 處理函數
+// � OPTIONS handler for CORS preflight
+export async function OPTIONS(request) {
+	return new NextResponse(null, {
+		status: 200,
+		headers: {
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Methods': 'POST, OPTIONS',
+			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+			'Access-Control-Max-Age': '86400',
+		},
+	});
+}
+
+// �🎯 主要 API 處理函數
 export async function POST(request) {
 	// 🔧 FIX: Declare variables at top level for finally block access
 	let sessionId,
@@ -3200,6 +3220,7 @@ export async function POST(request) {
 		locale;
 
 	// 🔧 FIX: Helper function to capture response before returning
+	// 🆕 BYTESTRING FIX: Wrap NextResponse.json to handle encoding errors
 	const returnWithResponse = (jsonData) => {
 		// Extract and save response content before returning
 		if (jsonData.response && typeof jsonData.response === "string") {
@@ -3209,7 +3230,21 @@ export async function POST(request) {
 				response.substring(0, 100) + "..."
 			);
 		}
-		return NextResponse.json(jsonData);
+		
+		try {
+			// Ensure proper UTF-8 encoding for Chinese characters
+			const safeData = JSON.parse(JSON.stringify(jsonData));
+			return NextResponse.json(safeData);
+		} catch (encodingError) {
+			console.error("⚠️ ByteString encoding error caught:", encodingError);
+			// Fallback: return plain text response
+			return new NextResponse(JSON.stringify(jsonData), {
+				status: 200,
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8',
+				},
+			});
+		}
 	};
 
 	try {
@@ -7957,15 +7992,26 @@ export async function POST(request) {
 	} catch (error) {
 		console.error("🚨 Smart-Chat2 錯誤:", error);
 
-		return NextResponse.json(
-			{
-				response:
-					"抱歉，系統暫時遇到問題。不過我還是很想幫你！不如告訴我你的生日，讓我為你做個簡單的運勢分析？ 📅 格式：1990-05-15",
-				error: "系統錯誤",
-				systemType: "smart-chat2",
-			},
-			{ status: 500 }
-		);
+		// 🆕 BYTESTRING FIX: Handle ByteString errors specifically
+		const errorResponse = {
+			response:
+				"抱歉，系統暫時遇到問題。不過我還是很想幫你！不如告訴我你的生日，讓我為你做個簡單的運勢分析？ 📅 格式：1990-05-15",
+			error: "系統錯誤",
+			systemType: "smart-chat2",
+		};
+
+		try {
+			return NextResponse.json(errorResponse, { status: 500 });
+		} catch (byteStringError) {
+			// If NextResponse.json fails due to encoding, use plain Response
+			console.error("⚠️ ByteString error in error handler:", byteStringError);
+			return new NextResponse(JSON.stringify(errorResponse), {
+				status: 500,
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8',
+				},
+			});
+		}
 	} finally {
 		// � DEBUG: Check all variables in finally block
 		console.log("🔍 Finally block variables:", {

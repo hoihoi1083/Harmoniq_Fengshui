@@ -13,6 +13,22 @@ const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME || "0.0.0.0";
 const port = parseInt(process.env.PORT || "3000", 10);
 
+// 🛡️ Handle EPIPE errors gracefully to prevent PM2 crashes
+process.on("uncaughtException", (err) => {
+	if (err.code === "EPIPE" || err.errno === -32) {
+		// Client disconnected - this is normal, just log and continue
+		console.warn("⚠️ EPIPE error caught (client disconnected):", err.message);
+		return;
+	}
+	// Other errors are fatal
+	console.error("💥 Fatal uncaught exception:", err);
+	process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+	console.error("💥 Unhandled rejection at:", promise, "reason:", reason);
+});
+
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 

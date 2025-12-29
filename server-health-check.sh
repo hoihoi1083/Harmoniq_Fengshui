@@ -2,19 +2,41 @@
 # Server Health and Security Check Script
 # Run this weekly to check for malware and system health
 
+# Track critical alerts
+CRITICAL_ALERTS=0
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 echo "🔍 Server Health & Security Check"
 echo "=================================="
 echo "Date: $(date)"
 echo ""
 
-# 1. Check for crypto miners
+# 1. Check for crypto miners (COMPREHENSIVE - catches hidden & disguised miners)
 echo "1️⃣ Checking for crypto miners..."
-MINERS=$(ps aux | grep -iE 'xmrig|cpuminer|monero|kinsing' | grep -v grep)
-if [ -z "$MINERS" ]; then
+# Check for known miner names (including n0de, xm64, etc.)
+MINERS=$(ps aux | grep -iE 'xmrig|cpuminer|monero|kinsing|n0de|xm64|minergate|stratum' | grep -v grep)
+# Check for processes connecting to common mining ports (including 80, 443 disguise)
+MINING_PORTS=$(sudo netstat -antp 2>/dev/null | grep ESTABLISHED | grep -E ':3333|:4444|:5555|:7777|:8888|:9999|:14433|:14444|:30002' | grep -v '127.0.0.1')
+# Check for suspicious executables in tmp AND hidden user directories
+SUSPICIOUS_BINS=$(find /tmp /var/tmp /dev/shm ~/.cache-* ~/.local/share/.wd* ~/.local/share/.bd* ~/.config/.wd* ~/.config/.bd* -type f -executable 2>/dev/null | grep -vE 'systemd|yum|dnf|gpg|spotify|google|microsoft|vscode' | head -20)
+# Check for disguised process names (gvfs-*, worker-*, daemon-*, etc.)
+DISGUISED=$(ps aux | grep -vE '(grep|ps aux)' | grep -E '\.gvfs-[0-9]|\.worker-|\.config-[0-9]|\.daemon-|\.run-|\.pd_|\.helper-|cache.*worker' | head -5)
+# Check for hidden malware directories
+HIDDEN_DIRS=$(find ~ -maxdepth 2 -type d -name '.cache-*' -o -name '.*worker*' -o -name '.*miner*' 2>/dev/null)
+# Check for multiple watchdog processes (5+ similar named processes)
+WATCHDOGS=$(ps aux | awk '{print $11}' | grep -E '^\..*-[0-9a-f]{6}$' | sort | uniq -c | awk '$1 >= 5 {print $2}')
+
+if [ -z "$MINERS" ] && [ -z "$MINING_PORTS" ] && [ -z "$SUSPICIOUS_BINS" ] && [ -z "$DISGUISED" ] && [ -z "$HIDDEN_DIRS" ] && [ -z "$WATCHDOGS" ]; then
     echo "   ✅ No crypto miners detected"
 else
     echo "   🚨 ALERT: Crypto miners found!"
-    echo "$MINERS"
+    [ -n "$MINERS" ] && echo "   Known miners: $MINERS"
+    [ -n "$MINING_PORTS" ] && echo "   Mining connections: $MINING_PORTS"
+    [ -n "$SUSPICIOUS_BINS" ] && echo "   Suspicious binaries: $SUSPICIOUS_BINS"
+    [ -n "$DISGUISED" ] && echo "   Disguised processes: $DISGUISED"
+    [ -n "$HIDDEN_DIRS" ] && echo "   Hidden directories: $HIDDEN_DIRS"
+    [ -n "$WATCHDOGS" ] && echo "   Watchdog processes: $WATCHDOGS"
+    CRITICAL_ALERTS=$((CRITICAL_ALERTS + 1))
 fi
 echo ""
 
@@ -42,7 +64,7 @@ else
 fi
 echo ""
 
-# 4. Check CPU usage
+# 4. Check CPU usage (including nice/stealth miners)
 echo "4️⃣ CPU Load:"
 uptime
 LOAD=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | sed 's/,//')
@@ -51,6 +73,15 @@ if [ "$LOAD_INT" -gt 200 ]; then
     echo "   🚨 ALERT: High CPU load ($LOAD)"
 else
     echo "   ✅ CPU load normal ($LOAD)"
+fi
+
+# Check for high 'nice' CPU usage (miner stealth tactic)
+if command -v mpstat >/dev/null 2>&1; then
+    NICE_CPU=$(mpstat 1 1 | tail -1 | awk '{print $4}' | cut -d. -f1)
+    if [ "$NICE_CPU" -gt 30 ]; then
+        echo "   🚨 ALERT: High 'nice' CPU usage: ${NICE_CPU}% (stealth miner indicator!)"
+        CRITICAL_ALERTS=$((CRITICAL_ALERTS + 1))
+    fi
 fi
 echo ""
 
@@ -102,14 +133,30 @@ else
 fi
 echo ""
 
-# 8. Check cron monitoring
-echo "8️⃣ Checking automated monitoring..."
-CRON_CHECK=$(crontab -l 2>/dev/null | grep -c detect-miners)
-if [ "$CRON_CHECK" -gt 0 ]; then
-    echo "   ✅ Miner detection cron job active"
-    crontab -l | grep detect-miners
+# 8. Check cron monitoring + malicious cron jobs
+echo "8️⃣ Checking automated monitoring & malicious cron..."
+HEALTH_CHECK=$(crontab -l 2>/dev/null | grep -c "monitor-health.sh")
+INTEGRITY_CHECK=$(crontab -l 2>/dev/null | grep -c "file-integrity-monitor.sh")
+SECURITY_AUDIT=$(crontab -l 2>/dev/null | grep -c "security-audit.sh")
+
+if [ "$HEALTH_CHECK" -gt 0 ] && [ "$INTEGRITY_CHECK" -gt 0 ] && [ "$SECURITY_AUDIT" -gt 0 ]; then
+    echo "   ✅ All monitoring cron jobs active"
+    echo "      - Health check: Every 5 minutes"
+    echo "      - Integrity monitor: Daily at 2 AM"
+    echo "      - Security audit: Weekly Sunday 3 AM"
 else
-    echo "   🚨 ALERT: Miner detection cron job not found!"
+    echo "   ⚠️  WARNING: Some monitoring cron jobs missing!"
+    [ "$HEALTH_CHECK" -eq 0 ] && echo "      ❌ Health check cron not found"
+    [ "$INTEGRITY_CHECK" -eq 0 ] && echo "      ❌ Integrity monitor cron not found"
+    [ "$SECURITY_AUDIT" -eq 0 ] && echo "      ❌ Security audit cron not found"
+fi
+
+# Check for malicious cron entries
+MALICIOUS_CRON=$(crontab -l 2>/dev/null | grep -vE '^#|monitor-health|file-integrity|security-audit' | grep -iE 'cache|worker|miner|\.gvfs|\.pd_|curl.*sh|wget.*sh|/tmp/|/var/tmp/' | head -5)
+if [ -n "$MALICIOUS_CRON" ]; then
+    echo "   🚨 ALERT: Suspicious cron entries detected!"
+    echo "$MALICIOUS_CRON" | sed 's/^/      /'
+    CRITICAL_ALERTS=$((CRITICAL_ALERTS + 1))
 fi
 echo ""
 
@@ -186,8 +233,94 @@ else
 fi
 echo ""
 
+# 16. Check file integrity
+echo "1️⃣6️⃣ File Integrity Check:"
+if [ -f "$HOME/fengshui-layout/.file-checksums" ]; then
+    CONFIG_SIZE=$(stat -c%s "$HOME/fengshui-layout/next.config.js" 2>/dev/null || stat -f%z "$HOME/fengshui-layout/next.config.js" 2>/dev/null)
+    if [ "$CONFIG_SIZE" -gt 5000 ]; then
+        echo "   🚨 ALERT: next.config.js is suspiciously large ($CONFIG_SIZE bytes)!"
+        echo "   Run: ./file-integrity-monitor.sh"
+    else
+        echo "   ✅ Config files normal size ($CONFIG_SIZE bytes)"
+    fi
+    
+    # Check for recent integrity alerts
+    if [ -f "$HOME/fengshui-layout/logs/integrity-alerts.log" ]; then
+        RECENT_ALERTS=$(tail -5 "$HOME/fengshui-layout/logs/integrity-alerts.log" 2>/dev/null | wc -l)
+        if [ "$RECENT_ALERTS" -gt 0 ]; then
+            echo "   ⚠️  $RECENT_ALERTS recent integrity alerts"
+            echo "   Review: tail $HOME/fengshui-layout/logs/integrity-alerts.log"
+        fi
+    fi
+else
+    echo "   ℹ️  File integrity monitoring not initialized"
+    echo "   Run: ./file-integrity-monitor.sh"
+fi
+echo ""
+
+# 17. Quick malware scan
+echo "1️⃣7️⃣ Quick Malware Scan:"
+OBFUSCATED=$(grep -l "_0x[0-9a-f]\{6\}" "$HOME/fengshui-layout/next.config.js" "$HOME/fengshui-layout/server.js" 2>/dev/null)
+if [ -n "$OBFUSCATED" ]; then
+    echo "   🚨 CRITICAL: Obfuscated code detected in config files!"
+    echo "$OBFUSCATED" | sed 's/^/      /'
+    echo "   IMMEDIATE ACTION REQUIRED!"
+else
+    echo "   ✅ No obfuscated code in config files"
+fi
+echo ""
+
+# 18. Check shell startup file tampering
+echo "1️⃣8️⃣ Shell Startup File Integrity:"
+STARTUP_MALWARE=$(grep -H -E 'cache-d50bfb|worker-1f2fd4|\.gvfs-|\.pd_|curl.*\|.*sh|wget.*\|.*sh' ~/.bashrc ~/.bash_profile ~/.profile 2>/dev/null)
+if [ -n "$STARTUP_MALWARE" ]; then
+    echo "   🚨 CRITICAL: Malware detected in shell startup files!"
+    echo "$STARTUP_MALWARE" | sed 's/^/      /'
+    CRITICAL_ALERTS=$((CRITICAL_ALERTS + 1))
+else
+    echo "   ✅ Shell startup files clean"
+fi
+echo ""
+
+# 19. Check for malware backup copies
+echo "1️⃣9️⃣ Checking for malware backups:"
+BACKUPS=$(find ~/.local/share ~/.config -type f -name '.wd_*' -o -name '.bd_*' 2>/dev/null | grep -vE 'node_modules|pnpm|fnm|npm' | head -10)
+if [ -n "$BACKUPS" ]; then
+    echo "   🚨 ALERT: Suspicious backup files found!"
+    echo "$BACKUPS" | sed 's/^/      /'
+    CRITICAL_ALERTS=$((CRITICAL_ALERTS + 1))
+else
+    echo "   ✅ No suspicious backups detected"
+fi
+echo ""
+
 # Summary
 echo "=================================="
 echo "✅ Health check complete!"
-echo "Run this script weekly: ./server-health-check.sh"
+echo ""
+
+# Send critical alerts via email
+if [ $CRITICAL_ALERTS -gt 0 ]; then
+    if [ -f "$SCRIPT_DIR/send-alert-email.sh" ]; then
+        ALERT_MSG="Critical Server Health Issues!
+
+Server: $(hostname)
+Critical alerts: $CRITICAL_ALERTS
+
+Issues may include:
+- PM2 processes down
+- High memory usage (>90%)
+- Crypto miners detected
+- Suspicious services running
+- Config file tampering
+
+Check logs: ssh fs 'tail -100 ~/fengshui-layout/logs/health-check.log'"
+        bash "$SCRIPT_DIR/send-alert-email.sh" "🚨 Critical Server Health Alert" "$ALERT_MSG"
+    fi
+fi
+
+echo "📋 Available Security Tools:"
+echo "   ./file-integrity-monitor.sh  - Monitor file changes (run daily)"
+echo "   ./security-audit.sh          - Scan for malware (run weekly)"
+echo "   ./pre-deployment-check.sh    - Check before deploying"
 echo ""

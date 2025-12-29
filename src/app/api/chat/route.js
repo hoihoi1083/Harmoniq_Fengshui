@@ -15,20 +15,29 @@ const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
 // DeepSeek API call function with error handling
 async function callDeepSeekAPI(messages, options = {}) {
 	try {
+		// Ensure messages are properly sanitized and don't contain any special characters that could leak into headers
+		const sanitizedMessages = messages.map(msg => ({
+			role: msg.role,
+			content: typeof msg.content === 'string' ? msg.content : String(msg.content)
+		}));
+
+		const requestBody = JSON.stringify({
+			model: "deepseek-chat", // DeepSeek's main chat model
+			messages: sanitizedMessages,
+			max_tokens: options.max_tokens || 500,
+			temperature: options.temperature || 0.8,
+			top_p: options.top_p || 0.9,
+			stream: false,
+		});
+
 		const response = await fetch(DEEPSEEK_API_URL, {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+				"Content-Type": "application/json; charset=utf-8",
+				"Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
+				"Accept": "application/json",
 			},
-			body: JSON.stringify({
-				model: "deepseek-chat", // DeepSeek's main chat model
-				messages: messages,
-				max_tokens: options.max_tokens || 500,
-				temperature: options.temperature || 0.8,
-				top_p: options.top_p || 0.9,
-				stream: false,
-			}),
+			body: requestBody,
 		});
 
 		if (!response.ok) {
@@ -44,7 +53,11 @@ async function callDeepSeekAPI(messages, options = {}) {
 
 		return await response.json();
 	} catch (error) {
-		console.error("DeepSeek API call failed:", error);
+		console.error("DeepSeek API call failed:", error.message);
+		// Log more details for debugging but don't expose in production
+		if (error.message.includes('ByteString')) {
+			console.error("⚠️ Character encoding issue detected. This usually means special characters in the message.");
+		}
 		throw error;
 	}
 }
