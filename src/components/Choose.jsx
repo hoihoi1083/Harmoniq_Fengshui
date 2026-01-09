@@ -50,7 +50,7 @@ const Choose = () => {
 	];
 
 	// Generate arrays for dropdowns
-	const years = Array.from({ length: 2025 - 1926 + 1 }, (_, i) => 1926 + i);
+	const years = Array.from({ length: new Date().getFullYear() - 1926 + 1 }, (_, i) => 1926 + i);
 	const months = Array.from({ length: 12 }, (_, i) => i + 1);
 	const days = Array.from({ length: 31 }, (_, i) => i + 1);
 	const hours = Array.from({ length: 24 }, (_, i) => i + 1);

@@ -119,6 +119,19 @@ export default function MenuBar({ className, isOpen, setIsOpen, from }) {
 						</Link>
 					)}
  */}
+
+					{/* My Orders Link - only show for logged in users */}
+					{isLogined && (
+						<Link
+							className="block text-base focus:bg-secondary focus:text-primary py-3.5 px-4"
+							href="/orders"
+							onClick={() => setIsOpen(false)}
+						>
+							{currentLocale === "zh-CN"
+								? "我的订单"
+								: "我的訂單"}
+						</Link>
+					)}
 					{/* <Select>
 						<SelectTrigger className="w-full text-base border-none py-4 mt-1 data-[state=open]:mb-22 px-4 shadow-none data-[state=open]:bg-secondary data-[state=open]:text-primary">
 							{t("locale")}

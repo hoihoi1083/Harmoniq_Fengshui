@@ -12,7 +12,7 @@ import { saveComponentContentWithUser } from "@/utils/simpleCoupleContentSave";
 export default function CoupleCoreSuggestion({
 	user1,
 	user2,
-	currentYear = 2025,
+	currentYear = new Date().getFullYear(),
 	isSimplified = false,
 }) {
 	const t = useTranslations("coupleReport.coupleCoreSuggestion");

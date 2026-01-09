@@ -10,7 +10,7 @@ import {
 	storeComponentData,
 } from "../utils/componentDataStore";
 
-export default function Season({ userInfo, currentYear = 2025 }) {
+export default function Season({ userInfo, currentYear = new Date().getFullYear() }) {
 	const locale = useLocale();
 	const t = useTranslations("fengShuiReport.components.season");
 	const [analysisData, setAnalysisData] = useState(null);

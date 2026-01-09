@@ -272,7 +272,7 @@ export default function BazhaiCompass({
 										{dir.element}
 									</text>
 
-									{/* 2025年飛星 */}
+									{/* 流年飛星 */}
 									{showFlyingStars && (
 										<text
 											x={textX}
@@ -398,7 +398,7 @@ export default function BazhaiCompass({
 
 						<div className="space-y-2">
 							<h4 className="font-medium text-gray-800">
-								2025年飛星
+							流年飛星
 							</h4>
 							<p>
 								<strong>飛星：</strong>
@@ -452,7 +452,7 @@ export default function BazhaiCompass({
 				</div>
 				<div className="flex items-center">
 					<div className="w-4 h-4 bg-purple-500 rounded-full mr-2"></div>
-					<span>2025年飛星</span>
+					<span>流年飛星</span>
 				</div>
 			</div>
 

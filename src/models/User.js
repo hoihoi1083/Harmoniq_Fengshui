@@ -22,6 +22,13 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		required: false,
 	},
+	// Add role field for admin system
+	role: {
+		type: String,
+		enum: ["user", "admin", "guest"],
+		default: "user",
+		required: true,
+	},
 	gender: {
 		type: String,
 		enum: ["female", "male"],

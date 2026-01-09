@@ -210,6 +210,22 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 									{t("theory")}
 								</button> */}
 								<Link
+									href="/shop"
+									className={`px-3 py-1 rounded-full transition-all font-noto-sans-hk duration-200 hover:opacity-80 ${
+										pathname === "/shop"
+											? "bg-[#A3B116]"
+											: ""
+									}`}
+									style={{
+										color:
+											pathname === "/shop"
+												? "#fff"
+												: navTextColor,
+									}}
+								>
+									{t("shop")}
+								</Link>
+								<Link
 									href="/price"
 									className={`px-3 py-1 rounded-full transition-all font-noto-sans-hk duration-200 hover:opacity-80 ${
 										pathname === "/price"
@@ -337,6 +353,14 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 							style={{ fontFamily: "Noto Serif TC, serif" }}
 						>
 							{t("smartChat")}
+						</Link>
+						<Link
+							href="/shop"
+							className="block px-4 py-2 text-gray-800 transition-colors rounded hover:bg-gray-100"
+							onClick={() => setIsMobileMenuOpen(false)}
+							style={{ fontFamily: "Noto Serif TC, serif" }}
+						>
+							{t("shop")}
 						</Link>
 						<Link
 							href="/price"

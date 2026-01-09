@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 import { getConcernColor } from "../utils/colorTheme";
 
-export default function CoreSuggestion({ userInfo, currentYear = 2025 }) {
+export default function CoreSuggestion({ userInfo, currentYear = new Date().getFullYear() }) {
 	const locale = useLocale();
 	const t = useTranslations("fengShuiReport.components.coreSuggestion");
 	const [analysisData, setAnalysisData] = useState(null);

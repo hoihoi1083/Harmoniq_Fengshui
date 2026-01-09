@@ -1,0 +1,266 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { useLocale } from "next-intl";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+	ShoppingCart,
+	User,
+	Search,
+	LogOut,
+	Sparkles,
+	X,
+} from "lucide-react";
+
+export default function ShopNavbar({ onSearch, cartCount }) {
+	const { data: session } = useSession();
+	const locale = useLocale();
+	const [searchTerm, setSearchTerm] = useState("");
+	const [showUserMenu, setShowUserMenu] = useState(false);
+	const [showPromoBanner, setShowPromoBanner] = useState(true);
+
+	const handleSearch = (e) => {
+		const value = e.target.value;
+		setSearchTerm(value);
+		if (onSearch) {
+			onSearch(value);
+		}
+	};
+
+	return (
+		<>
+			{/* Promotional Banner */}
+			{showPromoBanner && (
+				<div className="sticky top-0 z-50 bg-black text-white py-2">
+					<div className="container mx-auto px-4">
+						<div className="flex items-center justify-center relative">
+							<p className="text-sm text-center">
+								{locale === "zh-CN"
+									? "注册即可享首单八折优惠 "
+									: "註冊即可享首單八折優惠 "}
+								<Link
+									href={`/${locale}/register`}
+									className="underline font-semibold hover:text-gray-300 transition-colors"
+								>
+									{locale === "zh-CN" ? "立即注册" : "立即註冊"}
+								</Link>
+							</p>
+							<button
+								onClick={() => setShowPromoBanner(false)}
+								className="absolute right-0 p-1 hover:bg-white/10 rounded transition-colors"
+								aria-label="Close"
+							>
+								<X className="w-4 h-4" />
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Main Navbar */}
+			<nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+			<div className="container mx-auto px-4">
+				<div className="flex items-center justify-between h-20">
+					{/* Logo */}
+					<Link
+						href={`/${locale}/shop`}
+						className="flex items-center hover:opacity-80 transition-opacity"
+					>
+					<Image
+						src="/images/logo/logo-desktop.png"
+						alt="HarmoniQ Logo"
+						width={681}
+						height={132}
+						className="h-8 w-auto"
+						style={{
+							filter: "none",
+							backfaceVisibility: "hidden",
+							WebkitFontSmoothing: "antialiased",
+						}}
+						quality={100}
+						priority
+					/>
+				</Link>
+
+				{/* Navigation Links */}
+				<div className="hidden md:flex items-center gap-8">
+					<Link
+							href={`/${locale}/shop#products-section`}
+					className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors"
+						>
+							{locale === "zh-CN" ? "2026新品" : "2026新品"}
+						</Link>
+						<Link
+							href={`/${locale}/shop#hot-products`}
+							className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors"
+						>
+							{locale === "zh-CN" ? "热销产品" : "熱銷產品"}
+						</Link>
+						<Link
+							href={`/${locale}/shop/categories`}
+						>
+							{locale === "zh-CN" ? "分类" : "分類"}
+						</Link>
+					</div>
+
+					{/* Search Bar */}
+					<div className="hidden lg:flex flex-1 max-w-md mx-8">
+						<div className="relative w-full">
+							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+							<Input
+								type="text"
+								placeholder={
+									locale === "zh-CN"
+										? "搜索产品..."
+										: "搜索產品..."
+								}
+								value={searchTerm}
+								onChange={handleSearch}
+								className="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 focus:bg-white focus:ring-2 focus:ring-[#6B8E23] rounded-full transition-all"
+							/>
+						</div>
+					</div>
+
+					{/* Right Actions */}
+					<div className="flex items-center gap-4">
+						{/* Cart */}
+						<Link href={`/${locale}/cart`}>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="relative hover:bg-gray-100 rounded-full"
+							>
+								<ShoppingCart className="w-6 h-6 text-[#6B8E23]" />
+								{cartCount > 0 && (
+									<span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+										{cartCount}
+									</span>
+								)}
+							</Button>
+						</Link>
+
+						{/* User Account */}
+						<div className="relative">
+							<Button
+								variant="ghost"
+								size="icon"
+								className="hover:bg-gray-100 rounded-full"
+								onClick={() => setShowUserMenu(!showUserMenu)}
+							>
+								<User className="w-6 h-6 text-[#6B8E23]" />
+							</Button>
+
+							{/* User Dropdown Menu */}
+							{showUserMenu && (
+								<div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+									{session?.user ? (
+										<>
+											<div className="px-4 py-3 border-b border-gray-100">
+												<p className="text-sm font-medium text-gray-900 truncate">
+													{session.user.email}
+												</p>
+											</div>
+											<Link
+												href={`/${locale}/profile`}
+												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+												onClick={() => setShowUserMenu(false)}
+											>
+												{locale === "zh-CN"
+													? "我的账户"
+													: "我的帳戶"}
+											</Link>
+											<Link
+												href={`/${locale}/orders`}
+												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+												onClick={() => setShowUserMenu(false)}
+											>
+												{locale === "zh-CN"
+													? "我的订单"
+													: "我的訂單"}
+											</Link>
+											{session?.user?.role === "admin" && (
+												<Link
+													href={`/${locale}/admin/shop`}
+													className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+													onClick={() => setShowUserMenu(false)}
+												>
+													{locale === "zh-CN"
+														? "商品管理"
+														: "商品管理"}
+												</Link>
+											)}
+											<button
+												onClick={() => {
+													signOut();
+													setShowUserMenu(false);
+												}}
+												className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors flex items-center gap-2"
+											>
+												<LogOut className="w-4 h-4" />
+												{locale === "zh-CN"
+													? "登出"
+													: "登出"}
+											</button>
+										</>
+									) : (
+										<>
+											<Link
+												href={`/${locale}/login`}
+												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+												onClick={() => setShowUserMenu(false)}
+											>
+												{locale === "zh-CN"
+													? "登录"
+													: "登入"}
+											</Link>
+											<Link
+												href={`/${locale}/register`}
+												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+												onClick={() => setShowUserMenu(false)}
+											>
+												{locale === "zh-CN"
+													? "注册"
+													: "註冊"}
+											</Link>
+										</>
+									)}
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+
+				{/* Mobile Search Bar */}
+				<div className="lg:hidden pb-4">
+					<div className="relative w-full">
+						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+						<Input
+							type="text"
+							placeholder={
+								locale === "zh-CN"
+									? "搜索产品..."
+									: "搜索產品..."
+							}
+							value={searchTerm}
+							onChange={handleSearch}
+							className="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 focus:bg-white focus:ring-2 focus:ring-[#6B8E23] rounded-full"
+						/>
+					</div>
+				</div>
+			</div>
+
+			{/* Click outside to close user menu */}
+			{showUserMenu && (
+				<div
+					className="fixed inset-0 z-40"
+					onClick={() => setShowUserMenu(false)}
+				/>
+			)}
+		</nav>
+		</>
+	);
+}

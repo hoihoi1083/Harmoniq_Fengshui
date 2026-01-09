@@ -1043,7 +1043,7 @@ const CoupleAnnualAnalysis = ({
 									fontSize: "clamp(20px, 6vw, 35px)",
 								}}
 							>
-								2025&2026流年關鍵應對策略
+							2026流年關鍵應對策略
 							</h3>
 						</div>
 

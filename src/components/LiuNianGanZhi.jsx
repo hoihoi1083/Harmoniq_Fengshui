@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { ComponentErrorBoundary } from "./ErrorHandling";
 
-export default function LiuNianGanZhi({ userInfo, currentYear = 2025 }) {
+export default function LiuNianGanZhi({ userInfo, currentYear = new Date().getFullYear() }) {
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [activeSection, setActiveSection] = useState("天干乙木-正印");

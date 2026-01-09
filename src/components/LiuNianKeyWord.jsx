@@ -9,7 +9,7 @@ import {
 	storeComponentData,
 } from "../utils/componentDataStore";
 
-export default function LiuNianKeyWord({ userInfo, currentYear = 2025 }) {
+export default function LiuNianKeyWord({ userInfo, currentYear = new Date().getFullYear() }) {
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 

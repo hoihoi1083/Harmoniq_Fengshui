@@ -12,7 +12,7 @@ import { saveComponentContentWithUser } from "@/utils/simpleCoupleContentSave";
 export default function CoupleSeason({
 	user1,
 	user2,
-	currentYear = 2025,
+	currentYear = new Date().getFullYear(),
 	isSimplified = false,
 }) {
 	const { data: session } = useSession();

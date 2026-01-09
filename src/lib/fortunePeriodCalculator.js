@@ -13,7 +13,7 @@ import getWuxingData from "./nayin";
 export function calculateFortunePeriods(
 	birthDateTime,
 	gender,
-	currentYear = 2025
+	currentYear = new Date().getFullYear()
 ) {
 	if (!birthDateTime || !gender) {
 		console.error(
@@ -225,7 +225,7 @@ function getDefaultPeriodsList() {
 export function getCurrentFortunePeriods(
 	birthDateTime,
 	gender,
-	currentYear = 2025
+	currentYear = new Date().getFullYear()
 ) {
 	const fortuneData = calculateFortunePeriods(
 		birthDateTime,

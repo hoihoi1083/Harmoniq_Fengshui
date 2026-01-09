@@ -117,6 +117,77 @@ async function fulfillCheckout(session) {
 					},
 					{ upsert: true, new: true }
 				);
+			} else if (paymentType === "shop") {
+				console.log("Shop payment completed:", sessionId);
+
+				const orderId = session.metadata.orderId;
+				if (!orderId) {
+					console.error("No orderId found in metadata for shop payment");
+					return;
+				}
+
+				const Order = (await import("@/models/Order")).default;
+				const Product = (await import("@/models/Product")).default;
+				const Cart = (await import("@/models/Cart")).default;
+				const { sendOrderConfirmationEmail } = await import("@/lib/emailService");
+
+				// Update order status
+				const order = await Order.findById(orderId);
+				if (!order) {
+					console.error("Order not found:", orderId);
+					return;
+				}
+
+				order.stripePaymentIntentId = session.payment_intent;
+				order.paymentStatus = "paid";
+				order.status = "paid";
+				order.paidAt = new Date();
+				await order.save();
+
+				// Update product stock for physical items
+				for (const item of order.items) {
+					if (!item.isDigital) {
+						const product = await Product.findById(item.productId);
+						if (product) {
+							product.stock -= item.quantity;
+							await product.save();
+						}
+					}
+				}
+
+				// Clear user's cart
+				const userId = session.metadata.userId;
+				if (userId) {
+					await Cart.findOneAndUpdate(
+						{ userId },
+						{ $set: { items: [] } },
+						{ new: true }
+					);
+					console.log("Cart cleared for user:", userId);
+				}
+
+				// Send order confirmation email
+				try {
+					const locale = order.shippingAddress?.country === "中国" || order.shippingAddress?.country === "China" ? "zh-CN" : "zh-TW";
+					await sendOrderConfirmationEmail(order, locale);
+					console.log("📧 Order confirmation email sent");
+				} catch (emailError) {
+					console.error("Failed to send confirmation email:", emailError);
+				}
+
+				// Record fulfillment
+				await CheckoutSession.findOneAndUpdate(
+					{ sessionId },
+					{
+						sessionId,
+						isFullfilled: true,
+						paymentType: "shop",
+						completedAt: new Date(),
+					},
+					{ upsert: true, new: true }
+				);
+
+				console.log("Shop order payment successful:", orderId);
 			} else {
 				// Handle regular user payments (expert188, expert88, etc.)
 				const userId = session.metadata.userId;

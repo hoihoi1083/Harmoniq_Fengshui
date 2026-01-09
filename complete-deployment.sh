@@ -93,6 +93,15 @@ server_build_and_deploy() {
         # Navigate to project directory
         cd /home/ec2-user/fengshui-layout
         
+        # Unlock immutable files (if locked by file-integrity-monitor)
+        echo "🔓 Unlocking protected files..."
+        sudo chattr -i package.json 2>/dev/null || true
+        sudo chattr -i ecosystem.config.json 2>/dev/null || true
+        sudo chattr -i next.config.js 2>/dev/null || true
+        sudo chattr -i next.config.ts 2>/dev/null || true
+        sudo chattr -i .env 2>/dev/null || true
+        sudo chattr -i .env.production 2>/dev/null || true
+        
         # Stop existing PM2 processes
         echo "⏹️  Stopping existing processes..."
         pm2 stop all || true
@@ -138,6 +147,15 @@ server_build_and_deploy() {
         
         # Save PM2 configuration
         pm2 save
+        
+        # Re-lock critical files for security
+        echo "🔒 Re-locking protected files..."
+        sudo chattr +i package.json 2>/dev/null || true
+        sudo chattr +i ecosystem.config.json 2>/dev/null || true
+        sudo chattr +i next.config.js 2>/dev/null || true
+        sudo chattr +i next.config.ts 2>/dev/null || true
+        sudo chattr +i .env 2>/dev/null || true
+        sudo chattr +i .env.production 2>/dev/null || true
         
         # Show process status
         echo "📊 Process status:"

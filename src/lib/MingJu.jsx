@@ -208,7 +208,7 @@ function generatePersonalizedContent(concernArea, tab, userInfo) {
 	const birthYear = birthDateTime
 		? new Date(birthDateTime).getFullYear()
 		: 2000;
-	const age = 2025 - birthYear;
+	const age = new Date().getFullYear() - birthYear;
 	const isYoung = age < 35;
 	const isMidAge = age >= 35 && age < 55;
 	const isElder = age >= 55;

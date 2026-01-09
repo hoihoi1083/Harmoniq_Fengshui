@@ -1,5 +1,13 @@
-import 'server-only'
+import "server-only";
 
-import Stripe from 'stripe'
+import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+if (!process.env.STRIPE_SECRET_KEY) {
+	console.warn(
+		"Warning: STRIPE_SECRET_KEY is not set. Stripe functionality will not work."
+	);
+}
+
+export const stripe = process.env.STRIPE_SECRET_KEY
+	? new Stripe(process.env.STRIPE_SECRET_KEY)
+	: null;

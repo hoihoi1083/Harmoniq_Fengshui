@@ -1247,7 +1247,7 @@ export default function GanZhi({ userInfo, currentYear = 2025 }) {
 						conclusion: `${currentYear}年為突破年，雖有壓力卻暗藏機遇，需平衡各方面因素。`,
 					},
 					yearGanZhi: {
-						stem: currentYear === 2025 ? "乙" : "甲",
+						stem: currentYear === 2025 ? "乙" : "丙",
 						branch: currentYear === 2025 ? "巳" : "午",
 					},
 				};
