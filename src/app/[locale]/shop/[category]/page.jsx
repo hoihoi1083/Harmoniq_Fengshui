@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,11 +18,14 @@ import ShopNavbar from "@/components/ShopNavbar";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
-export default function CategoryPage() {
+function CategoryPageContent() {
 	const { data: session } = useSession();
 	const params = useParams();
+	const searchParams = useSearchParams();
+	const router = useRouter();
 	const locale = params.locale;
 	const category = params.category;
+	const searchQuery = searchParams.get('search');
 
 	const [allProducts, setAllProducts] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
@@ -121,7 +124,7 @@ export default function CategoryPage() {
 	// Apply filters whenever filter state changes
 	useEffect(() => {
 		applyFilters();
-	}, [allProducts, selectedProductType, selectedElement, minPrice, maxPrice, sortBy]);
+	}, [allProducts, selectedProductType, selectedElement, minPrice, maxPrice, sortBy, searchQuery]);
 
 	const fetchProducts = async () => {
 		try {
@@ -186,6 +189,8 @@ export default function CategoryPage() {
 	};
 
 	const applyFilters = () => {
+		console.log('🔍 applyFilters called - searchQuery:', searchQuery, 'allProducts:', allProducts.length);
+		
 		if (allProducts.length === 0) {
 			setFilteredProducts([]);
 			return;
@@ -193,9 +198,55 @@ export default function CategoryPage() {
 		
 		let filtered = [...allProducts];
 		
-		// Filter by product type (sub-category)
-		if (selectedProductType) {
-			filtered = filtered.filter(p => p.category === selectedProductType);
+		// Filter by search query
+		if (searchQuery && searchQuery.trim()) {
+			console.log('🔍 Applying search filter for:', searchQuery);
+			const query = searchQuery.toLowerCase().trim();
+			filtered = filtered.filter(p => {
+				const nameZhCN = p.name?.zh_CN?.toLowerCase() || '';
+				const nameZhTW = p.name?.zh_TW?.toLowerCase() || '';
+				const nameEn = p.name?.en?.toLowerCase() || '';
+				const name = typeof p.name === 'string' ? p.name.toLowerCase() : '';
+				
+				// DEBUG: Expanded logging to see actual data structure
+				if (query === "i don't" || query === "i don't") {
+					console.log('🔍 DEBUG Product:', { 
+						nameZhCN, 
+						nameZhTW, 
+						nameEn, 
+						name, 
+						rawName: p.name,
+						productId: p._id,
+						productKeys: Object.keys(p)
+					});
+					console.log('🔍 Full product object:', JSON.stringify(p, null, 2));
+				}
+				
+				// Handle description which can be string or object
+				const descZhCN = p.description?.zh_CN?.toLowerCase() || '';
+				const descZhTW = p.description?.zh_TW?.toLowerCase() || '';
+				const descEn = p.description?.en?.toLowerCase() || '';
+				const description = typeof p.description === 'string' ? p.description.toLowerCase() : '';
+				
+				const category = p.category?.toLowerCase() || '';
+				
+				return nameZhCN.includes(query) || 
+					   nameZhTW.includes(query) || 
+					   nameEn.includes(query) ||
+					   name.includes(query) ||
+					   descZhCN.includes(query) ||
+					   descZhTW.includes(query) ||
+					   descEn.includes(query) ||
+					   description.includes(query) ||
+					   category.includes(query);
+			});
+			console.log('🔍 After search filter:', filtered.length, 'products found');
+		} else {
+			// Only apply category filter if NOT searching
+			// Filter by product type (sub-category)
+			if (selectedProductType) {
+				filtered = filtered.filter(p => p.category === selectedProductType);
+			}
 		}
 		
 		// Filter by element type
@@ -218,7 +269,7 @@ export default function CategoryPage() {
 		}
 		
 		setFilteredProducts(filtered);
-		console.log('Filtered products:', filtered.length, 'from', allProducts.length);
+		console.log('Filtered products:', filtered.length, 'from', allProducts.length, searchQuery ? `searching for "${searchQuery}"` : '');
 	};
 
 	// Category display names
@@ -261,6 +312,7 @@ export default function CategoryPage() {
 
 	// Count active filters
 	const activeFilterCount = [
+		searchQuery !== null && searchQuery.trim() !== '',
 		selectedProductType !== null,
 		selectedElement !== null,
 		minPrice > 0 || maxPrice < 1000
@@ -271,6 +323,8 @@ export default function CategoryPage() {
 		setSelectedElement(null);
 		setMinPrice(0);
 		setMaxPrice(1000);
+		// Clear search query by navigating to URL without search param
+		router.push(`/${locale}/shop/all`);
 	};
 
 	const renderStars = (rating) => {
@@ -329,30 +383,53 @@ export default function CategoryPage() {
 								</div>
 							)}
 
-							{/* Product Type Section */}
-							<div className="border-b border-gray-200 pb-4">
-								<button
-									onClick={() => toggleSection("productType")}
-									className="flex items-center justify-between w-full mb-4"
-								>
-									<h3 className="font-bold text-lg">
-										{locale === "zh-CN" ? "产品类型" : "產品類型"}
-									</h3>
-									<SlidersHorizontal className="w-5 h-5 text-gray-400" />
-								</button>
-								{expandedSections.productType && (
-									<div className="space-y-3">
-										<button
-											onClick={() => setSelectedProductType(null)}
-											className={`flex items-center justify-between w-full transition-colors ${
-												selectedProductType === null 
-													? "text-[#8B9F3A] font-semibold" 
-													: "text-gray-700 hover:text-[#8B9F3A]"
-											}`}
-										>
-											<span>{locale === "zh-CN" ? "全部" : "全部"}</span>
-											<ChevronRight className="w-4 h-4" />
-										</button>
+						{/* Active Search Filter */}
+						{searchQuery && (
+							<div className="pb-4 border-b border-gray-200">
+								<div className="flex items-center justify-between mb-2">
+									<span className="text-sm font-medium text-gray-700">
+										{locale === "zh-CN" ? "搜索" : "搜索"}
+									</span>
+								</div>
+								<div className="flex items-center gap-2 bg-[#F0F4E8] px-3 py-2 rounded-lg">
+									<span className="text-sm text-gray-700 flex-1 truncate">"{searchQuery}"</span>
+									<button
+										onClick={() => router.push(`/${locale}/shop/all`)}
+										className="text-gray-500 hover:text-gray-700 flex-shrink-0"
+										title={locale === "zh-CN" ? "清除搜索" : "清除搜索"}
+									>
+										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+										</svg>
+									</button>
+								</div>
+							</div>
+						)}
+
+						{/* Product Type Section */}
+						<div className="border-b border-gray-200 pb-4">
+							<button
+								onClick={() => toggleSection("productType")}
+								className="flex items-center justify-between w-full mb-4"
+							>
+								<h3 className="font-bold text-lg">
+									{locale === "zh-CN" ? "产品类型" : "產品類型"}
+								</h3>
+								<SlidersHorizontal className="w-5 h-5 text-gray-400" />
+							</button>
+							{expandedSections.productType && (
+								<div className="space-y-3">
+									<button
+										onClick={() => setSelectedProductType(null)}
+										className={`flex items-center justify-between w-full transition-colors ${
+											selectedProductType === null 
+												? "text-[#8B9F3A] font-semibold" 
+												: "text-gray-700 hover:text-[#8B9F3A]"
+										}`}
+									>
+										<span>{locale === "zh-CN" ? "全部" : "全部"}</span>
+										<ChevronRight className="w-4 h-4" />
+									</button>
 										{productTypes.map((item) => (
 											<button
 												key={item.id}
@@ -557,7 +634,15 @@ export default function CategoryPage() {
 						{/* Header */}
 						<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
 							<div>
-								<h1 className="text-3xl font-bold mb-2">{categoryName}</h1>
+							<h1 className="text-3xl font-bold mb-2">
+								{searchQuery ? (
+									locale === "zh-CN" 
+										? `"${searchQuery}" 的搜索结果` 
+										: `"${searchQuery}" 的搜索結果`
+								) : (
+									categoryName
+								)}
+							</h1>
 								<p className="text-gray-500 text-sm">
 									{loading
 										? locale === "zh-CN" ? "加载中..." : "載入中..."
@@ -938,5 +1023,20 @@ export default function CategoryPage() {
 				</div>
 			</footer>
 		</div>
+	);
+}
+
+export default function CategoryPage() {
+	return (
+		<Suspense fallback={
+			<div className="min-h-screen bg-white flex items-center justify-center">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#6B8E23] mx-auto mb-4"></div>
+					<p className="text-lg text-gray-600">載入中...</p>
+				</div>
+			</div>
+		}>
+			<CategoryPageContent />
+		</Suspense>
 	);
 }

@@ -5,6 +5,9 @@ import Product from "@/models/Product";
 import { auth } from "@/auth";
 import { sendShippingNotificationEmail } from "@/lib/emailService";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET - Get specific order (Admin only)
 export async function GET(request, { params }) {
 	try {
@@ -94,8 +97,11 @@ export async function PATCH(request, { params }) {
 
 		// Update fields
 		if (status) {
-			order.paymentStatus = status; // Update paymentStatus field
-			order.status = status; // Also update status field for consistency
+			order.status = status;
+			// Update paymentStatus only for payment-related statuses
+			if (['paid', 'pending', 'failed', 'refunded'].includes(status)) {
+				order.paymentStatus = status;
+			}
 		}
 		if (trackingNumber) order.trackingNumber = trackingNumber;
 		if (shippingMethod) order.shippingMethod = shippingMethod;

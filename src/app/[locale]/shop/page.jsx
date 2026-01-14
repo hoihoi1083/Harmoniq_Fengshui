@@ -467,21 +467,33 @@ export default function ShopPage() {
 														</span>
 													</div>
 
-													{/* Price */}
-													<div className="flex items-center gap-2">
-														<span className="text-2xl font-bold text-[#6B8E23]">
-															${hasDiscount ? discountedPrice.toFixed(0) : product.price}
-														</span>
-														{hasDiscount && (
-															<>
-																<span className="text-sm text-gray-400 line-through">
-																	${product.price}
-																</span>
-																<span className="text-xs font-semibold text-red-500 bg-red-50 px-2 py-1 rounded">
-																	-{product.discount.percentage}%
-																</span>
-															</>
-														)}
+													{/* Price & Action */}
+													<div className="flex items-center justify-between gap-2">
+														<div className="flex items-center gap-2">
+															<span className="text-2xl font-bold text-[#6B8E23]">
+																${hasDiscount ? discountedPrice.toFixed(0) : product.price}
+															</span>
+															{hasDiscount && (
+																<>
+																	<span className="text-sm text-gray-400 line-through">
+																		${product.price}
+																	</span>
+																	<span className="text-xs font-semibold text-red-500 bg-red-50 px-2 py-1 rounded">
+																		-{product.discount.percentage}%
+																	</span>
+																</>
+															)}
+														</div>
+														<button
+															onClick={(e) => {
+																e.preventDefault();
+																e.stopPropagation();
+																handleAddToCart(product);
+															}}
+															className="flex items-center justify-center w-10 h-10 rounded-full bg-[#6B8E23] text-white hover:bg-[#2E7D32] transition-colors"
+														>
+															<ShoppingCart className="w-5 h-5" />
+														</button>
 													</div>
 												</div>
 											</div>
@@ -490,18 +502,15 @@ export default function ShopPage() {
 								})}
 							</div>
 							<div className="text-center">
-								<Button
-									size="lg"
-									className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
-									onClick={() => {
-										document
-											.getElementById("all-products")
-											?.scrollIntoView({ behavior: "smooth" });
-									}}
-								>
-									{locale === "zh-CN" ? "浏览更多" : "瀏覽更多"}
-								</Button>
-							</div>
+					<Link href={`/${locale}/shop/all`}>
+						<Button
+							size="lg"
+							className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
+						>
+							{locale === "zh-CN" ? "浏览更多" : "瀏覽更多"}
+						</Button>
+					</Link>
+				</div>
 						</>
 					) : (
 						<div className="text-center py-12">
@@ -648,9 +657,16 @@ export default function ShopPage() {
 																HK${hasDiscount ? discountedPrice.toFixed(0) : product.price}
 															</span>
 														</div>
-														<div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#6B8E23] text-white group-hover:bg-[#2E7D32] transition-colors">
+														<button
+															onClick={(e) => {
+																e.preventDefault();
+																e.stopPropagation();
+																handleAddToCart(product);
+															}}
+															className="flex items-center justify-center w-10 h-10 rounded-full bg-[#6B8E23] text-white hover:bg-[#2E7D32] transition-colors"
+														>
 															<ShoppingCart className="w-5 h-5" />
-														</div>
+														</button>
 													</div>
 												</div>
 											</div>
@@ -659,17 +675,14 @@ export default function ShopPage() {
 								})}
 							</div>
 							<div className="text-center">
-								<Button
-									size="lg"
-									className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
-									onClick={() => {
-										document
-											.getElementById("all-products")
-											?.scrollIntoView({ behavior: "smooth" });
-									}}
-								>
-									{locale === "zh-CN" ? "浏览更多" : "瀏覽更多"}
-								</Button>
+								<Link href={`/${locale}/shop/all`}>
+									<Button
+										size="lg"
+										className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
+									>
+										{locale === "zh-CN" ? "浏览更多" : "瀏覽更多"}
+									</Button>
+								</Link>
 							</div>
 						</>
 					) : (

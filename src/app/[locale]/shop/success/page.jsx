@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Package, ArrowRight, Home, Sparkles } from "lucide-react";
 
@@ -41,7 +41,7 @@ export default function ShopSuccessPage() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-[#EFEFEF] via-white to-[#EFEFEF]">
-			<Navbar />
+			<ShopNavbar />
 
 			<div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
 				<div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-100 text-center">

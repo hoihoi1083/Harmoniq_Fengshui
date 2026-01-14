@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +35,6 @@ export default function AdminShopPage() {
 		description: { zh_TW: "", zh_CN: "", en: "" },
 		category: "charm",
 		price: "",
-		originalPrice: "",
 		currency: "HKD",
 		stock: "",
 		sold: 0,
@@ -106,9 +105,6 @@ export default function AdminShopPage() {
 			const cleanedData = {
 				...formData,
 				price: parseFloat(formData.price),
-				originalPrice: formData.originalPrice
-					? parseFloat(formData.originalPrice)
-					: undefined,
 				stock: parseInt(formData.stock) || 0,
 				sold: parseInt(formData.sold) || 0,
 				images: formData.images.filter((img) => img.trim() !== ""),
@@ -189,7 +185,6 @@ export default function AdminShopPage() {
 			description: product.description || { zh_TW: "", zh_CN: "", en: "" },
 			category: product.category || "charm",
 			price: product.price ? product.price.toString() : "",
-			originalPrice: product.originalPrice ? product.originalPrice.toString() : "",
 			currency: product.currency || "HKD",
 			stock: product.stock ? product.stock.toString() : "",
 			sold: product.soldCount || product.sold || 0,
@@ -249,7 +244,6 @@ export default function AdminShopPage() {
 			description: { zh_TW: "", zh_CN: "", en: "" },
 			category: "charm",
 			price: "",
-			originalPrice: "",
 			currency: "HKD",
 			stock: "",
 			sold: 0,
@@ -379,8 +373,8 @@ export default function AdminShopPage() {
 	if (status === "loading") {
 		return (
 			<div className="min-h-screen bg-[#EFEFEF]">
-				<Navbar />
-				<div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+				<ShopNavbar />
+				<div className="px-4 py-8 pt-24 mx-auto max-w-7xl sm:px-6 lg:px-8">
 					<div className="flex items-center justify-center h-64">
 						<div className="text-center">
 							<div className="w-12 h-12 border-4 border-[#1C312E] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -402,16 +396,16 @@ export default function AdminShopPage() {
 
 	return (
 		<div className="min-h-screen bg-[#EFEFEF]">
-			<Navbar />
+			<ShopNavbar />
 
-			<div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<div className="px-4 py-8 pt-24 mx-auto max-w-7xl sm:px-6 lg:px-8">
 				{/* Header */}
 				<div className="flex items-center justify-between mb-8">
 					<div>
 						<h1 className="text-3xl font-bold text-gray-900">
 							商品管理
 						</h1>
-						<p className="text-gray-600 mt-2">
+						<p className="mt-2 text-gray-600">
 							管理您的開運商城商品
 						</p>
 					</div>
@@ -443,13 +437,13 @@ export default function AdminShopPage() {
 				{/* Add/Edit Product Form */}
 				{showForm && (
 					<div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border-2 border-[#73897F]/30">
-						<h2 className="text-2xl font-bold mb-6">
+						<h2 className="mb-6 text-2xl font-bold">
 							{isEditMode ? "編輯商品" : "新增商品"}
 						</h2>
 
 						<form onSubmit={handleSubmit} className="space-y-6">
 							{/* Product Names */}
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<div>
 									<Label htmlFor="name_zh_TW">
 										商品名稱 (繁體) *
@@ -493,7 +487,7 @@ export default function AdminShopPage() {
 							</div>
 
 							{/* Descriptions */}
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<div>
 									<Label htmlFor="desc_zh_TW">
 										商品描述 (繁體) *
@@ -539,7 +533,7 @@ export default function AdminShopPage() {
 							</div>
 
 							{/* Category, Element, Currency */}
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 								<div>
 									<Label htmlFor="category">類別 *</Label>
 									<Select
@@ -640,138 +634,120 @@ export default function AdminShopPage() {
 							</div>
 
 							{/* Price, Original Price, Stock */}
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-								<div>
-									<Label htmlFor="price">價格 *</Label>
-									<Input
-										id="price"
-										type="number"
-										required
-										value={formData.price}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												price: e.target.value,
-											})
-										}
-										placeholder="188"
-									/>
-								</div>
-
-								<div>
-									<Label htmlFor="originalPrice">
-										原價（顯示折扣用）
-									</Label>
-									<Input
-										id="originalPrice"
-										type="number"
-										value={formData.originalPrice}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												originalPrice: e.target.value,
-											})
-										}
-										placeholder="288"
-									/>
-								</div>
-
-								<div>
-									<Label htmlFor="stock">庫存 *</Label>
-									<Input
-										id="stock"
-										type="number"
-										required
-										value={formData.stock}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												stock: e.target.value,
-											})
-										}
-										placeholder="100"
-									/>
-								</div>
-							</div>
-
-							{/* Sold Count */}
+						<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 							<div>
-								<Label htmlFor="sold">銷售數量（用於熱銷產品排序）</Label>
+								<Label htmlFor="price">價格 *</Label>
 								<Input
-									id="sold"
+									id="price"
 									type="number"
-									min="0"
-									value={formData.sold}
+									required
+									value={formData.price}
 									onChange={(e) =>
 										setFormData({
 											...formData,
-											sold: parseInt(e.target.value) || 0,
+											price: e.target.value,
 										})
 									}
-									placeholder="0"
-								/>
-								<p className="text-xs text-gray-500 mt-1">
-									設定大於 0 的數值，商品會顯示在「熱銷產品」區域
-								</p>
-							</div>
+									placeholder="188"
+							/>
+						</div>
 
-							{/* Discount */}
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div>
-									<Label htmlFor="discount">
-										折扣百分比 (%)
-									</Label>
-									<Input
-										id="discount"
-										type="number"
-										min="0"
-										max="100"
-										value={formData.discount.percentage}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												discount: {
-													...formData.discount,
-													percentage: parseInt(
-														e.target.value
-													),
-												},
-											})
-										}
-										placeholder="20"
-									/>
-								</div>
+						<div>
+							<Label htmlFor="stock">庫存 *</Label>
+							<Input
+								id="stock"
+								type="number"
+								required
+								value={formData.stock}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										stock: e.target.value,
+									})
+								}
+								placeholder="100"
+							/>
+						</div>
+					</div>
 
-								<div>
-									<Label htmlFor="discountValidUntil">
-										折扣有效期
-									</Label>
-									<Input
-										id="discountValidUntil"
-										type="date"
-										value={
-											formData.discount.validUntil
-												?.split("T")[0] || ""
-										}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												discount: {
-													...formData.discount,
-													validUntil: e.target.value
-														? new Date(
-																e.target.value
-															).toISOString()
-														: "",
-												},
-											})
-										}
-									/>
-								</div>
-							</div>
+				{/* Sold Count */}
+				<div>
+					<Label htmlFor="sold">銷售數量（用於熱銷產品排序）</Label>
+					<Input
+						id="sold"
+						type="number"
+						min="0"
+						value={formData.sold}
+						onChange={(e) =>
+							setFormData({
+								...formData,
+								sold: parseInt(e.target.value) || 0,
+							})
+						}
+						placeholder="0"
+					/>
+					<p className="mt-1 text-xs text-gray-500">
+						設定大於 0 的數值，商品會顯示在「熱銷產品」區域
+					</p>
+				</div>
 
-							{/* Rating */}
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+			{/* Discount */}
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+				<div>
+					<Label htmlFor="discount">
+						折扣百分比 (%)
+					</Label>
+					<Input
+						id="discount"
+						type="number"
+						min="0"
+						max="100"
+						value={formData.discount.percentage}
+						onChange={(e) =>
+							setFormData({
+								...formData,
+								discount: {
+									...formData.discount,
+									percentage: parseInt(
+										e.target.value
+									),
+								},
+							})
+						}
+						placeholder="20"
+					/>
+				</div>
+
+				<div>
+					<Label htmlFor="discountValidUntil">
+						折扣有效期
+					</Label>
+					<Input
+						id="discountValidUntil"
+						type="date"
+						value={
+							formData.discount.validUntil
+								?.split("T")[0] || ""
+						}
+						onChange={(e) =>
+							setFormData({
+								...formData,
+								discount: {
+									...formData.discount,
+									validUntil: e.target.value
+										? new Date(
+												e.target.value
+											).toISOString()
+										: "",
+								},
+							})
+						}
+					/>
+				</div>
+			</div>
+
+			{/* Rating */}
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<div>
 									<Label htmlFor="ratingAverage">
 										評分 (0-5)
@@ -851,15 +827,15 @@ export default function AdminShopPage() {
 							{/* Images */}
 							<div>
 								<Label>商品圖片</Label>
-								<div className="space-y-3 mt-2">
+								<div className="mt-2 space-y-3">
 									{formData.images.map((image, index) => (
 										<div
 											key={index}
-											className="space-y-2 p-4 border rounded-lg bg-gray-50"
+											className="p-4 space-y-2 border rounded-lg bg-gray-50"
 										>
 											<div className="flex gap-2">
 												<div className="flex-1">
-													<Label className="text-xs text-gray-600 mb-1">
+													<Label className="mb-1 text-xs text-gray-600">
 														圖片 URL（或上傳圖片）
 													</Label>
 													<Input
@@ -893,7 +869,7 @@ export default function AdminShopPage() {
 														htmlFor={`upload-${index}`}
 														className="cursor-pointer"
 													>
-														<div className="flex items-center gap-2 px-4 py-2 border border-dashed border-purple-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
+														<div className="flex items-center gap-2 px-4 py-2 transition-colors border border-purple-300 border-dashed rounded-lg hover:border-purple-500 hover:bg-purple-50">
 															<Upload className="w-4 h-4 text-purple-600" />
 															<span className="text-sm text-purple-600">
 																{uploadingImage
@@ -914,11 +890,11 @@ export default function AdminShopPage() {
 													/>
 												</div>
 												{image && (
-													<div className="w-20 h-20 border rounded-lg overflow-hidden">
+													<div className="w-20 h-20 overflow-hidden border rounded-lg">
 														<img
 															src={image}
 															alt={`Preview ${index + 1}`}
-															className="w-full h-full object-cover"
+															className="object-cover w-full h-full"
 															onError={(e) => {
 																e.target.style.display = "none";
 															}}
@@ -938,7 +914,7 @@ export default function AdminShopPage() {
 										新增圖片欄位
 									</Button>
 								</div>
-								<p className="text-sm text-gray-500 mt-2">
+								<p className="mt-2 text-sm text-gray-500">
 									💡 提示：可直接上傳圖片（最大 5MB）或貼上圖片網址
 								</p>
 							</div>
@@ -946,7 +922,7 @@ export default function AdminShopPage() {
 							{/* Benefits */}
 							<div>
 								<Label>功效作用</Label>
-								<div className="space-y-2 mt-2">
+								<div className="mt-2 space-y-2">
 									{formData.benefits.map((benefit, index) => (
 										<div
 											key={index}
@@ -988,7 +964,7 @@ export default function AdminShopPage() {
 							</div>
 
 							{/* Specifications */}
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 								<div>
 									<Label htmlFor="material">材質</Label>
 									<Input
@@ -1085,7 +1061,7 @@ export default function AdminShopPage() {
 							>
 								{loading ? (
 									<>
-										<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+										<div className="w-5 h-5 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin" />
 										{isEditMode ? "更新中..." : "創建中..."}
 									</>
 								) : (
@@ -1100,24 +1076,24 @@ export default function AdminShopPage() {
 				)}
 
 				{/* Products List */}
-				<div className="bg-white rounded-2xl shadow-lg p-8">
-					<h2 className="text-2xl font-bold mb-6">
+				<div className="p-8 bg-white shadow-lg rounded-2xl">
+					<h2 className="mb-6 text-2xl font-bold">
 						現有商品 ({products.length})
 					</h2>
 
 					{products.length === 0 ? (
-						<div className="text-center py-12 text-gray-500">
+						<div className="py-12 text-center text-gray-500">
 							<p>尚未有任何商品</p>
-							<p className="text-sm mt-2">
+							<p className="mt-2 text-sm">
 								點擊上方「新增商品」按鈕開始添加
 							</p>
 						</div>
 					) : (
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 							{products.map((product) => (
 								<div
 									key={product._id}
-									className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+									className="overflow-hidden transition-shadow border rounded-lg hover:shadow-lg"
 								>
 									{/* Product Image */}
 									{product.images && product.images.length > 0 && (
@@ -1125,10 +1101,10 @@ export default function AdminShopPage() {
 											<img
 												src={product.images[0]}
 												alt={product.name.zh_TW}
-												className="w-full h-full object-cover"
+												className="object-cover w-full h-full"
 											/>
 											{product.isFeatured && (
-												<Badge className="absolute top-2 right-2 bg-yellow-500">
+												<Badge className="absolute bg-yellow-500 top-2 right-2">
 													⭐ 精選
 												</Badge>
 											)}
@@ -1137,10 +1113,10 @@ export default function AdminShopPage() {
 									
 									{/* Product Info */}
 									<div className="p-4">
-										<h3 className="font-semibold text-lg mb-2">
+										<h3 className="mb-2 text-lg font-semibold">
 											{product.name.zh_TW}
 										</h3>
-										<p className="text-sm text-gray-600 mb-3 line-clamp-2">
+										<p className="mb-3 text-sm text-gray-600 line-clamp-2">
 											{product.description.zh_TW}
 										</p>
 										
@@ -1160,10 +1136,10 @@ export default function AdminShopPage() {
 										</div>
 										
 										{/* Price & Stock */}
-										<div className="flex justify-between items-center mb-4">
+										<div className="flex items-center justify-between mb-4">
 											<div>
 												{product.originalPrice && product.originalPrice > product.price && (
-													<span className="text-sm text-gray-400 line-through mr-2">
+													<span className="mr-2 text-sm text-gray-400 line-through">
 														{product.currency === "HKD" && "HK$"}
 														{product.currency === "CNY" && "¥"}
 														{product.originalPrice}

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useLocale } from "next-intl";
 import { useRouter, useParams } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
@@ -79,7 +79,7 @@ export default function OrderConfirmationPage() {
 	if (loading) {
 		return (
 			<div className="min-h-screen bg-[#EFEFEF]">
-				<Navbar />
+				<ShopNavbar />
 				<div className="flex items-center justify-center h-[80vh] pt-20">
 					<div className="text-center">
 						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1C312E] mx-auto mb-4"></div>
@@ -95,7 +95,7 @@ export default function OrderConfirmationPage() {
 	if (!session?.user) {
 		return (
 			<div className="min-h-screen bg-[#EFEFEF]">
-				<Navbar />
+				<ShopNavbar />
 				<div className="container mx-auto px-4 py-24 text-center">
 					<Package className="w-16 h-16 mx-auto mb-4 text-[#73897F]" />
 					<h2 className="text-2xl font-bold mb-2">
@@ -115,7 +115,7 @@ export default function OrderConfirmationPage() {
 	if (!order && !loading) {
 		return (
 			<div className="min-h-screen bg-[#EFEFEF]">
-				<Navbar />
+				<ShopNavbar />
 				<div className="container mx-auto px-4 py-24 text-center">
 					<Package className="w-16 h-16 mx-auto mb-4 text-[#73897F]" />
 					<h2 className="text-2xl font-bold mb-2">
@@ -128,7 +128,7 @@ export default function OrderConfirmationPage() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-[#EFEFEF] via-white to-[#EFEFEF]">
-			<Navbar />
+			<ShopNavbar />
 
 			<div className="container mx-auto px-4 pt-24 pb-12 max-w-7xl">
 				{/* Success Header */}

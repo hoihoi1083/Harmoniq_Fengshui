@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import {
 export default function ShopNavbar({ onSearch, cartCount }) {
 	const { data: session } = useSession();
 	const locale = useLocale();
+	const router = useRouter();
 	const [searchTerm, setSearchTerm] = useState("");
 	const [showUserMenu, setShowUserMenu] = useState(false);
 	const [showPromoBanner, setShowPromoBanner] = useState(true);
@@ -28,6 +30,13 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 		setSearchTerm(value);
 		if (onSearch) {
 			onSearch(value);
+		}
+	};
+
+	const handleSearchSubmit = (e) => {
+		e.preventDefault();
+		if (searchTerm.trim()) {
+			router.push(`/${locale}/shop/all?search=${encodeURIComponent(searchTerm.trim())}`);
 		}
 	};
 
@@ -84,8 +93,13 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 						quality={100}
 						priority
 					/>
-				<							href={`/${locale}/shop#products-section`}Link>
-							className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors"
+				</Link>
+
+				{/* Navigation Links */}
+				<div className="hidden md:flex items-center gap-8">
+					<Link
+							href={`/${locale}/shop#products-section`}
+					className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors"
 						>
 							{locale === "zh-CN" ? "2026新品" : "2026新品"}
 						</Link>
@@ -104,22 +118,25 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 
 					{/* Search Bar */}
 					<div className="hidden lg:flex flex-1 max-w-md mx-8">
-						<div className="relative w-full">
-							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-							<Input
-								type="text"
-								placeholder={
-									locale === "zh-CN"
-										? "搜索产品..."
-										: "搜索產品..."
+					<form onSubmit={handleSearchSubmit} className="relative w-full">
+						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+						<Input
+							type="text"
+							placeholder={
+								locale === "zh-CN"
+									? "搜索产品..."
+									: "搜索產品..."
+							}
+							value={searchTerm}
+							onChange={handleSearch}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									handleSearchSubmit(e);
 								}
-								value={searchTerm}
-								onChange={handleSearch}
-								className="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 focus:bg-white focus:ring-2 focus:ring-[#6B8E23] rounded-full transition-all"
-							/>
-						</div>
-					</div>
-
+							}}
+							className="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 focus:bg-white focus:ring-2 focus:ring-[#6B8E23] rounded-full transition-all"
+						/>
+					</form>
 					{/* Right Actions */}
 					<div className="flex items-center gap-4">
 						{/* Cart */}
@@ -160,15 +177,7 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 												</p>
 											</div>
 											<Link
-												href={`/${locale}/profile`}
-												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-												onClick={() => setShowUserMenu(false)}
-											>
-												{locale === "zh-CN"
-													? "我的账户"
-													: "我的帳戶"}
-											</Link>
-											<Link
+
 												href={`/${locale}/orders`}
 												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
 												onClick={() => setShowUserMenu(false)}
@@ -202,26 +211,15 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 											</button>
 										</>
 									) : (
-										<>
-											<Link
-												href={`/${locale}/login`}
-												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-												onClick={() => setShowUserMenu(false)}
-											>
-												{locale === "zh-CN"
-													? "登录"
-													: "登入"}
-											</Link>
-											<Link
-												href={`/${locale}/register`}
-												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-												onClick={() => setShowUserMenu(false)}
-											>
-												{locale === "zh-CN"
-													? "注册"
-													: "註冊"}
-											</Link>
-										</>
+										<Link
+											href={`/${locale}/auth/login`}
+											className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+											onClick={() => setShowUserMenu(false)}
+										>
+											{locale === "zh-CN"
+												? "登录"
+												: "登入"}
+										</Link>
 									)}
 								</div>
 							)}
@@ -231,31 +229,34 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 
 				{/* Mobile Search Bar */}
 				<div className="lg:hidden pb-4">
-					<div className="relative w-full">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-						<Input
-							type="text"
-							placeholder={
-								locale === "zh-CN"
-									? "搜索产品..."
-									: "搜索產品..."
+				<form onSubmit={handleSearchSubmit} className="relative w-full">
+					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+					<Input
+						type="text"
+						placeholder={
+							locale === "zh-CN"
+								? "搜索产品..."
+								: "搜索產品..."
+						}
+						value={searchTerm}
+						onChange={handleSearch}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								handleSearchSubmit(e);
 							}
-							value={searchTerm}
-							onChange={handleSearch}
-							className="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 focus:bg-white focus:ring-2 focus:ring-[#6B8E23] rounded-full"
-						/>
-					</div>
-				</div>
+						}}
+						className="w-full pl-10 pr-4 py-2 bg-gray-100 border-0 focus:bg-white focus:ring-2 focus:ring-[#6B8E23] rounded-full"
+					/>
+				</form>
 			</div>
+		</div>
 
-			{/* Click outside to close user menu */}
-			{showUserMenu && (
-				<div
-					className="fixed inset-0 z-40"
-					onClick={() => setShowUserMenu(false)}
-				/>
-			)}
-		</nav>
-		</>
-	);
-}
+		{/* Click outside to close user menu */}
+	{showUserMenu && (
+		<div
+			className="fixed inset-0 z-40"
+			onClick={() => setShowUserMenu(false)}
+		/>
+	)}
+</nav>
+</>

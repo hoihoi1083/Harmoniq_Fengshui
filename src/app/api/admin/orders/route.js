@@ -4,6 +4,9 @@ import Order from "@/models/Order";
 import Product from "@/models/Product";
 import { auth } from "@/auth";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET - Get all orders (Admin only)
 export async function GET(request) {
 	try {
@@ -35,6 +38,7 @@ export async function GET(request) {
 
 		return NextResponse.json({
 			success: true,
+			orders: orders,
 			data: orders,
 		});
 	} catch (error) {

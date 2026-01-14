@@ -50,7 +50,13 @@ function AdminOrderDetailContent({ orderId, locale }) {
 	useEffect(() => {
 		const fetchOrder = async () => {
 			try {
-				const response = await fetch(`/api/admin/orders/${orderId}`);
+				const response = await fetch(`/api/admin/orders/${orderId}`, {
+					cache: 'no-store',
+					headers: {
+						'Cache-Control': 'no-cache',
+						'Content-Type': 'application/json'
+					}
+				});
 				const data = await response.json();
 				console.log("Admin order API response:", data);
 				if (response.ok && data.success) {
@@ -226,9 +232,9 @@ function AdminOrderDetailContent({ orderId, locale }) {
 							</p>
 						</div>
 						<div className="flex items-center gap-2">
-							{getStatusIcon(order.paymentStatus)}
-							<span className="font-medium">
-								{getStatusText(order.paymentStatus)}
+						{getStatusIcon(order.status)}
+						<span className="font-medium">
+							{getStatusText(order.status)}
 							</span>
 						</div>
 					</div>
@@ -251,7 +257,7 @@ function AdminOrderDetailContent({ orderId, locale }) {
 										訂單狀態
 									</label>
 									<Select
-										value={order.paymentStatus}
+									value={order.status}
 										onValueChange={handleStatusUpdate}
 										disabled={updating}
 									>

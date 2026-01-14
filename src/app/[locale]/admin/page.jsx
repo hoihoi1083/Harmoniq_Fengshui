@@ -45,8 +45,18 @@ export default function AdminDashboard({ params }) {
 		try {
 			// Fetch real stats from your API
 			const [ordersRes, productsRes] = await Promise.all([
-				fetch("/api/admin/orders"),
-				fetch("/api/shop/products?limit=1000"),
+				fetch("/api/admin/orders", {
+					cache: 'no-store',
+					headers: {
+						'Cache-Control': 'no-cache'
+					}
+				}),
+				fetch("/api/shop/products?limit=1000", {
+					cache: 'no-store',
+					headers: {
+						'Cache-Control': 'no-cache'
+					}
+				}),
 			]);
 
 			const ordersData = await ordersRes.json();
