@@ -209,23 +209,16 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 								>
 									{t("theory")}
 								</button> */}
-								<Link
-									href="/shop"
-									className={`px-3 py-1 rounded-full transition-all font-noto-sans-hk duration-200 hover:opacity-80 ${
-										pathname === "/shop"
-											? "bg-[#A3B116]"
-											: ""
-									}`}
-									style={{
-										color:
-											pathname === "/shop"
-												? "#fff"
-												: navTextColor,
-									}}
-								>
-									{t("shop")}
-								</Link>
-								<Link
+							<div
+								className="px-3 py-1 rounded-full font-noto-sans-hk opacity-50 cursor-not-allowed flex items-center gap-1"
+								style={{
+									color: navTextColor,
+								}}
+							>
+								{t("shop")}
+								<span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">Coming Soon</span>
+							</div>
+							<Link
 									href="/price"
 									className={`px-3 py-1 rounded-full transition-all font-noto-sans-hk duration-200 hover:opacity-80 ${
 										pathname === "/price"
@@ -354,14 +347,13 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 						>
 							{t("smartChat")}
 						</Link>
-						<Link
-							href="/shop"
-							className="block px-4 py-2 text-gray-800 transition-colors rounded hover:bg-gray-100"
-							onClick={() => setIsMobileMenuOpen(false)}
+						<div
+							className="block px-4 py-2 text-gray-400 cursor-not-allowed flex items-center justify-between"
 							style={{ fontFamily: "Noto Serif TC, serif" }}
 						>
 							{t("shop")}
-						</Link>
+							<span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Coming Soon</span>
+						</div>
 						<Link
 							href="/price"
 							className="block px-4 py-2 text-gray-800 transition-colors rounded hover:bg-gray-100"

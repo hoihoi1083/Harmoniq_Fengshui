@@ -93,6 +93,34 @@ server_build_and_deploy() {
         # Navigate to project directory
         cd /home/ec2-user/fengshui-layout
         
+        # Check disk space BEFORE deployment
+        echo "💾 Checking disk space..."
+        AVAILABLE_GB=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+        USED_PERCENT=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
+        
+        echo "Available space: ${AVAILABLE_GB}GB"
+        echo "Disk usage: ${USED_PERCENT}%"
+        
+        if [ "$AVAILABLE_GB" -lt 2 ]; then
+            echo "⚠️ WARNING: Less than 2GB available!"
+            echo "🧹 Cleaning logs to free up space..."
+            pm2 flush || true
+            find logs -name "*.log" -type f -size +10M -delete 2>/dev/null || true
+            echo "✅ Logs cleaned"
+        fi
+        
+        if [ "$USED_PERCENT" -gt 90 ]; then
+            echo "🚨 CRITICAL: Disk usage above 90%!"
+            echo "🧹 Emergency cleanup..."
+            # Clean old .next builds
+            rm -rf .next.backup 2>/dev/null || true
+            # Clean PM2 logs
+            pm2 flush || true
+            # Clean old logs
+            find logs -name "*.log" -mtime +7 -delete 2>/dev/null || true
+            echo "✅ Emergency cleanup completed"
+        fi
+        
         # Unlock immutable files (if locked by file-integrity-monitor)
         echo "🔓 Unlocking protected files..."
         sudo chattr -i package.json 2>/dev/null || true
@@ -106,8 +134,29 @@ server_build_and_deploy() {
         echo "⏹️  Stopping existing processes..."
         pm2 stop all || true
         
-        # Install dependencies
-        echo "📦 Installing dependencies..."
+        # Backup current .next if it exists (for rollback)
+        if [ -d ".next" ]; then
+            echo "💾 Backing up current build..."
+            rm -rf .next.backup 2>/dev/null || true
+            mv .next .next.backup
+        fi
+        
+        # Clean PM2 logs before build
+        echo "🧹 Cleaning PM2 logs..."
+        pm2 flush || true
+        
+        # In# Restore backup if build failed
+            if [ -d ".next.backup" ]; then
+                echo "🔄 Restoring previous build..."
+                rm -rf .next
+                mv .next.backup .next
+            fi
+            exit 1
+        fi
+        
+        # Remove backup on successful build
+        echo "🗑️  Removing old build backup..."
+        rm -rf .next.backup 2>/dev/null || trueho "📦 Installing dependencies..."
         npm install --production=false
         
         # Build the application
@@ -151,6 +200,11 @@ server_build_and_deploy() {
         # Re-lock critical files for security
         echo "🔒 Re-locking protected files..."
         sudo chattr +i package.json 2>/dev/null || true
+        # Show final disk space
+        echo ""
+        echo "💾 Final disk space:"
+        df -h / | grep -E 'Filesystem|nvme'
+        
         sudo chattr +i ecosystem.config.json 2>/dev/null || true
         sudo chattr +i next.config.js 2>/dev/null || true
         sudo chattr +i next.config.ts 2>/dev/null || true

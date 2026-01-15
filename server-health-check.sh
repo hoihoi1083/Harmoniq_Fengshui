@@ -223,13 +223,25 @@ echo ""
 
 # 15. Check website accessibility & response time
 echo "1️⃣5️⃣ Website Health Check:"
-RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/health 2>/dev/null)
-RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}s" https://www.harmoniqfengshui.com 2>/dev/null)
+# Test local API health endpoint
+RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/health 2>/dev/null || echo "000")
+# Test public website (accept 200, 301, 302, 307 as healthy)
+PUBLIC_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://www.harmoniqfengshui.com 2>/dev/null || echo "000")
+RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}s" https://www.harmoniqfengshui.com 2>/dev/null || echo "N/A")
+
+# Check if local API is responding
 if [ "$RESPONSE" = "200" ]; then
-    echo "   ✅ Website responding (HTTP $RESPONSE)"
+    echo "   ✅ Local API responding (HTTP $RESPONSE)"
+else
+    echo "   ⚠️  Local API status: HTTP $RESPONSE"
+fi
+
+# Check if public website is responding (redirects are OK)
+if [[ "$PUBLIC_RESPONSE" =~ ^(200|301|302|307)$ ]]; then
+    echo "   ✅ Public website responding (HTTP $PUBLIC_RESPONSE)"
     echo "   ⏱️  Response time: $RESPONSE_TIME"
 else
-    echo "   🚨 ALERT: Website not responding (HTTP $RESPONSE)"
+    echo "   🚨 ALERT: Public website not responding (HTTP $PUBLIC_RESPONSE)"
 fi
 echo ""
 
