@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongoose";
 import Product from "@/models/Product";
 import { getUserInfo } from "@/lib/session";
+import { unlink } from "fs/promises";
+import path from "path";
 import mongoose from "mongoose";
 
 // GET single product by ID
@@ -153,11 +155,8 @@ export async function DELETE(request, { params }) {
 			);
 		}
 
-		const product = await Product.findByIdAndUpdate(
-			productId,
-			{ isActive: false, updatedAt: Date.now() },
-			{ new: true }
-		);
+		// Get product first to retrieve image URLs
+		const product = await Product.findById(productId);
 
 		if (!product) {
 			return NextResponse.json(
@@ -166,9 +165,32 @@ export async function DELETE(request, { params }) {
 			);
 		}
 
+		// Delete associated image files from filesystem
+		if (product.images && product.images.length > 0) {
+			for (const imageUrl of product.images) {
+				try {
+					// Extract filename from URL like "/images/shop/product_xxx.jpg"
+					const filename = imageUrl.split("/").pop();
+					const filepath = path.join(process.cwd(), "public", "images", "shop", filename);
+					await unlink(filepath);
+					console.log(`✅ Deleted image file: ${filename}`);
+				} catch (error) {
+					// Log but don't fail if image file doesn't exist
+					console.warn(`⚠️ Could not delete image file: ${imageUrl}`, error.message);
+				}
+			}
+		}
+
+		// Soft delete the product
+		await Product.findByIdAndUpdate(
+			productId,
+			{ isActive: false, updatedAt: Date.now() },
+			{ new: true }
+		);
+
 		return NextResponse.json({
 			success: true,
-			message: "Product deleted successfully",
+			message: "Product and associated images deleted successfully",
 		});
 	} catch (error) {
 		console.error("Error deleting product:", error);

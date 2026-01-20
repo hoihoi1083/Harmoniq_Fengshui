@@ -51,14 +51,21 @@ export async function POST(request) {
 
 		await dbConnect();
 
+		// Log incoming items for debugging
+		console.log("📦 Checkout items received:", JSON.stringify(items, null, 2));
+
 		// Verify products and build line items for Stripe
 		const lineItems = [];
 		let subtotal = 0;
 		const orderItems = [];
 
 		for (const item of items) {
+			console.log(`🔍 Looking for product ID: ${item.productId}`);
 			const product = await Product.findById(item.productId);
+			console.log(`📝 Product found:`, product ? `${product.name.zh_TW} (Active: ${product.isActive})` : 'null');
+			
 			if (!product || !product.isActive) {
+				console.error(`❌ Product ${item.productId} not found or inactive`);
 				return NextResponse.json(
 					{
 						success: false,
@@ -176,7 +183,7 @@ export async function POST(request) {
 
 		// Create Stripe checkout session
 		const stripeSession = await stripe.checkout.sessions.create({
-			payment_method_types: ["card", "alipay", "wechat_pay"],
+			payment_method_types: ["card"],
 			line_items: lineItems,
 			mode: "payment",
 			success_url: `${origin}/${locale}/shop/success?session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
@@ -188,11 +195,6 @@ export async function POST(request) {
 			},
 			customer_email: session.user.email,
 			// Shipping info already collected on checkout page, no need to ask again
-			payment_method_options: {
-				wechat_pay: {
-					client: "web",
-				},
-			},
 		});
 
 		// Update order with Stripe session ID

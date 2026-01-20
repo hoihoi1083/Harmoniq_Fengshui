@@ -84,13 +84,6 @@ export async function POST(request) {
 			);
 		}
 
-		if (!product.isDigital && product.stock < quantity) {
-			return NextResponse.json(
-				{ success: false, error: "Insufficient stock" },
-				{ status: 400 }
-			);
-		}
-
 		// Get or create cart
 		let cart = await Cart.findOne({ userId: session.user.email });
 
@@ -105,6 +98,24 @@ export async function POST(request) {
 		const existingItemIndex = cart.items.findIndex(
 			(item) => item.productId.toString() === productId
 		);
+
+		// Calculate final quantity after adding
+		let finalQuantity = quantity;
+		if (existingItemIndex > -1 && !setAbsolute) {
+			finalQuantity = cart.items[existingItemIndex].quantity + quantity;
+		}
+
+		// Check stock availability for physical products
+		if (!product.isDigital && product.stock < finalQuantity) {
+			return NextResponse.json(
+				{ 
+					success: false, 
+					error: `Insufficient stock. Only ${product.stock} available`,
+					availableStock: product.stock
+				},
+				{ status: 400 }
+			);
+		}
 
 		if (existingItemIndex > -1) {
 			// Update quantity - either set absolute or add to existing

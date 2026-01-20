@@ -60,6 +60,15 @@ export async function POST(request) {
 		// Return the public URL path
 		const publicUrl = `/images/shop/${filename}`;
 
+		// Trigger PM2 reload in background (non-blocking)
+		// This makes the new image immediately accessible
+		fetch("http://localhost:3000/api/pm2-reload", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+		}).catch(() => {
+			// Silently ignore PM2 reload failures
+		});
+
 		return NextResponse.json({
 			success: true,
 			url: publicUrl,

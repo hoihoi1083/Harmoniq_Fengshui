@@ -156,8 +156,11 @@ server_build_and_deploy() {
         
         # Remove backup on successful build
         echo "🗑️  Removing old build backup..."
-        rm -rf .next.backup 2>/dev/null || trueho "📦 Installing dependencies..."
-        npm install --production=false
+        rm -rf .next.backup 2>/dev/null || true
+        
+        # Skip npm install - AWS blocks outbound package manager connections
+        # NOTE: If package.json changes, you'll need to manually install dependencies on server
+        echo "⚠️  Skipping npm install (AWS blocks it - using existing node_modules)"
         
         # Build the application
         echo "🔨 Building application..."
