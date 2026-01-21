@@ -43,7 +43,7 @@ function calculateAccurateBaZi(birthDateTime, gender = "male") {
 		// Parse the wuxingScale string: "金:0.00%，木:37.50%，水:12.50%，火:12.50%，土:37.50%"
 		if (wuxingData.wuxingScale) {
 			const matches = wuxingData.wuxingScale.match(
-				/([金木水火土]):(\d+\.?\d*)%/g
+				/([金木水火土]):(\d+\.?\d*)%/g,
 			);
 			if (matches) {
 				matches.forEach((match) => {
@@ -57,7 +57,7 @@ function calculateAccurateBaZi(birthDateTime, gender = "male") {
 
 		// Determine strongest and weakest elements based on actual percentages
 		const sortedElements = Object.entries(elementCount).sort(
-			([, a], [, b]) => b - a
+			([, a], [, b]) => b - a,
 		);
 		const strongestElements = sortedElements
 			.filter(([, count]) => count > 0)
@@ -160,7 +160,7 @@ async function generatePersonalizedSolution(userInfo) {
 	
 請根據用戶的準確八字信息、具體問題和關注領域，提供個人化的簡要分析和方向性建議。
 
-當前年份：2025年（乙巳年 - 木火年）
+當前年份：2026年（丙午年 - 火火年）
 
 十年天干地支循環參考（2020-2029）：
 2020庚子(金水)、2021辛丑(金土)、2022壬寅(水木)、2023癸卯(水木)、2024甲辰(木土)、2025乙巳(木火)、2026丙午(火火)、2027丁未(火土)、2028戊申(土金)、2029己酉(土金)
@@ -246,7 +246,7 @@ async function generatePersonalizedSolution(userInfo) {
 		});
 		console.log(
 			"🔍 [API DEBUG] User Prompt (first 500 chars):",
-			userPrompt.substring(0, 500)
+			userPrompt.substring(0, 500),
 		);
 	} else {
 		// Fallback prompt without detailed Ba Zi
@@ -278,7 +278,7 @@ async function generatePersonalizedSolution(userInfo) {
 
 		console.log(
 			"🔍 [API DEBUG] Raw AI Response:",
-			response.substring(0, 500)
+			response.substring(0, 500),
 		);
 
 		// Parse AI response
@@ -306,12 +306,12 @@ async function generatePersonalizedSolution(userInfo) {
 						"戊土",
 					];
 					const hasWrongPatterns = wrongPatterns.some((pattern) =>
-						aiResponse.content.includes(pattern)
+						aiResponse.content.includes(pattern),
 					);
 
 					if (hasWrongPatterns) {
 						console.warn(
-							"⚠️ [API DEBUG] AI generated wrong Ba Zi patterns, correcting..."
+							"⚠️ [API DEBUG] AI generated wrong Ba Zi patterns, correcting...",
 						);
 
 						// Replace wrong patterns with correct ones
@@ -320,47 +320,62 @@ async function generatePersonalizedSolution(userInfo) {
 						// Replace wrong patterns with correct patterns
 						correctedContent = correctedContent.replace(
 							/乙巳/g,
-							baziData.year
+							baziData.year,
 						);
 						correctedContent = correctedContent.replace(
 							/丙戌/g,
-							baziData.month
+							baziData.month,
 						);
 						correctedContent = correctedContent.replace(
 							/壬戌/g,
-							baziData.day
+							baziData.day,
 						);
 						correctedContent = correctedContent.replace(
 							/丙午/g,
-							baziData.hour
+							baziData.hour,
 						);
 						correctedContent = correctedContent.replace(
 							/壬水/g,
-							`${baziData.dayMaster}${baziData.dayElement}`
+							`${baziData.dayMaster}${baziData.dayElement}`,
 						);
 
 						// Also replace other wrong patterns
 						correctedContent = correctedContent.replace(
 							/辛巳/g,
-							baziData.year
+							baziData.year,
 						);
 						correctedContent = correctedContent.replace(
 							/戊午/g,
-							baziData.day
+							baziData.day,
 						);
 						correctedContent = correctedContent.replace(
 							/戊土/g,
-							`${baziData.dayMaster}${baziData.dayElement}`
+							`${baziData.dayMaster}${baziData.dayElement}`,
 						);
 
 						aiResponse.content = correctedContent;
 						console.log(
 							"✅ [API DEBUG] Content corrected, preview:",
-							correctedContent.substring(0, 200)
+							correctedContent.substring(0, 200),
 						);
 					} else {
 						console.log(
-							"✅ [API DEBUG] AI response passed Ba Zi validation"
+							"✅ [API DEBUG] AI response passed Ba Zi validation",
+						);
+					}
+
+					// Remove all ** markers from the content (except for the emoji 💡 note)
+					// Keep the emoji note intact, but remove bold markers from the main text
+					const parts = aiResponse.content.split("💡");
+					if (parts.length > 1) {
+						// Remove ** from main text, keep emoji note as is
+						parts[0] = parts[0].replace(/\*\*/g, "");
+						aiResponse.content = parts.join("💡");
+					} else {
+						// No emoji note, just remove all **
+						aiResponse.content = aiResponse.content.replace(
+							/\*\*/g,
+							"",
 						);
 					}
 				}
@@ -368,7 +383,7 @@ async function generatePersonalizedSolution(userInfo) {
 				// Fallback: create structured response from plain text
 				aiResponse = {
 					title: `${concern}指導建議`,
-					content: response.trim(),
+					content: response.trim().replace(/\*\*/g, ""), // Remove ** markers
 				};
 			}
 		} catch (parseError) {
@@ -422,7 +437,7 @@ export async function POST(request) {
 		if (!userInfo || !userInfo.problem || !userInfo.concern) {
 			return NextResponse.json(
 				{ error: "缺少必要的用戶資訊" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -440,7 +455,7 @@ export async function POST(request) {
 				error: "分析服務暫時不可用，請稍後再試",
 				fallback: true,
 			},
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

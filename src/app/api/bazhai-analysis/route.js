@@ -567,7 +567,7 @@ function generateOverallBazhaiPrompt(roomAnalyses, userProfile, mingGuaInfo) {
 • 覆蓋方位：${allDirections}
 • 吉位房間：${auspiciousRooms.length}個
 • 凶位房間：${inauspiciousRooms.length}個
-• 分析年份：2025年（乙巳蛇年）
+• 分析年份：2026年（丙午馬年）
 
 【要求】：請生成完整的綜合風水分析，包含：
 

@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { BaziAnalysisSystem } from "@/lib/newConversationFlow";
-import { ArrowLeft, Calendar, User, Target, AlertCircle } from "lucide-react";
+import { ArrowLeft, Calendar, User, Target, AlertCircle, Download } from "lucide-react";
+import jsPDF from "jspdf";
+import { domToPng } from "modern-screenshot";
 import FiveElement from "@/components/FiveElement";
 import Zodiac from "@/components/Zodiac";
 import LiuNianKeyWord from "@/components/LiuNianKeyWord";
@@ -36,8 +38,10 @@ export default function FengShuiReportPage() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [historicalDataReady, setHistoricalDataReady] = useState(false);
+	const [exporting, setExporting] = useState(false);
 	const searchParams = useSearchParams();
 	const router = useRouter();
+	const reportRef = useRef(null);
 
 	// Helper function to determine if components should render
 	const shouldRenderComponents = () => {
@@ -924,6 +928,69 @@ export default function FengShuiReportPage() {
 		router.push("/price?newReport=true");
 	};
 
+	// Export report as PDF
+	const handleExportPDF = async () => {
+		if (!reportRef.current) return;
+
+		try {
+			setExporting(true);
+
+			// Use modern-screenshot to capture the report
+			const dataUrl = await domToPng(reportRef.current, {
+				scale: 2,
+				backgroundColor: '#EFEFEF',
+				filter: (node) => {
+					// Filter out navbar and non-report elements
+					if (node.tagName === 'NAV') return false;
+					if (node.classList?.contains('navbar')) return false;
+					return true;
+				},
+			});
+
+			// Create PDF from the image
+			const pdf = new jsPDF({
+				orientation: 'portrait',
+				unit: 'mm',
+				format: 'a4',
+			});
+
+			// Calculate dimensions from the actual element
+			const imgWidth = 210; // A4 width in mm
+			const pageHeight = 297; // A4 height in mm
+			
+			// Get dimensions from the ref element
+			const elementWidth = reportRef.current.offsetWidth;
+			const elementHeight = reportRef.current.offsetHeight;
+			const imgHeight = (elementHeight * imgWidth) / elementWidth;
+			let heightLeft = imgHeight;
+			let position = 0;
+
+			// Add first page
+			pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
+			heightLeft -= pageHeight;
+
+			// Add additional pages if content is longer
+			while (heightLeft > 0) {
+				position = heightLeft - imgHeight;
+				pdf.addPage();
+				pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
+				heightLeft -= pageHeight;
+			}
+
+			// Generate filename with date
+			const date = new Date().toISOString().split('T')[0];
+			const filename = `風水報告_${reportData?.concern || '命理分析'}_${date}.pdf`;
+
+			// Save PDF
+			pdf.save(filename);
+		} catch (err) {
+			console.error('PDF export error:', err);
+			alert('匯出PDF時發生錯誤，請稍後再試');
+		} finally {
+			setExporting(false);
+		}
+	};
+
 	// For historical reports, add a banner but use normal component rendering
 	const showHistoricalBanner = reportData?.isHistoricalReport;
 
@@ -932,6 +999,7 @@ export default function FengShuiReportPage() {
 			<Navbar from="report" />
 			<LoadingProvider>
 				<div
+					ref={reportRef}
 					className="container w-full px-4 py-8 mx-auto"
 					style={{ paddingTop: "80px" }}
 				>
@@ -951,22 +1019,37 @@ export default function FengShuiReportPage() {
 						</div>
 					)}
 
-					{/* 頭部 */}
+					{/* 頭部 with PDF Export Button */}
 					<div className="mb-8 ml-0 md:ml-[5%]">
-						<h1
-							className="mb-2 font-extrabold text-center md:text-left"
-							style={{
-								fontFamily: "Noto Serif TC, Serif",
-								fontWeight: 800,
-								color: getConcernColor({
-									concern: reportData?.concern,
-								}),
-								fontSize: "clamp(2rem, 6vw, 60px)",
-								lineHeight: 1.1,
-							}}
-						>
-							{t("sectionBasicAnalysis")}
-						</h1>
+						<div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+							<h1
+								className="mb-2 font-extrabold text-center md:text-left"
+								style={{
+									fontFamily: "Noto Serif TC, Serif",
+									fontWeight: 800,
+									color: getConcernColor({
+										concern: reportData?.concern,
+									}),
+									fontSize: "clamp(2rem, 6vw, 60px)",
+									lineHeight: 1.1,
+								}}
+							>
+								{t("sectionBasicAnalysis")}
+							</h1>
+							<button
+								onClick={handleExportPDF}
+								disabled={exporting}
+								className="flex items-center gap-2 px-6 py-3 text-white transition-all duration-300 rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+								style={{
+									backgroundColor: getConcernColor({ concern: reportData?.concern }),
+								}}
+							>
+								<Download className="w-5 h-5" />
+								<span className="font-semibold">
+									{exporting ? '匯出中...' : '匯出PDF'}
+								</span>
+							</button>
+						</div>
 					</div>
 
 					{/* Five Elements Analysis */}

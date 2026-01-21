@@ -124,7 +124,7 @@ export async function POST(request) {
 	try {
 		const {
 			userInfo,
-			currentYear = 2025,
+			currentYear = new Date().getFullYear(),
 			locale = "zh-TW",
 		} = await request.json();
 
@@ -133,7 +133,7 @@ export async function POST(request) {
 		if (!userInfo) {
 			return NextResponse.json(
 				{ error: "用戶信息缺失" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -219,13 +219,6 @@ ${analysisRequirements}`;
 2. **合庚减泄**：具体分析...
 3. **官星透出**：具体分析...
 
-实际表现
-在${concern}领域的具体表现：
-- 具体会在哪些时间点或情况下出现变化（注意：当前是${new Date().getMonth() + 1}月，如提及未来月份请明确标示"明年"或具体月份范围）
-- 实际的影响程度和表现形式
-- 可能遇到的具体情况或挑战
-- 如使用季节或其他时间词汇，请明确指出对应的具体月份（例：春季指明年3-5月）
-
 ### 3. 【地支${yearGanZhi.branch}效应】
 地支${yearGanZhi.branch}为**偏印**（示例）
 地支${yearGanZhi.branch}触发三重效应
@@ -233,12 +226,19 @@ ${analysisRequirements}`;
 2. **创意思维**：具体分析...
 3. **人际变化**：具体分析...
 
-实际表现
+### 【流年实际表现】
+**重要：此部分请综合天干与地支的影响，提供全年完整的实际表现分析，按时间顺序（年初到年尾）呈现。**
+
 在${concern}领域的具体表现：
-- 具体会在哪些时间点或情况下出现变化（注意：当前是${new Date().getMonth() + 1}月，如提及未来月份请明确标示"明年"或具体月份范围）
-- 实际的影响程度和表现形式
-- 可能遇到的具体情况或挑战
-- 如使用季节或其他时间词汇，请明确指出对应的具体月份（例：春季指明年3-5月）
+- **时间点与变化**：从年初到年尾，分阶段说明不同时期的变化（例如：年初受天干影响如何，年中受地支影响如何，某特定月份的关键时点）
+- **影响程度与形式**：整体影响的程度和具体表现方式
+- **可能情况与挑战**：全年可能遇到的主要情况或挑战
+
+**格式要求**：
+1. 必须使用子标题如「- 时间点与变化：」「- 影响程度与形式：」「- 可能情况与挑战：」
+2. 按时间顺序整合天干和地支的影响，形成完整的全年分析
+3. 注意：当前是${new Date().getMonth() + 1}月，如提及未来月份请明确标示"明年"或具体月份范围
+4. 如使用季节词汇，请明确指出对应的具体月份（例：春季指明年3-5月）
 
 ### 4. 【注意事项】
 风险
@@ -261,6 +261,8 @@ ${analysisRequirements}`;
 结合八字和流年特点，总结${concern}在${currentYear}年的整体运势走向，提供核心建议和关键提醒。
 
 **重要提醒**：以上4个部分（流年干支作用、天干效应、地支效应、注意事项）已经包含所有必要内容，请勿在【注意事项】之后再添加额外的"建议"或"总结"段落。所有建议内容应整合在【注意事项】的**建议**中，所有总结内容应整合在【注意事项】的**总结**中。
+
+**严格禁止**：绝对不可在任何地方提及"2025年"，当前分析年份为${currentYear}年（${yearGanZhi.stem}${yearGanZhi.branch}年），所有总结必须明确写"${currentYear}年"。
 
 请确保每个部分都针对${concern}领域提供具体、实用的内容，避免使用通用的建议。`
 				: `請分析以下信息：
@@ -285,13 +287,6 @@ ${analysisRequirements}`;
 2. **合庚減洩**：具體分析...
 3. **官星透出**：具體分析...
 
-實際表現
-在${concern}領域的具體表現：
-- 具體會在哪些時間點或情況下出現變化（注意：當前是${new Date().getMonth() + 1}月，如提及未來月份請明確標示"明年"或具體月份範圍）
-- 實際的影響程度和表現形式
-- 可能遇到的具體情況或挑戰
-- 如使用季節或其他時間詞彙，請明確指出對應的具體月份（例：春季指明年3-5月）
-
 ### 3. 【地支${yearGanZhi.branch}效應】
 地支${yearGanZhi.branch}為**偏印**（示例）
 地支${yearGanZhi.branch}觸發三重效應
@@ -299,12 +294,19 @@ ${analysisRequirements}`;
 2. **創意思維**：具體分析...
 3. **人際變化**：具體分析...
 
-實際表現
+### 【流年實際表現】
+**重要：此部分請綜合天干與地支的影響，提供全年完整的實際表現分析，按時間順序（年初到年尾）呈現。**
+
 在${concern}領域的具體表現：
-- 具體會在哪些時間點或情況下出現變化（注意：當前是${new Date().getMonth() + 1}月，如提及未來月份請明確標示"明年"或具體月份範圍）
-- 實際的影響程度和表現形式
-- 可能遇到的具體情況或挑戰
-- 如使用季節或其他時間詞彙，請明確指出對應的具體月份（例：春季指明年3-5月）
+- **時間點與變化**：從年初到年尾，分階段說明不同時期的變化（例如：年初受天干影響如何，年中受地支影響如何，某特定月份的關鍵時點）
+- **影響程度與形式**：整體影響的程度和具體表現方式
+- **可能情況與挑戰**：全年可能遇到的主要情況或挑戰
+
+**格式要求**：
+1. 必須使用子標題如「- 時間點與變化：」「- 影響程度與形式：」「- 可能情況與挑戰：」
+2. 按時間順序整合天干和地支的影響，形成完整的全年分析
+3. 注意：當前是${new Date().getMonth() + 1}月，如提及未來月份請明確標示"明年"或具體月份範圍
+4. 如使用季節詞彙，請明確指出對應的具體月份（例：春季指明年3-5月）
 
 ### 4. 【注意事項】
 風險
@@ -328,6 +330,8 @@ ${analysisRequirements}`;
 
 **重要提醒**：以上4個部分（流年干支作用、天干效應、地支效應、注意事項）已經包含所有必要內容，請勿在【注意事項】之後再添加額外的"建議"或"總結"段落。所有建議內容應整合在【注意事項】的**建議**中，所有總結內容應整合在【注意事項】的**總結**中。
 
+**嚴格禁止**：絕對不可在任何地方提及"2025年"，當前分析年份為${currentYear}年（${yearGanZhi.stem}${yearGanZhi.branch}年），所有總結必須明確寫"${currentYear}年"。
+
 請確保每個部分都針對${concern}領域提供具體、實用的內容，避免使用通用的建議。`;
 
 		console.log("🚀 Calling DeepSeek API for GanZhi analysis...");
@@ -347,7 +351,7 @@ ${analysisRequirements}`;
 			{
 				max_tokens: 4000, // Increased from 2000 to allow complete 5-section response
 				temperature: 0.7,
-			}
+			},
 		);
 
 		console.log("✅ AI GanZhi analysis completed");
@@ -356,19 +360,28 @@ ${analysisRequirements}`;
 		let finalContent = aiContent;
 		if (locale === "zh-CN") {
 			console.log(
-				"🔄 Converting Traditional Chinese to Simplified Chinese..."
+				"🔄 Converting Traditional Chinese to Simplified Chinese...",
 			);
 			console.log(
 				"📝 Sample BEFORE conversion:",
-				aiContent.substring(0, 200)
+				aiContent.substring(0, 200),
 			);
 			finalContent = convertToSimplified(aiContent);
 			console.log(
 				"📝 Sample AFTER conversion:",
-				finalContent.substring(0, 200)
+				finalContent.substring(0, 200),
 			);
 			console.log("✅ Conversion completed");
 		}
+
+		// Log the COMPLETE AI response for debugging
+		console.log("=".repeat(80));
+		console.log("📋 COMPLETE AI RESPONSE (Full Text):");
+		console.log("=".repeat(80));
+		console.log(finalContent);
+		console.log("=".repeat(80));
+		console.log(`📊 Total length: ${finalContent.length} characters`);
+		console.log("=".repeat(80));
 
 		return NextResponse.json({
 			success: true,
@@ -390,7 +403,7 @@ ${analysisRequirements}`;
 				error: "生成干支分析時發生錯誤",
 				message: error.message,
 			},
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
