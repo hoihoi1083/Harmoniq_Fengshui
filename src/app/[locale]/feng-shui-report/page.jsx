@@ -18,6 +18,7 @@ import JiXiong from "@/components/JiXiong";
 import Season from "@/components/Season";
 import CoreSuggestion from "@/components/CoreSuggestion";
 import SpecificSuggestion from "@/components/SpecificSuggestion";
+import OverallSummary from "@/components/OverallSummary";
 import QuestionFocus from "@/components/QuestionFocus";
 import SavedReportDisplay from "@/components/SavedReportDisplay";
 import getWuxingData from "@/lib/nayin";
@@ -1268,6 +1269,15 @@ export default function FengShuiReportPage() {
 									problem: reportData.problem,
 								}}
 								currentYear={new Date().getFullYear()}
+							/>
+						</div>
+					)}
+
+					{/* Overall Summary - The Perfect Ending */}
+					{shouldRenderComponents() && (
+						<div className="mb-6">
+							<OverallSummary
+								concernColor={getConcernColor(reportData.concern)}
 							/>
 						</div>
 					)}

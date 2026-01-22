@@ -1108,7 +1108,7 @@ export default function CoupleCoreSuggestion({
 							{
 								title: "戊月",
 								content:
-									"2025年農曆九月需特別注意財務規劃，避免因金錢問題產生隔閡",
+									"2026年農曆九月需特別注意財務規劃，避免因金錢問題產生隔閡",
 							},
 						],
 					},
@@ -1406,7 +1406,7 @@ export default function CoupleCoreSuggestion({
 忌在臥室西北方放置尖銳物品，防止金木相剋影響感情
 
 戊月
-2025年農曆九月需特別注意財務規劃，避免因金錢問題產生隔閡
+2026年農曆九月需特別注意財務規劃，避免因金錢問題產生隔閡
 
 環境禁忌
 約會避開

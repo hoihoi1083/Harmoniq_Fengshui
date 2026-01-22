@@ -1066,9 +1066,9 @@ const CoupleAnnualAnalysis = ({
 																"clamp(12px, 3vw, 14px)",
 														}}
 													>
-														{year === "2025"
-															? `2025年${getChineseMonth(strategy.currentMonth || 10)}`
-															: "2026年"}
+														{year === "2026"
+															? `2026年${getChineseMonth(strategy.currentMonth || 10)}`
+															: "2027年"}
 													</h4>
 												</div>
 											</div>

@@ -165,13 +165,7 @@ function parseSuggestionsFromText(text, isSimplified = false) {
 			}
 
 			// Clean up content
-			title = title.trim().replace(/[：:]/g, "");
-			content = content.trim();
-
-			// Remove newlines and clean up formatting
-			content = content.replace(/\n+/g, " ").replace(/\s+/g, " ");
-
-			// Clean up content length
+	title = title.trim().replace(/[：:]/g, "").replace(/\*\*/g, "");
 			if (content.length > 150) {
 				content = content.substring(0, 120) + "...";
 			}
@@ -260,13 +254,7 @@ function parseTaboosFromText(text, isSimplified = false) {
 			}
 
 			// Clean up content
-			title = title.trim().replace(/[：:]/g, "");
-			content = content.trim();
-
-			// Remove newlines and clean up formatting
-			content = content.replace(/\n+/g, " ").replace(/\s+/g, " ");
-
-			// Clean up content length
+	title = title.trim().replace(/[：:]/g, "").replace(/\*\*/g, "");
 			if (content.length > 150) {
 				content = content.substring(0, 120) + "...";
 			}
