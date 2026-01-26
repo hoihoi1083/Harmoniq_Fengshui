@@ -44,6 +44,7 @@ import CoupleGodExplain from "@/components/CoupleGodExplain";
 import CoupleMingJu from "@/components/CoupleMingJu";
 import CoupleSeason from "@/components/CoupleSeason";
 import CoupleCoreSuggestion from "@/components/CoupleCoreSuggestion";
+import CoupleOverallSummary from "@/components/CoupleOverallSummary";
 
 export default function CoupleReportPage({ params }) {
 	const { locale } = use(params);
@@ -904,6 +905,9 @@ export default function CoupleReportPage({ params }) {
 											currentYear={new Date().getFullYear()}
 											isSimplified={isSimplified}
 										/>
+										
+										{/* Couple Overall Summary - Relationship 2026 Summary */}
+										<CoupleOverallSummary concernColor="#D91A5A" />
 									</>
 								) : (
 									<div className="flex items-center justify-center py-16">

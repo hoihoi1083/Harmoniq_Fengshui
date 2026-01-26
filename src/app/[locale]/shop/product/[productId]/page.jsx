@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -24,6 +24,7 @@ import {
 	MessageSquare,
 	HelpCircle,
 	Check,
+	ZoomIn,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -41,6 +42,9 @@ export default function ProductDetailPage() {
 	const [activeTab, setActiveTab] = useState("reviews"); // reviews or faq
 	const [selectedSize, setSelectedSize] = useState(null);
 	const [cartCount, setCartCount] = useState(0);
+	const [showZoom, setShowZoom] = useState(false);
+	const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+	const imageRef = useRef(null);
 
 	useEffect(() => {
 		if (params.productId) {
@@ -59,9 +63,7 @@ export default function ProductDetailPage() {
 
 	const fetchProduct = async () => {
 		try {
-			const res = await fetch(
-				`/api/shop/products/${params.productId}`
-			);
+			const res = await fetch(`/api/shop/products/${params.productId}`);
 			const data = await res.json();
 			if (data.success) {
 				setProduct(data.data);
@@ -70,19 +72,33 @@ export default function ProductDetailPage() {
 					setSelectedSize(data.data.specifications.size);
 				}
 			} else {
-				toast.error(
-					locale === "zh-CN" ? "商品不存在" : "商品不存在"
-				);
+				toast.error(locale === "zh-CN" ? "商品不存在" : "商品不存在");
 				router.push(`/${locale}/shop`);
 			}
 		} catch (error) {
 			console.error("Failed to fetch product:", error);
-			toast.error(
-				locale === "zh-CN" ? "加载失败" : "載入失敗"
-			);
+			toast.error(locale === "zh-CN" ? "加载失败" : "載入失敗");
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const handleImageMouseMove = (e) => {
+		if (!imageRef.current) return;
+
+		const rect = imageRef.current.getBoundingClientRect();
+		const x = ((e.clientX - rect.left) / rect.width) * 100;
+		const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+		setZoomPosition({ x, y });
+	};
+
+	const handleImageMouseEnter = () => {
+		setShowZoom(true);
+	};
+
+	const handleImageMouseLeave = () => {
+		setShowZoom(false);
 	};
 
 	const fetchRelatedProducts = async () => {
@@ -92,7 +108,7 @@ export default function ProductDetailPage() {
 			const data = await res.json();
 			if (data.success && product) {
 				const allProducts = data.data.products.filter(
-					(p) => p._id !== params.productId
+					(p) => p._id !== params.productId,
 				);
 
 				// Smart recommendation algorithm
@@ -170,7 +186,7 @@ export default function ProductDetailPage() {
 				// Count total quantity of all items
 				const totalQuantity = data.data.items.reduce(
 					(total, item) => total + item.quantity,
-					0
+					0,
 				);
 				setCartCount(totalQuantity);
 			}
@@ -181,9 +197,7 @@ export default function ProductDetailPage() {
 
 	const handleAddToCart = async () => {
 		if (!session?.user) {
-			toast.error(
-				locale === "zh-CN" ? "请先登录" : "請先登入"
-			);
+			toast.error(locale === "zh-CN" ? "请先登录" : "請先登入");
 			return;
 		}
 
@@ -203,20 +217,18 @@ export default function ProductDetailPage() {
 				// Update cart count
 				const totalQuantity = data.data.items.reduce(
 					(total, item) => total + item.quantity,
-					0
+					0,
 				);
 				setCartCount(totalQuantity);
-				
+
 				toast.success(
-					locale === "zh-CN" ? "已添加到购物车" : "已加入購物車"
+					locale === "zh-CN" ? "已添加到购物车" : "已加入購物車",
 				);
 			} else {
 				throw new Error(data.error);
 			}
 		} catch (error) {
-			toast.error(
-				locale === "zh-CN" ? "添加失败" : "加入失敗"
-			);
+			toast.error(locale === "zh-CN" ? "添加失败" : "加入失敗");
 		} finally {
 			setIsAddingToCart(false);
 		}
@@ -320,15 +332,16 @@ export default function ProductDetailPage() {
 		},
 		{
 			question:
-				locale === "zh-CN" ? "運送需要多長時間？" : "運送需要多長時間？",
+				locale === "zh-CN"
+					? "運送需要多長時間？"
+					: "運送需要多長時間？",
 			answer:
 				locale === "zh-CN"
 					? "一般3-5個工作日送達，偏遠地區可能需要7-10個工作日。"
 					: "一般3-5個工作日送達，偏遠地區可能需要7-10個工作日。",
 		},
 		{
-			question:
-				locale === "zh-CN" ? "可以退換貨嗎？" : "可以退換貨嗎？",
+			question: locale === "zh-CN" ? "可以退換貨嗎？" : "可以退換貨嗎？",
 			answer:
 				locale === "zh-CN"
 					? "收到商品後7天內如有品質問題可以退換貨，請保持商品完整包裝。"
@@ -340,39 +353,37 @@ export default function ProductDetailPage() {
 		<div className="min-h-screen bg-white">
 			<ShopNavbar cartCount={cartCount} onSearch={() => {}} />
 
-			<div className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<div className="px-4 py-8 pt-20 mx-auto max-w-7xl sm:px-6 lg:px-8">
 				{/* Breadcrumb Navigation */}
-				<nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+				<nav className="flex items-center gap-2 mb-8 text-sm text-gray-500">
 					<Link
 						href={`/${locale}`}
-						className="hover:text-gray-700 transition-colors"
+						className="transition-colors hover:text-gray-700"
 					>
 						{locale === "zh-CN" ? "首页" : "首頁"}
 					</Link>
 					<ChevronRight className="w-4 h-4" />
 					<Link
 						href={`/${locale}/shop`}
-						className="hover:text-gray-700 transition-colors"
+						className="transition-colors hover:text-gray-700"
 					>
 						{locale === "zh-CN" ? "商店" : "商店"}
 					</Link>
 					<ChevronRight className="w-4 h-4" />
-					<span className="text-gray-900 font-medium line-clamp-1">
+					<span className="font-medium text-gray-900 line-clamp-1">
 						{product?.name[locale] || product?.name.zh_TW}
 					</span>
 				</nav>
 
-				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
 					{/* Left: Thumbnail Images */}
-					<div className="lg:col-span-1 order-2 lg:order-1">
-						<div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-visible">
+					<div className="order-2 lg:col-span-1 lg:order-1">
+						<div className="flex gap-3 overflow-x-auto lg:flex-col lg:overflow-visible">
 							{product?.images &&
 								product.images.map((image, index) => (
 									<button
 										key={index}
-										onClick={() =>
-											setSelectedImage(index)
-										}
+										onClick={() => setSelectedImage(index)}
 										className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
 											selectedImage === index
 												? "border-[#8B7355] ring-2 ring-[#8B7355]/30"
@@ -391,32 +402,79 @@ export default function ProductDetailPage() {
 					</div>
 
 					{/* Center: Main Image */}
-					<div className="lg:col-span-5 order-1 lg:order-2">
-						<div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50">
-							{product?.images &&
-							product.images.length > 0 ? (
-								<Image
-									src={product.images[selectedImage]}
-									alt={
-										product.name[locale] ||
-										product.name.zh_TW
-									}
-									fill
-									className="object-contain p-8"
-									priority
-								/>
-							) : (
-								<div className="flex items-center justify-center h-full">
-									<Sparkles className="w-32 h-32 text-gray-300" />
-								</div>
-							)}
+					<div className="order-1 lg:col-span-5 lg:order-2">
+						<div
+							ref={imageRef}
+							className="relative overflow-visible aspect-square rounded-2xl bg-gray-50 group"
+							onMouseMove={handleImageMouseMove}
+							onMouseEnter={handleImageMouseEnter}
+							onMouseLeave={handleImageMouseLeave}
+						>
+							<div className="relative w-full h-full overflow-hidden rounded-2xl">
+								{product?.images &&
+								product.images.length > 0 ? (
+									<>
+										<Image
+											src={product.images[selectedImage]}
+											alt={
+												product.name[locale] ||
+												product.name.zh_TW
+											}
+											fill
+											className="object-contain p-8"
+											priority
+										/>
+										{/* Zoom Icon Indicator */}
+										<div className="absolute z-10 transition-opacity duration-300 opacity-0 top-4 right-4 group-hover:opacity-100">
+											<div className="bg-black/50 backdrop-blur-sm rounded-full p-2.5">
+												<ZoomIn className="w-5 h-5 text-white" />
+											</div>
+										</div>
+									</>
+								) : (
+									<div className="flex items-center justify-center h-full">
+										<Sparkles className="w-32 h-32 text-gray-300" />
+									</div>
+								)}
+							</div>
+
+							{/* Zoom Preview Popup */}
+							{showZoom &&
+								product?.images &&
+								product.images.length > 0 && (
+									<div className="absolute top-0 z-50 hidden ml-8 pointer-events-none left-full lg:block">
+										<div className="w-[500px] h-[500px] border-4 border-white shadow-2xl rounded-2xl overflow-hidden bg-white">
+											<div className="relative w-full h-full overflow-hidden">
+												<div
+													className="absolute w-[200%] h-[200%]"
+													style={{
+														left: `${-zoomPosition.x * 1}%`,
+														top: `${-zoomPosition.y * 1}%`,
+													}}
+												>
+													<Image
+														src={
+															product.images[
+																selectedImage
+															]
+														}
+														alt={`${product.name[locale] || product.name.zh_TW} - Zoomed`}
+														fill
+														className="object-contain"
+														sizes="1500px"
+													/>
+												</div>
+											</div>
+										</div>
+									</div>
+								)}
 						</div>
 					</div>
 
 					{/* Right: Product Info */}
-					<div className="lg:col-span-6 order-3 space-y-6">
+					<div className="order-3 space-y-6 lg:col-span-6">
 						{/* Product Title */}
-						<h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+						<h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
 							{product?.name[locale] || product?.name.zh_TW}
 						</h1>
 
@@ -428,7 +486,7 @@ export default function ProductDetailPage() {
 										product?.rating?.average || 4.8;
 									const fillPercentage = Math.min(
 										Math.max(rating - i, 0),
-										1
+										1,
 									);
 									return (
 										<div
@@ -477,13 +535,11 @@ export default function ProductDetailPage() {
 										<span className="text-lg text-gray-400 line-through">
 											{product?.currency === "HKD" &&
 												"HK$"}
-											{product?.currency === "CNY" &&
-												"¥"}
-											{product?.currency === "USD" &&
-												"$"}
+											{product?.currency === "CNY" && "¥"}
+											{product?.currency === "USD" && "$"}
 											{product?.price}
 										</span>
-										<Badge className="bg-red-500 text-white text-xs">
+										<Badge className="text-xs text-white bg-red-500">
 											-{product?.discount?.percentage}%
 										</Badge>
 									</>
@@ -492,7 +548,7 @@ export default function ProductDetailPage() {
 						</div>
 
 						{/* Description */}
-						<div className="text-gray-600 text-sm leading-relaxed border-t border-b border-gray-200 py-4">
+						<div className="py-4 text-sm leading-relaxed text-gray-600 border-t border-b border-gray-200">
 							<p>
 								{product?.description[locale] ||
 									product?.description.zh_TW}
@@ -504,15 +560,13 @@ export default function ProductDetailPage() {
 							<div className="space-y-3">
 								<div className="flex items-center justify-between">
 									<span className="text-sm font-medium text-gray-700">
-										{locale === "zh-CN"
-											? "尺寸"
-											: "尺寸"}
+										{locale === "zh-CN" ? "尺寸" : "尺寸"}
 									</span>
 								</div>
 								<button
 									onClick={() =>
 										setSelectedSize(
-											product.specifications.size
+											product.specifications.size,
 										)
 									}
 									className={`px-4 py-2 border-2 rounded-lg text-sm font-medium transition-all ${
@@ -532,7 +586,7 @@ export default function ProductDetailPage() {
 							<Button
 								variant="outline"
 								size="icon"
-								className="h-10 w-10 rounded-md border-gray-300"
+								className="w-10 h-10 border-gray-300 rounded-md"
 								onClick={() =>
 									setQuantity(Math.max(1, quantity - 1))
 								}
@@ -540,19 +594,19 @@ export default function ProductDetailPage() {
 							>
 								<Minus className="w-4 h-4" />
 							</Button>
-							<span className="w-12 text-center font-medium">
+							<span className="w-12 font-medium text-center">
 								{quantity}
 							</span>
 							<Button
 								variant="outline"
 								size="icon"
-								className="h-10 w-10 rounded-md border-gray-300"
+								className="w-10 h-10 border-gray-300 rounded-md"
 								onClick={() =>
 									setQuantity(
 										Math.min(
 											product?.stock || 99,
-											quantity + 1
-										)
+											quantity + 1,
+										),
 									)
 								}
 								disabled={quantity >= (product?.stock || 99)}
@@ -567,17 +621,14 @@ export default function ProductDetailPage() {
 							className="w-full bg-[#6B8E23] hover:bg-[#5A7A1E] text-white h-14 text-base font-medium rounded-lg"
 							onClick={handleAddToCart}
 							disabled={
-								(!product?.isDigital &&
-									product?.stock === 0) ||
+								(!product?.isDigital && product?.stock === 0) ||
 								isAddingToCart
 							}
 						>
 							{isAddingToCart ? (
-								<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+								<div className="w-5 h-5 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin" />
 							) : null}
-							{locale === "zh-CN"
-								? "加到購物車"
-								: "加到購物車"}
+							{locale === "zh-CN" ? "加到購物車" : "加到購物車"}
 						</Button>
 					</div>
 				</div>
@@ -596,9 +647,7 @@ export default function ProductDetailPage() {
 						>
 							<div className="flex items-center gap-2">
 								<MessageSquare className="w-5 h-5" />
-								{locale === "zh-CN"
-									? "用户评价"
-									: "用戶評價"}
+								{locale === "zh-CN" ? "用户评价" : "用戶評價"}
 							</div>
 							{activeTab === "reviews" && (
 								<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />
@@ -614,9 +663,7 @@ export default function ProductDetailPage() {
 						>
 							<div className="flex items-center gap-2">
 								<HelpCircle className="w-5 h-5" />
-								{locale === "zh-CN"
-									? "常见问题"
-									: "常見問題"}
+								{locale === "zh-CN" ? "常见问题" : "常見問題"}
 							</div>
 							{activeTab === "faq" && (
 								<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />
@@ -636,7 +683,7 @@ export default function ProductDetailPage() {
 											: "用戶評價"}{" "}
 										({reviews.length})
 									</h3>
-									<select className="px-4 py-2 border border-gray-300 rounded-lg text-sm">
+									<select className="px-4 py-2 text-sm border border-gray-300 rounded-lg">
 										<option>
 											{locale === "zh-CN"
 												? "最新"
@@ -651,11 +698,11 @@ export default function ProductDetailPage() {
 								</div>
 
 								{/* Reviews List */}
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 									{reviews.map((review) => (
 										<div
 											key={review.id}
-											className="bg-gray-50 rounded-xl p-6 space-y-3"
+											className="p-6 space-y-3 bg-gray-50 rounded-xl"
 										>
 											{/* User Info and Rating */}
 											<div className="flex items-start justify-between">
@@ -668,9 +715,7 @@ export default function ProductDetailPage() {
 													<div>
 														<div className="flex items-center gap-2">
 															<span className="font-medium text-gray-900">
-																{
-																	review.name
-																}
+																{review.name}
 															</span>
 															{review.verified && (
 																<Check className="w-4 h-4 text-green-500" />
@@ -682,45 +727,44 @@ export default function ProductDetailPage() {
 													</div>
 												</div>
 												<div className="flex items-center gap-0.5">
-													{[
-														...Array(5),
-													].map((_, i) => {
-														const isFilled = i < Math.floor(review.rating);
-														const isHalf = !isFilled && i < review.rating;
-														
-														return (
-															<div
-																key={i}
-																className="relative w-4 h-4"
-															>
-																{isFilled ? (
-																	<Star
-																		className="w-4 h-4 text-yellow-400 fill-yellow-400"
-																	/>
-																) : isHalf ? (
-																	<>
-																		<Star
-																			className="absolute inset-0 w-4 h-4 text-gray-300 fill-gray-300"
-																		/>
-																		<div className="absolute inset-0 w-1/2 overflow-hidden">
-																			<Star
-																				className="w-4 h-4 text-yellow-400 fill-yellow-400"
-																			/>
-																		</div>
-																	</>
-																) : (
-																	<Star
-																		className="w-4 h-4 text-gray-300 fill-gray-300"
-																	/>
-																)}
-															</div>
-														);
-													})}
+													{[...Array(5)].map(
+														(_, i) => {
+															const isFilled =
+																i <
+																Math.floor(
+																	review.rating,
+																);
+															const isHalf =
+																!isFilled &&
+																i <
+																	review.rating;
+
+															return (
+																<div
+																	key={i}
+																	className="relative w-4 h-4"
+																>
+																	{isFilled ? (
+																		<Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+																	) : isHalf ? (
+																		<>
+																			<Star className="absolute inset-0 w-4 h-4 text-gray-300 fill-gray-300" />
+																			<div className="absolute inset-0 w-1/2 overflow-hidden">
+																				<Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+																			</div>
+																		</>
+																	) : (
+																		<Star className="w-4 h-4 text-gray-300 fill-gray-300" />
+																	)}
+																</div>
+															);
+														},
+													)}
 												</div>
 											</div>
 
 											{/* Review Text */}
-											<p className="text-sm text-gray-700 leading-relaxed">
+											<p className="text-sm leading-relaxed text-gray-700">
 												{review.text}
 											</p>
 										</div>
@@ -732,7 +776,7 @@ export default function ProductDetailPage() {
 								{faqs.map((faq, index) => (
 									<div
 										key={index}
-										className="bg-gray-50 rounded-xl p-6 space-y-3"
+										className="p-6 space-y-3 bg-gray-50 rounded-xl"
 									>
 										<h4 className="font-semibold text-gray-900">
 											{faq.question}
@@ -749,25 +793,24 @@ export default function ProductDetailPage() {
 
 				{/* Related Products Section */}
 				{relatedProducts.length > 0 && (
-					<div className="mt-16 border-t border-gray-200 pt-16">
-						<h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+					<div className="pt-16 mt-16 border-t border-gray-200">
+						<h2 className="mb-8 text-2xl font-bold text-center text-gray-900">
 							{locale === "zh-CN" ? "猜你喜欢" : "猜你喜歡"}
 						</h2>
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+						<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 							{relatedProducts.map((relatedProduct) => {
 								const hasDiscount =
 									relatedProduct.discount &&
 									relatedProduct.discount.percentage > 0 &&
 									(!relatedProduct.discount.validUntil ||
 										new Date(
-											relatedProduct.discount.validUntil
+											relatedProduct.discount.validUntil,
 										) > new Date());
 
 								const discountedPrice = hasDiscount
 									? relatedProduct.price *
-									  (1 -
-											relatedProduct.discount
-												.percentage /
+										(1 -
+											relatedProduct.discount.percentage /
 												100)
 									: relatedProduct.price;
 
@@ -780,27 +823,26 @@ export default function ProductDetailPage() {
 										href={`/${locale}/shop/product/${relatedProduct._id}`}
 										className="group"
 									>
-										<div className="bg-white rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
+										<div className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-xl hover:shadow-lg">
 											{/* Product Image */}
-											<div className="relative aspect-square overflow-hidden bg-gray-50">
+											<div className="relative overflow-hidden aspect-square bg-gray-50">
 												{relatedProduct.images &&
-												relatedProduct.images
-													.length > 0 ? (
+												relatedProduct.images.length >
+													0 ? (
 													<Image
 														src={
 															relatedProduct
 																.images[0]
 														}
 														alt={
-															relatedProduct
-																.name[
+															relatedProduct.name[
 																locale
 															] ||
 															relatedProduct.name
 																.zh_TW
 														}
 														fill
-														className="object-cover group-hover:scale-110 transition-transform duration-500"
+														className="object-cover transition-transform duration-500 group-hover:scale-110"
 														sizes="(max-width: 768px) 50vw, 25vw"
 													/>
 												) : (
@@ -809,7 +851,7 @@ export default function ProductDetailPage() {
 													</div>
 												)}
 												{hasDiscount && (
-													<Badge className="absolute top-3 right-3 bg-red-500 text-white text-xs">
+													<Badge className="absolute text-xs text-white bg-red-500 top-3 right-3">
 														-
 														{
 															relatedProduct
@@ -835,39 +877,37 @@ export default function ProductDetailPage() {
 												<div className="flex items-center gap-0.5">
 													{[...Array(5)].map(
 														(_, i) => {
-															const isFilled = i < Math.floor(rating);
-															const isHalf = !isFilled && i < rating;
-															
+															const isFilled =
+																i <
+																Math.floor(
+																	rating,
+																);
+															const isHalf =
+																!isFilled &&
+																i < rating;
+
 															return (
 																<div
 																	key={i}
 																	className="relative w-3.5 h-3.5"
 																>
 																	{isFilled ? (
-																		<Star
-																			className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400"
-																		/>
+																		<Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
 																	) : isHalf ? (
 																		<>
-																			<Star
-																				className="absolute inset-0 w-3.5 h-3.5 text-gray-300 fill-gray-300"
-																			/>
+																			<Star className="absolute inset-0 w-3.5 h-3.5 text-gray-300 fill-gray-300" />
 																			<div className="absolute inset-0 w-1/2 overflow-hidden">
-																				<Star
-																					className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400"
-																				/>
+																				<Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
 																			</div>
 																		</>
 																	) : (
-																		<Star
-																			className="w-3.5 h-3.5 text-gray-300 fill-gray-300"
-																		/>
+																		<Star className="w-3.5 h-3.5 text-gray-300 fill-gray-300" />
 																	)}
 																</div>
 															);
-														}
+														},
 													)}
-													<span className="text-xs text-gray-600 ml-1">
+													<span className="ml-1 text-xs text-gray-600">
 														{rating}/5
 													</span>
 												</div>
@@ -878,8 +918,8 @@ export default function ProductDetailPage() {
 														$
 														{hasDiscount
 															? discountedPrice.toFixed(
-																	0
-															  )
+																	0,
+																)
 															: relatedProduct.price}
 													</span>
 													{hasDiscount && (
@@ -896,7 +936,11 @@ export default function ProductDetailPage() {
 												{hasDiscount && (
 													<span className="text-xs font-semibold text-red-500">
 														-
-														{relatedProduct.discount.percentage}
+														{
+															relatedProduct
+																.discount
+																.percentage
+														}
 														%
 													</span>
 												)}
@@ -912,11 +956,11 @@ export default function ProductDetailPage() {
 
 			{/* Footer */}
 			<footer className="bg-[#2C2C2C] text-white pt-16 pb-8 mt-16">
-				<div className="container px-4 mx-auto py-12">
+				<div className="container px-4 py-12 mx-auto">
 					{/* Top Section */}
-					<div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-12">
+					<div className="flex flex-col items-start justify-between gap-8 mb-12 md:flex-row">
 						{/* Left Side - Logo and Links */}
-						<div className="flex flex-col md:flex-row items-start gap-12">
+						<div className="flex flex-col items-start gap-12 md:flex-row">
 							<div>
 								<div className="mb-6">
 									<Image
@@ -924,7 +968,7 @@ export default function ProductDetailPage() {
 										alt="HarmoniQ Logo"
 										width={681}
 										height={132}
-										className="h-8 w-auto"
+										className="w-auto h-8"
 										style={{
 											filter: "brightness(0) invert(1)",
 										}}
@@ -962,7 +1006,7 @@ export default function ProductDetailPage() {
 										href="https://facebook.com"
 										target="_blank"
 										rel="noopener noreferrer"
-										className="hover:opacity-80 transition-opacity"
+										className="transition-opacity hover:opacity-80"
 									>
 										<Image
 											src="/images/footer/Facebook.png"
@@ -976,7 +1020,7 @@ export default function ProductDetailPage() {
 										href="https://instagram.com"
 										target="_blank"
 										rel="noopener noreferrer"
-										className="hover:opacity-80 transition-opacity"
+										className="transition-opacity hover:opacity-80"
 									>
 										<Image
 											src="/images/footer/Instagram.png"
@@ -996,7 +1040,7 @@ export default function ProductDetailPage() {
 									? "联系我们："
 									: "聯絡我們："}
 							</div>
-							<div className="space-y-3 mb-6">
+							<div className="mb-6 space-y-3">
 								<p className="text-white">
 									{locale === "zh-CN" ? "电邮" : "電郵"}:
 									info@gmail.com
@@ -1014,7 +1058,7 @@ export default function ProductDetailPage() {
 											? "您的电邮"
 											: "您的電郵"
 									}
-									className="bg-transparent border-2 border-white text-white placeholder:text-white/60 rounded-full px-6 py-3"
+									className="px-6 py-3 text-white bg-transparent border-2 border-white rounded-full placeholder:text-white/60"
 								/>
 								<Button className="bg-[#8B9F3A] hover:bg-[#6B8E23] text-[#2C2C2C] rounded-full px-8 py-3 font-bold">
 									{locale === "zh-CN"
@@ -1026,21 +1070,21 @@ export default function ProductDetailPage() {
 					</div>
 
 					{/* Bottom Section */}
-					<div className="border-t border-gray-700 pt-8 mt-8">
-						<div className="flex flex-col md:flex-row justify-between items-center gap-4">
-							<p className="text-gray-400 text-sm">
+					<div className="pt-8 mt-8 border-t border-gray-700">
+						<div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+							<p className="text-sm text-gray-400">
 								© 2025 HarmoniQ.{" "}
 								{locale === "zh-CN"
 									? "保留所有权利"
 									: "保留所有權利"}
 								.
 							</p>
-							<div className="flex gap-2 items-center">
+							<div className="flex items-center gap-2">
 								{/* Visa */}
 								<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
 									<svg
 										viewBox="0 0 48 32"
-										className="h-6 w-auto"
+										className="w-auto h-6"
 										fill="none"
 									>
 										<path
@@ -1053,7 +1097,7 @@ export default function ProductDetailPage() {
 								<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
 									<svg
 										viewBox="0 0 48 32"
-										className="h-6 w-auto"
+										className="w-auto h-6"
 										fill="none"
 									>
 										<circle
@@ -1075,7 +1119,7 @@ export default function ProductDetailPage() {
 								<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
 									<svg
 										viewBox="0 0 48 32"
-										className="h-6 w-auto"
+										className="w-auto h-6"
 										fill="none"
 									>
 										<path
@@ -1092,7 +1136,7 @@ export default function ProductDetailPage() {
 								<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
 									<svg
 										viewBox="0 0 48 32"
-										className="h-6 w-auto"
+										className="w-auto h-6"
 										fill="none"
 									>
 										<path
@@ -1109,7 +1153,7 @@ export default function ProductDetailPage() {
 								<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
 									<svg
 										viewBox="0 0 48 32"
-										className="h-6 w-auto"
+										className="w-auto h-6"
 										fill="none"
 									>
 										<path

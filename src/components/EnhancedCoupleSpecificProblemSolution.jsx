@@ -28,7 +28,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 	isSimplified = false,
 }) => {
 	const t = useTranslations(
-		"coupleReport.enhancedCoupleSpecificProblemSolution"
+		"coupleReport.enhancedCoupleSpecificProblemSolution",
 	);
 	const { data: session } = useSession();
 	const { analysisData: contextAnalysisData } = useCoupleAnalysis();
@@ -83,7 +83,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		const sessionId =
 			`couple_${user1.birthDateTime}_${user2.birthDateTime}`.replace(
 				/[^a-zA-Z0-9]/g,
-				"_"
+				"_",
 			);
 
 		const completeData = {
@@ -98,7 +98,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 				baseData: !!baseData,
 				subsectionsCount: Object.keys(subsections).length,
 				subsections: Object.keys(subsections),
-			}
+			},
 		);
 
 		saveComponentContentWithUser(
@@ -113,7 +113,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 				gender2: user2.gender,
 				specificProblem: specificProblem,
 				problemCategory: problemCategory,
-			}
+			},
 		);
 	};
 
@@ -126,7 +126,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 					analysisData: !!analysisData,
 					subsectionsCount: Object.keys(subsectionData).length,
 					subsectionKeys: Object.keys(subsectionData),
-				}
+				},
 			);
 
 			// Save complete data (we'll collect subsections as they become available)
@@ -159,14 +159,14 @@ const EnhancedCoupleSpecificProblemSolution = ({
 				currentStableScore: stableScore,
 				femaleUser: !!femaleUser,
 				maleUser: !!maleUser,
-			}
+			},
 		);
 
 		// PRIORITY 0: If we already have a stable score, use it to prevent changes
 		if (stableScore !== null) {
 			console.log(
 				"🔒 EnhancedCoupleSpecificProblemSolution - Using LOCKED stable score:",
-				stableScore
+				stableScore,
 			);
 			return stableScore;
 		}
@@ -174,7 +174,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		// PRIORITY 1: Wait for context data to stabilize before using it
 		if (contextAnalysisData?.compatibility?.score && contextDataStable) {
 			const calculatedScore = parseInt(
-				contextAnalysisData.compatibility.score
+				contextAnalysisData.compatibility.score,
 			);
 			console.log(
 				"✅ EnhancedCoupleSpecificProblemSolution - Using STABLE context score (SYNCHRONIZED):",
@@ -183,7 +183,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 					parsedScore: calculatedScore,
 					contextDataStable,
 					timestamp: new Date().toISOString(),
-				}
+				},
 			);
 			return calculatedScore;
 		}
@@ -191,7 +191,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		// PRIORITY 2: Still waiting for context data to stabilize
 		if (contextAnalysisData === null || !contextDataStable) {
 			console.log(
-				"⏳ EnhancedCoupleSpecificProblemSolution - Waiting for STABLE context data, using temporary score"
+				"⏳ EnhancedCoupleSpecificProblemSolution - Waiting for STABLE context data, using temporary score",
 			);
 			return 75; // Temporary while waiting for stable data
 		}
@@ -201,21 +201,21 @@ const EnhancedCoupleSpecificProblemSolution = ({
 			try {
 				const user1Analysis = calculateUnifiedElements(
 					femaleUser.birthDateTime,
-					femaleUser.gender
+					femaleUser.gender,
 				);
 				const user2Analysis = calculateUnifiedElements(
 					maleUser.birthDateTime,
-					maleUser.gender
+					maleUser.gender,
 				);
 
 				const calculatedScore = calculateBasicCompatibilityScore(
 					user1Analysis,
-					user2Analysis
+					user2Analysis,
 				);
 
 				console.log(
 					"⚠️ EnhancedCoupleSpecificProblemSolution - Using calculated score (FALLBACK):",
-					calculatedScore
+					calculatedScore,
 				);
 				return calculatedScore;
 			} catch (error) {
@@ -226,7 +226,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 
 		// Ultimate fallback
 		console.log(
-			"❌ EnhancedCoupleSpecificProblemSolution - Using ultimate fallback score"
+			"❌ EnhancedCoupleSpecificProblemSolution - Using ultimate fallback score",
 		);
 		return 75;
 	}, [
@@ -243,7 +243,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 			// Check if data is immediately available (synchronous case)
 			if (contextAnalysisData.compatibility.score) {
 				console.log(
-					"📊 EnhancedCoupleSpecificProblemSolution - Context data IMMEDIATELY stable"
+					"📊 EnhancedCoupleSpecificProblemSolution - Context data IMMEDIATELY stable",
 				);
 				setContextDataStable(true);
 				return;
@@ -252,7 +252,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 			// Fallback minimal delay for edge cases
 			const stabilityTimer = setTimeout(() => {
 				console.log(
-					"📊 EnhancedCoupleSpecificProblemSolution - Context data marked as STABLE (delayed)"
+					"📊 EnhancedCoupleSpecificProblemSolution - Context data marked as STABLE (delayed)",
 				);
 				setContextDataStable(true);
 			}, 50); // Minimal 50ms delay for edge cases
@@ -271,7 +271,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		) {
 			console.log(
 				"🔒 EnhancedCoupleSpecificProblemSolution - LOCKING STABLE score to prevent changes:",
-				compatibilityScore
+				compatibilityScore,
 			);
 			setStableScore(compatibilityScore);
 		}
@@ -357,14 +357,14 @@ const EnhancedCoupleSpecificProblemSolution = ({
 			"🐛 DEBUG: useEffect triggered - user1:",
 			user1,
 			"user2:",
-			user2
+			user2,
 		);
 		console.log("🐛 DEBUG: femaleUser:", femaleUser, "maleUser:", maleUser);
 
 		if (user1 && user2) {
 			// TEMPORARILY SKIP DATABASE LOADING TO TEST NEW FALLBACK LOGIC
 			console.log(
-				"⏭️ SKIPPING database load to test new bilingual fallback"
+				"⏭️ SKIPPING database load to test new bilingual fallback",
 			);
 			setDatabaseDataLoaded(true);
 		}
@@ -451,11 +451,11 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		if (femaleUser && maleUser && specificProblem) {
 			// Check for historical data from browser storage (fallback)
 			const historicalData = getCoupleComponentData(
-				"enhancedCoupleSpecificProblemSolution"
+				"enhancedCoupleSpecificProblemSolution",
 			);
 			if (historicalData) {
 				console.log(
-					"📚 Loading historical data from browser storage for Enhanced Couple Specific Problem Solution"
+					"📚 Loading historical data from browser storage for Enhanced Couple Specific Problem Solution",
 				);
 				setAnalysisData(historicalData);
 				setLoading(false);
@@ -559,7 +559,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 		try {
 			console.log(
 				"📊 EnhancedCoupleSpecificProblemSolution - Calling API with isSimplified:",
-				isSimplified
+				isSimplified,
 			);
 
 			const response = await fetch(
@@ -573,7 +573,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 						specificProblem,
 						isSimplified,
 					}),
-				}
+				},
 			);
 
 			if (response.ok) {
@@ -582,7 +582,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 
 				// Note: Complete data will be saved when subsections are ready
 				console.log(
-					"⏳ Base analysis ready, waiting for subsections..."
+					"⏳ Base analysis ready, waiting for subsections...",
 				);
 			} else {
 				// Try to get data from response even if not ok
@@ -593,14 +593,14 @@ const EnhancedCoupleSpecificProblemSolution = ({
 
 						// Note: Complete data will be saved when subsections are ready
 						console.log(
-							"⏳ Base analysis ready (from error response), waiting for subsections..."
+							"⏳ Base analysis ready (from error response), waiting for subsections...",
 						);
 					} else {
 						throw new Error("No valid data in response");
 					}
 				} catch (parseError) {
 					throw new Error(
-						`HTTP ${response.status}: ${response.statusText}`
+						`HTTP ${response.status}: ${response.statusText}`,
 					);
 				}
 			}
@@ -953,15 +953,15 @@ const EnhancedCoupleSpecificProblemSolution = ({
 	return (
 		<div className="w-full space-y-6 sm:space-y-8">
 			{/* Main Analysis Section with New Layout */}
-			<div
+			{/* <div
 				className="flex flex-col gap-4 sm:gap-6 lg:flex-row"
 				style={{ padding: "clamp(4px, 4vw, 4px)" }}
-			>
-				{/* Left Side: Large Compatibility Circle (Full Height) */}
-				<div className="flex items-center justify-center py-6 sm:py-8 lg:w-1/3">
-					<div className="relative">
-						{/* Larger Circular Progress */}
-						<div
+			> */}
+			{/* Left Side: Large Compatibility Circle (Full Height) */}
+			{/* <div className="flex items-center justify-center py-6 sm:py-8 lg:w-1/3">
+					<div className="relative"> */}
+			{/* Larger Circular Progress */}
+			{/* <div
 							className="relative"
 							style={{
 								width: "clamp(240px, 60vw, 320px)",
@@ -971,18 +971,18 @@ const EnhancedCoupleSpecificProblemSolution = ({
 							<svg
 								className="w-full h-full transform -rotate-90"
 								viewBox="0 0 100 100"
-							>
-								{/* Background circle - Updated color and thickness */}
-								<circle
+							> */}
+			{/* Background circle - Updated color and thickness */}
+			{/* <circle
 									cx="50"
 									cy="50"
 									r="40"
 									fill="none"
 									stroke="#817E7E"
 									strokeWidth="10"
-								/>
-								{/* Progress circle with gradient - Updated thickness */}
-								<circle
+								/> */}
+			{/* Progress circle with gradient - Updated thickness */}
+			{/* <circle
 									cx="50"
 									cy="50"
 									r="40"
@@ -992,9 +992,9 @@ const EnhancedCoupleSpecificProblemSolution = ({
 									strokeLinecap="round"
 									strokeDasharray={`${(compatibilityScore * 251.2) / 100} 251.2`}
 									className="transition-all duration-1000 ease-out"
-								/>
-								{/* Gradient definition */}
-								<defs>
+								/> */}
+			{/* Gradient definition */}
+			{/* <defs>
 									<linearGradient
 										id="enhancedGradient"
 										x1="0%"
@@ -1013,9 +1013,9 @@ const EnhancedCoupleSpecificProblemSolution = ({
 										/>
 									</linearGradient>
 								</defs>
-							</svg>
-							{/* Score display */}
-							<div className="absolute inset-0 flex flex-col items-center justify-center">
+							</svg> */}
+			{/* Score display */}
+			{/* <div className="absolute inset-0 flex flex-col items-center justify-center">
 								<span
 									className="font-bold text-amber-600"
 									style={{
@@ -1036,14 +1036,14 @@ const EnhancedCoupleSpecificProblemSolution = ({
 						</div>
 					</div>
 				</div>
-
-				{/* Right Side: BaZi Cards */}
-				<div className="flex flex-col gap-4 sm:gap-6 lg:w-2/3">
-					{/* BaZi Analysis Cards */}
-					{analysisData && (
-						<div className="flex flex-col gap-4 sm:gap-6">
-							{/* Female BaZi Card */}
-							<div
+ */}
+			{/* Right Side: BaZi Cards */}
+			{/* <div className="flex flex-col gap-4 sm:gap-6 lg:w-2/3"> */}
+			{/* BaZi Analysis Cards */}
+			{/* {analysisData && (
+						<div className="flex flex-col gap-4 sm:gap-6"> */}
+			{/* Female BaZi Card */}
+			{/* <div
 								className="overflow-hidden bg-white shadow-lg"
 								style={{
 									borderRadius: "clamp(20px, 5vw, 30px)",
@@ -1092,9 +1092,9 @@ const EnhancedCoupleSpecificProblemSolution = ({
 									style={{
 										padding: "clamp(16px, 4vw, 24px)",
 									}}
-								>
-									{/* Four Pillars Display */}
-									<div className="mb-4 sm:mb-6">
+								> */}
+			{/* Four Pillars Display */}
+			{/* <div className="mb-4 sm:mb-6">
 										<div className="flex flex-wrap gap-2">
 											{analysisData.female.pillars?.map(
 												(pillar, index) => (
@@ -1119,10 +1119,10 @@ const EnhancedCoupleSpecificProblemSolution = ({
 												)
 											)}
 										</div>
-									</div>
+									</div> */}
 
-									{/* Description */}
-									<div
+			{/* Description */}
+			{/* <div
 										className="leading-relaxed text-gray-700"
 										style={{
 											fontSize: "clamp(12px, 3vw, 14px)",
@@ -1136,10 +1136,10 @@ const EnhancedCoupleSpecificProblemSolution = ({
 										)}
 									</div>
 								</div>
-							</div>
+							</div> */}
 
-							{/* Male BaZi Card */}
-							<div
+			{/* Male BaZi Card */}
+			{/* <div
 								className="overflow-hidden bg-white shadow-lg"
 								style={{
 									borderRadius: "clamp(20px, 5vw, 30px)",
@@ -1188,9 +1188,9 @@ const EnhancedCoupleSpecificProblemSolution = ({
 									style={{
 										padding: "clamp(16px, 4vw, 24px)",
 									}}
-								>
-									{/* Four Pillars Display */}
-									<div className="mb-4 sm:mb-6">
+								> */}
+			{/* Four Pillars Display */}
+			{/* <div className="mb-4 sm:mb-6">
 										<div className="flex flex-wrap gap-2">
 											{analysisData.male.pillars?.map(
 												(pillar, index) => (
@@ -1215,10 +1215,10 @@ const EnhancedCoupleSpecificProblemSolution = ({
 												)
 											)}
 										</div>
-									</div>
+									</div> */}
 
-									{/* Description */}
-									<div
+			{/* Description */}
+			{/* <div
 										className="leading-relaxed text-gray-700"
 										style={{
 											fontSize: "clamp(12px, 3vw, 14px)",
@@ -1236,7 +1236,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 						</div>
 					)}
 				</div>
-			</div>
+			</div> */}
 
 			{/* Problem Category Section */}
 			{specificProblem && problemCategory && (
@@ -1262,7 +1262,7 @@ const EnhancedCoupleSpecificProblemSolution = ({
 									>
 										{t("problemType")}：
 										{t(
-											`problemCategories.${problemCategory.categoryKey}`
+											`problemCategories.${problemCategory.categoryKey}`,
 										)}
 									</h3>
 								</div>

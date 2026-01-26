@@ -66,7 +66,7 @@ const calculateBaziWithTime = (birthDateTime) => {
 	} catch (error) {
 		console.error(
 			"BaziCalculator error, using fallback calculation:",
-			error
+			error,
 		);
 		// Safer fallback with basic calculation instead of EnhancedInitialAnalysis
 		return {
@@ -126,7 +126,7 @@ const CoupleAnnualAnalysis = ({
 		const historicalData = getCoupleComponentData("coupleAnnualAnalysis");
 		if (historicalData) {
 			console.log(
-				"🏛️ Using historical couple annual analysis data from data store"
+				"🏛️ Using historical couple annual analysis data from data store",
 			);
 			setAnalysisResult(historicalData);
 
@@ -156,11 +156,11 @@ const CoupleAnnualAnalysis = ({
 				// Use unified element calculation for consistency
 				const user1BasicAnalysis = calculateUnifiedElements(
 					user1.birthDateTime,
-					user1.gender
+					user1.gender,
 				);
 				const user2BasicAnalysis = calculateUnifiedElements(
 					user2.birthDateTime,
-					user2.gender
+					user2.gender,
 				);
 
 				// Generate AI-powered annual analysis
@@ -169,19 +169,19 @@ const CoupleAnnualAnalysis = ({
 					user2,
 					user1BasicAnalysis,
 					user2BasicAnalysis,
-					analysisData
+					analysisData,
 				);
 
 				// 🔄 SYNCHRONIZED compatibility calculation - PRIORITY: Use context data first
 				const calculatedCompatibilityScore =
 					calculateBasicCompatibilityScore(
 						user1BasicAnalysis,
-						user2BasicAnalysis
+						user2BasicAnalysis,
 					);
 
 				// PRIORITY 1: Use context analysis data score if available (same as EnhancedCoupleSpecificProblemSolution)
 				const contextScore = parseInt(
-					analysisData.compatibility?.score
+					analysisData.compatibility?.score,
 				);
 				const finalCompatibilityScore =
 					contextScore || calculatedCompatibilityScore;
@@ -197,7 +197,7 @@ const CoupleAnnualAnalysis = ({
 						finalScore: finalCompatibilityScore,
 						usingContextScore: !!contextScore,
 						timestamp: new Date().toISOString(),
-					}
+					},
 				);
 
 				const analysisResultData = {
@@ -214,26 +214,26 @@ const CoupleAnnualAnalysis = ({
 						dominantElement:
 							user1BasicAnalysis?.dayMasterElement || "未知",
 						elementType: getElementTypeDescription(
-							user1BasicAnalysis?.dayMasterElement
+							user1BasicAnalysis?.dayMasterElement,
 						),
 						characteristics: getElementCharacteristics(
-							user1BasicAnalysis?.dayMasterElement
+							user1BasicAnalysis?.dayMasterElement,
 						),
 					},
 					user2Analysis: {
 						dominantElement:
 							user2BasicAnalysis?.dayMasterElement || "未知",
 						elementType: getElementTypeDescription(
-							user2BasicAnalysis?.dayMasterElement
+							user2BasicAnalysis?.dayMasterElement,
 						),
 						characteristics: getElementCharacteristics(
-							user2BasicAnalysis?.dayMasterElement
+							user2BasicAnalysis?.dayMasterElement,
 						),
 					},
 					elementInteraction: generateElementInteractionAnalysis(
 						user1BasicAnalysis?.dayMasterElement,
 						user2BasicAnalysis?.dayMasterElement,
-						analysisData
+						analysisData,
 					),
 					annualStrategy: annualInsights,
 				};
@@ -245,7 +245,7 @@ const CoupleAnnualAnalysis = ({
 
 				// Note: Complete data will be saved when individual analyses are ready
 				console.log(
-					"⏳ Waiting for individual analyses to complete before saving..."
+					"⏳ Waiting for individual analyses to complete before saving...",
 				);
 
 				setLoading(false);
@@ -262,12 +262,12 @@ const CoupleAnnualAnalysis = ({
 	const saveCompleteAnalysisData = (
 		mainAnalysisData,
 		user1Analysis,
-		user2Analysis
+		user2Analysis,
 	) => {
 		const sessionId =
 			`couple_${user1.birthDateTime}_${user2.birthDateTime}`.replace(
 				/[^a-zA-Z0-9]/g,
-				"_"
+				"_",
 			);
 
 		const completeData = {
@@ -284,7 +284,7 @@ const CoupleAnnualAnalysis = ({
 				mainAnalysis: !!mainAnalysisData,
 				user1Analysis: !!user1Analysis,
 				user2Analysis: !!user2Analysis,
-			}
+			},
 		);
 
 		saveComponentContentWithUser(
@@ -297,7 +297,7 @@ const CoupleAnnualAnalysis = ({
 				birthday2: user2.birthDateTime,
 				gender: user1.gender,
 				gender2: user2.gender,
-			}
+			},
 		);
 	};
 
@@ -309,12 +309,12 @@ const CoupleAnnualAnalysis = ({
 			individualAnalysisData.user2
 		) {
 			console.log(
-				"🔄 Both individual analyses ready, saving complete data..."
+				"🔄 Both individual analyses ready, saving complete data...",
 			);
 			saveCompleteAnalysisData(
 				analysisResult,
 				individualAnalysisData.user1,
-				individualAnalysisData.user2
+				individualAnalysisData.user2,
 			);
 		}
 	}, [
@@ -327,11 +327,11 @@ const CoupleAnnualAnalysis = ({
 	const generateFallbackAnnualAnalysis = () => {
 		const user1BasicAnalysis = calculateUnifiedElements(
 			user1.birthDateTime,
-			user1.gender
+			user1.gender,
 		);
 		const user2BasicAnalysis = calculateUnifiedElements(
 			user2.birthDateTime,
-			user2.gender
+			user2.gender,
 		);
 
 		if (!user1BasicAnalysis || !user2BasicAnalysis) {
@@ -341,7 +341,7 @@ const CoupleAnnualAnalysis = ({
 
 		const compatibilityScore = calculateBasicCompatibilityScore(
 			user1BasicAnalysis,
-			user2BasicAnalysis
+			user2BasicAnalysis,
 		);
 
 		// Use consistent score with context data priority
@@ -356,28 +356,28 @@ const CoupleAnnualAnalysis = ({
 			user1Analysis: {
 				dominantElement: user1BasicAnalysis.dayMasterElement,
 				elementType: getElementTypeDescription(
-					user1BasicAnalysis.dayMasterElement
+					user1BasicAnalysis.dayMasterElement,
 				),
 				characteristics: getElementCharacteristics(
-					user1BasicAnalysis.dayMasterElement
+					user1BasicAnalysis.dayMasterElement,
 				),
 			},
 			user2Analysis: {
 				dominantElement: user2BasicAnalysis.dayMasterElement,
 				elementType: getElementTypeDescription(
-					user2BasicAnalysis.dayMasterElement
+					user2BasicAnalysis.dayMasterElement,
 				),
 				characteristics: getElementCharacteristics(
-					user2BasicAnalysis.dayMasterElement
+					user2BasicAnalysis.dayMasterElement,
 				),
 			},
 			elementInteraction: generateElementInteractionAnalysis(
 				user1BasicAnalysis.dayMasterElement,
-				user2BasicAnalysis.dayMasterElement
+				user2BasicAnalysis.dayMasterElement,
 			),
 			annualStrategy: generateBasicAnnualStrategy(
 				user1BasicAnalysis.dayMasterElement,
-				user2BasicAnalysis.dayMasterElement
+				user2BasicAnalysis.dayMasterElement,
 			),
 		};
 
@@ -388,7 +388,7 @@ const CoupleAnnualAnalysis = ({
 
 		// Note: Complete data will be saved when individual analyses are ready
 		console.log(
-			"⏳ Waiting for individual analyses to complete before saving fallback..."
+			"⏳ Waiting for individual analyses to complete before saving fallback...",
 		);
 
 		setLoading(false);
@@ -400,7 +400,7 @@ const CoupleAnnualAnalysis = ({
 		user2,
 		user1Analysis,
 		user2Analysis,
-		aiData
+		aiData,
 	) => {
 		try {
 			const currentYear = new Date().getFullYear();
@@ -412,7 +412,7 @@ const CoupleAnnualAnalysis = ({
 			const timeoutId = setTimeout(() => {
 				controller.abort();
 				console.log(
-					"⏰ Annual analysis API call timed out after 60 seconds"
+					"⏰ Annual analysis API call timed out after 60 seconds",
 				);
 			}, 60000); // 60 second timeout
 
@@ -442,7 +442,7 @@ const CoupleAnnualAnalysis = ({
 		} catch (error) {
 			if (error.name === "AbortError") {
 				console.log(
-					"⏰ Annual insights API call was aborted due to timeout"
+					"⏰ Annual insights API call was aborted due to timeout",
 				);
 			} else {
 				console.error("Error generating annual insights:", error);
@@ -452,7 +452,7 @@ const CoupleAnnualAnalysis = ({
 		// Fallback to basic annual strategy
 		return generateBasicAnnualStrategy(
 			user1Analysis?.dominantElement,
-			user2Analysis?.dominantElement
+			user2Analysis?.dominantElement,
 		);
 	};
 
@@ -467,7 +467,7 @@ const CoupleAnnualAnalysis = ({
 			element2,
 			currentYear,
 			nextYear,
-			currentMonth
+			currentMonth,
 		);
 
 		return {
@@ -476,7 +476,7 @@ const CoupleAnnualAnalysis = ({
 				description: generateYearlyDescription(
 					element1,
 					element2,
-					currentYear
+					currentYear,
 				),
 				monthlyFocus: monthlyAdvice[currentYear],
 				currentMonth: currentMonth, // Add current month information
@@ -486,7 +486,7 @@ const CoupleAnnualAnalysis = ({
 				description: generateYearlyDescription(
 					element1,
 					element2,
-					nextYear
+					nextYear,
 				),
 				monthlyFocus: monthlyAdvice[nextYear],
 			},
@@ -498,7 +498,7 @@ const CoupleAnnualAnalysis = ({
 		element2,
 		currentYear,
 		nextYear,
-		currentMonth
+		currentMonth,
 	) => {
 		const monthAdviceTemplates = {
 			金: {
@@ -630,7 +630,7 @@ const CoupleAnnualAnalysis = ({
 		const allElements = ["金", "木", "水", "火", "土"];
 		const presentElements = [element1, element2];
 		const missing = allElements.filter(
-			(el) => !presentElements.includes(el)
+			(el) => !presentElements.includes(el),
 		);
 
 		if (missing.length > 0) {
@@ -828,7 +828,7 @@ const CoupleAnnualAnalysis = ({
 		const allElements = ["金", "木", "水", "火", "土"];
 		const presentElements = [element1, element2];
 		const missing = allElements.filter(
-			(el) => !presentElements.includes(el)
+			(el) => !presentElements.includes(el),
 		);
 
 		// Five element generation and destruction cycles
@@ -1013,7 +1013,7 @@ const CoupleAnnualAnalysis = ({
 								>
 									{getElementCombinationResult(
 										user1Analysis.dominantElement,
-										user2Analysis.dominantElement
+										user2Analysis.dominantElement,
 									)}
 								</span>
 							</div>
@@ -1043,7 +1043,7 @@ const CoupleAnnualAnalysis = ({
 									fontSize: "clamp(20px, 6vw, 35px)",
 								}}
 							>
-							2026流年關鍵應對策略
+								2026流年關鍵應對策略
 							</h3>
 						</div>
 
@@ -1089,7 +1089,7 @@ const CoupleAnnualAnalysis = ({
 											</div>
 										</div>
 									</div>
-								)
+								),
 							)}
 						</div>
 					</div>
@@ -1268,7 +1268,7 @@ const IndividualAnalysisSection = ({
 		if (savedIndividualData) {
 			console.log(
 				`🏛️ Using saved individual analysis data for ${gender}`,
-				savedIndividualData
+				savedIndividualData,
 			);
 			setBaziData(savedIndividualData.baziData);
 			setIndividualAnalysis(savedIndividualData.analysis);
@@ -1276,7 +1276,7 @@ const IndividualAnalysisSection = ({
 			// Notify parent that saved data is loaded
 			if (onAnalysisReady) {
 				console.log(
-					`📤 Sending saved individual analysis data for ${gender} to parent`
+					`📤 Sending saved individual analysis data for ${gender} to parent`,
 				);
 				onAnalysisReady(savedIndividualData);
 			}
@@ -1304,7 +1304,7 @@ const IndividualAnalysisSection = ({
 					user: user,
 				};
 				console.log(
-					`📤 Sending cached individual analysis data for ${gender} to parent`
+					`📤 Sending cached individual analysis data for ${gender} to parent`,
 				);
 				onAnalysisReady(completeIndividualData);
 			}
@@ -1332,7 +1332,7 @@ const IndividualAnalysisSection = ({
 					const timeoutId = setTimeout(() => {
 						controller.abort();
 						console.log(
-							`⏰ Individual analysis API call for ${gender} timed out after 45 seconds`
+							`⏰ Individual analysis API call for ${gender} timed out after 45 seconds`,
 						);
 					}, 45000); // 45 second timeout
 
@@ -1363,7 +1363,7 @@ const IndividualAnalysisSection = ({
 						const data = await response.json();
 						aiAnalysis = parseIndividualAIAnalysis(
 							data.aiAnalysis,
-							bazi
+							bazi,
 						);
 					} else {
 						console.log("API call failed, using basic analysis");
@@ -1371,12 +1371,12 @@ const IndividualAnalysisSection = ({
 				} catch (error) {
 					if (error.name === "AbortError") {
 						console.log(
-							`⏰ Individual analysis API call for ${gender} was aborted due to timeout`
+							`⏰ Individual analysis API call for ${gender} was aborted due to timeout`,
 						);
 					} else {
 						console.log(
 							"AI analysis failed, using basic analysis:",
-							error
+							error,
 						);
 					}
 				}
@@ -1407,7 +1407,7 @@ const IndividualAnalysisSection = ({
 						user: user,
 					};
 					console.log(
-						`📤 Sending individual analysis data for ${gender} to parent`
+						`📤 Sending individual analysis data for ${gender} to parent`,
 					);
 					onAnalysisReady(completeIndividualData);
 				}
@@ -1440,8 +1440,9 @@ const IndividualAnalysisSection = ({
 		let cleanText = aiText
 			.replace(
 				/✨|🌙|💖|🎯|🔍|💡|🌱|～|~|唷|啦|哦|呢|⚠️|🌸|💑|💞|💧/g,
-				""
+				"",
 			) // Remove emojis and casual particles
+			.replace(/\*\*/g, "") // Remove markdown bold markers
 			.replace(/小鈴[^。！？]*[。！？]/g, "") // Remove 小鈴 sentences
 			.replace(/叮鈴鈴.*$/g, "") // Remove promotional content
 			.replace(/解鎖.*報告.*$/gm, "") // Remove unlock promotion
@@ -1772,7 +1773,7 @@ const IndividualAnalysisSection = ({
 				description: generatePillarDescription(
 					bazi.year,
 					"年",
-					"祖業根基，早年環境"
+					"祖業根基，早年環境",
 				),
 			},
 			月柱: {
@@ -1781,7 +1782,7 @@ const IndividualAnalysisSection = ({
 				description: generatePillarDescription(
 					bazi.month,
 					"月",
-					"父母宮位，中年發展"
+					"父母宮位，中年發展",
 				),
 			},
 			日柱: {
@@ -1790,7 +1791,7 @@ const IndividualAnalysisSection = ({
 				description: generatePillarDescription(
 					bazi.day,
 					"日",
-					"自身性格，配偶關係"
+					"自身性格，配偶關係",
 				),
 			},
 			時柱: {
@@ -1799,7 +1800,7 @@ const IndividualAnalysisSection = ({
 				description: generatePillarDescription(
 					bazi.hour,
 					"時",
-					"子女宮位，晚年運勢"
+					"子女宮位，晚年運勢",
 				),
 			},
 		};
@@ -1962,7 +1963,7 @@ const IndividualAnalysisSection = ({
 								</p>
 							</div>
 						</div>
-					)
+					),
 				)}
 			</div>
 
@@ -1989,7 +1990,7 @@ const IndividualAnalysisSection = ({
 				</div>
 
 				{/* Characteristics Description */}
-				<div className="p-3 mb-4 bg-white rounded-lg sm:p-4">
+				{/* <div className="p-3 mb-4 bg-white rounded-lg sm:p-4">
 					<p
 						className="leading-relaxed text-black"
 						style={{
@@ -1999,7 +2000,7 @@ const IndividualAnalysisSection = ({
 					>
 						{individualAnalysis.characteristics}
 					</p>
-				</div>
+				</div> */}
 
 				{/* Strengths and Suggestions Layout - Mobile Stacked, Desktop Side by Side */}
 				<div className="grid gap-4 sm:gap-6 md:grid-cols-2">
@@ -2039,11 +2040,11 @@ const IndividualAnalysisSection = ({
 												? strength
 												: strength.replace(
 														/^[•\-\*]\s*/,
-														""
+														"",
 													)}
 										</span>
 									</li>
-								)
+								),
 							)}
 						</ul>
 					</div>
@@ -2084,11 +2085,11 @@ const IndividualAnalysisSection = ({
 												? suggestion
 												: suggestion.replace(
 														/^[•\-\*]\s*/,
-														""
+														"",
 													)}
 										</span>
 									</li>
-								)
+								),
 							)}
 						</ul>
 					</div>
