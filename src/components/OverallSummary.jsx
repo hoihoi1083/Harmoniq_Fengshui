@@ -39,8 +39,9 @@ export default function OverallSummary({ concernColor = '#8B5CF6' }) {
 
 			// Check if we have required data to generate summary
 			// Note: Data is stored with "Analysis" suffix
-			if (!dataStore.questionFocusAnalysis || !dataStore.coreSuggestionAnalysis) {
-				console.log('⏳ Missing required data - questionFocus:', !!dataStore.questionFocusAnalysis, 'coreSuggestion:', !!dataStore.coreSuggestionAnalysis);
+			// CoreSuggestion is now optional - we can generate summary without it
+			if (!dataStore.questionFocusAnalysis) {
+				console.log('⏳ Missing required data - questionFocus:', !!dataStore.questionFocusAnalysis);
 				setLoading(false);
 				return;
 			}
@@ -107,8 +108,8 @@ export default function OverallSummary({ concernColor = '#8B5CF6' }) {
 					hasCoreSuggestion: !!dataStore.coreSuggestionAnalysis,
 				});
 				
-				// If we have enough data, load immediately
-				if (dataStore.questionFocusAnalysis && dataStore.coreSuggestionAnalysis) {
+				// If we have enough data, load immediately (coreSuggestion is now optional)
+				if (dataStore.questionFocusAnalysis) {
 					console.log('✅ OverallSummary: Required data found, loading summary');
 					hasLoaded = true;
 					clearInterval(pollInterval);
@@ -135,7 +136,7 @@ export default function OverallSummary({ concernColor = '#8B5CF6' }) {
 	const handleCopyToClipboard = async () => {
 		if (!summaryData) return;
 
-		const shareText = `🌟 我的2026年運勢總結 🌟
+		let shareText = `🌟 我的2026年運勢總結 🌟
 
 【${summaryData.keyPhrase}】
 
@@ -145,10 +146,17 @@ ${summaryData.coreThemes.map((theme, i) => `${i + 1}. ${theme}`).join('\n')}
 💬 ${summaryData.shareableQuote}
 
 📊 全年展望：
-${summaryData.yearOverview}
+${summaryData.yearOverview}`;
 
----
-來自 HarmoniqFengShui 命理分析報告`;
+		if (summaryData.luckyColors && summaryData.luckyColors.length > 0) {
+			shareText += `\n\n🎨 開運色彩：${summaryData.luckyColors.join('、')}`;
+		}
+
+		if (summaryData.luckyAccessories && summaryData.luckyAccessories.length > 0) {
+			shareText += `\n💎 開運配飾：${summaryData.luckyAccessories.join('、')}`;
+		}
+
+		shareText += `\n\n---\n來自 HarmoniqFengShui 命理分析報告`;
 
 		try {
 			await navigator.clipboard.writeText(shareText);
@@ -299,12 +307,71 @@ ${summaryData.yearOverview}
 						initial={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.8 }}
+						className="mb-8"
 					>
 						<h3 className="text-lg font-semibold text-gray-700 mb-3">📊 全年展望</h3>
 						<p className="text-gray-700 leading-relaxed">
 							{summaryData.yearOverview}
 						</p>
 					</motion.div>
+
+					{/* Lucky Colors and Accessories */}
+					{(summaryData.luckyColors || summaryData.luckyAccessories) && (
+						<motion.div
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.9 }}
+							className="grid grid-cols-1 md:grid-cols-2 gap-6"
+						>
+							{/* Lucky Colors */}
+							{summaryData.luckyColors && (
+								<div className="p-5 rounded-xl bg-white/50 border-2" style={{ borderColor: `${concernColor}20` }}>
+									<h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
+										<span>🎨</span>
+										<span>開運色彩</span>
+									</h3>
+									<div className="flex flex-wrap gap-3">
+										{summaryData.luckyColors.map((color, index) => (
+											<motion.div
+												key={index}
+												initial={{ scale: 0 }}
+												animate={{ scale: 1 }}
+												transition={{ delay: 1.0 + index * 0.1 }}
+												className="px-4 py-2 rounded-full font-medium text-gray-700"
+												style={{ background: `${concernColor}15`, border: `1px solid ${concernColor}30` }}
+											>
+												{color}
+											</motion.div>
+										))}
+									</div>
+								</div>
+							)}
+
+							{/* Lucky Accessories */}
+							{summaryData.luckyAccessories && (
+								<div className="p-5 rounded-xl bg-white/50 border-2" style={{ borderColor: `${concernColor}20` }}>
+									<h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
+										<span>💎</span>
+										<span>開運配飾</span>
+									</h3>
+									<div className="flex flex-wrap gap-3">
+										{summaryData.luckyAccessories.map((accessory, index) => (
+											<motion.div
+												key={index}
+												initial={{ scale: 0 }}
+												animate={{ scale: 1 }}
+												transition={{ delay: 1.0 + index * 0.1 }}
+												className="px-4 py-2 rounded-full font-medium text-gray-700"
+												style={{ background: `${concernColor}15`, border: `1px solid ${concernColor}30` }}
+											>
+												{accessory}
+											</motion.div>
+										))}
+									</div>
+								</div>
+							)}
+						</motion.div>
+					)}
 				</div>
 			</div>
 		</motion.div>

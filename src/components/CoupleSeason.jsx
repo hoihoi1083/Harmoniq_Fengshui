@@ -126,13 +126,7 @@ export default function CoupleSeason({
 		const currentSeasonName = seasonInfo.currentSeason;
 		const seasonOrder = seasonInfo.relevantSeasons;
 
-		const getSeasonContext = (season) => {
-			if (season === currentSeasonName) {
-				return "【當前季節】";
-			} else {
-				return "【未來參考】";
-			}
-		};
+		// Removed getSeasonContext function - no longer adding tags to season names
 
 		const allSeasons = [
 			{
@@ -169,7 +163,7 @@ export default function CoupleSeason({
 			},
 		];
 
-		// Order seasons based on current date - put current season first
+		// Use seasons without tags
 		const reorderedSeasons = seasonOrder
 			.map((seasonName) =>
 				allSeasons.find((season) => season.name === seasonName)
@@ -589,11 +583,11 @@ export default function CoupleSeason({
 											fontSize: "clamp(20px, 5vw, 28px)",
 										}}
 									>
-										{
+										{getOriginalSeasonName(
 											analysisData.seasons[
 												activeSeasonIndex
 											].name
-										}
+										)}
 									</h3>
 
 									{/* Period with Season Background - Responsive */}

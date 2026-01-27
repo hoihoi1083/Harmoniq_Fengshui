@@ -415,7 +415,7 @@ const JiXiong = memo(function JiXiong({
 							<div className="flex flex-col mb-6 sm:mb-8 lg:flex-row lg:gap-6 xl:gap-8">
 								{/* Left Side - 吉象 */}
 								<div className="w-full mb-6 sm:mb-8 lg:w-1/2 lg:mb-0">
-									<div className="h-full p-4 sm:p-6 bg-white rounded-[15px] sm:rounded-[20px] shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
+									<div className="h-full p-4 sm:p-6 bg-white rounded-[15px] sm:rounded-[20px]">
 										<h2
 											className="mb-4 font-bold text-center sm:mb-6 sm:text-left"
 											style={{
@@ -435,7 +435,7 @@ const JiXiong = memo(function JiXiong({
 												(item, index) => (
 													<div
 														key={index}
-														className="p-3 sm:p-4 min-h-[200px] sm:h-[250px] flex flex-col"
+													className="p-3 sm:p-4 min-h-[280px] sm:min-h-[320px] flex flex-col"
 													>
 														<div
 															className="flex items-center justify-center mb-2 sm:mb-3 font-bold text-white rounded-lg w-full max-w-[200px] mx-auto h-[35px] sm:h-[40px]"
@@ -480,9 +480,9 @@ const JiXiong = memo(function JiXiong({
 
 								{/* Right Side - 凶象 */}
 								<div className="w-full lg:w-1/2">
-									<div className="bg-gray-800 rounded-[15px] sm:rounded-[20px] p-4 sm:p-6 h-full shadow-[0_4px_5.3px_rgba(0,0,0,0.25)]">
+									<div className="bg-white rounded-[15px] sm:rounded-[20px] p-4 sm:p-6 h-full">
 										<h2
-											className="mb-4 font-bold text-center text-white sm:mb-6 sm:text-left"
+											className="mb-4 font-bold text-center sm:mb-6 sm:text-left text-black"
 											style={{
 												fontFamily:
 													"Noto Sans HK, sans-serif",
@@ -499,7 +499,7 @@ const JiXiong = memo(function JiXiong({
 												(item, index) => (
 													<div
 														key={index}
-														className="p-3 sm:p-4 min-h-[200px] sm:h-[250px] flex flex-col"
+													className="p-3 sm:p-4 min-h-[280px] sm:min-h-[320px] flex flex-col"
 													>
 														<div
 															className="flex items-center justify-center mb-2 sm:mb-3 font-bold text-white rounded-lg w-full max-w-[200px] mx-auto h-[35px] sm:h-[40px]"
@@ -524,7 +524,7 @@ const JiXiong = memo(function JiXiong({
 															}}
 														>
 															<p
-																className="leading-relaxed text-white"
+																className="leading-relaxed text-gray-800"
 																style={{
 																	fontSize:
 																		"clamp(0.875rem, 2.5vw, 0.9375rem)",

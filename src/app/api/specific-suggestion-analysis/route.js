@@ -165,7 +165,8 @@ function parseSuggestionsFromText(text, isSimplified = false) {
 			}
 
 			// Clean up content
-	title = title.trim().replace(/[：:]/g, "").replace(/\*\*/g, "");
+			title = title.trim().replace(/[：:]/g, "").replace(/\*\*/g, "");
+			content = content.trim().replace(/\*\*/g, "");
 			if (content.length > 150) {
 				content = content.substring(0, 120) + "...";
 			}
@@ -254,7 +255,8 @@ function parseTaboosFromText(text, isSimplified = false) {
 			}
 
 			// Clean up content
-	title = title.trim().replace(/[：:]/g, "").replace(/\*\*/g, "");
+			title = title.trim().replace(/[：:]/g, "").replace(/\*\*/g, "");
+			content = content.trim().replace(/\*\*/g, "");
 			if (content.length > 150) {
 				content = content.substring(0, 120) + "...";
 			}

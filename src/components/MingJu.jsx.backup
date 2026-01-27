@@ -7,18 +7,6 @@ import {
 } from "../utils/componentDataStore";
 import getWuxingData from "../lib/nayin";
 
-// Print styles
-const printStyles = `
-	@media print {
-		body { margin: 0; padding: 0; }
-		.no-print { display: none !important; }
-		.print-only { display: block !important; }
-		div { page-break-inside: avoid; }
-		h1, h2 { page-break-after: avoid; }
-		p { orphans: 2; widows: 2; }
-	}
-`;
-
 // Helper function to normalize concern characters (simplified to traditional)
 const normalizeConcern = (concern) => {
 	const mapping = {
@@ -2823,8 +2811,14 @@ function getFallbackContent(concernArea, tab) {
 export function MingJu({ userInfo, currentYear }) {
 	const locale = useLocale();
 	const t = useTranslations("fengShuiReport.components.mingJu");
+	const [selectedTab, setSelectedTab] = useState("日主特性");
+	const [tabContent, setTabContent] = useState("");
+	const [aiContent, setAiContent] = useState("");
+	const [loading, setLoading] = useState(true); // Start with loading true
 	const [contentCache, setContentCache] = useState({}); // Cache for storing loaded content
+	const [preloadingTabs, setPreloadingTabs] = useState(new Set()); // Track which tabs are being preloaded
 	const [allTabsLoaded, setAllTabsLoaded] = useState(false); // Track if all tabs are loaded
+	const [initialLoad, setInitialLoad] = useState(true); // Track if this is the initial load
 	const concern = userInfo.concern || "財運";
 
 	// Create a unique cache key for this tab and user info combination
@@ -2835,26 +2829,38 @@ export function MingJu({ userInfo, currentYear }) {
 	// Clear cache when user info changes significantly
 	useEffect(() => {
 		setContentCache({});
+		setPreloadingTabs(new Set());
 		setAllTabsLoaded(false);
+		setInitialLoad(true);
+		setLoading(true); // Show loading when user info changes
 	}, [userInfo.birthDateTime, userInfo.concern]);
-
 
 	// Preload content for all tabs when component mounts or user info changes
 	useEffect(() => {
 		async function preloadAllTabs() {
 			console.log("🚀 Starting preload for all tabs...");
+			console.log("🔍 User info for preloading:", userInfo);
+			console.log("🔍 Current year:", currentYear);
+			console.log("🔍 Available tabs:", TABS);
 
 			// Check if historical data exists in component data store
 			const existingMingJuData = getComponentData("mingJuAnalysis");
 			if (existingMingJuData) {
-				console.log("📖 MingJu using existing data from component store");
+				console.log(
+					"📖 MingJu using existing data from component store"
+				);
 
 				// Pre-populate cache with existing data
 				const newContentCache = {};
 				TABS.forEach((tab) => {
 					if (existingMingJuData[tab]?.content) {
-						const cacheKey = getCacheKey(tab, userInfo, currentYear);
-						newContentCache[cacheKey] = existingMingJuData[tab].content;
+						const cacheKey = getCacheKey(
+							tab,
+							userInfo,
+							currentYear
+						);
+						newContentCache[cacheKey] =
+							existingMingJuData[tab].content;
 						console.log(`📋 Loaded existing content for ${tab}`);
 					}
 				});
@@ -2862,14 +2868,16 @@ export function MingJu({ userInfo, currentYear }) {
 				if (Object.keys(newContentCache).length > 0) {
 					setContentCache(newContentCache);
 					setAllTabsLoaded(true);
+					setLoading(false);
 					return;
 				}
 			}
 
-			console.log("🚀 Generating fresh content for each session");
+			console.log("� Generating fresh content for each session");
 
 			const loadPromises = TABS.map(async (tab) => {
 				const cacheKey = getCacheKey(tab, userInfo, currentYear);
+				console.log(`🔑 Cache key for ${tab}:`, cacheKey);
 
 				// Skip if already cached
 				if (contentCache[cacheKey]) {
@@ -2878,14 +2886,22 @@ export function MingJu({ userInfo, currentYear }) {
 				}
 
 				console.log(`⏳ Preloading content for ${tab}`);
+				setPreloadingTabs((prev) => new Set([...prev, tab]));
 
 				try {
-					console.log(`🤖 Calling generateMingJuAnalysis for ${tab}...`);
+					console.log(
+						`🤖 Calling generateMingJuAnalysis for ${tab}...`
+					);
 					const result = await generateMingJuAnalysis(
 						{ ...userInfo, currentYear },
 						tab,
 						locale
 					);
+					console.log(`📋 Result for ${tab}:`, {
+						hasContent: !!result.content,
+						contentLength: result.content?.length,
+						isAI: result.isAI,
+					});
 
 					// Cache the content
 					setContentCache((prev) => ({
@@ -2893,9 +2909,10 @@ export function MingJu({ userInfo, currentYear }) {
 						[cacheKey]: result.content,
 					}));
 
-					// Store successful content in global data store
+					// Store successful content in global data store for database saving
 					if (result.content && typeof window !== "undefined") {
-						window.componentDataStore = window.componentDataStore || {};
+						window.componentDataStore =
+							window.componentDataStore || {};
 						if (!window.componentDataStore.mingJuAnalysis) {
 							window.componentDataStore.mingJuAnalysis = {};
 						}
@@ -2904,181 +2921,371 @@ export function MingJu({ userInfo, currentYear }) {
 							isAI: result.isAI,
 							timestamp: new Date().toISOString(),
 						};
-						console.log(`📊 Stored MingJu data for ${tab}: SUCCESS`);
+						console.log(
+							`📊 Stored MingJu data for ${tab}:`,
+							"SUCCESS"
+						);
 					}
 
 					console.log(`✅ Preloaded content for ${tab}`);
 				} catch (error) {
 					console.error(`❌ Error preloading ${tab}:`, error);
+					console.error(`🔍 Error details for ${tab}:`, {
+						message: error.message,
+						stack: error.stack,
+						userInfo: userInfo,
+						currentYear: currentYear,
+						tab: tab,
+						cacheKey: cacheKey,
+					});
 					// Store error content in cache to prevent retry
 					setContentCache((prev) => ({
 						...prev,
 						[cacheKey]: "內容載入失敗，請稍後再試。",
 					}));
+				} finally {
+					setPreloadingTabs((prev) => {
+						const newSet = new Set(prev);
+						newSet.delete(tab);
+						return newSet;
+					});
 				}
 			});
 
 			// Wait for all tabs to load
 			await Promise.all(loadPromises);
 			setAllTabsLoaded(true);
+			setInitialLoad(false); // Mark initial load as complete
 			console.log("🎉 All tabs preloaded successfully!");
 		}
 
 		preloadAllTabs();
 	}, [userInfo, currentYear]);
 
-	// Helper function to parse and render JSON content for print
-	const renderPrintJSON = (content) => {
-		if (!content || typeof content !== 'string') return null;
-		
-		try {
-			const parsed = JSON.parse(content);
-			
-			// Handle sections format (middle tab)
-			if (parsed.sections) {
-				return parsed.sections.map((section, idx) => (
-					<div key={idx} style={{ marginBottom: "20px" }}>
-						<h3 style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "10px", color: "#333" }}>
-							{section.title}
-						</h3>
-						<p style={{ marginBottom: "10px", lineHeight: "1.8" }}>
-							{section.content}
-						</p>
-						{section.interactions && section.interactions.map((interaction, iIdx) => (
-							<p key={iIdx} style={{ marginLeft: "15px", marginBottom: "8px", lineHeight: "1.8" }}>
-								• {interaction}
-							</p>
-						))}
-					</div>
-				));
-			}
-			
-			// Handle keywords format (right tab)
-			if (parsed.keywords) {
-				return (
-					<>
-						{parsed.keywords.map((keyword, idx) => (
-							<div key={idx} style={{ marginBottom: "15px" }}>
-								<h4 style={{ fontSize: "15px", fontWeight: "bold", marginBottom: "5px", color: "#333" }}>
-									{keyword.text}
-								</h4>
-								<p style={{ lineHeight: "1.8" }}>
-									{keyword.description}
-								</p>
-							</div>
-						))}
-						{parsed.analysis && (
-							<div style={{ marginTop: "20px", padding: "15px", backgroundColor: "#f5f5f5", borderRadius: "8px" }}>
-								<p style={{ lineHeight: "1.8" }}>
-									{parsed.analysis}
-								</p>
-							</div>
-						)}
-					</>
+	// Update displayed content when tab changes
+	useEffect(() => {
+		const updateDisplay = () => {
+			const cacheKey = getCacheKey(selectedTab, userInfo, currentYear);
+
+			if (contentCache[cacheKey]) {
+				console.log(`📋 Displaying cached content for ${selectedTab}`);
+				console.log(`🔍 Cache content preview:`, {
+					type: typeof contentCache[cacheKey],
+					length: contentCache[cacheKey]?.length,
+					preview:
+						typeof contentCache[cacheKey] === "string"
+							? contentCache[cacheKey].substring(0, 150) + "..."
+							: contentCache[cacheKey],
+					isJSON:
+						typeof contentCache[cacheKey] === "string"
+							? contentCache[cacheKey].trim().startsWith("{")
+							: false,
+				});
+				setTabContent(contentCache[cacheKey]);
+				setAiContent(contentCache[cacheKey]);
+				setLoading(false);
+			} else if (preloadingTabs.has(selectedTab) || initialLoad) {
+				console.log(
+					`⏳ Content for ${selectedTab} is still loading...`
 				);
+				setLoading(true);
+				setTabContent("內容載入中...");
+				setAiContent("");
+			} else {
+				console.log(`❓ No content found for ${selectedTab}`);
+				setLoading(false);
+				setTabContent("內容載入失敗，請稍後再試。");
+				setAiContent("");
 			}
-			
-			return null;
-		} catch (e) {
-			// If not JSON, return as plain text
-			return content;
+		};
+
+		updateDisplay();
+	}, [selectedTab, initialLoad]); // Add initialLoad to dependencies
+
+	// Watch for cache updates for the current tab
+	useEffect(() => {
+		const cacheKey = getCacheKey(selectedTab, userInfo, currentYear);
+		if (contentCache[cacheKey] && contentCache[cacheKey] !== tabContent) {
+			console.log(
+				`🔄 Cache updated for current tab ${selectedTab}, refreshing display`
+			);
+			setTabContent(contentCache[cacheKey]);
+			setAiContent(contentCache[cacheKey]);
+			setLoading(false);
+		}
+	}, [contentCache]);
+
+	// Get the header title color based on selected tab
+	const getHeaderColor = (tab, concern) => {
+		if (tab === "日主特性") return "#B4003C";
+		if (tab === "middle") return getTabConfig(concern).middle.selectedBg;
+		if (tab === "right") return getTabConfig(concern).right.selectedBg;
+		return "#B4003C";
+	};
+
+	// Handle tab click with loading state
+	const handleTabClick = (tab) => {
+		if (tab !== selectedTab) {
+			setLoading(true); // Show loading when switching tabs
+			setSelectedTab(tab);
+
+			// If content is not cached, keep loading until it's available
+			const cacheKey = getCacheKey(tab, userInfo, currentYear);
+			if (!contentCache[cacheKey]) {
+				setTimeout(() => {
+					// Check again after a brief delay to see if content is loaded
+					if (contentCache[cacheKey]) {
+						setLoading(false);
+					}
+				}, 100);
+			}
 		}
 	};
 
-	// Print-friendly content rendering
-	const renderPrintContent = () => {
-		// Get colors based on concern type
-		const getHeaderColor = (tab) => {
-			if (tab === "日主特性") return "#B4003C";
-			if (tab === "middle") return getTabConfig(concern).middle.selectedBg;
-			if (tab === "right") return getTabConfig(concern).right.selectedBg;
-			return "#B4003C";
-		};
+	return (
+		<div
+			className="p-4 mx-auto shadow-md rounded-[24px] sm:rounded-[48px] lg:rounded-[80px] sm:p-6 md:p-8 lg:p-15"
+			style={{
+				width: "95%",
+				backgroundColor: "white",
+				boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
+			}}
+		>
+			<div className="px-2 sm:px-4 md:px-6 lg:px-8">
+				{/* Tabs */}
+				<div className="flex items-center justify-center gap-8 px-2 mt-3 mb-6 sm:px-4 sm:mb-8 sm:gap-8 md:gap-16 lg:gap-70">
+					{TABS.map((tab) => {
+						const isSelected = selectedTab === tab;
+						const label = getTabLabel(tab, concern, t);
+						const imgSrc = getTabImg(tab, concern);
+						const bgColor = getTabBg(tab, concern, isSelected);
+						const imgColor = getTabImgColor(
+							tab,
+							concern,
+							isSelected
+						);
+						return (
+							<div
+								key={tab}
+								className="flex flex-col items-center mb-6 sm:mb-8 lg:mb-10"
+							>
+								<button
+									className="flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-[90px] lg:h-[90px]"
+									style={{
+										borderRadius: "50%",
+										backgroundColor: bgColor,
+										boxShadow: "0 4px 4px rgba(0,0,0,0.25)",
+									}}
+									onClick={() => handleTabClick(tab)}
+								>
+									<Image
+										src={imgSrc}
+										alt={label}
+										width={24}
+										height={24}
+										className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8"
+										style={{
+											filter: (() => {
+												if (isSelected) {
+													return "brightness(0) invert(1)";
+												}
 
-		return (
-			<div
-				style={{
-					padding: "20px",
-					fontFamily: "system-ui, -apple-system, sans-serif",
-					lineHeight: "1.6",
-					color: "#000",
-					backgroundColor: "#fff",
-				}}
-			>
-				{/* 日主特性 */}
-				<div style={{ marginBottom: "30px", pageBreakInside: "avoid" }}>
-					<h2 style={{ 
-						fontSize: "clamp(1.5rem, 4vw, 2rem)", 
-						marginBottom: "20px", 
-						fontWeight: "800",
-						color: getHeaderColor("日主特性"),
-						fontFamily: "Noto Serif TC, serif",
-					}}>
-						{getTabLabel("日主特性", concern, t)}
-					</h2>
-					<div style={{ 
-						whiteSpace: "pre-wrap", 
-						fontSize: "clamp(0.875rem, 2.5vw, 1rem)", 
-						lineHeight: "1.8",
-						backgroundColor: "white",
-						padding: "20px",
-						borderRadius: "12px",
-					}}>
-						{contentCache[getCacheKey("日主特性", userInfo, currentYear)] || "內容載入中..."}
-					</div>
+												// When unselected, use the color that would be the background when selected
+												const unselectedColor =
+													getTabImgColor(
+														tab,
+														concern,
+														false
+													);
+
+												if (
+													unselectedColor ===
+													"#DEAB20"
+												) {
+													return "brightness(0) saturate(100%) invert(85%) sepia(50%) saturate(2000%)  brightness(95%) contrast(102%)";
+												} else if (
+													unselectedColor ===
+													"#389D7D"
+												) {
+													return "brightness(0) saturate(100%) invert(45%) sepia(67%) saturate(1000%) hue-rotate(150deg) brightness(85%) contrast(102%)";
+												} else if (
+													unselectedColor ===
+													"#D09900"
+												) {
+													return "brightness(0) saturate(100%) invert(85%) sepia(50%) saturate(2000%)  brightness(95%) contrast(102%)";
+												} else if (
+													unselectedColor ===
+													"#3263C4"
+												) {
+													return "brightness(0) saturate(100%) invert(25%) sepia(67%) saturate(2000%) hue-rotate(210deg) brightness(85%) contrast(102%)";
+												} else if (
+													unselectedColor ===
+													"#C74772"
+												) {
+													return "brightness(0) saturate(100%) invert(35%) sepia(67%) saturate(1500%) hue-rotate(330deg) brightness(90%) contrast(102%)";
+												} else if (
+													unselectedColor ===
+													"#B4003C"
+												) {
+													return "brightness(0) saturate(100%) invert(29%) sepia(67%) saturate(5988%) hue-rotate(345deg) brightness(92%) contrast(102%)";
+												} else {
+													// Default fallback
+													return "brightness(0) saturate(100%) invert(29%) sepia(67%) saturate(5988%) hue-rotate(345deg) brightness(92%) contrast(102%)";
+												}
+											})(),
+										}}
+									/>
+								</button>
+								<span
+									className="mt-2 text-xs font-semibold leading-tight text-center sm:mt-3 sm:text-sm max-w-16 sm:max-w-20 lg:max-w-20"
+									style={{
+										color: isSelected ? bgColor : "#666",
+									}}
+								>
+									{label}
+								</span>
+							</div>
+						);
+					})}
 				</div>
-
-				{/* Middle Tab */}
-				<div style={{ marginBottom: "30px", pageBreakInside: "avoid" }}>
-					<h2 style={{ 
-						fontSize: "clamp(1.5rem, 4vw, 2rem)", 
-						marginBottom: "20px", 
-						fontWeight: "800",
-						color: getHeaderColor("middle"),
-						fontFamily: "Noto Serif TC, serif",
-					}}>
-						{getTabLabel("middle", concern, t)}
+				{/* Header Title */}
+				<div className="mb-6 sm:mb-8 text-start">
+					<h2
+						className="mb-2 font-extrabold"
+						style={{
+							color: getHeaderColor(selectedTab, concern),
+							fontFamily: "Noto Serif TC, serif",
+							fontSize: "clamp(1.5rem, 4vw, 2rem)",
+						}}
+					>
+						{getTabLabel(selectedTab, concern, t)}
 					</h2>
-					<div style={{ 
-						fontSize: "clamp(0.875rem, 2.5vw, 1rem)", 
-						lineHeight: "1.8",
-						backgroundColor: "white",
-						padding: "20px",
-						borderRadius: "12px",
-					}}>
-						{renderPrintJSON(contentCache[getCacheKey("middle", userInfo, currentYear)]) || "內容載入中..."}
-					</div>
 				</div>
+				{/* Content Area */}
+				<div className="mt-4 sm:mt-6">
+					{selectedTab === "日主特性" ? (
+						<div
+							className=" sm:min-h-[100px]"
+							style={{
+								backgroundColor: "white",
+								color: "black",
+								fontSize: "clamp(0.875rem, 2.5vw, 1rem)",
+							}}
+						>
+							{loading ? (
+								<div className="flex flex-col items-center justify-center py-12 space-y-4">
+									{/* Loading spinner */}
+									<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
 
-				{/* Right Tab */}
-				<div style={{ marginBottom: "30px", pageBreakInside: "avoid" }}>
-					<h2 style={{ 
-						fontSize: "clamp(1.5rem, 4vw, 2rem)", 
-						marginBottom: "20px", 
-						fontWeight: "800",
-						color: getHeaderColor("right"),
-						fontFamily: "Noto Serif TC, serif",
-					}}>
-						{getTabLabel("right", concern, t)}
-					</h2>
-					<div style={{ 
-						fontSize: "clamp(0.875rem, 2.5vw, 1rem)", 
-						lineHeight: "1.8",
-						backgroundColor: "white",
-						padding: "20px",
-						borderRadius: "12px",
-					}}>
-						{renderPrintJSON(contentCache[getCacheKey("right", userInfo, currentYear)]) || "內容載入中..."}
-					</div>
+									{/* 小鈴 loading image */}
+									<div className="flex items-center justify-center">
+										<Image
+											src="/images/風水妹/風水妹-loading.png"
+											alt={t("loadingAlt")}
+											width={120}
+											height={120}
+											className="object-contain"
+										/>
+									</div>
+
+									{/* Loading text */}
+									<div className="space-y-2 text-center">
+										<div
+											className="text-gray-700"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(14px, 3.5vw, 16px)",
+											}}
+										>
+											{t("loadingText")}
+										</div>
+									</div>
+								</div>
+							) : (
+								<div
+									style={{
+										fontFamily:
+											"system-ui, -apple-system, sans-serif",
+									}}
+								>
+									<div
+										className="mb-4 leading-relaxed text-black whitespace-pre-line"
+										style={{
+											fontSize:
+												"clamp(0.875rem, 2.5vw, 1rem)",
+										}}
+									>
+										{tabContent}
+									</div>
+								</div>
+							)}
+						</div>
+					) : (
+						<div className="min-h-[250px] sm:min-h-[300px]">
+							{loading ? (
+								<div className="flex flex-col items-center justify-center py-12 space-y-4">
+									{/* Loading spinner */}
+									<div className="w-8 h-8 border-b-2 border-pink-500 rounded-full animate-spin"></div>
+
+									{/* 小鈴 loading image */}
+									<div className="flex items-center justify-center">
+										<Image
+											src="/images/風水妹/風水妹-loading.png"
+											alt={t("loadingAlt")}
+											width={120}
+											height={120}
+											className="object-contain"
+										/>
+									</div>
+
+									{/* Loading text */}
+									<div className="space-y-2 text-center">
+										<div
+											className="text-gray-700"
+											style={{
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												fontSize:
+													"clamp(14px, 3.5vw, 16px)",
+											}}
+										>
+											{t("loadingText")}
+										</div>
+									</div>
+								</div>
+							) : (
+								<div
+									style={{
+										fontFamily:
+											"system-ui, -apple-system, sans-serif",
+									}}
+								>
+									{selectedTab === "middle" ||
+									selectedTab === "right" ? (
+										renderStructuredContent(
+											concern,
+											selectedTab,
+											aiContent
+										)
+									) : (
+										<div
+											className="leading-relaxed text-gray-800 whitespace-pre-line"
+											style={{
+												fontSize:
+													"clamp(0.875rem, 2.5vw, 1rem)",
+											}}
+										>
+											{tabContent}
+										</div>
+									)}
+								</div>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
-		);
-	};
-
-	return (
-		<>
-			<style>{printStyles}</style>
-			{renderPrintContent()}
-		</>
+		</div>
 	);
 }

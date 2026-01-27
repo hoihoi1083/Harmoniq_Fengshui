@@ -17,7 +17,7 @@ export async function POST(request) {
 					success: false,
 					error: "Missing birth information for both partners",
 				},
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -28,7 +28,7 @@ export async function POST(request) {
 		if (isNaN(user1Date.getTime()) || isNaN(user2Date.getTime())) {
 			return NextResponse.json(
 				{ success: false, error: "Invalid birth dates provided" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -509,7 +509,7 @@ export async function POST(request) {
 					max_tokens: 2500,
 					temperature: 0.7,
 				}),
-			}
+			},
 		);
 
 		if (!deepSeekResponse.ok) {
@@ -557,7 +557,7 @@ export async function POST(request) {
 						? error.stack
 						: undefined,
 			},
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

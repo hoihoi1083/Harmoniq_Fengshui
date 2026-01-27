@@ -11,7 +11,7 @@ export async function POST(request) {
 
 		console.log(
 			"📥 /api/couple-specific-problem-analysis received isSimplified:",
-			isSimplified
+			isSimplified,
 		);
 
 		// Format birth date for display
@@ -49,14 +49,14 @@ export async function POST(request) {
 				// Calculate month using traditional 五虎遁法 - pass date object to handle CNY correctly
 				const monthPillarResult = BaziCalculator.getMonthPillar(
 					date,
-					month
+					month,
 				);
 				const monthPillar = monthPillarResult.combined;
 
 				// Simplified hour pillar calculation
 				const hourBranchIndex = Math.floor((hour + 1) / 2) % 12;
 				const dayStemIndex = BaziCalculator.tianGan.indexOf(
-					dayPillar.tianGan
+					dayPillar.tianGan,
 				);
 				const hourStemIndex =
 					(dayStemIndex * 12 + hourBranchIndex) % 10;
@@ -75,7 +75,7 @@ export async function POST(request) {
 
 				console.log(
 					`✅ BaziCalculator result for ${birthDateTime}:`,
-					result
+					result,
 				);
 				return result;
 			} catch (error) {
@@ -133,7 +133,7 @@ export async function POST(request) {
 
 				// Calculate day pillar (日柱) - simplified calculation
 				const daysSinceReference = Math.floor(
-					(date - new Date("1900-01-01")) / (1000 * 60 * 60 * 24)
+					(date - new Date("1900-01-01")) / (1000 * 60 * 60 * 24),
 				);
 				const dayStemIndex = (daysSinceReference + 9) % 10;
 				const dayBranchIndex = (daysSinceReference + 11) % 12;
@@ -160,7 +160,7 @@ export async function POST(request) {
 
 				console.log(
 					`⚠️ Fallback calculation result for ${birthDateTime}:`,
-					fallbackResult
+					fallbackResult,
 				);
 				return fallbackResult;
 			}
@@ -249,11 +249,11 @@ export async function POST(request) {
 		}; // Calculate real BaZi for both users
 		const femaleAnalysis = generateBaZiAnalysis(
 			femaleUser.birthDateTime,
-			"female"
+			"female",
 		);
 		const maleAnalysis = generateBaZiAnalysis(
 			maleUser.birthDateTime,
-			"male"
+			"male",
 		);
 
 		// Generate AI analysis prompt with actual BaZi data (bilingual support)
@@ -338,7 +338,7 @@ export async function POST(request) {
 		const prompt = isSimplified ? simplifiedPrompt : traditionalPrompt;
 		console.log(
 			"🎯 /api/couple-specific-problem-analysis using prompt:",
-			isSimplified ? "SIMPLIFIED (简体)" : "TRADITIONAL (繁體)"
+			isSimplified ? "SIMPLIFIED (简体)" : "TRADITIONAL (繁體)",
 		);
 
 		// Make API call to DeepSeek
@@ -366,7 +366,7 @@ export async function POST(request) {
 					max_tokens: 2000,
 					temperature: 0.7,
 				}),
-			}
+			},
 		);
 
 		if (!deepseekResponse.ok) {
@@ -383,12 +383,12 @@ export async function POST(request) {
 		const parseAnalysisResponse = (response) => {
 			console.log(
 				"🔍 PARSING AI RESPONSE - Full response length:",
-				response.length
+				response.length,
 			);
 			console.log("🔍 First 500 characters:", response.substring(0, 500));
 			console.log(
 				"🔍 Last 500 characters:",
-				response.substring(response.length - 500)
+				response.substring(response.length - 500),
 			);
 
 			const sections = {
@@ -409,14 +409,14 @@ export async function POST(request) {
 			// Parse female section
 			console.log("🔍 Attempting to match female pattern...");
 			const femaleMatch = response.match(
-				/#{0,4}\s*1\.\s*\*\*您的八字（女[^）]*）\*\*\s*\*\*八字[：:]([^\n*]*)\*\*\s*([\s\S]*?)(?=#{0,4}\s*2\.|$)/
+				/#{0,4}\s*1\.\s*\*\*您的八字（女[^）]*）\*\*\s*\*\*八字[：:]([^\n*]*)\*\*\s*([\s\S]*?)(?=#{0,4}\s*2\.|$)/,
 			);
 			if (femaleMatch) {
 				console.log("✅ Female pattern matched!");
 				console.log("   - BaZi:", femaleMatch[1].trim());
 				console.log(
 					"   - Description length:",
-					femaleMatch[2].trim().length
+					femaleMatch[2].trim().length,
 				);
 				sections.female.bazi = femaleMatch[1].trim();
 				sections.female.description = femaleMatch[2]
@@ -442,14 +442,14 @@ export async function POST(request) {
 			// Parse male section
 			console.log("🔍 Attempting to match male pattern...");
 			const maleMatch = response.match(
-				/#{0,4}\s*2\.\s*\*\*伴[侣侶]八字（男[^）]*）\*\*\s*\*\*八字[：:]([^\n*]*)\*\*\s*([\s\S]*?)(?=\n\n#{1,4}\s|---|\*\*\*|针对|关系发展|专业提醒|$)/
+				/#{0,4}\s*2\.\s*\*\*伴[侣侶]八字（男[^）]*）\*\*\s*\*\*八字[：:]([^\n*]*)\*\*\s*([\s\S]*?)(?=\n\n#{1,4}\s|---|\*\*\*|针对|关系发展|专业提醒|$)/,
 			);
 			if (maleMatch) {
 				console.log("✅ Male pattern matched!");
 				console.log("   - BaZi:", maleMatch[1].trim());
 				console.log(
 					"   - Description length:",
-					maleMatch[2].trim().length
+					maleMatch[2].trim().length,
 				);
 				sections.male.bazi = maleMatch[1].trim();
 				sections.male.description = maleMatch[2]
@@ -543,11 +543,11 @@ export async function POST(request) {
 		try {
 			const femaleAnalysis = generateBaZiAnalysis(
 				femaleUser.birthDateTime,
-				"female"
+				"female",
 			);
 			const maleAnalysis = generateBaZiAnalysis(
 				maleUser.birthDateTime,
-				"male"
+				"male",
 			);
 
 			return NextResponse.json({

@@ -5,7 +5,14 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { BaziAnalysisSystem } from "@/lib/newConversationFlow";
-import { ArrowLeft, Calendar, User, Target, AlertCircle, Download } from "lucide-react";
+import {
+	ArrowLeft,
+	Calendar,
+	User,
+	Target,
+	AlertCircle,
+	Download,
+} from "lucide-react";
 import jsPDF from "jspdf";
 import { domToPng } from "modern-screenshot";
 import FiveElement from "@/components/FiveElement";
@@ -87,7 +94,7 @@ export default function FengShuiReportPage() {
 
 		const wuxingData = getWuxingData(
 			userInfo.birthDateTime,
-			userInfo.gender || "male"
+			userInfo.gender || "male",
 		);
 
 		if (!wuxingData) return null;
@@ -133,7 +140,7 @@ export default function FengShuiReportPage() {
 	const analyzeWuxingStrength = (elementCounts) => {
 		const total = Object.values(elementCounts).reduce(
 			(sum, count) => sum + count,
-			0
+			0,
 		);
 		const strongElements = [];
 		const weakElements = [];
@@ -158,7 +165,7 @@ export default function FengShuiReportPage() {
 		} else {
 			const maxCount = Math.max(...Object.values(elementCounts));
 			const dominant = Object.entries(elementCounts).find(
-				([_, count]) => count === maxCount
+				([_, count]) => count === maxCount,
 			)?.[0];
 			strengthDesc = dominant ? `${dominant}為主` : "五行平衡";
 		}
@@ -265,7 +272,7 @@ export default function FengShuiReportPage() {
 			// Create URL with parameters for the API call
 			const apiUrl = new URL(
 				"/api/fortune-report",
-				window.location.origin
+				window.location.origin,
 			);
 			if (birthday) apiUrl.searchParams.set("birthday", birthday);
 			if (birthTime) apiUrl.searchParams.set("birthTime", birthTime);
@@ -312,7 +319,7 @@ export default function FengShuiReportPage() {
 			const hasActualContent =
 				checkData.data?.reportContent &&
 				Object.values(checkData.data.reportContent).some(
-					(value) => value !== null && value !== undefined
+					(value) => value !== null && value !== undefined,
 				);
 
 			console.log("🔍 Content check:", {
@@ -336,7 +343,7 @@ export default function FengShuiReportPage() {
 				// Generate fresh content (default behavior or no saved content)
 				if (showHistorical && !hasActualContent) {
 					console.log(
-						"⚠️ Historical content requested but no saved data found, generating fresh content"
+						"⚠️ Historical content requested but no saved data found, generating fresh content",
 					);
 				} else {
 					console.log("✅ Generating fresh content for this session");
@@ -346,7 +353,7 @@ export default function FengShuiReportPage() {
 				console.error("❌ Cannot generate report!");
 				console.error(
 					"- Full checkData:",
-					JSON.stringify(checkData, null, 2)
+					JSON.stringify(checkData, null, 2),
 				);
 				setError(t("errorReportGenerationFailed"));
 				setLoading(false);
@@ -368,11 +375,11 @@ export default function FengShuiReportPage() {
 				Object.keys(savedData.reportContent).length === 0
 			) {
 				console.log(
-					"⚠️ Saved data exists but reportContent is empty, falling back to fresh generation"
+					"⚠️ Saved data exists but reportContent is empty, falling back to fresh generation",
 				);
 				await generateNewReport(
 					savedData.sessionId,
-					savedData.userInputs
+					savedData.userInputs,
 				);
 				return;
 			}
@@ -393,7 +400,7 @@ export default function FengShuiReportPage() {
 
 			// Pre-populate component data store with saved content
 			console.log(
-				"📥 Pre-populating component data store with saved content..."
+				"📥 Pre-populating component data store with saved content...",
 			);
 
 			// Map saved content to component data store
@@ -402,14 +409,14 @@ export default function FengShuiReportPage() {
 			if (reportContent.fiveElementAnalysis) {
 				storeComponentData(
 					"fiveElementAnalysis",
-					reportContent.fiveElementAnalysis
+					reportContent.fiveElementAnalysis,
 				);
 			}
 
 			if (reportContent.zodiacAnalysis) {
 				storeComponentData(
 					"zodiacAnalysis",
-					reportContent.zodiacAnalysis
+					reportContent.zodiacAnalysis,
 				);
 			}
 
@@ -425,54 +432,54 @@ export default function FengShuiReportPage() {
 			if (reportContent.mingJuAnalysis) {
 				storeComponentData(
 					"mingJuAnalysis",
-					reportContent.mingJuAnalysis
+					reportContent.mingJuAnalysis,
 				);
 			}
 
 			if (reportContent.ganZhiAnalysis) {
 				storeComponentData(
 					"ganZhiAnalysis",
-					reportContent.ganZhiAnalysis
+					reportContent.ganZhiAnalysis,
 				);
 			}
 
 			if (reportContent.jiXiongAnalysis) {
 				storeComponentData(
 					"jiXiongAnalysis",
-					reportContent.jiXiongAnalysis
+					reportContent.jiXiongAnalysis,
 				);
 			}
 
 			if (reportContent.seasonAnalysis) {
 				storeComponentData(
 					"seasonAnalysis",
-					reportContent.seasonAnalysis
+					reportContent.seasonAnalysis,
 				);
 			}
 
 			if (reportContent.coreSuggestionAnalysis) {
 				storeComponentData(
 					"coreSuggestionAnalysis",
-					reportContent.coreSuggestionAnalysis
+					reportContent.coreSuggestionAnalysis,
 				);
 			}
 
 			if (reportContent.specificSuggestionAnalysis) {
 				storeComponentData(
 					"specificSuggestionAnalysis",
-					reportContent.specificSuggestionAnalysis
+					reportContent.specificSuggestionAnalysis,
 				);
 			}
 
 			if (reportContent.questionFocusAnalysis) {
 				storeComponentData(
 					"questionFocusAnalysis",
-					reportContent.questionFocusAnalysis
+					reportContent.questionFocusAnalysis,
 				);
 			}
 
 			console.log(
-				"✅ Component data store populated with historical content"
+				"✅ Component data store populated with historical content",
 			);
 
 			// Create proper birthDateTime for historical reports too
@@ -559,7 +566,7 @@ export default function FengShuiReportPage() {
 
 			const birthdayDate = new Date(birthDateTime);
 			console.log(
-				"🔍 Calling BaziAnalysisSystem.generatePersonalAnalysisV2..."
+				"🔍 Calling BaziAnalysisSystem.generatePersonalAnalysisV2...",
 			);
 
 			// Instead of relying on BaziAnalysisSystem, we'll collect data from components directly
@@ -589,7 +596,7 @@ export default function FengShuiReportPage() {
 					const checkCompletion = () => {
 						if (completedComponents >= totalComponents) {
 							console.log(
-								"🎉 All components loaded successfully!"
+								"🎉 All components loaded successfully!",
 							);
 							resolve(componentData);
 						}
@@ -599,7 +606,7 @@ export default function FengShuiReportPage() {
 					const collectWithTimeout = async () => {
 						// Wait for components to initialize and load
 						await new Promise((resolve) =>
-							setTimeout(resolve, 5000)
+							setTimeout(resolve, 5000),
 						); // 5 second timeout
 
 						// Try to collect data from global component states or localStorage
@@ -617,14 +624,14 @@ export default function FengShuiReportPage() {
 				await BaziAnalysisSystem.generatePersonalAnalysisV2(
 					birthdayDate,
 					concern,
-					problem
+					problem,
 				);
 
 			console.log("📊 Analysis result:");
 			console.log("- analysis:", analysis);
 			console.log(
 				"- analysis keys:",
-				analysis ? Object.keys(analysis) : "null"
+				analysis ? Object.keys(analysis) : "null",
 			);
 
 			// Log all properties to see the actual structure
@@ -639,7 +646,7 @@ export default function FengShuiReportPage() {
 				const partnerBirthdayDate = new Date(partnerBirthday);
 				coupleAnalysis = BaziAnalysisSystem.generateCoupleAnalysis(
 					birthdayDate,
-					partnerBirthdayDate
+					partnerBirthdayDate,
 				);
 				console.log("💑 Couple analysis result:", coupleAnalysis);
 			}
@@ -676,7 +683,7 @@ export default function FengShuiReportPage() {
 			console.log("💾 Saving report content to database:");
 			console.log(
 				"- reportContentToSave:",
-				JSON.stringify(reportContentToSave, null, 2)
+				JSON.stringify(reportContentToSave, null, 2),
 			);
 
 			// Save the generated report to database
@@ -698,7 +705,7 @@ export default function FengShuiReportPage() {
 			} else {
 				console.warn(
 					"❌ Failed to save report to database:",
-					saveData.error
+					saveData.error,
 				);
 			}
 
@@ -714,7 +721,7 @@ export default function FengShuiReportPage() {
 					concern,
 					problem,
 					partnerBirthday,
-					gender
+					gender,
 				);
 			}, 80000); // Wait 80 seconds for all AI components to complete (extended for Season)
 		} catch (err) {
@@ -730,11 +737,11 @@ export default function FengShuiReportPage() {
 		concern,
 		problem,
 		partnerBirthday,
-		gender
+		gender,
 	) => {
 		try {
 			console.log(
-				"🔄 Starting background save of complete report content..."
+				"🔄 Starting background save of complete report content...",
 			);
 			console.log("📋 Session ID for background save:", sessionId);
 
@@ -746,12 +753,12 @@ export default function FengShuiReportPage() {
 				birthdayDate,
 				concern,
 				problem,
-				gender
+				gender,
 			);
 
 			console.log(
 				"💾 Saving complete report content:",
-				completeReportContent
+				completeReportContent,
 			);
 
 			// Update the database with complete content
@@ -772,7 +779,7 @@ export default function FengShuiReportPage() {
 			} else {
 				console.warn(
 					"❌ Failed to save complete content:",
-					updateData.error
+					updateData.error,
 				);
 			}
 		} catch (error) {
@@ -784,14 +791,14 @@ export default function FengShuiReportPage() {
 		birthdayDate,
 		concern,
 		problem,
-		gender
+		gender,
 	) => {
 		console.log(
-			"🗃️ Checking for component-generated data in global store..."
+			"🗃️ Checking for component-generated data in global store...",
 		);
 		console.log(
 			"🗃️ Available keys:",
-			Object.keys(window.componentDataStore || {})
+			Object.keys(window.componentDataStore || {}),
 		);
 
 		// Log what we have from the global store
@@ -838,7 +845,7 @@ export default function FengShuiReportPage() {
 		componentFields.forEach((field) => {
 			const hasData = completeContent[field];
 			console.log(
-				`✅ Collected ${field}: ${hasData ? "SUCCESS" : "NULL"}`
+				`✅ Collected ${field}: ${hasData ? "SUCCESS" : "NULL"}`,
 			);
 		});
 
@@ -929,64 +936,25 @@ export default function FengShuiReportPage() {
 		router.push("/price?newReport=true");
 	};
 
-	// Export report as PDF
+	// Export report as PDF using browser's native print-to-PDF
 	const handleExportPDF = async () => {
-		if (!reportRef.current) return;
-
 		try {
 			setExporting(true);
 
-			// Use modern-screenshot to capture the report
-			const dataUrl = await domToPng(reportRef.current, {
-				scale: 2,
-				backgroundColor: '#EFEFEF',
-				filter: (node) => {
-					// Filter out navbar and non-report elements
-					if (node.tagName === 'NAV') return false;
-					if (node.classList?.contains('navbar')) return false;
-					return true;
-				},
-			});
+			// Add print-specific class to trigger print styles
+			document.body.classList.add("printing-mode");
 
-			// Create PDF from the image
-			const pdf = new jsPDF({
-				orientation: 'portrait',
-				unit: 'mm',
-				format: 'a4',
-			});
+			// Small delay to ensure styles are applied
+			await new Promise((resolve) => setTimeout(resolve, 100));
 
-			// Calculate dimensions from the actual element
-			const imgWidth = 210; // A4 width in mm
-			const pageHeight = 297; // A4 height in mm
-			
-			// Get dimensions from the ref element
-			const elementWidth = reportRef.current.offsetWidth;
-			const elementHeight = reportRef.current.offsetHeight;
-			const imgHeight = (elementHeight * imgWidth) / elementWidth;
-			let heightLeft = imgHeight;
-			let position = 0;
+			// Trigger browser's print dialog
+			window.print();
 
-			// Add first page
-			pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
-			heightLeft -= pageHeight;
-
-			// Add additional pages if content is longer
-			while (heightLeft > 0) {
-				position = heightLeft - imgHeight;
-				pdf.addPage();
-				pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
-				heightLeft -= pageHeight;
-			}
-
-			// Generate filename with date
-			const date = new Date().toISOString().split('T')[0];
-			const filename = `風水報告_${reportData?.concern || '命理分析'}_${date}.pdf`;
-
-			// Save PDF
-			pdf.save(filename);
+			// Remove print mode class after printing
+			document.body.classList.remove("printing-mode");
 		} catch (err) {
-			console.error('PDF export error:', err);
-			alert('匯出PDF時發生錯誤，請稍後再試');
+			console.error("PDF export error:", err);
+			alert("匯出PDF時發生錯誤，請稍後再試");
 		} finally {
 			setExporting(false);
 		}
@@ -996,17 +964,17 @@ export default function FengShuiReportPage() {
 	const showHistoricalBanner = reportData?.isHistoricalReport;
 
 	return (
-		<div className="min-h-screen bg-[#EFEFEF]">
+		<div className="min-h-screen bg-white">
 			<Navbar from="report" />
 			<LoadingProvider>
 				<div
 					ref={reportRef}
-					className="container w-full px-4 py-8 mx-auto"
+					className="container w-full px-4 py-8 mx-auto print:px-0 print:py-0"
 					style={{ paddingTop: "80px" }}
 				>
 					{/* Historical Report Banner */}
 					{showHistoricalBanner && (
-						<div className="p-4 mb-4 border border-yellow-200 rounded-lg bg-yellow-50">
+						<div className="p-4 mb-4 border border-yellow-200 rounded-lg bg-yellow-50 screen-only">
 							<p className="text-yellow-800">
 								<strong>{t("historicalBanner")}</strong>
 								{t("historicalBannerText")}
@@ -1021,7 +989,7 @@ export default function FengShuiReportPage() {
 					)}
 
 					{/* 頭部 with PDF Export Button */}
-					<div className="mb-8 ml-0 md:ml-[5%]">
+					<div className="mb-8 ml-0 md:ml-[5%] print-no-break">
 						<div className="flex flex-col items-center justify-between gap-4 md:flex-row">
 							<h1
 								className="mb-2 font-extrabold text-center md:text-left"
@@ -1037,25 +1005,34 @@ export default function FengShuiReportPage() {
 							>
 								{t("sectionBasicAnalysis")}
 							</h1>
-							<button
-								onClick={handleExportPDF}
-								disabled={exporting}
-								className="flex items-center gap-2 px-6 py-3 text-white transition-all duration-300 rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-								style={{
-									backgroundColor: getConcernColor({ concern: reportData?.concern }),
-								}}
-							>
-								<Download className="w-5 h-5" />
-								<span className="font-semibold">
-									{exporting ? '匯出中...' : '匯出PDF'}
-								</span>
-							</button>
+							<div className="flex flex-col items-end gap-2">
+								<button
+									onClick={handleExportPDF}
+									disabled={exporting}
+									className="flex items-center gap-2 px-6 py-3 text-white transition-all duration-300 rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed screen-only"
+									style={{
+										backgroundColor: getConcernColor({
+											concern: reportData?.concern,
+										}),
+									}}
+								>
+									<Download className="w-5 h-5" />
+									<span className="font-semibold">
+										{exporting
+											? "準備列印中..."
+											: "下載PDF報告"}
+									</span>
+								</button>
+							</div>
 						</div>
 					</div>
 
 					{/* Five Elements Analysis */}
 					{shouldRenderComponents() && (
-						<div className="mb-6" style={{ width: "100%" }}>
+						<div
+							className="mb-6 print-no-break"
+							style={{ width: "100%" }}
+						>
 							<FiveElement
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1072,7 +1049,7 @@ export default function FengShuiReportPage() {
 
 					{/* Zodiac and Four Pillars Analysis */}
 					{shouldRenderComponents() && (
-						<div className="mb-6">
+						<div className="mb-6 print-no-break">
 							<Zodiac
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1091,7 +1068,7 @@ export default function FengShuiReportPage() {
 
 					{/* Question Focus Section */}
 					{shouldRenderComponents() && (
-						<div className="mb-6">
+						<div className="mb-6 print-no-break">
 							<QuestionFocus
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1105,7 +1082,7 @@ export default function FengShuiReportPage() {
 
 					{/* Liu Nian Key Word Analysis */}
 					{/* {shouldRenderComponents() && (
-						<div className="mb-6">
+						<div className="mb-6 print-no-break">
 							<LiuNianKeyWord
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1117,7 +1094,7 @@ export default function FengShuiReportPage() {
 							/>
 						</div>
 					)} */}
-					<div className="mb-8 ml-0 md:ml-[5%]">
+					<div className="mb-8 ml-0 md:ml-[5%] print-no-break print-page-break-before">
 						<h1
 							className="mb-2 font-extrabold text-center md:text-left"
 							style={{
@@ -1135,7 +1112,7 @@ export default function FengShuiReportPage() {
 					</div>
 					{/* Ming Ju Core Analysis */}
 					{shouldRenderComponents() && (
-						<div className="mb-6">
+						<div className="mb-6 print-no-break">
 							<MingJu
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1147,7 +1124,7 @@ export default function FengShuiReportPage() {
 							/>
 						</div>
 					)}
-					<div className="mb-6 sm:mb-8 ml-0 md:ml-[5%]">
+					<div className="mb-6 sm:mb-8 ml-0 md:ml-[5%] print-no-break print-page-break-before">
 						<h1
 							className="mb-2 font-extrabold text-center md:text-left"
 							style={{
@@ -1165,7 +1142,7 @@ export default function FengShuiReportPage() {
 					</div>
 					{/* Gan Zhi Detailed Analysis */}
 					{shouldRenderComponents() && (
-						<div className="mb-6">
+						<div className="mb-6 print-no-break">
 							<GanZhi
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1177,7 +1154,7 @@ export default function FengShuiReportPage() {
 							/>
 						</div>
 					)}
-					<div className="mb-6 sm:mb-8 ml-0 md:ml-[5%]">
+					<div className="mb-6 sm:mb-8 ml-0 md:ml-[5%] print-no-break print-page-break-before">
 						<h1
 							className="mb-2 font-extrabold text-center md:text-left"
 							style={{
@@ -1195,7 +1172,7 @@ export default function FengShuiReportPage() {
 					</div>
 					{/* Ji Xiong Analysis */}
 					{shouldRenderComponents() && (
-						<div className="flex justify-center mb-6">
+						<div className="flex justify-center mb-6 print-no-break">
 							<JiXiong
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1214,7 +1191,7 @@ export default function FengShuiReportPage() {
 
 					{/* Season Analysis */}
 					{shouldRenderComponents() && (
-						<div className="mb-6">
+						<div className="mb-6 print-no-break">
 							<Season
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1226,7 +1203,7 @@ export default function FengShuiReportPage() {
 							/>
 						</div>
 					)}
-					<div className="mb-8 ml-0 md:ml-[5%]">
+					<div className="mb-8 ml-0 md:ml-[5%] print-no-break print-page-break-before">
 						<h1
 							className="mb-2 font-extrabold text-center md:text-left"
 							style={{
@@ -1243,8 +1220,8 @@ export default function FengShuiReportPage() {
 						</h1>
 					</div>
 					{/* Core Suggestion Analysis */}
-					{shouldRenderComponents() && (
-						<div className="mb-6">
+					{/* {shouldRenderComponents() && (
+						<div className="mb-6 print-no-break">
 							<CoreSuggestion
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1256,11 +1233,11 @@ export default function FengShuiReportPage() {
 								currentYear={new Date().getFullYear()}
 							/>
 						</div>
-					)}
+					)} */}
 
 					{/* Specific Suggestion Analysis */}
 					{shouldRenderComponents() && (
-						<div className="mb-6">
+						<div className="mb-6 print-no-break">
 							<SpecificSuggestion
 								userInfo={{
 									birthDateTime: reportData.birthday,
@@ -1275,9 +1252,11 @@ export default function FengShuiReportPage() {
 
 					{/* Overall Summary - The Perfect Ending */}
 					{shouldRenderComponents() && (
-						<div className="mb-6">
+						<div className="mb-6 print-no-break">
 							<OverallSummary
-								concernColor={getConcernColor(reportData.concern)}
+								concernColor={getConcernColor(
+									reportData.concern,
+								)}
 							/>
 						</div>
 					)}

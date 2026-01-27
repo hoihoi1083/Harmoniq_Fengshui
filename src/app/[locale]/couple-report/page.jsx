@@ -54,7 +54,7 @@ export default function CoupleReportPage({ params }) {
 		"🚀 CoupleReportPage - currentLocale:",
 		currentLocale,
 		"isSimplified:",
-		isSimplified
+		isSimplified,
 	);
 	const t = useTranslations("coupleReport");
 	console.log("🚀 CoupleReportPage component mounting/re-rendering");
@@ -93,7 +93,7 @@ export default function CoupleReportPage({ params }) {
 
 		const wuxingData = getWuxingData(
 			userInfo.birthDateTime,
-			userInfo.gender || "male"
+			userInfo.gender || "male",
 		);
 
 		if (!wuxingData) return null;
@@ -134,7 +134,7 @@ export default function CoupleReportPage({ params }) {
 			elementCounts,
 			missingElements,
 			dominantElement: Object.keys(elementCounts).reduce((a, b) =>
-				elementCounts[a] > elementCounts[b] ? a : b
+				elementCounts[a] > elementCounts[b] ? a : b,
 			),
 		};
 	};
@@ -147,7 +147,7 @@ export default function CoupleReportPage({ params }) {
 
 		const total = Object.values(elementCounts).reduce(
 			(sum, count) => sum + count,
-			0
+			0,
 		);
 		const strengths = {};
 
@@ -206,7 +206,7 @@ export default function CoupleReportPage({ params }) {
 			console.log("📚 Fetching saved couple report:", sessionId);
 
 			const response = await fetch(
-				`/api/couple-complete-report?sessionId=${sessionId}`
+				`/api/couple-complete-report?sessionId=${sessionId}`,
 			);
 
 			if (!response.ok) {
@@ -283,7 +283,7 @@ export default function CoupleReportPage({ params }) {
 							godExplanations: godData.explanations,
 						};
 						console.log(
-							"📋 Stored coupleGodExplain data (transformed structure)"
+							"📋 Stored coupleGodExplain data (transformed structure)",
 						);
 					} else {
 						window.coupleComponentDataStore.coupleGodExplain =
@@ -305,16 +305,16 @@ export default function CoupleReportPage({ params }) {
 					window.coupleComponentDataStore.enhancedCoupleSpecificProblemSolution =
 						data.report.problemSolution;
 					console.log(
-						"📋 Stored enhancedCoupleSpecificProblemSolution data"
+						"📋 Stored enhancedCoupleSpecificProblemSolution data",
 					);
 				}
 
 				console.log(
-					"✅ Couple component data store populated with historical content"
+					"✅ Couple component data store populated with historical content",
 				);
 				console.log(
 					"🔍 Final component data store state:",
-					window.coupleComponentDataStore
+					window.coupleComponentDataStore,
 				);
 			}
 
@@ -371,13 +371,13 @@ export default function CoupleReportPage({ params }) {
 				if (sessionId) {
 					console.log(
 						"✅ SessionId found - Loading historical couple report:",
-						sessionId
+						sessionId,
 					);
 					await displaySavedCoupleReport(sessionId);
 					return;
 				} else {
 					console.log(
-						"❌ No sessionId found - Will load fresh report"
+						"❌ No sessionId found - Will load fresh report",
 					);
 				}
 
@@ -395,7 +395,7 @@ export default function CoupleReportPage({ params }) {
 				// If we have fresh birthday data from URL parameters, use that first
 				if (birthday && birthday2) {
 					console.log(
-						"🔍 Using fresh URL parameters for couple analysis"
+						"🔍 Using fresh URL parameters for couple analysis",
 					);
 					console.log("📅 Birthday 1:", birthday);
 					console.log("📅 Birthday 2:", birthday2);
@@ -432,7 +432,7 @@ export default function CoupleReportPage({ params }) {
 					console.log("   originalProblem:", originalProblem);
 					console.log(
 						"   最終使用的 specificProblem:",
-						specificProblem
+						specificProblem,
 					);
 
 					console.log("🔍 Birth DateTime combination:");
@@ -471,7 +471,7 @@ export default function CoupleReportPage({ params }) {
 					console.log("🔍 正在載入報告 ID:", reportId);
 					// Fetch report data from database
 					const response = await fetch(
-						`/api/smart-chat2/${reportId}`
+						`/api/smart-chat2/${reportId}`,
 					);
 					if (response.ok) {
 						const savedReport = await response.json();
@@ -515,7 +515,7 @@ export default function CoupleReportPage({ params }) {
 							}
 
 							console.log(
-								"🔍 Database Birth DateTime combination:"
+								"🔍 Database Birth DateTime combination:",
 							);
 							console.log("   birthDateTime:", birthDateTime);
 							console.log("   birthDateTime2:", birthDateTime2);
@@ -581,7 +581,7 @@ export default function CoupleReportPage({ params }) {
 
 				// This should not be reached since we handle URL params first
 				console.log(
-					"⚠️ Fallback case - should not happen with new logic"
+					"⚠️ Fallback case - should not happen with new logic",
 				);
 				setError("無法獲取分析數據");
 				setLoading(false);
@@ -729,7 +729,7 @@ export default function CoupleReportPage({ params }) {
 								{t("calculationTime")}{" "}
 								{reportData.reportGeneratedAt
 									? new Date(
-											reportData.reportGeneratedAt
+											reportData.reportGeneratedAt,
 										).toLocaleString()
 									: "N/A"}
 								)。
@@ -905,7 +905,7 @@ export default function CoupleReportPage({ params }) {
 											currentYear={new Date().getFullYear()}
 											isSimplified={isSimplified}
 										/>
-										
+
 										{/* Couple Overall Summary - Relationship 2026 Summary */}
 										<CoupleOverallSummary concernColor="#D91A5A" />
 									</>

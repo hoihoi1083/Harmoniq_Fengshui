@@ -20,7 +20,7 @@ export async function POST(request) {
 		if (!user1Birthday || !user2Birthday) {
 			return NextResponse.json(
 				{ error: "Missing required birthday information" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -34,7 +34,7 @@ export async function POST(request) {
 			nextYear,
 			currentMonth,
 			compatibilityData,
-			isSimplified
+			isSimplified,
 		);
 
 		return NextResponse.json({
@@ -49,7 +49,7 @@ export async function POST(request) {
 				error: "Failed to generate annual analysis",
 				details: error.message,
 			},
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
@@ -63,7 +63,7 @@ async function generateAnnualStrategyWithAI(
 	nextYear,
 	currentMonth,
 	compatibilityData,
-	isSimplified = false
+	isSimplified = false,
 ) {
 	try {
 		// Get detailed bazi analysis for both users
@@ -180,7 +180,7 @@ async function generateAnnualStrategyWithAI(
 				new Date(user2Birthday),
 				user1Element,
 				user2Element,
-				prompt
+				prompt,
 			);
 
 		// Parse AI response and structure it
@@ -192,7 +192,7 @@ async function generateAnnualStrategyWithAI(
 			user1Element,
 			user2Element,
 			compatibilityData,
-			isSimplified
+			isSimplified,
 		);
 
 		return structuredAnalysis;
@@ -207,7 +207,7 @@ async function generateAnnualStrategyWithAI(
 			user1Element,
 			user2Element,
 			compatibilityData,
-			isSimplified
+			isSimplified,
 		);
 	}
 }
@@ -220,7 +220,7 @@ function parseAndStructureAIResponse(
 	user1Element,
 	user2Element,
 	compatibilityData,
-	isSimplified = false
+	isSimplified = false,
 ) {
 	// Try to parse the AI response and extract structured information
 	const lines = aiResponse.split("\n").filter((line) => line.trim());
@@ -279,7 +279,7 @@ function parseAndStructureAIResponse(
 					user1Element,
 					user2Element,
 					compatibilityData,
-					isSimplified
+					isSimplified,
 				),
 			monthlyFocus:
 				extractMonthlyFocus(monthlyAdvice, currentYear) ||
@@ -288,7 +288,7 @@ function parseAndStructureAIResponse(
 					currentMonth,
 					user1Element,
 					user2Element,
-					isSimplified
+					isSimplified,
 				),
 		},
 		[nextYear]: {
@@ -302,7 +302,7 @@ function parseAndStructureAIResponse(
 					user1Element,
 					user2Element,
 					compatibilityData,
-					isSimplified
+					isSimplified,
 				),
 			monthlyFocus:
 				extractMonthlyFocus(monthlyAdvice, nextYear) ||
@@ -311,7 +311,7 @@ function parseAndStructureAIResponse(
 					6,
 					user1Element,
 					user2Element,
-					isSimplified
+					isSimplified,
 				),
 		},
 	};
@@ -335,7 +335,7 @@ function generateBasicYearAnalysis(
 	element1,
 	element2,
 	compatibilityData,
-	isSimplified = false
+	isSimplified = false,
 ) {
 	const score = compatibilityData?.score || 75;
 	const level =
@@ -355,7 +355,7 @@ function generateBasicYearAnalysis(
 		element1,
 		element2,
 		year,
-		isSimplified
+		isSimplified,
 	);
 
 	return isSimplified
@@ -368,7 +368,7 @@ function generateBasicMonthlyAdvice(
 	month,
 	element1,
 	element2,
-	isSimplified = false
+	isSimplified = false,
 ) {
 	const seasonAdvice = isSimplified
 		? {
@@ -404,7 +404,7 @@ function getElementYearAnalysis(
 	element1,
 	element2,
 	year,
-	isSimplified = false
+	isSimplified = false,
 ) {
 	const combinations = isSimplified
 		? {
@@ -446,7 +446,7 @@ function generateFallbackAnnualStrategy(
 	user1Element,
 	user2Element,
 	compatibilityData,
-	isSimplified = false
+	isSimplified = false,
 ) {
 	return {
 		[currentYear]: {
@@ -458,14 +458,14 @@ function generateFallbackAnnualStrategy(
 				user1Element,
 				user2Element,
 				compatibilityData,
-				isSimplified
+				isSimplified,
 			),
 			monthlyFocus: generateBasicMonthlyAdvice(
 				currentYear,
 				currentMonth,
 				user1Element,
 				user2Element,
-				isSimplified
+				isSimplified,
 			),
 		},
 		[nextYear]: {
@@ -477,14 +477,14 @@ function generateFallbackAnnualStrategy(
 				user1Element,
 				user2Element,
 				compatibilityData,
-				isSimplified
+				isSimplified,
 			),
 			monthlyFocus: generateBasicMonthlyAdvice(
 				nextYear,
 				6,
 				user1Element,
 				user2Element,
-				isSimplified
+				isSimplified,
 			),
 		},
 	};

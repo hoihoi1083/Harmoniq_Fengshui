@@ -325,3 +325,230 @@
     margin-top: 90px;
   }
 }
+
+/* ===================================
+   Print Styles for A4 Paper
+   =================================== */
+@media print {
+  /* Page setup for A4 size */
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm 20mm 15mm;
+  }
+
+  /* Basic print styling */
+  body {
+    background: white !important;
+    font-size: 11pt;
+    line-height: 1.4;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Hide non-essential elements when printing */
+  nav,
+  footer,
+  .navbar,
+  button:not(.print-visible),
+  [role="navigation"],
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* Main container adjustments */
+  .container {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 5mm !important;
+    margin: 0 !important;
+  }
+
+  /* Report container specific adjustments */
+  [ref="reportRef"],
+  .mx-auto {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Section break control - prevent awkward breaks */
+  .mb-6,
+  .mb-8,
+  [class*="mb-"] {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Print-specific classes for controlled breaking */
+  .print-no-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 8pt;
+  }
+
+  .print-page-break-before {
+    page-break-before: always !important;
+    break-before: page !important;
+    padding-top: 0 !important;
+    margin-top: 12pt !important;
+  }
+
+  /* Heading styles with proper page break control */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-top: 8pt;
+    margin-bottom: 6pt;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Keep headings with their following content */
+  h1 + *,
+  h2 + *,
+  h3 + * {
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+  }
+
+  /* Large title adjustments for print */
+  h1 {
+    font-size: 20pt !important;
+    margin-top: 0 !important;
+    margin-bottom: 8pt;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: 16pt !important;
+  }
+
+  h3 {
+    font-size: 14pt !important;
+  }
+
+  /* Component sections should stay together when possible */
+  [class*="component"],
+  .report-section,
+  section,
+  article {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 12pt;
+  }
+
+  /* Cards and boxes - keep content together */
+  [class*="card"],
+  [class*="border"],
+  [class*="shadow"],
+  [class*="rounded"],
+  [class*="bg-"] {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-shadow: none !important;
+  }
+
+  /* Preserve background colors for important elements */
+  [class*="bg-purple"],
+  [class*="bg-pink"],
+  [class*="bg-blue"],
+  [class*="bg-green"],
+  [class*="bg-red"],
+  [class*="bg-yellow"],
+  [class*="bg-indigo"] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Flex and Grid containers - prevent breaking */
+  [class*="flex"],
+  [class*="grid"] {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Table handling */
+  table {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Image handling */
+  img {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Optimize font sizes for print */
+  .text-sm { font-size: 9pt !important; }
+  .text-base { font-size: 11pt !important; }
+  .text-lg { font-size: 12pt !important; }
+  .text-xl { font-size: 14pt !important; }
+  .text-2xl { font-size: 16pt !important; }
+  .text-3xl { font-size: 18pt !important; }
+  .text-4xl { font-size: 20pt !important; }
+
+  /* Remove unnecessary shadows */
+  [class*="shadow"] {
+    box-shadow: none !important;
+  }
+
+  /* Spacing adjustments for print density */
+  .py-8 { padding-top: 6pt !important; padding-bottom: 6pt !important; }
+  .py-6 { padding-top: 5pt !important; padding-bottom: 5pt !important; }
+  .py-4 { padding-top: 4pt !important; padding-bottom: 4pt !important; }
+  
+  .px-8 { padding-left: 6pt !important; padding-right: 6pt !important; }
+  .px-6 { padding-left: 5pt !important; padding-right: 5pt !important; }
+  .px-4 { padding-left: 4pt !important; padding-right: 4pt !important; }
+
+  /* Ensure proper text color for readability while preserving colored headings */
+  p, span, li, td, th {
+    color: #000 !important;
+  }
+
+  /* Orphan and widow control */
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Remove margin-left adjustments that cause layout issues in print */
+  .md\:ml-\[5\%\] {
+    margin-left: 0 !important;
+  }
+
+  /* Ensure proper width for all elements */
+  * {
+    max-width: 100%;
+  }
+}
+
+/* Print-specific utility classes */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .print-only {
+    display: block !important;
+  }
+  
+  .screen-only {
+    display: none !important;
+  }
+}

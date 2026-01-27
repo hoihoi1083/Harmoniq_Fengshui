@@ -12,7 +12,7 @@ export async function POST(req) {
 		if (!user1Info || !user2Info) {
 			return Response.json(
 				{ error: "Missing couple information" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -248,18 +248,18 @@ export async function POST(req) {
 					max_tokens: 6000,
 					temperature: 0.6,
 				}),
-			}
+			},
 		);
 
 		if (!response.ok) {
 			console.error(
 				"DeepSeek API Error:",
 				response.status,
-				response.statusText
+				response.statusText,
 			);
 			return Response.json(
 				{ error: "AI analysis service unavailable" },
-				{ status: 500 }
+				{ status: 500 },
 			);
 		}
 
@@ -269,7 +269,7 @@ export async function POST(req) {
 		if (!aiContent) {
 			return Response.json(
 				{ error: "No couple season analysis generated" },
-				{ status: 500 }
+				{ status: 500 },
 			);
 		}
 
@@ -280,7 +280,7 @@ export async function POST(req) {
 			user1Info,
 			user2Info,
 			currentSeasonName,
-			isSimplified
+			isSimplified,
 		);
 
 		return Response.json({
@@ -296,7 +296,7 @@ export async function POST(req) {
 		console.error("Couple Season Analysis Error:", error);
 		return Response.json(
 			{ error: "Couple season analysis generation failed" },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
@@ -307,7 +307,7 @@ function parseCoupleSeasonContent(
 	user1Info,
 	user2Info,
 	currentSeasonName = "秋季",
-	isSimplified = false
+	isSimplified = false,
 ) {
 	try {
 		// Get season context for time-aware content
@@ -361,7 +361,7 @@ function parseCoupleSeasonContent(
 
 		// Reorder seasons: current first, then chronological future seasons
 		const currentIndex = baseSeasonsData.findIndex(
-			(s) => s.name === currentSeasonName
+			(s) => s.name === currentSeasonName,
 		);
 		const orderedSeasonsData =
 			currentIndex >= 0
@@ -389,27 +389,27 @@ function parseCoupleSeasonContent(
 				// Pattern 1: 【春季（寅卯辰月，木旺）】：
 				new RegExp(
 					`【${originalSeasonName}[^】]*】[：:]?\\s*([\\s\\S]*?)(?=【|####|$)`,
-					"g"
+					"g",
 				),
 				// Pattern 2: **春季（寅卯辰月，木旺）**：
 				new RegExp(
 					`\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=\\*\\*|####|$)`,
-					"g"
+					"g",
 				),
 				// Pattern 3: #### **春季（寅卯辰月，木旺）**：
 				new RegExp(
 					`####\\s*\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=####|$)`,
-					"g"
+					"g",
 				),
 				// Pattern 4: 春季（寅卯辰月，木旺）：
 				new RegExp(
 					`${originalSeasonName}（[^）]*）[：:]?\\s*([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)（|####|$)`,
-					"g"
+					"g",
 				),
 				// Pattern 5: More flexible - season name followed by content
 				new RegExp(
 					`${originalSeasonName}[^\\n]*[：:]([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)|###|$)`,
-					"g"
+					"g",
 				),
 			];
 
@@ -436,11 +436,11 @@ function parseCoupleSeasonContent(
 				const flexiblePatterns = [
 					new RegExp(
 						`${originalSeasonName}[^\\n]*\\n([\\s\\S]{50,400}?)(?=(?:春季|夏季|秋季|冬季)|$)`,
-						"g"
+						"g",
 					),
 					new RegExp(
 						`${originalSeasonName}[^。]*。([\\s\\S]{30,400}?)(?=(?:春季|夏季|秋季|冬季)|$)`,
-						"g"
+						"g",
 					),
 				];
 
@@ -479,7 +479,7 @@ function parseCoupleSeasonContent(
 						concern,
 						user1Info,
 						user2Info,
-						isSimplified
+						isSimplified,
 					);
 					// Combine original and fallback if needed - allowing full content
 					if (
@@ -498,7 +498,7 @@ function parseCoupleSeasonContent(
 					concern,
 					user1Info,
 					user2Info,
-					isSimplified
+					isSimplified,
 				);
 			}
 		});
@@ -514,7 +514,7 @@ function parseCoupleSeasonContent(
 			concern,
 			user1Info,
 			user2Info,
-			isSimplified
+			isSimplified,
 		);
 	}
 }
@@ -524,7 +524,7 @@ function getCoupleFallbackSeasonContent(
 	concern,
 	user1Info,
 	user2Info,
-	isSimplified = false
+	isSimplified = false,
 ) {
 	const name1 = user1Info.name || (isSimplified ? "男方" : "男方");
 	const name2 = user2Info.name || (isSimplified ? "女方" : "女方");
@@ -573,7 +573,7 @@ function getCoupleFallbackSeasonData(
 	concern,
 	user1Info,
 	user2Info,
-	isSimplified = false
+	isSimplified = false,
 ) {
 	const name1 = user1Info.name || (isSimplified ? "男方" : "男方");
 	const name2 = user2Info.name || (isSimplified ? "女方" : "女方");
@@ -589,7 +589,7 @@ function getCoupleFallbackSeasonData(
 				concern,
 				user1Info,
 				user2Info,
-				isSimplified
+				isSimplified,
 			),
 			keyPoints: isSimplified
 				? ["感情萌芽", "寅卯辰月", "木旺生发"]
@@ -605,7 +605,7 @@ function getCoupleFallbackSeasonData(
 				concern,
 				user1Info,
 				user2Info,
-				isSimplified
+				isSimplified,
 			),
 			keyPoints: isSimplified
 				? ["情感考验", "巳午未月", "火旺冲克"]
@@ -621,7 +621,7 @@ function getCoupleFallbackSeasonData(
 				concern,
 				user1Info,
 				user2Info,
-				isSimplified
+				isSimplified,
 			),
 			keyPoints: isSimplified
 				? ["感情收获", "申酉戌月", "金旺调和"]
@@ -637,7 +637,7 @@ function getCoupleFallbackSeasonData(
 				concern,
 				user1Info,
 				user2Info,
-				isSimplified
+				isSimplified,
 			),
 			keyPoints: isSimplified
 				? ["感情修复", "亥子丑月", "水旺调候"]

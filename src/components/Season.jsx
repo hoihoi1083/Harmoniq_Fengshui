@@ -15,10 +15,22 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 	const t = useTranslations("fengShuiReport.components.season");
 	const [analysisData, setAnalysisData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const [activeSeasonIndex, setActiveSeasonIndex] = useState(0);
 	const [error, setError] = useState(null);
 	const [loadingMessage, setLoadingMessage] = useState(t("analyzingSeasons"));
 	const [requestInProgress, setRequestInProgress] = useState(false);
+
+	// Helper function to clean season names from tags
+	const cleanSeasonData = (data) => {
+		if (!data || !data.seasons) return data;
+		
+		return {
+			...data,
+			seasons: data.seasons.map(season => ({
+				...season,
+				name: season.name.replace(/【[^】]*】/g, "").trim()
+			}))
+		};
+	};
 
 	// Get current date and determine current season
 	const getCurrentSeasonInfo = () => {
@@ -167,22 +179,7 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 		const seasonInfo = getCurrentSeasonInfo();
 		const currentMonth = seasonInfo.currentMonth;
 
-		// Update content based on current date context
-		const getSeasonContext = (seasonName) => {
-			const now = new Date();
-			const currentSeason = seasonInfo.currentSeason;
-
-			if (seasonName === currentSeason) {
-				return "【當前季節】";
-			} else if (
-				seasonInfo.relevantSeasons.indexOf(seasonName) <=
-				seasonInfo.relevantSeasons.indexOf(currentSeason)
-			) {
-				return "【即將到來】";
-			} else {
-				return "【未來參考】";
-			}
-		};
+		// Removed getSeasonContext function - no longer adding tags to season names
 
 		const fallbackContent = {
 			財運: {
@@ -252,11 +249,8 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 			},
 		];
 
-		// Add time context to season names and reorder based on current season
-		const allSeasons = baseSeasonsData.map((season) => ({
-			...season,
-			name: season.name + getSeasonContext(season.name),
-		}));
+		// Keep original season names without tags
+		const allSeasons = baseSeasonsData;
 
 		// Reorder seasons based on relevance (current season first)
 		const reorderedSeasons = seasonOrder
@@ -289,16 +283,8 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 				console.log(
 					"📖 Season using existing data from component store"
 				);
-				setAnalysisData(existingData);
-				// Set active season to current season if available
-				if (existingData.currentSeason && existingData.seasons) {
-					const currentSeasonIndex = existingData.seasons.findIndex(
-						(season) => season.name === existingData.currentSeason
-					);
-					if (currentSeasonIndex >= 0) {
-						setActiveSeasonIndex(currentSeasonIndex);
-					}
-				}
+				const cleanedData = cleanSeasonData(existingData);
+				setAnalysisData(cleanedData);
 				setIsLoading(false);
 				return;
 			}
@@ -316,18 +302,17 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 					generateSeasonAnalysis(userInfo, currentYear)
 						.then((analysis) => {
 							if (isMounted && analysis) {
-								setAnalysisData(analysis);
-								// Set active season to current season (first in reordered array)
-								setActiveSeasonIndex(0);
+								const cleanedAnalysis = cleanSeasonData(analysis);
+								setAnalysisData(cleanedAnalysis);
 								// Store data for database saving
-								storeComponentData("seasonAnalysis", analysis);
+								storeComponentData("seasonAnalysis", cleanedAnalysis);
 								console.log(
 									"📊 Stored Season fresh data:",
 									"SUCCESS"
 								);
 								console.log(
 									"🎯 Set active season to current:",
-									analysis.currentSeason
+									cleanedAnalysis.currentSeason
 								);
 							}
 						})
@@ -339,13 +324,12 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 								);
 								setError(error.message);
 								// Set minimal fallback if generateSeasonAnalysis doesn't return fallback
-								setAnalysisData(
-									getMinimalFallbackData(
-										userInfo.concern || "財運",
-										currentYear,
-										userInfo
-									)
+								const fallbackData = getMinimalFallbackData(
+									userInfo.concern || "財運",
+									currentYear,
+									userInfo
 								);
+								setAnalysisData(cleanSeasonData(fallbackData));
 							}
 						})
 						.finally(() => {
@@ -361,9 +345,8 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 			console.warn(
 				"Season component: Missing required userInfo or birthday"
 			);
-			setAnalysisData(
-				getMinimalFallbackData("財運", currentYear, userInfo || {})
-			);
+			const fallbackData = getMinimalFallbackData("財運", currentYear, userInfo || {});
+			setAnalysisData(cleanSeasonData(fallbackData));
 			setIsLoading(false);
 		}
 
@@ -437,48 +420,46 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 				style={{ width: "95%" }}
 			>
 				{/* Header */}
-				<div className="flex items-center justify-between mb-6 sm:mb-8">
-					<div>
-						<h2
-							className="text-center sm:text-left"
-							style={{
-								fontFamily: "Noto Serif TC, serif",
-								fontSize: "clamp(1.75rem, 5vw, 2.5rem)",
-								fontWeight: 800,
-								color: getConcernColor(userInfo),
-								lineHeight: 1.2,
-							}}
-						>
-							{t("title")}
-						</h2>
-						{/* Current Season Indicator */}
-						{analysisData?.currentSeason && (
-							<div className="mt-2">
-								<span
-									className="inline-block px-3 py-1 text-sm font-medium text-white rounded-full"
-									style={{
-										backgroundColor: (() => {
-											const colorMap = {
-												春季: "#7cb856",
-												夏季: "#B4003C",
-												秋季: "#DEAB20",
-												冬季: "#568CB8",
-											};
-											return (
-												colorMap[
-													analysisData.currentSeason
-												] || "#666"
-											);
-										})(),
-									}}
-								>
-									{t("current")}
-									{analysisData.currentSeason} (
-									{analysisData.currentMonth}月)
-								</span>
-							</div>
-						)}
-					</div>
+				<div className="mb-6 sm:mb-8">
+					<h2
+						className="text-center sm:text-left"
+						style={{
+							fontFamily: "Noto Serif TC, serif",
+							fontSize: "clamp(1.75rem, 5vw, 2.5rem)",
+							fontWeight: 800,
+							color: getConcernColor(userInfo),
+							lineHeight: 1.2,
+						}}
+					>
+						{t("title")}
+					</h2>
+					{/* Current Season Indicator */}
+					{analysisData?.currentSeason && (
+						<div className="mt-2">
+							<span
+								className="inline-block px-3 py-1 text-sm font-medium text-white rounded-full"
+								style={{
+									backgroundColor: (() => {
+										const colorMap = {
+											春季: "#7cb856",
+											夏季: "#B4003C",
+											秋季: "#DEAB20",
+											冬季: "#568CB8",
+										};
+										return (
+											colorMap[
+												analysisData.currentSeason
+											] || "#666"
+										);
+									})(),
+								}}
+							>
+								{t("current")}
+								{analysisData.currentSeason} (
+								{analysisData.currentMonth}月)
+							</span>
+						</div>
+					)}
 				</div>
 
 				{/* Error Message */}
@@ -495,236 +476,80 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 					</div>
 				)}
 
-				{/* Season Icons */}
-				<div className="flex justify-center mb-6 sm:mb-8">
-					<div className="flex justify-between w-full max-w-xs sm:max-w-md">
-						{(() => {
-							// Extract original season name without time context tags
-							const getOriginalSeasonName = (seasonName) => {
-								return seasonName
-									.replace(/【[^】]*】/g, "")
-									.trim();
-							};
-
-							return analysisData.seasons.map((season, index) => {
-								const getSeasonBgColor = (
-									seasonName,
-									isActive
-								) => {
-									const originalName =
-										getOriginalSeasonName(seasonName);
-									const colorMap = {
-										春季: isActive
-											? "bg-[#7cb856]"
-											: "bg-[#EFEFEF]",
-										夏季: isActive
-											? "bg-[#B4003C]"
-											: "bg-[#EFEFEF]",
-										秋季: isActive
-											? "bg-[#DEAB20]"
-											: "bg-[#EFEFEF]",
-										冬季: isActive
-											? "bg-[#568CB8]"
-											: "bg-[#EFEFEF]",
-									};
-									return (
-										colorMap[originalName] ||
-										(isActive
-											? "bg-gray-600"
-											: "bg-[#EFEFEF]")
-									);
-								};
-
-								// Extract original season name without time context tags
-								const getOriginalSeasonName = (seasonName) => {
-									return seasonName
-										.replace(/【[^】]*】/g, "")
-										.trim();
-								};
-
-								const getSeasonImage = (seasonName) => {
-									const originalName =
-										getOriginalSeasonName(seasonName);
-									const imageMap = {
-										春季: "/images/report/spring.png",
-										夏季: "/images/report/summer.png",
-										秋季: "/images/report/autumn.png",
-										冬季: "/images/report/winter.png",
-									};
-									return (
-										imageMap[originalName] ||
-										"/images/report/spring.png"
-									);
-								};
-
-								const getImageFilter = (
-									seasonName,
-									isActive
-								) => {
-									if (isActive) {
-										// When selected, make image white
-										return "brightness(0) invert(1)";
-									} else {
-										// When unselected, match the background color
-										const originalName =
-											getOriginalSeasonName(seasonName);
-										const filterMap = {
-											春季: "hue-rotate(60deg) saturate(0.8) brightness(0.6)",
-											夏季: "hue-rotate(330deg) saturate(1.2) brightness(0.4)",
-											秋季: "hue-rotate(40deg) saturate(1.1) brightness(0.7)",
-											冬季: "hue-rotate(200deg) saturate(0.9) brightness(0.5)",
-										};
-										return (
-											filterMap[originalName] || "none"
-										);
-									}
-								};
-
-								return (
-									<div key={season.name} className="relative">
-										<button
-											onClick={() =>
-												setActiveSeasonIndex(index)
-											}
-											className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_4px_4px_rgba(0,0,0,0.25)] ${getSeasonBgColor(
-												season.name,
-												activeSeasonIndex === index
-											)} ${
-												activeSeasonIndex === index
-													? "transform scale-110"
-													: "hover:scale-105"
-											}`}
-										>
-											<img
-												src={getSeasonImage(
-													season.name
-												)}
-												alt={season.name}
-												className="w-6 h-6 sm:w-8 sm:h-8"
-												style={{
-													filter: getImageFilter(
-														season.name,
-														activeSeasonIndex ===
-															index
-													),
-												}}
-											/>
-										</button>
-										{/* Current Season Badge */}
-										{analysisData?.currentSeason ===
-											getOriginalSeasonName(
-												season.name
-											) && (
-											<div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold shadow-lg">
-												現在
-											</div>
-										)}
-									</div>
-								);
-							});
-						})()}
-					</div>
-				</div>
-
-				{/* Active Season Content */}
-				{(() => {
-					// Extract original season name without time context tags
+				{/* All Seasons Content */}
+				{analysisData.seasons.map((season, index) => {
 					const getOriginalSeasonName = (seasonName) => {
 						return seasonName.replace(/【[^】]*】/g, "").trim();
 					};
 
+					const originalName = getOriginalSeasonName(season.name);
+					const isCurrent = analysisData.currentSeason === originalName;
+
+					const colorMap = {
+						春季: "#7cb856",
+						夏季: "#B4003C",
+						秋季: "#DEAB20",
+						冬季: "#568CB8",
+					};
+
+					const seasonColor = colorMap[originalName] || "#666";
+
 					return (
-						<div className="p-4 mb-6 sm:p-6 sm:mb-8">
+						<div key={season.name} className="mb-8 sm:mb-10">
 							<div className="flex items-center mb-3 sm:mb-4">
 								<div className="w-full">
-									{/* Season Name with Color */}
-									<h3
-										className={`font-bold mb-2 ${(() => {
-											const originalName =
-												getOriginalSeasonName(
-													analysisData.seasons[
-														activeSeasonIndex
-													].name
-												);
-											const colorMap = {
-												春季: "text-[#7cb856]",
-												夏季: "text-[#B4003C]",
-												秋季: "text-[#DEAB20]",
-												冬季: "text-[#568CB8]",
-											};
-											return (
-												colorMap[originalName] ||
-												"text-gray-800"
-											);
-										})()}`}
-										style={{
-											fontSize:
-												"clamp(1.25rem, 4vw, 1.5rem)",
-										}}
-									>
-										{
-											analysisData.seasons[
-												activeSeasonIndex
-											].name
-										}
-									</h3>
+									{/* Season Name with Color and Badge */}
+									<div className="flex items-center gap-2 mb-2">
+										<h3
+											className="font-bold"
+											style={{
+												fontSize: "clamp(1.5rem, 4vw, 2rem)",
+												color: seasonColor,
+												fontFamily: "Noto Serif TC, serif",
+											}}
+										>
+											{originalName}
+										</h3>
+										{isCurrent && (
+											<span className="px-2 py-1 text-xs font-bold text-white bg-red-500 rounded-full">
+												現在
+											</span>
+										)}
+									</div>
 
 									{/* Period with Season Background */}
 									<div
-										className={`inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-white font-medium ${(() => {
-											const originalName =
-												getOriginalSeasonName(
-													analysisData.seasons[
-														activeSeasonIndex
-													].name
-												);
-											const colorMap = {
-												春季: "bg-[#7cb856]",
-												夏季: "bg-[#B4003C]",
-												秋季: "bg-[#DEAB20]",
-												冬季: "bg-[#568CB8]",
-											};
-											return (
-												colorMap[originalName] ||
-												"bg-gray-600"
-											);
-										})()}`}
+										className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-white font-medium"
 										style={{
-											fontSize:
-												"clamp(0.875rem, 2.5vw, 1rem)",
+											backgroundColor: seasonColor,
+											fontSize: "clamp(0.875rem, 2.5vw, 1rem)",
 										}}
 									>
-										{
-											analysisData.seasons[
-												activeSeasonIndex
-											].period
-										}
+										{season.period}
 									</div>
 								</div>
 							</div>
 
-							{/* Season Description - Organized Content */}
-							<div className="p-4 sm:p-6">
+							{/* Season Description */}
+							<div
+								className="p-4 sm:p-6 bg-white rounded-lg"
+								style={{
+									backgroundColor: "#f9f9f9",
+								}}
+							>
 								<div className="space-y-3 leading-relaxed text-gray-700 sm:space-y-4">
 									{(() => {
-										const content =
-											analysisData.seasons[
-												activeSeasonIndex
-											].content;
+										const content = season.content;
 
 										// Simple check - if no meaningful content, show loading
-										if (
-											!content ||
-											content.trim().length < 10
-										) {
+										if (!content || content.trim().length < 10) {
 											return (
 												<div className="flex items-center justify-center py-6 sm:py-8">
 													<div className="w-5 h-5 border-b-2 rounded-full sm:w-6 sm:h-6 animate-spin border-amber-600"></div>
 													<span
 														className="ml-3 text-gray-600"
 														style={{
-															fontSize:
-																"clamp(0.875rem, 2.5vw, 1rem)",
+															fontSize: "clamp(0.875rem, 2.5vw, 1rem)",
 														}}
 													>
 														正在分析中...
@@ -733,39 +558,21 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 											);
 										}
 
-										// Simple content cleaning - just remove obvious system messages
+										// Simple content cleaning
 										let displayContent = content
-											.replace(
-												/以上分析由DeepSeek生成，僅供參考。.*$/gm,
-												""
-											)
-											.replace(
-												/命理之說旨在啟發思路，切勿全信。.*$/gm,
-												""
-											)
-											.replace(
-												/--\s*免責聲明：以上內容由DeepSeek生成.*$/gms,
-												""
-											)
+											.replace(/以上分析由DeepSeek生成，僅供參考。.*$/gm, "")
+											.replace(/命理之說旨在啟發思路，切勿全信。.*$/gm, "")
+											.replace(/--\s*免責聲明：以上內容由DeepSeek生成.*$/gms, "")
 											.replace(/免責聲明：.*$/gms, "")
-											.replace(
-												/以上內容由DeepSeek生成.*$/gms,
-												""
-											)
-											.replace(
-												/命理分析並非精密科學.*$/gms,
-												""
-											)
-											.replace(
-												/實際決策請務必結合現實情況.*$/gms,
-												""
-											)
+											.replace(/以上內容由DeepSeek生成.*$/gms, "")
+											.replace(/命理分析並非精密科學.*$/gms, "")
+											.replace(/實際決策請務必結合現實情況.*$/gms, "")
 											.replace(/--\s*總結：.*$/gms, "")
 											.replace(/總結：.*$/gms, "")
 											.replace(/^：\s*/gm, "")
 											.replace(/\n--\s*$/gm, "")
 											.replace(/--$/gm, "")
-											.replace(/^###\s*/gm, "") // Remove ### markdown headers but keep the content
+											.replace(/^###\s*/gm, "")
 											.replace(/^\s*###\s*$/gm, "")
 											.trim();
 
@@ -777,8 +584,7 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 													<span
 														className="ml-3 text-gray-600"
 														style={{
-															fontSize:
-																"clamp(0.875rem, 2.5vw, 1rem)",
+															fontSize: "clamp(0.875rem, 2.5vw, 1rem)",
 														}}
 													>
 														正在分析中...
@@ -787,28 +593,22 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 											);
 										}
 
-										// Display the content as-is, without complex parsing
 										return (
-											<div className="space-y-3 sm:space-y-4">
-												<p
-													className="leading-relaxed text-gray-700 whitespace-pre-line"
-													style={{
-														fontSize:
-															"clamp(0.875rem, 2.5vw, 1rem)",
-													}}
-												>
-													{displayContent}
-												</p>
-											</div>
+											<p
+												className="leading-relaxed text-gray-700 whitespace-pre-line"
+												style={{
+													fontSize: "clamp(0.875rem, 2.5vw, 1rem)",
+												}}
+											>
+												{displayContent}
+											</p>
 										);
 									})()}
 								</div>
 							</div>
 						</div>
 					);
-				})()}
-
-				{/* AI Prompt Section */}
+				})}
 			</section>
 		</ComponentErrorBoundary>
 	);

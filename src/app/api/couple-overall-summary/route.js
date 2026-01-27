@@ -1,14 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 /**
  * Couple Overall Summary Analysis API
- * 
+ *
  * This API generates a comprehensive relationship summary for couple's feng shui report.
  * It synthesizes data from all couple analyses to create:
  * 1. An 8-12 character relationship catchphrase for 2026
  * 2. Core relationship themes
  * 3. A shareable couple motto/quote
- * 
+ *
  * Strategy: EXTRACTIVE (synthesize existing data) not GENERATIVE (create new predictions)
  */
 
@@ -29,60 +29,72 @@ export async function POST(request) {
 		// Validate required data
 		if (!coupleCoreSuggestionData) {
 			return NextResponse.json(
-				{ error: 'Missing required couple analysis data' },
-				{ status: 400 }
+				{ error: "Missing required couple analysis data" },
+				{ status: 400 },
 			);
 		}
 
-		const isSimplified = locale === 'zh-CN';
+		const isSimplified = locale === "zh-CN";
 
 		// Build comprehensive context from all couple analyses
 		const contextParts = [];
 
 		// 1. User basic info
 		if (user1Info && user2Info) {
-			contextParts.push(`【夫妻基本信息】\n男方：${user1Info.birthday || ''}\n女方：${user2Info.birthday || ''}`);
+			contextParts.push(
+				`【夫妻基本信息】\n男方：${user1Info.birthday || ""}\n女方：${user2Info.birthday || ""}`,
+			);
 		}
 
 		// 2. Core Couple Suggestions
 		if (coupleCoreSuggestionData) {
-			if (typeof coupleCoreSuggestionData === 'string') {
-				contextParts.push(`【核心感情建議】\n${coupleCoreSuggestionData}`);
+			if (typeof coupleCoreSuggestionData === "string") {
+				contextParts.push(
+					`【核心感情建議】\n${coupleCoreSuggestionData}`,
+				);
 			} else {
-				Object.entries(coupleCoreSuggestionData).forEach(([category, content]) => {
-					contextParts.push(`【${category}】\n${content}`);
-				});
+				Object.entries(coupleCoreSuggestionData).forEach(
+					([category, content]) => {
+						contextParts.push(`【${category}】\n${content}`);
+					},
+				);
 			}
 		}
 
 		// 3. Annual Analysis
 		if (coupleAnnualData) {
-			if (typeof coupleAnnualData === 'string') {
+			if (typeof coupleAnnualData === "string") {
 				contextParts.push(`【流年運勢】\n${coupleAnnualData}`);
 			} else {
-				contextParts.push(`【流年運勢】\n${JSON.stringify(coupleAnnualData)}`);
+				contextParts.push(
+					`【流年運勢】\n${JSON.stringify(coupleAnnualData)}`,
+				);
 			}
 		}
 
 		// 4. Seasonal Analysis
 		if (coupleSeasonData) {
-			if (typeof coupleSeasonData === 'string') {
+			if (typeof coupleSeasonData === "string") {
 				contextParts.push(`【四季相處】\n${coupleSeasonData}`);
 			} else {
-				contextParts.push(`【四季相處】\n${JSON.stringify(coupleSeasonData)}`);
+				contextParts.push(
+					`【四季相處】\n${JSON.stringify(coupleSeasonData)}`,
+				);
 			}
 		}
 
 		// 5. Specific Problem Solutions
 		if (coupleSpecificData) {
-			if (typeof coupleSpecificData === 'string') {
+			if (typeof coupleSpecificData === "string") {
 				contextParts.push(`【具體問題解決】\n${coupleSpecificData}`);
 			} else {
-				contextParts.push(`【具體問題解決】\n${JSON.stringify(coupleSpecificData)}`);
+				contextParts.push(
+					`【具體問題解決】\n${JSON.stringify(coupleSpecificData)}`,
+				);
 			}
 		}
 
-		const fullContext = contextParts.join('\n\n---\n\n');
+		const fullContext = contextParts.join("\n\n---\n\n");
 
 		// Prepare prompt for AI
 		const systemPrompt = `你是一位資深感情命理師，擅長從多維度夫妻分析中提煉核心洞察，為夫妻創造易於分享的感情總結。
@@ -135,93 +147,104 @@ ${fullContext}
 }`;
 
 		// Call DeepSeek API
-		const deepseekResponse = await fetch('https://api.deepseek.com/chat/completions', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+		const deepseekResponse = await fetch(
+			"https://api.deepseek.com/chat/completions",
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+				},
+				body: JSON.stringify({
+					model: "deepseek-chat",
+					messages: [
+						{ role: "system", content: systemPrompt },
+						{ role: "user", content: userPrompt },
+					],
+					temperature: 0.7,
+					max_tokens: 1000,
+				}),
 			},
-			body: JSON.stringify({
-				model: 'deepseek-chat',
-				messages: [
-					{ role: 'system', content: systemPrompt },
-					{ role: 'user', content: userPrompt }
-				],
-				temperature: 0.7,
-				max_tokens: 1000,
-			}),
-		});
+		);
 
 		if (!deepseekResponse.ok) {
 			const errorData = await deepseekResponse.json();
-			console.error('DeepSeek API Error:', errorData);
+			console.error("DeepSeek API Error:", errorData);
 			return NextResponse.json(
-				{ error: 'AI service error', details: errorData },
-				{ status: 500 }
+				{ error: "AI service error", details: errorData },
+				{ status: 500 },
 			);
 		}
 
 		const deepseekData = await deepseekResponse.json();
-		const aiContent = deepseekData.choices?.[0]?.message?.content || '';
+		const aiContent = deepseekData.choices?.[0]?.message?.content || "";
 
-		console.log('🤖 AI Raw Response:', aiContent);
+		console.log("🤖 AI Raw Response:", aiContent);
 
 		// Parse the JSON response
 		let parsedData;
 		try {
 			// Try to extract JSON from markdown code blocks if present
-			const jsonMatch = aiContent.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
-			                  aiContent.match(/(\{[\s\S]*\})/);
-			
+			const jsonMatch =
+				aiContent.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) ||
+				aiContent.match(/(\{[\s\S]*\})/);
+
 			if (jsonMatch) {
 				parsedData = JSON.parse(jsonMatch[1]);
 			} else {
-				throw new Error('No JSON found in response');
+				throw new Error("No JSON found in response");
 			}
 		} catch (parseError) {
-			console.error('Failed to parse AI response:', parseError);
-			console.error('Raw content:', aiContent);
-			
+			console.error("Failed to parse AI response:", parseError);
+			console.error("Raw content:", aiContent);
+
 			// Return fallback data
 			return NextResponse.json({
 				success: true,
 				data: {
-					keyPhrase: '攜手同行，共創未來',
+					keyPhrase: "攜手同行，共創未來",
 					themes: [
-						'溝通是感情的橋樑',
-						'理解是相處的基石',
-						'信任是關係的根本'
+						"溝通是感情的橋樑",
+						"理解是相處的基石",
+						"信任是關係的根本",
 					],
-					quote: '2026年，讓我們用愛與理解，共同書寫屬於我們的幸福篇章。',
-					yearOverview: '2026年是你們感情深化的一年。珍惜彼此，用心經營，必能收穫更美好的未來。'
-				}
+					quote: "2026年，讓我們用愛與理解，共同書寫屬於我們的幸福篇章。",
+					yearOverview:
+						"2026年是你們感情深化的一年。珍惜彼此，用心經營，必能收穫更美好的未來。",
+				},
 			});
 		}
 
 		// Map the parsed data to our component's expected format
 		const summaryData = {
-			keyPhrase: parsedData.keyPhrase || '攜手同行，共創未來',
+			keyPhrase: parsedData.keyPhrase || "攜手同行，共創未來",
 			themes: parsedData.coreThemes || [
-				'溝通是感情的橋樑',
-				'理解是相處的基石',
-				'信任是關係的根本'
+				"溝通是感情的橋樑",
+				"理解是相處的基石",
+				"信任是關係的根本",
 			],
-			quote: parsedData.shareableQuote || '2026年，讓我們用愛與理解，共同書寫屬於我們的幸福篇章。',
-			yearOverview: parsedData.yearOverview || '2026年是你們感情深化的一年。珍惜彼此，用心經營，必能收穫更美好的未來。'
+			quote:
+				parsedData.shareableQuote ||
+				"2026年，讓我們用愛與理解，共同書寫屬於我們的幸福篇章。",
+			yearOverview:
+				parsedData.yearOverview ||
+				"2026年是你們感情深化的一年。珍惜彼此，用心經營，必能收穫更美好的未來。",
 		};
 
-		console.log('✅ Couple Summary Generated:', summaryData);
+		console.log("✅ Couple Summary Generated:", summaryData);
 
 		return NextResponse.json({
 			success: true,
-			data: summaryData
+			data: summaryData,
 		});
-
 	} catch (error) {
-		console.error('Error generating couple overall summary:', error);
+		console.error("Error generating couple overall summary:", error);
 		return NextResponse.json(
-			{ error: 'Failed to generate couple summary', details: error.message },
-			{ status: 500 }
+			{
+				error: "Failed to generate couple summary",
+				details: error.message,
+			},
+			{ status: 500 },
 		);
 	}
 }

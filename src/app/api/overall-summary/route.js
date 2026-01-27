@@ -24,8 +24,8 @@ export async function POST(request) {
 			specificSuggestionData,
 		} = body;
 
-		// Validate required data
-		if (!questionFocusData || !coreSuggestionData) {
+		// Validate required data (coreSuggestionData is now optional)
+		if (!questionFocusData) {
 			return NextResponse.json(
 				{ error: 'Missing required analysis data' },
 				{ status: 400 }
@@ -42,11 +42,13 @@ export async function POST(request) {
 			contextParts.push(`【用戶關注焦點】\n${questionFocusData}`);
 		}
 
-		// 2. Core Suggestions by category
+		// 2. Core Suggestions by category (optional)
 		if (coreSuggestionData) {
 			Object.entries(coreSuggestionData).forEach(([category, content]) => {
 				contextParts.push(`【${category}建議】\n${content}`);
 			});
+		} else {
+			console.log('ℹ️ CoreSuggestion data not available, proceeding without it');
 		}
 
 		// 3. GanZhi Analysis
@@ -99,7 +101,9 @@ ${fullContext}
     "第三個核心主題（20字內）"
   ],
   "shareableQuote": "一句激勵人心、適合分享的金句（30-50字）",
-  "yearOverview": "簡要總結2026年的整體運勢走向（80-120字）"
+  "yearOverview": "簡要總結2026年的整體運勢走向（80-120字）",
+  "luckyColors": ["顏色1", "顏色2", "顏色3"],
+  "luckyAccessories": ["配飾1", "配飾2", "配飾3"]
 }
 
 **格式要求**：
@@ -107,6 +111,8 @@ ${fullContext}
 2. coreThemes：3個主題，各20字內，涵蓋事業/財運/感情/健康的核心洞察
 3. shareableQuote：30-50字，正能量，朗朗上口，適合社交分享
 4. yearOverview：80-120字，綜合各方面分析，給出全年整體方向
+5. luckyColors：3個開運顏色，根據五行分析推薦（例：["白色", "黑色", "藍色"]）
+6. luckyAccessories：3個開運配飾類型，根據命理推薦（例：["金屬手鍊", "黑曜石吊墜", "水晶戒指"]）
 
 **範例**：
 {
@@ -117,7 +123,9 @@ ${fullContext}
     "感情需真誠溝通，培養默契"
   ],
   "shareableQuote": "2026年，不是衝鋒的時刻，而是蓄勢的階段。每一分耕耘，都是未來豐收的種子。",
-  "yearOverview": "2026年整體呈現穩中有進的態勢。上半年適合打好基礎、積累資源，下半年可見成效顯現。事業上需低調務實，財運宜守不宜攻，感情需用心經營。把握住年中關鍵時機，腳踏實地前行，必能為未來鋪就堅實之路。"
+  "yearOverview": "2026年整體呈現穩中有進的態勢。上半年適合打好基礎、積累資源，下半年可見成效顯現。事業上需低調務實，財運宜守不宜攻，感情需用心經營。把握住年中關鍵時機，腳踏實地前行，必能為未來鋪就堅實之路。",
+  "luckyColors": ["白色", "黑色", "藍色"],
+  "luckyAccessories": ["金屬手鍊", "黑曜石吊墜", "水晶項鍊"]
 }`;
 
 		// Call DeepSeek API
@@ -171,6 +179,14 @@ ${fullContext}
 				{ error: 'Incomplete AI response', data: summaryData },
 				{ status: 500 }
 			);
+		}
+
+		// Ensure luckyColors and luckyAccessories are arrays (provide defaults if missing)
+		if (!summaryData.luckyColors || !Array.isArray(summaryData.luckyColors)) {
+			summaryData.luckyColors = ["白色", "黑色", "藍色"];
+		}
+		if (!summaryData.luckyAccessories || !Array.isArray(summaryData.luckyAccessories)) {
+			summaryData.luckyAccessories = ["金屬飾品", "水晶配飾", "玉石吊墜"];
 		}
 
 		return NextResponse.json({
