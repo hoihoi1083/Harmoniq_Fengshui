@@ -2849,7 +2849,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 		async function preloadAllTabs() {
 			// Log print mode status
 			if (isPrintMode) {
-				console.log("🖨️ Print mode detected - loading MingJu content for print");
+				console.log(
+					"🖨️ Print mode detected - loading MingJu content for print",
+				);
 			}
 			console.log("🚀 Starting preload for all tabs...");
 

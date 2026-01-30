@@ -8,7 +8,7 @@ export async function POST(req) {
 		if (!userInfo) {
 			return Response.json(
 				{ error: "Missing user information" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -205,18 +205,18 @@ ${
 					max_tokens: 5000, // Balanced for detailed but accessible content
 					temperature: 0.6, // More consistent for easier understanding
 				}),
-			}
+			},
 		);
 
 		if (!response.ok) {
 			console.error(
 				"DeepSeek API Error:",
 				response.status,
-				response.statusText
+				response.statusText,
 			);
 			return Response.json(
 				{ error: "AI analysis service unavailable" },
-				{ status: 500 }
+				{ status: 500 },
 			);
 		}
 
@@ -226,25 +226,25 @@ ${
 		if (!aiContent) {
 			return Response.json(
 				{ error: "No analysis generated" },
-				{ status: 500 }
+				{ status: 500 },
 			);
 		}
 
 		// Remove disclaimer text if present
 		aiContent = aiContent.replace(
 			/（以上分析僅基於傳統五行理論，提供生活化建議，實際決策請結合個人情況與專業財務顧問意見。）/g,
-			""
+			"",
 		);
 		aiContent = aiContent.replace(
 			/\(以上分析仅基于传统五行理论，提供生活化建议，实际决策请结合个人情况与专业财务顾问意见。\)/g,
-			""
+			"",
 		);
 
 		// Parse the AI response to extract structured data
 		const parsedContent = parseSeasonContent(
 			aiContent,
 			concern,
-			currentSeasonName
+			currentSeasonName,
 		);
 
 		return Response.json({
@@ -260,7 +260,7 @@ ${
 		console.error("Season Analysis Error:", error);
 		return Response.json(
 			{ error: "Analysis generation failed" },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
@@ -310,7 +310,7 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 
 		// Reorder seasons: current first, then chronological future seasons
 		const currentIndex = baseSeasonsData.findIndex(
-			(s) => s.name === currentSeasonName
+			(s) => s.name === currentSeasonName,
 		);
 		const orderedSeasonsData =
 			currentIndex >= 0
@@ -338,27 +338,27 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 				// Pattern 1: 【春季（寅卯辰月，木旺）】：
 				new RegExp(
 					`【${originalSeasonName}[^】]*】[：:]?\\s*([\\s\\S]*?)(?=【(?:春季|夏季|秋季|冬季)|####(?:(?:春季|夏季|秋季|冬季))|$)`,
-					"g"
+					"g",
 				),
 				// Pattern 2: **春季（寅卯辰月，木旺）**：
 				new RegExp(
 					`\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=\\*\\*(?:春季|夏季|秋季|冬季)|####\\s*\\*\\*(?:春季|夏季|秋季|冬季)|$)`,
-					"g"
+					"g",
 				),
 				// Pattern 3: #### **春季（寅卯辰月，木旺）**：
 				new RegExp(
 					`####\\s*\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=####\\s*\\*\\*(?:春季|夏季|秋季|冬季)|$)`,
-					"g"
+					"g",
 				),
 				// Pattern 4: 春季（寅卯辰月，木旺）：
 				new RegExp(
 					`${originalSeasonName}（[^）]*）[：:]?\\s*([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)（|####\\s*(?:春季|夏季|秋季|冬季)|$)`,
-					"g"
+					"g",
 				),
 				// Pattern 5: More flexible - season name followed by content (allow ### subsections)
 				new RegExp(
 					`${originalSeasonName}[^\\n]*[：:]([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)【|(?:春季|夏季|秋季|冬季)（|####\\s*(?:春季|夏季|秋季|冬季)|$)`,
-					"g"
+					"g",
 				),
 			];
 
@@ -385,11 +385,11 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 				const flexiblePatterns = [
 					new RegExp(
 						`${originalSeasonName}[^\\n]*\\n([\\s\\S]{50,500}?)(?=(?:春季|夏季|秋季|冬季)|$)`,
-						"g"
+						"g",
 					),
 					new RegExp(
 						`${originalSeasonName}[^。]*。([\\s\\S]{30,400}?)(?=(?:春季|夏季|秋季|冬季)|$)`,
-						"g"
+						"g",
 					),
 				];
 
@@ -444,7 +444,7 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 				season.content = getFallbackSeasonContent(
 					originalSeasonName,
 					concern,
-					currentSeasonName
+					currentSeasonName,
 				);
 			}
 		});
@@ -463,7 +463,7 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 function getFallbackSeasonContent(
 	seasonName,
 	concern,
-	currentSeasonName = "秋季"
+	currentSeasonName = "秋季",
 ) {
 	const getSeasonContext = (season) => {
 		if (season === currentSeasonName) {
@@ -516,7 +516,7 @@ function getFallbackSeasonData(concern, currentSeasonName = "秋季") {
 			content: getFallbackSeasonContent(
 				"春季",
 				concern,
-				currentSeasonName
+				currentSeasonName,
 			),
 			keyPoints: ["印星助學", "寅卯辰月", "木旺"],
 		},
@@ -528,7 +528,7 @@ function getFallbackSeasonData(concern, currentSeasonName = "秋季") {
 			content: getFallbackSeasonContent(
 				"夏季",
 				concern,
-				currentSeasonName
+				currentSeasonName,
 			),
 			keyPoints: ["極端防護", "巳午未月", "火旺"],
 		},
@@ -540,7 +540,7 @@ function getFallbackSeasonData(concern, currentSeasonName = "秋季") {
 			content: getFallbackSeasonContent(
 				"秋季",
 				concern,
-				currentSeasonName
+				currentSeasonName,
 			),
 			keyPoints: ["黃金收穫", "申酉戌月", "金旺"],
 		},
@@ -552,7 +552,7 @@ function getFallbackSeasonData(concern, currentSeasonName = "秋季") {
 			content: getFallbackSeasonContent(
 				"冬季",
 				concern,
-				currentSeasonName
+				currentSeasonName,
 			),
 			keyPoints: ["黃金修復期", "亥子丑月", "水旺"],
 		},

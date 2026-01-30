@@ -6,7 +6,8 @@ export default function Page5_6_CareerDetailed({ data }) {
 	// Extract jixiong (吉象 and 凶象) data
 	// The data structure is: { jixiang: [{title, content}], xiongxiang: [{title, content}] }
 	const auspiciousItems = jixiong?.jixiang || jixiong?.auspicious || [];
-	const inauspiciousItems = jixiong?.xiongxiang || jixiong?.inauspicious || [];
+	const inauspiciousItems =
+		jixiong?.xiongxiang || jixiong?.inauspicious || [];
 
 	// Convert to array format if they're already arrays, otherwise parse strings
 	const getItemsArray = (items) => {
@@ -14,14 +15,17 @@ export default function Page5_6_CareerDetailed({ data }) {
 			// Already in correct format: [{title, content}, ...]
 			return items;
 		}
-		if (typeof items === 'string') {
+		if (typeof items === "string") {
 			// Legacy string format, parse it
 			const lines = items.split("\n").filter((line) => line.trim());
 			return lines
 				.filter((line) => line.includes("•") || line.match(/^\d+\./))
 				.map((line, index) => ({
 					title: `要點 ${index + 1}`,
-					content: line.replace(/^•\s*/, "").replace(/^\d+\.\s*/, "").trim()
+					content: line
+						.replace(/^•\s*/, "")
+						.replace(/^\d+\.\s*/, "")
+						.trim(),
 				}));
 		}
 		return [];
@@ -45,18 +49,18 @@ export default function Page5_6_CareerDetailed({ data }) {
 				<div className="text-center mb-10 relative">
 					<div
 						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 text-[200px] opacity-5 font-bold"
-						style={{ 
+						style={{
 							color: color,
-							fontFamily: "Noto Serif TC, serif" 
+							fontFamily: "Noto Serif TC, serif",
 						}}
 					>
 						吉
 					</div>
 					<h1
 						className="text-5xl font-bold mb-3 relative z-10"
-						style={{ 
+						style={{
 							color: color,
-							fontFamily: "Noto Serif TC, serif" 
+							fontFamily: "Noto Serif TC, serif",
 						}}
 					>
 						總流年{concernChinese[concern]} · 吉象
@@ -86,7 +90,10 @@ export default function Page5_6_CareerDetailed({ data }) {
 								{/* Content */}
 								<div className="flex-1">
 									{item.title && (
-										<h3 className="text-xl font-bold mb-3" style={{ color: color }}>
+										<h3
+											className="text-xl font-bold mb-3"
+											style={{ color: color }}
+										>
 											{item.title}
 										</h3>
 									)}
@@ -126,9 +133,9 @@ export default function Page5_6_CareerDetailed({ data }) {
 					</div>
 					<h1
 						className="text-5xl font-bold mb-3 relative z-10"
-						style={{ 
+						style={{
 							color: "#666",
-							fontFamily: "Noto Serif TC, serif" 
+							fontFamily: "Noto Serif TC, serif",
 						}}
 					>
 						總流年{concernChinese[concern]} · 凶象

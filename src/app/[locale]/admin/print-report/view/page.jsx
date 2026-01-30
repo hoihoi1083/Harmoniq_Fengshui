@@ -11,6 +11,7 @@ import { MingJu } from "@/components/MingJu";
 import Page4_2026Overview from "./components/Page4_2026Overview";
 import Page5_6_CareerDetailed from "./components/Page5_6_CareerDetailed";
 import Page7_Seasons from "./components/Page7_Seasons";
+import Page8_9_Recommendations from "./components/Page8_9_Recommendations";
 
 function PrintReportView() {
 	const searchParams = useSearchParams();
@@ -24,6 +25,7 @@ function PrintReportView() {
 	const [ganzhiAnalysis, setGanzhiAnalysis] = useState(null);
 	const [jixiongData, setJixiongData] = useState(null);
 	const [seasonData, setSeasonData] = useState(null);
+	const [coreSuggestionData, setCoreSuggestionData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	// Get parameters from URL
@@ -188,7 +190,7 @@ function PrintReportView() {
 
 				// 2. Call Question Focus API (same as web-side)
 				// 2-4. Call all APIs in parallel to speed up loading
-				const [questionData, ganzhiData, jixiongResult, seasonResult] =
+			const [questionData, ganzhiData, jixiongResult, seasonResult, specificSuggestionResult] =
 					await Promise.all([
 						// Question Focus API
 						fetch("/api/question-focus-simple", {
@@ -246,31 +248,31 @@ function PrintReportView() {
 									time: birthTime,
 									concern: concern,
 								},
-							baziData: {
-								year: wuxingResult.wuxingData.year,
-								month: wuxingResult.wuxingData.month,
-								day: wuxingResult.wuxingData.day,
-								hour: wuxingResult.wuxingData.hour,
-								dayMaster: wuxingResult.wuxingData.dayStem,
-								dayElement:
-									wuxingResult.wuxingData.dayStemWuxing,
-							},
-							locale: locale,
-						}),
-					}).then((res) => res.json()),
+								baziData: {
+									year: wuxingResult.wuxingData.year,
+									month: wuxingResult.wuxingData.month,
+									day: wuxingResult.wuxingData.day,
+									hour: wuxingResult.wuxingData.hour,
+									dayMaster: wuxingResult.wuxingData.dayStem,
+									dayElement:
+										wuxingResult.wuxingData.dayStemWuxing,
+								},
+								locale: locale,
+							}),
+						}).then((res) => res.json()),
 
-					// Season Analysis API (Page 7) - Same as web side
-					fetch("/api/season-analysis", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							userInfo: {
-								birthday: birthday,
-								gender: gender,
-								time: birthTime,
-								concern: concern,
-							},
-							currentDate: {
+						// Season Analysis API (Page 7) - Same as web side
+						fetch("/api/season-analysis", {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								userInfo: {
+									birthday: birthday,
+									gender: gender,
+									time: birthTime,
+									concern: concern,
+								},
+								currentDate: {
 									year: new Date().getFullYear(),
 									month: new Date().getMonth() + 1,
 									currentSeason: (() => {
@@ -312,14 +314,26 @@ function PrintReportView() {
 								locale: locale,
 							}),
 						}).then((res) => res.json()),
-					]);
 
-				console.log("Question Focus API response:", questionData);
-				console.log("GanZhi Analysis API response:", ganzhiData);
-				console.log("JiXiong Analysis API response:", jixiongResult);
+				// Specific Suggestion Analysis API (Pages 8-9: 針對性建議 + 禁忌行為)
+				fetch("/api/specific-suggestion-analysis", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							userInfo: {
+								birthday: birthday,
+								gender: gender,
+								time: birthTime,
+								concern: concern,
+							},
+							locale: locale,
+						}),
+					}).then((res) => res.json()),
+			]);
+
+			console.log("Question Focus API response:", questionData);
 				console.log("Season Analysis API response:", seasonResult);
-
-				// Process Question Focus
+			console.log("Specific Suggestion API response:", specificSuggestionResult);
 				if (questionData.success && questionData.solution) {
 					setQuestionFocus(questionData.solution);
 					if (questionData.solution.content) {
@@ -347,6 +361,11 @@ function PrintReportView() {
 				// Process Season Analysis
 				if (seasonResult.success && seasonResult.analysis) {
 					setSeasonData(seasonResult.analysis);
+				}
+
+// Process Specific Suggestion Analysis (針對性建議 + 禁忌行為)
+			if (specificSuggestionResult.success && specificSuggestionResult.data) {
+				setCoreSuggestionData(specificSuggestionResult.data);
 				}
 
 				setIsLoading(false);
@@ -796,18 +815,29 @@ function PrintReportView() {
 						/>
 					</>
 				)}
-			</div>
 
-			{/* Print Styles */}
-			<style jsx global>{`
-				@media print {
-					.no-print {
-						display: none !important;
-					}
-					.print-container {
-						margin: 0 auto !important;
-						padding: 20mm 15mm !important;
-					}
+			{/* Pages 8-9: 針對性建議 + 禁忌行為 */}
+			{coreSuggestionData && (coreSuggestionData.suggestions || coreSuggestionData.taboos) && (
+				<Page8_9_Recommendations
+					data={{
+						summary: coreSuggestionData,
+						concern: concern,
+						color: getConcernColor({ concern: concern }),
+					}}
+				/>
+			)}
+		</div>
+
+		{/* Print Styles */}
+		<style jsx global>{`
+			@media print {
+				.no-print {
+					display: none !important;
+				}
+				.print-container {
+					margin: 0 auto !important;
+					padding: 20mm 15mm !important;
+				}
 					@page {
 						size: A4;
 						margin: 0;

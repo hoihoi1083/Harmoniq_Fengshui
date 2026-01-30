@@ -147,8 +147,14 @@ export async function POST(request) {
 		let baZi;
 		let dayMaster = "";
 		let dayElement = "";
-		
-		if (baziData && baziData.year && baziData.month && baziData.day && baziData.hour) {
+
+		if (
+			baziData &&
+			baziData.year &&
+			baziData.month &&
+			baziData.day &&
+			baziData.hour
+		) {
 			// Use the accurate BaZi data from frontend (calculated by lunisolar library)
 			baZi = {
 				year: baziData.year,
@@ -158,13 +164,17 @@ export async function POST(request) {
 			};
 			dayMaster = baziData.dayMaster || "";
 			dayElement = baziData.dayElement || "";
-			console.log("✅ Using provided BaZi data with dayMaster:", dayMaster, dayElement);
+			console.log(
+				"✅ Using provided BaZi data with dayMaster:",
+				dayMaster,
+				dayElement,
+			);
 		} else {
 			// Fallback to simple calculation if baziData not provided
 			baZi = generateBaZi(birthday);
 			console.log("⚠️ Using fallback BaZi calculation");
 		}
-		
+
 		const yearGanZhi = getYearlyStems(currentYear);
 
 		// Locale-aware text

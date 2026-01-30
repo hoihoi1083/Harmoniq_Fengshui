@@ -273,53 +273,62 @@ function parseStructuredContent(title, content, isJixiang) {
 	};
 
 	// Split by bullet points
-	const bullets = content.split(/\n•\s*/).filter(b => b.trim());
-	
+	const bullets = content.split(/\n•\s*/).filter((b) => b.trim());
+
 	// For 吉象 (auspicious), look for: 原理, 時機, 做法
 	// For 凶象 (inauspicious), look for: 原理, 時機, 風險, 預防
-	
-	bullets.forEach(bullet => {
+
+	bullets.forEach((bullet) => {
 		const trimmed = bullet.trim();
-		
+
 		if (isJixiang) {
 			if (/^原理[：:]/i.test(trimmed)) {
-				result.principle = trimmed.replace(/^原理[：:]\s*/i, '').trim();
+				result.principle = trimmed.replace(/^原理[：:]\s*/i, "").trim();
 			} else if (/^時機[：:]/i.test(trimmed)) {
-				result.timing = trimmed.replace(/^時機[：:]\s*/i, '').trim();
+				result.timing = trimmed.replace(/^時機[：:]\s*/i, "").trim();
 			} else if (/^做法[：:]/i.test(trimmed)) {
-				result.method = trimmed.replace(/^做法[：:]\s*/i, '').trim();
+				result.method = trimmed.replace(/^做法[：:]\s*/i, "").trim();
 			}
 		} else {
 			if (/^原理[：:]/i.test(trimmed)) {
-				result.principle = trimmed.replace(/^原理[：:]\s*/i, '').trim();
+				result.principle = trimmed.replace(/^原理[：:]\s*/i, "").trim();
 			} else if (/^時機[：:]/i.test(trimmed)) {
-				result.timing = trimmed.replace(/^時機[：:]\s*/i, '').trim();
+				result.timing = trimmed.replace(/^時機[：:]\s*/i, "").trim();
 			} else if (/^風險[：:]/i.test(trimmed)) {
-				result.risk = trimmed.replace(/^風險[：:]\s*/i, '').trim();
+				result.risk = trimmed.replace(/^風險[：:]\s*/i, "").trim();
 			} else if (/^預防[：:]/i.test(trimmed)) {
-				result.prevention = trimmed.replace(/^預防[：:]\s*/i, '').trim();
+				result.prevention = trimmed
+					.replace(/^預防[：:]\s*/i, "")
+					.trim();
 			}
 		}
 	});
-	
+
 	// If structured fields found, use them; otherwise keep original content
 	if (isJixiang && (result.principle || result.timing || result.method)) {
 		// Successfully parsed 吉象 structure
 		result.content = [
 			result.principle && `• 原理：${result.principle}`,
 			result.timing && `• 時機：${result.timing}`,
-			result.method && `• 做法：${result.method}`
-		].filter(Boolean).join('\n');
-	} else if (!isJixiang && (result.principle || result.timing || result.risk || result.prevention)) {
+			result.method && `• 做法：${result.method}`,
+		]
+			.filter(Boolean)
+			.join("\n");
+	} else if (
+		!isJixiang &&
+		(result.principle || result.timing || result.risk || result.prevention)
+	) {
 		// Successfully parsed 凶象 structure
 		result.content = [
 			result.principle && `• 原理：${result.principle}`,
 			result.timing && `• 時機：${result.timing}`,
 			result.risk && `• 風險：${result.risk}`,
-			result.prevention && `• 預防：${result.prevention}`
-		].filter(Boolean).join('\n');
+			result.prevention && `• 預防：${result.prevention}`,
+		]
+			.filter(Boolean)
+			.join("\n");
 	}
-	
+
 	return result;
 }
 
@@ -782,7 +791,7 @@ function extractItems(content, type) {
 									const parsedItem = parseStructuredContent(
 										subTitle,
 										trimmedSet,
-										type === "吉象"
+										type === "吉象",
 									);
 									items.push(parsedItem);
 								}
@@ -792,7 +801,7 @@ function extractItems(content, type) {
 							const parsedItem = parseStructuredContent(
 								title,
 								cleanDescription,
-								type === "吉象"
+								type === "吉象",
 							);
 							items.push(parsedItem);
 						}
@@ -846,7 +855,7 @@ function extractItems(content, type) {
 						const parsedItem = parseStructuredContent(
 							title,
 							description.replace(/\*\*/g, "").trim(),
-							type === "吉象"
+							type === "吉象",
 						);
 						items.push(parsedItem);
 					}

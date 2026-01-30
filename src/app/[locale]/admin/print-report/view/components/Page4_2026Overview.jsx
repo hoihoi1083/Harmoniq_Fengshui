@@ -5,39 +5,48 @@ export default function Page4_2026Overview({ data }) {
 
 	// Extract year analysis - the API response is in aiAnalysis
 	const rawAnalysis = year?.aiAnalysis || "";
-	
+
 	// Parse sections from the raw API response (markdown format)
 	const parseGanzhiContent = (rawText) => {
-		if (!rawText) return { ganzhiEffect: '', practicalResults: '' };
-		
+		if (!rawText) return { ganzhiEffect: "", practicalResults: "" };
+
 		// Extract 【流年干支作用】 section (section 1)
-		const ganzhiMatch = rawText.match(/### 1\. 【流年干支作用】\s*([\s\S]*?)(?=### 2\.|### 【|$)/);
-		let ganzhiEffect = ganzhiMatch ? ganzhiMatch[1].trim() : '';
-		
+		const ganzhiMatch = rawText.match(
+			/### 1\. 【流年干支作用】\s*([\s\S]*?)(?=### 2\.|### 【|$)/,
+		);
+		let ganzhiEffect = ganzhiMatch ? ganzhiMatch[1].trim() : "";
+
 		// Extract 【流年實際表現】 special section (after section 3, before section 4)
-		const practicalMatch = rawText.match(/### 【流年實際表現】\s*([\s\S]*?)(?=### 4\.|$)/);
-		let practicalResults = practicalMatch ? practicalMatch[1].trim() : '';
-		
+		const practicalMatch = rawText.match(
+			/### 【流年實際表現】\s*([\s\S]*?)(?=### 4\.|$)/,
+		);
+		let practicalResults = practicalMatch ? practicalMatch[1].trim() : "";
+
 		// Remove AI instruction text
 		if (practicalResults) {
-			practicalResults = practicalResults.replace(/\*{0,2}重要[:：].*?必須包含具體生活場景示例。?\*{0,2}\s*/s, '');
+			practicalResults = practicalResults.replace(
+				/\*{0,2}重要[:：].*?必須包含具體生活場景示例。?\*{0,2}\s*/s,
+				"",
+			);
 		}
-		
+
 		// Clean up the content - remove markdown formatting but keep structure
 		const cleanContent = (text) => {
-			if (!text) return '';
-			return text
-				// Remove analysis prefix
-				.replace(/^分析2026年丙午對原局的整體作用[:：]\s*/m, '')
-				// Remove markdown bold
-				.replace(/\*\*/g, '')
-				// Keep line breaks for structure
-				.trim();
+			if (!text) return "";
+			return (
+				text
+					// Remove analysis prefix
+					.replace(/^分析2026年丙午對原局的整體作用[:：]\s*/m, "")
+					// Remove markdown bold
+					.replace(/\*\*/g, "")
+					// Keep line breaks for structure
+					.trim()
+			);
 		};
-		
+
 		return {
 			ganzhiEffect: cleanContent(ganzhiEffect),
-			practicalResults: cleanContent(practicalResults)
+			practicalResults: cleanContent(practicalResults),
 		};
 	};
 
