@@ -114,6 +114,15 @@ export default function AdminDashboard({ params }) {
 
 	const mainActions = [
 		{
+			title: "報告生成",
+			title_en: "Print Report",
+			description: "生成專業格式命理報告",
+			description_en: "Generate professional feng shui reports",
+			icon: TrendingUp,
+			href: "/admin/print-report",
+			color: "from-rose-500 to-pink-600",
+		},
+		{
 			title: "商店管理",
 			title_en: "Shop Management",
 			description: "管理所有產品與庫存",
@@ -249,7 +258,7 @@ export default function AdminDashboard({ params }) {
 					<h2 className="text-2xl font-bold text-slate-800 mb-6">
 						主要功能
 					</h2>
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
 						{mainActions.map((action, index) => (
 							<Link key={index} href={action.href}>
 								<Card

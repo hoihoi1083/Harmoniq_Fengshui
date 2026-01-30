@@ -221,7 +221,7 @@ ${
 		}
 
 		const data = await response.json();
-		const aiContent = data.choices?.[0]?.message?.content;
+		let aiContent = data.choices?.[0]?.message?.content;
 
 		if (!aiContent) {
 			return Response.json(
@@ -229,6 +229,16 @@ ${
 				{ status: 500 }
 			);
 		}
+
+		// Remove disclaimer text if present
+		aiContent = aiContent.replace(
+			/（以上分析僅基於傳統五行理論，提供生活化建議，實際決策請結合個人情況與專業財務顧問意見。）/g,
+			""
+		);
+		aiContent = aiContent.replace(
+			/\(以上分析仅基于传统五行理论，提供生活化建议，实际决策请结合个人情况与专业财务顾问意见。\)/g,
+			""
+		);
 
 		// Parse the AI response to extract structured data
 		const parsedContent = parseSeasonContent(

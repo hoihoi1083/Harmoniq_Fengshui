@@ -87,6 +87,8 @@ export async function POST(request) {
 
 		const userPrompt = `請基於以下完整的命理分析報告，為用戶生成一個2026年的人生總結：
 
+**用戶關注領域**：${concernType || '綜合運勢'}
+
 ${fullContext}
 
 ---
@@ -105,6 +107,10 @@ ${fullContext}
   "luckyColors": ["顏色1", "顏色2", "顏色3"],
   "luckyAccessories": ["配飾1", "配飾2", "配飾3"]
 }
+
+**特別注意**：
+- 用戶的主要關注領域是「${concernType || '綜合運勢'}」，請在總結中重點突出這個領域的分析
+- coreThemes的3個主題必須圍繞「${concernType || '綜合運勢'}」展開，其他領域僅作輔助說明
 
 **格式要求**：
 1. keyPhrase：必須8-12個字，概括全年核心特質（例：「穩中求進，蓄勢待發」）

@@ -6,9 +6,14 @@ import {
 	storeComponentData,
 } from "../utils/componentDataStore";
 import getWuxingData from "../lib/nayin";
+import { getConcernColor } from "../utils/colorTheme";
 
 // Print styles
 const printStyles = `
+	@page {
+		size: A4;
+		margin: 0mm;
+	}
 	@media print {
 		body { margin: 0; padding: 0; }
 		.no-print { display: none !important; }
@@ -90,7 +95,7 @@ const getAccurateBaziInfo = (birthDateTime, gender = "male") => {
 		let strength = "中等";
 		if (wuxingScale) {
 			const elementMatch = wuxingScale.match(
-				new RegExp(`${dayElement}:(\\d+\\.?\\d*)%`)
+				new RegExp(`${dayElement}:(\\d+\\.?\\d*)%`),
 			);
 			if (elementMatch) {
 				const percentage = parseFloat(elementMatch[1]);
@@ -326,7 +331,7 @@ function getTabImgColor(tab, concern, selected) {
 function isDayMasterBulletFormat(text) {
 	if (!text || typeof text !== "string") return false;
 	const headings = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"].every((h) =>
-		text.includes(h)
+		text.includes(h),
 	);
 	const bulletCount = (text.match(/•/g) || []).length;
 	const lengthOk = text.length >= 220 && text.length <= 700;
@@ -337,7 +342,7 @@ function isDayMasterBulletFormat(text) {
 async function generateMingJuAnalysis(
 	{ birthDateTime, gender, concern, problem, currentYear },
 	tab,
-	locale = "zh-TW"
+	locale = "zh-TW",
 ) {
 	const concernArea = concern || "財運";
 
@@ -350,14 +355,14 @@ async function generateMingJuAnalysis(
 			gender,
 			problem,
 		},
-		locale
+		locale,
 	);
 
 	// Try AI API multiple times for better reliability
 	for (let attempt = 1; attempt <= 3; attempt++) {
 		try {
 			console.log(
-				`AI Analysis Attempt ${attempt} for ${tab} - ${concernArea}`
+				`AI Analysis Attempt ${attempt} for ${tab} - ${concernArea}`,
 			);
 
 			// Call your AI API here (replace with your actual AI service)
@@ -386,7 +391,7 @@ async function generateMingJuAnalysis(
 					// For 日主特性, enforce bullet structure
 					if (data.content && isDayMasterBulletFormat(data.content)) {
 						console.log(
-							`AI Success on attempt ${attempt} for 日主特性`
+							`AI Success on attempt ${attempt} for 日主特性`,
 						);
 						return {
 							content: data.content,
@@ -399,10 +404,11 @@ async function generateMingJuAnalysis(
 							{
 								length: data.content?.length,
 								hasHeadings: ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"].map(
-									(h) => data.content?.includes(h)
+									(h) => data.content?.includes(h),
 								),
-								bulletCount: (data.content?.match(/•/g) || []).length,
-							}
+								bulletCount: (data.content?.match(/•/g) || [])
+									.length,
+							},
 						);
 					}
 				} else {
@@ -423,7 +429,7 @@ async function generateMingJuAnalysis(
 						if (hasOldFormat || hasNewFormat) {
 							// Ensure substantial content and proper structure
 							console.log(
-								`AI Success on attempt ${attempt} - Format: ${hasNewFormat ? "sections" : "keywords"}`
+								`AI Success on attempt ${attempt} - Format: ${hasNewFormat ? "sections" : "keywords"}`,
 							);
 							return {
 								content: JSON.stringify(aiData), // Return full JSON structure
@@ -438,13 +444,13 @@ async function generateMingJuAnalysis(
 									hasKeywords: !!aiData.keywords,
 									hasSections: !!aiData.sections,
 									sectionsLength: aiData.sections?.length,
-								}
+								},
 							);
 						}
 					} catch (parseError) {
 						console.error(
 							`JSON parse error on attempt ${attempt}:`,
-							parseError
+							parseError,
 						);
 						console.log("Raw content:", data.content);
 					}
@@ -452,7 +458,7 @@ async function generateMingJuAnalysis(
 			} else {
 				console.log(
 					`AI API failed on attempt ${attempt}:`,
-					response.status
+					response.status,
 				);
 			}
 		} catch (error) {
@@ -502,7 +508,7 @@ function generatePersonalizedContent(concernArea, tab, userInfo) {
 	const lifeStage = isYoung ? "青年" : isMidAge ? "中年" : "長者";
 
 	console.log(
-		`Gender mapping: input="${gender}" -> output="${genderRef}", age=${age}, lifeStage="${lifeStage}"`
+		`Gender mapping: input="${gender}" -> output="${genderRef}", age=${age}, lifeStage="${lifeStage}"`,
 	);
 
 	if (tab === "日主特性") {
@@ -511,7 +517,7 @@ function generatePersonalizedContent(concernArea, tab, userInfo) {
 			genderRef,
 			lifeStage,
 			problem,
-			birthDateTime
+			birthDateTime,
 		);
 	} else if (tab === "middle") {
 		return generatePersonalizedMiddle(
@@ -519,7 +525,7 @@ function generatePersonalizedContent(concernArea, tab, userInfo) {
 			genderRef,
 			lifeStage,
 			problem,
-			birthDateTime
+			birthDateTime,
 		);
 	} else if (tab === "right") {
 		return generatePersonalizedRight(
@@ -527,7 +533,7 @@ function generatePersonalizedContent(concernArea, tab, userInfo) {
 			genderRef,
 			lifeStage,
 			problem,
-			birthDateTime
+			birthDateTime,
 		);
 	}
 
@@ -540,7 +546,7 @@ function generatePersonalizedDayMaster(
 	gender,
 	lifeStage,
 	problem,
-	birthDateTime
+	birthDateTime,
 ) {
 	// Get accurate BaZi data using nayin.js instead of hardcoded year lookup
 	const baziInfo = getAccurateBaziInfo(birthDateTime, gender);
@@ -654,56 +660,56 @@ function generatePersonalizedDayMaster(
 		baziInfo.strength === "偏強"
 			? "主導力強，可快速落地"
 			: baziInfo.strength === "偏弱"
-			? "親和度高，善於協作"
-			: "收放得宜，節奏穩定";
+				? "親和度高，善於協作"
+				: "收放得宜，節奏穩定";
 
 	const strengthWeak =
 		baziInfo.strength === "偏強"
 			? "易剛硬固執，需放柔"
 			: baziInfo.strength === "偏弱"
-			? "易信心不足，需助力"
-			: "決斷偏緩，需定節奏";
+				? "易信心不足，需助力"
+				: "決斷偏緩，需定節奏";
 
 	const stageWeak =
 		lifeStage === "青年"
 			? "經驗尚淺，需導師指引"
 			: lifeStage === "中年"
-			? "責任繁重，需分配資源"
-			: "體力漸減，需養生保能";
+				? "責任繁重，需分配資源"
+				: "體力漸減，需養生保能";
 
 	const strategyNeed = `用${baziInfo.lucky || "水木"}調候，平衡剛柔`;
 	const strategyDo =
 		normalizeConcern(concern) === "財運"
 			? "專注現金流，設定止損"
 			: normalizeConcern(concern) === "事業"
-			? "穩推核心專案，強化協作"
-			: normalizeConcern(concern) === "健康"
-			? "規律作息，溫養脾胃肺腎"
-			: normalizeConcern(concern) === "感情"
-			? "放慢節奏傾聽，真誠溝通"
-			: "明確重點，穩步累積";
+				? "穩推核心專案，強化協作"
+				: normalizeConcern(concern) === "健康"
+					? "規律作息，溫養脾胃肺腎"
+					: normalizeConcern(concern) === "感情"
+						? "放慢節奏傾聽，真誠溝通"
+						: "明確重點，穩步累積";
 
 	const shortTerm =
 		normalizeConcern(concern) === "財運"
 			? "近期以本業收益為主，少投機"
 			: normalizeConcern(concern) === "事業"
-			? "3-6月聚焦核心成果，減少分心"
-			: normalizeConcern(concern) === "健康"
-			? "本季落實作息與運動，減少熬夜"
-			: normalizeConcern(concern) === "感情"
-			? "保持單線溝通，避免多頭並進"
-			: "先穩基本盤，再逐步拓展";
+				? "3-6月聚焦核心成果，減少分心"
+				: normalizeConcern(concern) === "健康"
+					? "本季落實作息與運動，減少熬夜"
+					: normalizeConcern(concern) === "感情"
+						? "保持單線溝通，避免多頭並進"
+						: "先穩基本盤，再逐步拓展";
 
 	const longTerm =
 		normalizeConcern(concern) === "財運"
 			? "建立定投與現金儲備，分散風險"
 			: normalizeConcern(concern) === "事業"
-			? "培養可複製的專業力與人脈護城河"
-			: normalizeConcern(concern) === "健康"
-			? "每年健檢調整方案，四季分段調養"
-			: normalizeConcern(concern) === "感情"
-			? "穩定陪伴與共識累積，重視邊界"
-			: "每年檢視目標，循序升級";
+				? "培養可複製的專業力與人脈護城河"
+				: normalizeConcern(concern) === "健康"
+					? "每年健檢調整方案，四季分段調養"
+					: normalizeConcern(concern) === "感情"
+						? "穩定陪伴與共識累積，重視邊界"
+						: "每年檢視目標，循序升級";
 
 	return `【${concern}分析】
 
@@ -734,7 +740,7 @@ function generatePersonalizedMiddle(
 	gender,
 	lifeStage,
 	problem,
-	birthDateTime
+	birthDateTime,
 ) {
 	// Get accurate BaZi data using nayin.js instead of hardcoded year lookup
 	const baziInfo = getAccurateBaziInfo(birthDateTime, gender);
@@ -838,7 +844,7 @@ function generatePersonalizedRight(
 	gender,
 	lifeStage,
 	problem,
-	birthDateTime
+	birthDateTime,
 ) {
 	// Get accurate BaZi data using nayin.js instead of hardcoded year lookup
 	const baziInfo = getAccurateBaziInfo(birthDateTime, gender);
@@ -1372,7 +1378,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 		borderRadius: "20px",
 		boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
 		padding: "20px",
-		marginBottom: "16px",
+		marginBottom: "40px",
 	};
 
 	// Color schemes per concern
@@ -1413,7 +1419,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 				"starts with {:",
 				typeof aiContent === "string"
 					? aiContent.trim().startsWith("{")
-					: false
+					: false,
 			);
 		}
 	} catch (error) {
@@ -1421,7 +1427,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 			"❌ Failed to parse JSON:",
 			error.message,
 			"Content:",
-			aiContent?.substring(0, 200)
+			aiContent?.substring(0, 200),
 		);
 	}
 
@@ -1452,7 +1458,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 												<li key={pointIndex}>
 													{point}
 												</li>
-											)
+											),
 										)}
 									</ul>
 								)}
@@ -1477,7 +1483,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 													{highlight.description}
 												</p>
 											</div>
-										)
+										),
 									)}
 
 								{/* Render interactions if available */}
@@ -1499,7 +1505,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 													</span>
 													<span>{interaction}</span>
 												</div>
-											)
+											),
 										)}
 									</div>
 								)}
@@ -1633,7 +1639,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 						{titles.third}
 					</div>
 					<div className="leading-relaxed text-gray-800">
-						<p style={{ fontSize: "15px", lineHeight: "1.6" }}>
+						<p style={{ fontSize: "15px", lineHeight: "1.8" }}>
 							{parsedContent.analysis}
 						</p>
 					</div>
@@ -1648,7 +1654,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 		return renderStructuredFallbackMiddle(
 			concernArea,
 			colors,
-			containerStyle
+			containerStyle,
 		);
 	}
 
@@ -1657,7 +1663,7 @@ function renderStructuredContent(concernArea, tab, aiContent) {
 		return renderStructuredFallbackRight(
 			concernArea,
 			colors,
-			containerStyle
+			containerStyle,
 		);
 	}
 
@@ -2820,7 +2826,7 @@ function getFallbackContent(concernArea, tab) {
 	return "分析內容生成中...";
 }
 
-export function MingJu({ userInfo, currentYear }) {
+export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 	const locale = useLocale();
 	const t = useTranslations("fengShuiReport.components.mingJu");
 	const [contentCache, setContentCache] = useState({}); // Cache for storing loaded content
@@ -2838,31 +2844,48 @@ export function MingJu({ userInfo, currentYear }) {
 		setAllTabsLoaded(false);
 	}, [userInfo.birthDateTime, userInfo.concern]);
 
-
 	// Preload content for all tabs when component mounts or user info changes
 	useEffect(() => {
 		async function preloadAllTabs() {
+			// Log print mode status
+			if (isPrintMode) {
+				console.log("🖨️ Print mode detected - loading MingJu content for print");
+			}
 			console.log("🚀 Starting preload for all tabs...");
 
 			// Check if historical data exists in component data store
 			const existingMingJuData = getComponentData("mingJuAnalysis");
 			if (existingMingJuData) {
-				console.log("📖 MingJu using existing data from component store");
+				console.log(
+					"📖 MingJu using existing data from component store",
+				);
 
 				// Pre-populate cache with existing data
 				const newContentCache = {};
 				TABS.forEach((tab) => {
 					if (existingMingJuData[tab]?.content) {
-						const cacheKey = getCacheKey(tab, userInfo, currentYear);
-						newContentCache[cacheKey] = existingMingJuData[tab].content;
+						const cacheKey = getCacheKey(
+							tab,
+							userInfo,
+							currentYear,
+						);
+						newContentCache[cacheKey] =
+							existingMingJuData[tab].content;
 						console.log(`📋 Loaded existing content for ${tab}`);
 					}
 				});
 
 				if (Object.keys(newContentCache).length > 0) {
 					setContentCache(newContentCache);
-					setAllTabsLoaded(true);
-					return;
+					// Only set allTabsLoaded to true if ALL tabs are present
+					const allTabsPresent = TABS.every(
+						(tab) => existingMingJuData[tab]?.content,
+					);
+					if (allTabsPresent) {
+						setAllTabsLoaded(true);
+						return;
+					}
+					// If some tabs are missing, continue to load them
 				}
 			}
 
@@ -2880,11 +2903,13 @@ export function MingJu({ userInfo, currentYear }) {
 				console.log(`⏳ Preloading content for ${tab}`);
 
 				try {
-					console.log(`🤖 Calling generateMingJuAnalysis for ${tab}...`);
+					console.log(
+						`🤖 Calling generateMingJuAnalysis for ${tab}...`,
+					);
 					const result = await generateMingJuAnalysis(
 						{ ...userInfo, currentYear },
 						tab,
-						locale
+						locale,
 					);
 
 					// Cache the content
@@ -2895,7 +2920,8 @@ export function MingJu({ userInfo, currentYear }) {
 
 					// Store successful content in global data store
 					if (result.content && typeof window !== "undefined") {
-						window.componentDataStore = window.componentDataStore || {};
+						window.componentDataStore =
+							window.componentDataStore || {};
 						if (!window.componentDataStore.mingJuAnalysis) {
 							window.componentDataStore.mingJuAnalysis = {};
 						}
@@ -2904,7 +2930,9 @@ export function MingJu({ userInfo, currentYear }) {
 							isAI: result.isAI,
 							timestamp: new Date().toISOString(),
 						};
-						console.log(`📊 Stored MingJu data for ${tab}: SUCCESS`);
+						console.log(
+							`📊 Stored MingJu data for ${tab}: SUCCESS`,
+						);
 					}
 
 					console.log(`✅ Preloaded content for ${tab}`);
@@ -2925,41 +2953,63 @@ export function MingJu({ userInfo, currentYear }) {
 		}
 
 		preloadAllTabs();
-	}, [userInfo, currentYear]);
+	}, [userInfo, currentYear, isPrintMode]);
 
 	// Helper function to parse and render JSON content for print
 	const renderPrintJSON = (content) => {
-		if (!content || typeof content !== 'string') return null;
-		
+		if (!content || typeof content !== "string") return null;
+
 		try {
 			const parsed = JSON.parse(content);
-			
+
 			// Handle sections format (middle tab)
 			if (parsed.sections) {
 				return parsed.sections.map((section, idx) => (
-					<div key={idx} style={{ marginBottom: "20px" }}>
-						<h3 style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "10px", color: "#333" }}>
+					<div key={idx} style={{ marginBottom: "40px" }}>
+						<h3
+							style={{
+								fontSize: "15px",
+								fontWeight: "bold",
+								marginBottom: "40px",
+								color: "#333",
+							}}
+						>
 							{section.title}
 						</h3>
-						<p style={{ marginBottom: "10px", lineHeight: "1.8" }}>
+						<p style={{ marginBottom: "40px", lineHeight: "1.8" }}>
 							{section.content}
 						</p>
-						{section.interactions && section.interactions.map((interaction, iIdx) => (
-							<p key={iIdx} style={{ marginLeft: "15px", marginBottom: "8px", lineHeight: "1.8" }}>
-								• {interaction}
-							</p>
-						))}
+						{section.interactions &&
+							section.interactions.map((interaction, iIdx) => (
+								<p
+									key={iIdx}
+									style={{
+										marginLeft: "15px",
+										marginBottom: "24px",
+										lineHeight: "1.8",
+									}}
+								>
+									• {interaction}
+								</p>
+							))}
 					</div>
 				));
 			}
-			
+
 			// Handle keywords format (right tab)
 			if (parsed.keywords) {
 				return (
 					<>
 						{parsed.keywords.map((keyword, idx) => (
 							<div key={idx} style={{ marginBottom: "15px" }}>
-								<h4 style={{ fontSize: "15px", fontWeight: "bold", marginBottom: "5px", color: "#333" }}>
+								<h4
+									style={{
+										fontSize: "15px",
+										fontWeight: "bold",
+										marginBottom: "5px",
+										color: "#333",
+									}}
+								>
 									{keyword.text}
 								</h4>
 								<p style={{ lineHeight: "1.8" }}>
@@ -2968,7 +3018,14 @@ export function MingJu({ userInfo, currentYear }) {
 							</div>
 						))}
 						{parsed.analysis && (
-							<div style={{ marginTop: "20px", padding: "15px", backgroundColor: "#f5f5f5", borderRadius: "8px" }}>
+							<div
+								style={{
+									marginTop: "48px",
+									padding: "15px",
+									backgroundColor: "#f5f5f5",
+									borderRadius: "8px",
+								}}
+							>
 								<p style={{ lineHeight: "1.8" }}>
 									{parsed.analysis}
 								</p>
@@ -2977,7 +3034,7 @@ export function MingJu({ userInfo, currentYear }) {
 					</>
 				);
 			}
-			
+
 			return null;
 		} catch (e) {
 			// If not JSON, return as plain text
@@ -2990,85 +3047,774 @@ export function MingJu({ userInfo, currentYear }) {
 		// Get colors based on concern type
 		const getHeaderColor = (tab) => {
 			if (tab === "日主特性") return "#B4003C";
-			if (tab === "middle") return getTabConfig(concern).middle.selectedBg;
+			if (tab === "middle")
+				return getTabConfig(concern).middle.selectedBg;
 			if (tab === "right") return getTabConfig(concern).right.selectedBg;
 			return "#B4003C";
 		};
 
+		// Custom print layout for admin reports
+		if (isPrintMode) {
+			const concernColor = getConcernColor(concern);
+
+			// Debug logging
+			console.log("🖨️ Print mode - contentCache:", contentCache);
+			console.log("🖨️ Print mode - userInfo:", userInfo);
+			console.log("🖨️ Print mode - allTabsLoaded:", allTabsLoaded);
+
+			let rightContent =
+				contentCache[getCacheKey("right", userInfo, currentYear)] ||
+				"內容載入中...";
+			const middleContent =
+				contentCache[getCacheKey("middle", userInfo, currentYear)] ||
+				"內容載入中...";
+			const leftContent =
+				contentCache[getCacheKey("日主特性", userInfo, currentYear)] ||
+				"內容載入中...";
+			let extractedSummary = "";
+
+			console.log("🔍 RAW rightContent:", rightContent);
+			console.log("🔍 RAW rightContent type:", typeof rightContent);
+			console.log("🔍 RAW rightContent length:", rightContent?.length);
+
+			// Parse rightContent if it's JSON format
+			if (
+				typeof rightContent === "string" &&
+				rightContent.startsWith("{")
+			) {
+				try {
+					const parsed = JSON.parse(rightContent);
+					if (parsed.keywords && Array.isArray(parsed.keywords)) {
+						// Use ALL keywords as sections (not extracting last one as summary)
+						// Convert all keywords to text format
+						rightContent = parsed.keywords
+							.map((kw) => `${kw.text}\n${kw.description}`)
+							.join("\n\n");
+
+						// Use the 'analysis' field as summary if available
+						if (parsed.analysis) {
+							extractedSummary = parsed.analysis;
+							console.log(
+								"✅ Using 'analysis' field as summary, length:",
+								parsed.analysis.length,
+							);
+						}
+					}
+				} catch (e) {
+					console.error("Failed to parse rightContent JSON:", e);
+				}
+			}
+			console.log("🖨️ leftContent:", leftContent?.substring(0, 100));
+
+			// Get BaZi info for display
+			const baziInfo = getAccurateBaziInfo(
+				userInfo?.birthDateTime,
+				userInfo?.gender,
+			);
+
+			// Parse rightContent into sections and summary
+			const parseRightContent = (content) => {
+				if (typeof content !== "string")
+					return { sections: [], summary: "" };
+				const parts = content.split("\n\n").filter((p) => p.trim());
+				const sections = [];
+				let summary = "";
+
+				for (let i = 0; i < parts.length; i++) {
+					const part = parts[i];
+					const lines = part.split("\n");
+
+					// Check if this looks like a section with a title
+					if (lines.length >= 2) {
+						const title = lines[0].trim();
+						const text = lines.slice(1).join("\n").trim();
+
+						// Add all sections (don't treat last one as summary)
+						if (title && text) {
+							sections.push({ title, content: text });
+						}
+					}
+				}
+
+				console.log(
+					"📋 Parsed sections:",
+					sections.length,
+					sections.map((s) => s.title),
+				);
+
+				return { sections };
+			};
+
+			const { sections } = parseRightContent(
+				typeof rightContent === "string" ? rightContent : "",
+			);
+			const summary = extractedSummary; // Use extracted summary from JSON
+
+			console.log("📋 Final sections count:", sections.length);
+			console.log("📋 Final summary length:", summary?.length || 0);
+
+			return (
+				<>
+					{/* Page 2: 日主特性 */}
+					<div
+						style={{
+							width: "210mm",
+							minHeight: "297mm",
+							padding: "20mm 3mm 20mm 3mm",
+							position: "relative",
+							pageBreakAfter: "always",
+						}}
+					>
+						{/* Date */}
+						<div
+							style={{
+								position: "absolute",
+								top: "16px",
+								right: "16px",
+								color: "#666",
+							}}
+						>
+							{new Date()
+								.toLocaleDateString("zh-TW")
+								.replace(/\//g, "/")}
+						</div>
+
+						{/* Vertical Title */}
+						<div
+							style={{
+								display: "flex",
+								gap: "32px",
+								marginBottom: "40px",
+							}}
+						>
+							<div style={{ display: "flex", gap: "0px" }}>
+								{/* First Column: 日主 */}
+								<div style={{ writingMode: "vertical-rl" }}>
+									<span
+										style={{
+											fontSize: "60px",
+											fontWeight: "bold",
+											color: "#666",
+											letterSpacing: "0",
+										}}
+									>
+										日
+									</span>
+									<span
+										style={{
+											fontSize: "60px",
+											fontWeight: "bold",
+											color: "#666",
+											letterSpacing: "0",
+										}}
+									>
+										主
+									</span>
+								</div>
+								{/* Second Column: 特性 */}
+								<div style={{ writingMode: "vertical-rl" }}>
+									<span
+										style={{
+											fontSize: "60px",
+											fontWeight: "bold",
+											color: concernColor,
+											letterSpacing: "0",
+										}}
+									>
+										特
+									</span>
+									<span
+										style={{
+											fontSize: "60px",
+											fontWeight: "bold",
+											color: concernColor,
+											letterSpacing: "0",
+										}}
+									>
+										性
+									</span>
+								</div>
+							</div>
+
+							<div style={{ flex: 1 }}>
+								<div
+									style={{
+										fontSize: "15px",
+										fontWeight: "bold",
+										marginBottom: "24px",
+										lineHeight: "1.8",
+									}}
+								>
+									{baziInfo?.dayMaster}
+									{baziInfo?.strength}，{baziInfo?.element}
+									，例：{baziInfo?.characteristics}
+								</div>
+							</div>
+						</div>
+
+						{/* Parse leftContent into sections */}
+						{(() => {
+							// Parse the leftContent to extract sections
+							const parseSections = (content) => {
+								if (!content || content === "內容載入中...")
+									return {
+										characteristics: [],
+										sections: [],
+									};
+
+								// Split by emoji numbers to get sections
+								const sectionRegex = /[1-5]️⃣\s*([^\n]+)/g;
+								const allSections = [];
+								let match;
+
+								while (
+									(match = sectionRegex.exec(content)) !==
+									null
+								) {
+									allSections.push({
+										title: match[1].trim(),
+										startIndex:
+											match.index + match[0].length,
+									});
+								}
+
+								// Extract content for each section
+								const sectionsWithContent = allSections.map(
+									(section, idx) => {
+										const endIndex =
+											idx < allSections.length - 1
+												? allSections[idx + 1]
+														.startIndex -
+													allSections[idx + 1].title
+														.length -
+													3
+												: content.length;
+										const sectionContent =
+											content.substring(
+												section.startIndex,
+												endIndex,
+											);
+
+										// Extract bullet points
+										const bullets = sectionContent
+											.split("\n")
+											.map((line) => line.trim())
+											.filter((line) =>
+												line.startsWith("•"),
+											)
+											.map((line) =>
+												line
+													.replace(/^\s*•\s*/, "")
+													.trim(),
+											);
+
+										return {
+											title: section.title,
+											content: bullets,
+										};
+									},
+								);
+
+								// First section is characteristics (日主特質)
+								const characteristics =
+									sectionsWithContent.length > 0
+										? sectionsWithContent[0].content
+										: [];
+								// Rest are the 4 sections
+								const sections = sectionsWithContent.slice(1);
+
+								return { characteristics, sections };
+							};
+
+							const { characteristics, sections } =
+								parseSections(leftContent);
+
+							return (
+								<>
+									{/* Characteristics section - bullets from 日主特質 */}
+									{characteristics.length > 0 && (
+										<div
+											style={{
+												fontSize: "15px",
+												lineHeight: "1.8",
+												marginBottom: "40px",
+											}}
+										>
+											{characteristics.map(
+												(point, idx) => (
+													<div
+														key={idx}
+														style={{
+															marginBottom: "4px",
+														}}
+													>
+														• {point}
+													</div>
+												),
+											)}
+										</div>
+									)}
+
+									{/* Four sections in two-column grid */}
+									{sections.length > 0 && (
+										<div
+											style={{
+												display: "grid",
+												gridTemplateColumns: "1fr 1fr",
+												gap: "40px 48px",
+												marginTop: "28px",
+											}}
+										>
+											{sections.map((section, index) => (
+												<div key={index}>
+													<h3
+														style={{
+															fontSize: "18px",
+															fontWeight: "bold",
+															color: concernColor,
+															marginBottom:
+																"24px",
+														}}
+													>
+														{String(
+															index + 1,
+														).padStart(2, "0")}{" "}
+														{section.title}
+													</h3>
+													<div
+														style={{
+															fontSize: "13px",
+															lineHeight: "1.7",
+														}}
+													>
+														{section.content.map(
+															(point, idx) => (
+																<div
+																	key={idx}
+																	style={{
+																		marginBottom:
+																			"4px",
+																	}}
+																>
+																	• {point}
+																</div>
+															),
+														)}
+													</div>
+												</div>
+											))}
+										</div>
+									)}
+								</>
+							);
+						})()}
+
+						{/* Middle Tab Section */}
+						<div style={{ marginTop: "48px" }}>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "flex-start",
+									gap: "32px",
+									marginBottom: "40px",
+								}}
+							>
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										alignItems: "center",
+										gap: "3px",
+									}}
+								>
+									<h2
+										style={{
+											fontSize: "22px",
+											fontWeight: "bold",
+											color: concernColor,
+											letterSpacing: "0",
+										}}
+									>
+										{
+											getTabLabel(
+												"middle",
+												concern,
+												t,
+											).split("與")[0]
+										}
+									</h2>
+									<h2
+										style={{
+											fontSize: "22px",
+											fontWeight: "bold",
+											color: concernColor,
+										}}
+									>
+										&
+									</h2>
+									<h2
+										style={{
+											fontSize: "22px",
+											fontWeight: "bold",
+											color: concernColor,
+											letterSpacing: "0",
+										}}
+									>
+										十神
+									</h2>
+								</div>
+								<div style={{ flex: 1, paddingTop: "24px" }}>
+									<div
+										style={{
+											height: "3px",
+											backgroundColor: concernColor,
+											width: "80px",
+											marginBottom: "24px",
+										}}
+									></div>
+									<div
+										style={{
+											fontSize: "15px",
+											lineHeight: "1.8",
+										}}
+									>
+										{renderPrintJSON(middleContent)}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Footer */}
+						<div
+							style={{
+								position: "absolute",
+								bottom: "16px",
+								left: 0,
+								right: 0,
+								textAlign: "center",
+								color: "#999",
+								fontSize: "15px",
+							}}
+						>
+							HarmoniQ Bell
+						</div>
+					</div>
+
+					{/* Page 3: 財星定位 with sections and 總結 */}
+					<div
+						style={{
+							width: "210mm",
+							minHeight: "297mm",
+							padding: "20mm 3mm 20mm 3mm",
+							position: "relative",
+						}}
+					>
+						{/* Date */}
+						<div
+							style={{
+								position: "absolute",
+								top: "16px",
+								right: "16px",
+								color: "#666",
+							}}
+						>
+							{new Date()
+								.toLocaleDateString("zh-TW")
+								.replace(/\//g, "/")}
+						</div>
+
+						{/* Vertical Title - Two Columns */}
+						<div
+							style={{
+								display: "flex",
+								gap: "32px",
+								marginBottom: "24px",
+							}}
+						>
+							<div style={{ display: "flex", gap: "0px" }}>
+								{/* First Column: 財星 */}
+								<div style={{ writingMode: "vertical-rl" }}>
+									<span
+										style={{
+											fontSize: "60px",
+											fontWeight: "bold",
+											color: concernColor,
+											letterSpacing: "0",
+										}}
+									>
+										{getTabLabel(
+											"right",
+											concern,
+											t,
+										).charAt(0)}
+									</span>
+									<span
+										style={{
+											fontSize: "60px",
+											fontWeight: "bold",
+											color: concernColor,
+											letterSpacing: "0",
+										}}
+									>
+										{getTabLabel(
+											"right",
+											concern,
+											t,
+										).charAt(1)}
+									</span>
+								</div>
+								{/* Second Column: 定位 */}
+								<div style={{ writingMode: "vertical-rl" }}>
+									<span
+										style={{
+											fontSize: "60px",
+											fontWeight: "bold",
+											color: concernColor,
+											letterSpacing: "0",
+										}}
+									>
+										定
+									</span>
+									<span
+										style={{
+											fontSize: "60px",
+											fontWeight: "bold",
+											color: concernColor,
+											letterSpacing: "0",
+										}}
+									>
+										位
+									</span>
+								</div>
+							</div>
+
+							{/* Description */}
+							<div style={{ flex: 1 }}>
+								<div
+									style={{
+										fontSize: "18px",
+										lineHeight: "1.8",
+										marginBottom: "20px",
+									}}
+								>
+									甚麼是
+									{getTabLabel("right", concern, t).substring(
+										0,
+										2,
+									)}
+									甚麼是
+									{getTabLabel("right", concern, t).substring(
+										0,
+										2,
+									)}
+									甚麼是
+									{getTabLabel("right", concern, t).substring(
+										0,
+										2,
+									)}
+									甚麼是
+									{getTabLabel("right", concern, t).substring(
+										0,
+										2,
+									)}
+									甚麼是
+									{getTabLabel("right", concern, t).substring(
+										0,
+										2,
+									)}
+									。
+								</div>
+							</div>
+						</div>
+
+						{/* Content Sections in Two Columns */}
+						<div
+							style={{
+								display: "grid",
+								gridTemplateColumns: "1fr 1fr",
+								gap: "24px",
+								marginBottom: "24px",
+							}}
+						>
+							{sections.map((section, index) => (
+								<div key={index}>
+									<h3
+										style={{
+											fontSize: "18px",
+											fontWeight: "bold",
+											color: concernColor,
+											marginBottom: "8px",
+										}}
+									>
+										{section.title}
+									</h3>
+									<p
+										style={{
+											fontSize: "15px",
+											lineHeight: "1.8",
+											textAlign: "justify",
+										}}
+									>
+										{section.content}
+									</p>
+								</div>
+							))}
+						</div>
+
+						{/* 總結 Section */}
+						<div style={{ marginTop: "16px" }}>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "flex-start",
+									gap: "10px",
+									marginBottom: "8px",
+								}}
+							>
+								<h2
+									style={{
+										fontSize: "40px",
+										fontWeight: "bold",
+										color: "#666",
+										whiteSpace: "nowrap",
+									}}
+								>
+									總結
+								</h2>
+								<div style={{ flex: 1, paddingTop: "14px" }}>
+									<div
+										style={{
+											height: "3px",
+											backgroundColor: concernColor,
+											width: "70px",
+										}}
+									></div>
+								</div>
+							</div>
+							<p
+								style={{
+									fontSize: "15px",
+									lineHeight: "1.8",
+									textAlign: "justify",
+								}}
+							>
+								{summary}
+							</p>
+						</div>
+
+						{/* Footer */}
+						<div
+							style={{
+								marginTop: "16px",
+								textAlign: "center",
+								color: "#999",
+								fontSize: "10px",
+							}}
+						>
+							HarmoniQ Bell
+						</div>
+					</div>
+				</>
+			);
+		}
+
+		// Default print layout
 		return (
 			<div
 				style={{
 					padding: "20px",
 					fontFamily: "system-ui, -apple-system, sans-serif",
-					lineHeight: "1.6",
+					lineHeight: "1.8",
 					color: "#000",
 					backgroundColor: "#fff",
 				}}
 			>
 				{/* 日主特性 */}
 				<div style={{ marginBottom: "30px", pageBreakInside: "avoid" }}>
-					<h2 style={{ 
-						fontSize: "clamp(1.5rem, 4vw, 2rem)", 
-						marginBottom: "20px", 
-						fontWeight: "800",
-						color: getHeaderColor("日主特性"),
-						fontFamily: "Noto Serif TC, serif",
-					}}>
+					<h2
+						style={{
+							fontSize: "clamp(1.75rem, 5vw, 2.5rem)",
+							marginBottom: "40px",
+							fontWeight: "800",
+							color: getHeaderColor("日主特性"),
+							fontFamily: "Noto Serif TC, serif",
+						}}
+					>
 						{getTabLabel("日主特性", concern, t)}
 					</h2>
-					<div style={{ 
-						whiteSpace: "pre-wrap", 
-						fontSize: "clamp(0.875rem, 2.5vw, 1rem)", 
-						lineHeight: "1.8",
-						backgroundColor: "white",
-						padding: "20px",
-						borderRadius: "12px",
-					}}>
-						{contentCache[getCacheKey("日主特性", userInfo, currentYear)] || "內容載入中..."}
+					<div
+						style={{
+							whiteSpace: "pre-wrap",
+							fontSize: "clamp(1rem, 3vw, 1.125rem)",
+							lineHeight: "1.8",
+							backgroundColor: "white",
+							padding: "20px",
+							borderRadius: "12px",
+						}}
+					>
+						{contentCache[
+							getCacheKey("日主特性", userInfo, currentYear)
+						] || "內容載入中..."}
 					</div>
 				</div>
 
 				{/* Middle Tab */}
 				<div style={{ marginBottom: "30px", pageBreakInside: "avoid" }}>
-					<h2 style={{ 
-						fontSize: "clamp(1.5rem, 4vw, 2rem)", 
-						marginBottom: "20px", 
-						fontWeight: "800",
-						color: getHeaderColor("middle"),
-						fontFamily: "Noto Serif TC, serif",
-					}}>
+					<h2
+						style={{
+							fontSize: "clamp(1.75rem, 5vw, 2.5rem)",
+							marginBottom: "40px",
+							fontWeight: "800",
+							color: getHeaderColor("middle"),
+							fontFamily: "Noto Serif TC, serif",
+						}}
+					>
 						{getTabLabel("middle", concern, t)}
 					</h2>
-					<div style={{ 
-						fontSize: "clamp(0.875rem, 2.5vw, 1rem)", 
-						lineHeight: "1.8",
-						backgroundColor: "white",
-						padding: "20px",
-						borderRadius: "12px",
-					}}>
-						{renderPrintJSON(contentCache[getCacheKey("middle", userInfo, currentYear)]) || "內容載入中..."}
+					<div
+						style={{
+							fontSize: "clamp(1rem, 3vw, 1.125rem)",
+							lineHeight: "1.8",
+							backgroundColor: "white",
+							padding: "20px",
+							borderRadius: "12px",
+						}}
+					>
+						{renderPrintJSON(
+							contentCache[
+								getCacheKey("middle", userInfo, currentYear)
+							],
+						) || "內容載入中..."}
 					</div>
 				</div>
 
 				{/* Right Tab */}
 				<div style={{ marginBottom: "30px", pageBreakInside: "avoid" }}>
-					<h2 style={{ 
-						fontSize: "clamp(1.5rem, 4vw, 2rem)", 
-						marginBottom: "20px", 
-						fontWeight: "800",
-						color: getHeaderColor("right"),
-						fontFamily: "Noto Serif TC, serif",
-					}}>
+					<h2
+						style={{
+							fontSize: "clamp(1.75rem, 5vw, 2.5rem)",
+							marginBottom: "40px",
+							fontWeight: "800",
+							color: getHeaderColor("right"),
+							fontFamily: "Noto Serif TC, serif",
+						}}
+					>
 						{getTabLabel("right", concern, t)}
 					</h2>
-					<div style={{ 
-						fontSize: "clamp(0.875rem, 2.5vw, 1rem)", 
-						lineHeight: "1.8",
-						backgroundColor: "white",
-						padding: "20px",
-						borderRadius: "12px",
-					}}>
-						{renderPrintJSON(contentCache[getCacheKey("right", userInfo, currentYear)]) || "內容載入中..."}
+					<div
+						style={{
+							fontSize: "clamp(1rem, 3vw, 1.125rem)",
+							lineHeight: "1.8",
+							backgroundColor: "white",
+							padding: "20px",
+							borderRadius: "12px",
+						}}
+					>
+						{renderPrintJSON(
+							contentCache[
+								getCacheKey("right", userInfo, currentYear)
+							],
+						) || "內容載入中..."}
 					</div>
 				</div>
 			</div>
@@ -3082,3 +3828,5 @@ export function MingJu({ userInfo, currentYear }) {
 		</>
 	);
 }
+
+export default MingJu;

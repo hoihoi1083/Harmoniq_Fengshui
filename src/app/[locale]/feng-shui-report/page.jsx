@@ -1154,7 +1154,7 @@ export default function FengShuiReportPage() {
 							/>
 						</div>
 					)}
-					<div className="mb-6 sm:mb-8 ml-0 md:ml-[5%] print-no-break print-page-break-before">
+					<div className="mb-6 sm:mb-8 ml-0 md:ml-[5%] print-no-break">
 						<h1
 							className="mb-2 font-extrabold text-center md:text-left"
 							style={{

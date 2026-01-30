@@ -124,7 +124,7 @@ export default function QuestionFocusSimple({ userInfo }) {
 			>
 				<div className="mb-4">
 					<h2
-						className="mb-2 text-xl font-bold sm:text-2xl"
+						className="mb-2 text-2xl font-bold sm:text-3xl"
 						style={{ color: themeColor }}
 					>
 						疑問重點

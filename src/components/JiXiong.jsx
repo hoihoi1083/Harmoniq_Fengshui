@@ -37,7 +37,7 @@ const JiXiong = memo(function JiXiong({
 					window.componentDataStore?.jiXiongAnalysis
 				) {
 					console.log(
-						"📖 Using existing JiXiong data from component store"
+						"📖 Using existing JiXiong data from component store",
 					);
 					setAnalysisData(window.componentDataStore.jiXiongAnalysis);
 					setIsLoading(false);
@@ -106,7 +106,7 @@ const JiXiong = memo(function JiXiong({
 
 				if (!hasJixiang && !hasXiongxiang) {
 					throw new Error(
-						"AI response was incomplete or truncated. Please try again."
+						"AI response was incomplete or truncated. Please try again.",
 					);
 				}
 
@@ -435,7 +435,7 @@ const JiXiong = memo(function JiXiong({
 												(item, index) => (
 													<div
 														key={index}
-													className="p-3 sm:p-4 min-h-[280px] sm:min-h-[320px] flex flex-col"
+														className="p-1 sm:p-4 min-h-[200px] sm:min-h-[250px] flex flex-col"
 													>
 														<div
 															className="flex items-center justify-center mb-2 sm:mb-3 font-bold text-white rounded-lg w-full max-w-[200px] mx-auto h-[35px] sm:h-[40px]"
@@ -459,8 +459,8 @@ const JiXiong = memo(function JiXiong({
 																	"300px",
 															}}
 														>
-															<p
-																className="leading-relaxed text-black"
+															<div
+																className="leading-relaxed text-black space-y-2"
 																style={{
 																	fontSize:
 																		"clamp(0.875rem, 2.5vw, 0.9375rem)",
@@ -468,11 +468,13 @@ const JiXiong = memo(function JiXiong({
 																		"Noto Sans HK, sans-serif",
 																}}
 															>
-																{item.content}
-															</p>
+																{item.content.split(/\n/).filter(line => line.trim() && (line.includes('•') || line.includes('・') || /^\d+\./.test(line.trim()))).map((point, idx) => (
+																	<div key={idx} className="ml-2">{point.trim()}</div>
+																))}
+															</div>
 														</div>
 													</div>
-												)
+												),
 											)}
 										</div>
 									</div>
@@ -482,7 +484,7 @@ const JiXiong = memo(function JiXiong({
 								<div className="w-full lg:w-1/2">
 									<div className="bg-white rounded-[15px] sm:rounded-[20px] p-4 sm:p-6 h-full">
 										<h2
-											className="mb-4 font-bold text-center sm:mb-6 sm:text-left text-black"
+											className="mb-4 font-bold text-center text-black sm:mb-6 sm:text-left"
 											style={{
 												fontFamily:
 													"Noto Sans HK, sans-serif",
@@ -499,7 +501,7 @@ const JiXiong = memo(function JiXiong({
 												(item, index) => (
 													<div
 														key={index}
-													className="p-3 sm:p-4 min-h-[280px] sm:min-h-[320px] flex flex-col"
+														className="p-3 sm:p-4 min-h-[200px] sm:min-h-[250px] flex flex-col"
 													>
 														<div
 															className="flex items-center justify-center mb-2 sm:mb-3 font-bold text-white rounded-lg w-full max-w-[200px] mx-auto h-[35px] sm:h-[40px]"
@@ -523,8 +525,8 @@ const JiXiong = memo(function JiXiong({
 																	"300px",
 															}}
 														>
-															<p
-																className="leading-relaxed text-gray-800"
+															<div
+																className="leading-relaxed text-gray-800 space-y-2"
 																style={{
 																	fontSize:
 																		"clamp(0.875rem, 2.5vw, 0.9375rem)",
@@ -532,11 +534,13 @@ const JiXiong = memo(function JiXiong({
 																		"Noto Sans HK, sans-serif",
 																}}
 															>
-																{item.content}
-															</p>
+																{item.content.split(/\n/).filter(line => line.trim() && (line.includes('•') || line.includes('・') || /^\d+\./.test(line.trim()))).map((point, idx) => (
+																	<div key={idx} className="ml-2">{point.trim()}</div>
+																))}
+															</div>
 														</div>
 													</div>
-												)
+												),
 											)}
 										</div>
 									</div>

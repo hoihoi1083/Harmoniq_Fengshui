@@ -191,7 +191,7 @@ export default function LiuNianGanZhi({ userInfo, currentYear = new Date().getFu
 
 				{/* Current Section Content */}
 				{currentSection && (
-					<div className="p-4 mb-6 bg-gray-50 rounded-2xl sm:p-6 lg:p-8">
+				<div className="p-4 mb-6 bg-white rounded-2xl sm:p-6 lg:p-8">
 						<h3
 							className="mb-4 text-xl font-bold text-gray-800 sm:text-2xl"
 							style={{ fontFamily: "Noto Serif TC, serif" }}

@@ -476,26 +476,27 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 					</div>
 				)}
 
-				{/* All Seasons Content */}
-				{analysisData.seasons.map((season, index) => {
-					const getOriginalSeasonName = (seasonName) => {
-						return seasonName.replace(/【[^】]*】/g, "").trim();
-					};
+			{/* All Seasons Content - Grid Layout for 2 columns */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+			{analysisData.seasons.map((season, index) => {
+				const getOriginalSeasonName = (seasonName) => {
+					return seasonName.replace(/【[^】]*】/g, "").trim();
+				};
 
-					const originalName = getOriginalSeasonName(season.name);
-					const isCurrent = analysisData.currentSeason === originalName;
+				const originalName = getOriginalSeasonName(season.name);
+				const isCurrent = analysisData.currentSeason === originalName;
 
-					const colorMap = {
-						春季: "#7cb856",
-						夏季: "#B4003C",
-						秋季: "#DEAB20",
-						冬季: "#568CB8",
-					};
+				const colorMap = {
+					春季: "#7cb856",
+					夏季: "#B4003C",
+					秋季: "#DEAB20",
+					冬季: "#568CB8",
+				};
 
-					const seasonColor = colorMap[originalName] || "#666";
+				const seasonColor = colorMap[originalName] || "#666";
 
-					return (
-						<div key={season.name} className="mb-8 sm:mb-10">
+				return (
+					<div key={season.name} className="mb-0">
 							<div className="flex items-center mb-3 sm:mb-4">
 								<div className="w-full">
 									{/* Season Name with Color and Badge */}
@@ -608,8 +609,7 @@ export default function Season({ userInfo, currentYear = new Date().getFullYear(
 							</div>
 						</div>
 					);
-				})}
-			</section>
+				})}			</div>			</section>
 		</ComponentErrorBoundary>
 	);
 }

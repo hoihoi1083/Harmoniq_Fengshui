@@ -124,6 +124,7 @@ export async function POST(request) {
 	try {
 		const {
 			userInfo,
+			baziData, // Receive baziData from frontend (correct BaZi calculation)
 			currentYear = new Date().getFullYear(),
 			locale = "zh-TW",
 		} = await request.json();
@@ -142,8 +143,28 @@ export async function POST(request) {
 		const birthday = userInfo.birthDateTime || "";
 		const gender = userInfo.gender || "male";
 
-		// Generate BaZi
-		const baZi = generateBaZi(birthday);
+		// Use provided baziData if available, otherwise fallback to generateBaZi
+		let baZi;
+		let dayMaster = "";
+		let dayElement = "";
+		
+		if (baziData && baziData.year && baziData.month && baziData.day && baziData.hour) {
+			// Use the accurate BaZi data from frontend (calculated by lunisolar library)
+			baZi = {
+				year: baziData.year,
+				month: baziData.month,
+				day: baziData.day,
+				hour: baziData.hour,
+			};
+			dayMaster = baziData.dayMaster || "";
+			dayElement = baziData.dayElement || "";
+			console.log("✅ Using provided BaZi data with dayMaster:", dayMaster, dayElement);
+		} else {
+			// Fallback to simple calculation if baziData not provided
+			baZi = generateBaZi(birthday);
+			console.log("⚠️ Using fallback BaZi calculation");
+		}
+		
 		const yearGanZhi = getYearlyStems(currentYear);
 
 		// Locale-aware text
@@ -203,9 +224,12 @@ ${analysisRequirements}`;
 - 出生时间：${birthday}
 - 性别：${genderText}
 - 八字：${baZi ? `${baZi.year} ${baZi.month} ${baZi.day} ${baZi.hour}` : needCalculation}
+${dayMaster && dayElement ? `- **日主：${dayMaster}${dayElement}** ← 这是用户的日主，分析时必须使用此日主` : ""}
 - 关注领域：${concern}
 - 具体问题：${problem || overallFortune}
 - 当前年份：${currentYear}年（${yearGanZhi.stem}${yearGanZhi.branch}）
+
+${dayMaster && dayElement ? `**重要提醒**：用户的日主是**${dayMaster}${dayElement}**，不是其他天干。请在分析时明确使用"您的日主为${dayMaster}${dayElement}"，而不是使用八字中的其他天干（如时干或年干）。` : ""}
 
 **重要格式要求**：请严格按照以下markdown格式回应：
 
@@ -271,9 +295,12 @@ ${analysisRequirements}`;
 - 出生時間：${birthday}
 - 性別：${genderText}
 - 八字：${baZi ? `${baZi.year} ${baZi.month} ${baZi.day} ${baZi.hour}` : needCalculation}
+${dayMaster && dayElement ? `- **日主：${dayMaster}${dayElement}** ← 這是用戶的日主，分析時必須使用此日主` : ""}
 - 關注領域：${concern}
 - 具體問題：${problem || overallFortune}
 - 當前年份：${currentYear}年（${yearGanZhi.stem}${yearGanZhi.branch}）
+
+${dayMaster && dayElement ? `**重要提醒**：用戶的日主是**${dayMaster}${dayElement}**，不是其他天干。請在分析時明確使用"您的日主為${dayMaster}${dayElement}"，而不是使用八字中的其他天干（如時干或年干）。` : ""}
 
 **重要格式要求**：請嚴格按照以下markdown格式回應：
 

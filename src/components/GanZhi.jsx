@@ -1423,12 +1423,12 @@ export default function GanZhi({
 					</p>
 
 					{/* Main Container with EFEFEF background */}
-					<div
+					{/* <div
 						className="bg-[#EFEFEF] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6"
 						style={{ boxShadow: "0 4px 4px rgba(0,0,0,0.25)" }}
-					>
-						{/* Toggle Buttons */}
-						<div className="flex flex-col gap-3 mb-4 sm:flex-row sm:gap-4 sm:mb-6">
+					> */}
+					{/* Toggle Buttons */}
+					{/* <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:gap-4 sm:mb-6">
 							<button
 								onClick={() => setActiveSection("tianGan")}
 								className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all duration-300 flex-1 sm:flex-none text-center ${
@@ -1468,12 +1468,12 @@ export default function GanZhi({
 									`地支${analysisData?.yearGanZhi?.branch || "巳"}${getBranchElement(analysisData?.yearGanZhi?.branch || "巳")}-偏印`}
 							</button>
 						</div>
-
-						{/* Content based on active section */}
-						{activeSection === "tianGan" && (
-							<div>
-								{/* Title */}
-								<h3
+ */}
+					{/* Content based on active section */}
+					{/* {activeSection === "tianGan" && (
+							<div> */}
+					{/* Title */}
+					{/* <h3
 									className="mb-3 font-black sm:mb-4"
 									style={{
 										fontFamily: "Noto Serif TC, serif",
@@ -1488,21 +1488,21 @@ export default function GanZhi({
 									)}
 									{convertText("觸發三重效應")}
 								</h3>
-
-								{/* Content from AI analysis */}
-								<div
+ */}
+					{/* Content from AI analysis */}
+					{/* <div
 									className="mb-4 leading-relaxed text-gray-700 sm:mb-6"
 									style={{
 										fontFamily: "Noto Sans HK, sans-serif",
 										fontSize:
 											"clamp(0.875rem, 2.5vw, 1rem)",
 									}}
-								>
-									{/* Extract content from sections 1 and 2 of AI analysis */}
-								</div>
+								> */}
+					{/* Extract content from sections 1 and 2 of AI analysis */}
+					{/* </div> */}
 
-								{/* Key Actions Container */}
-								{/* {analysisData?.parsedContent?.tianGan
+					{/* Key Actions Container */}
+					{/* {analysisData?.parsedContent?.tianGan
 									?.keyActions?.length > 0 && (
 									<div
 										className="bg-[#567156] text-white p-4 rounded-lg mb-6"
@@ -1535,8 +1535,8 @@ export default function GanZhi({
 									</div>
 								)}
  */}
-								{/* Three Cards */}
-								<div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{/* Three Cards */}
+					{/* <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
 									{(
 										analysisData?.parsedContent?.tianGan
 											?.effects || [
@@ -1598,16 +1598,16 @@ export default function GanZhi({
 													</p>
 												</div>
 											</div>
-										))}
-								</div>
+										))} */}
+					{/* </div>
 							</div>
 						)}
-
-						{/* DiZhi Section */}
-						{activeSection === "diZhi" && (
-							<div>
-								{/* Title */}
-								<h3
+ */}
+					{/* DiZhi Section */}
+					{/* {activeSection === "diZhi" && (
+							<div> */}
+					{/* Title */}
+					{/* <h3
 									className="mb-3 font-black sm:mb-4"
 									style={{
 										fontFamily: "Noto Serif TC, serif",
@@ -1624,9 +1624,9 @@ export default function GanZhi({
 									)}
 									{convertText("觸發三重效應")}
 								</h3>
-
-								{/* Content from AI analysis */}
-								<div
+ */}
+					{/* Content from AI analysis */}
+					{/* <div
 									className="mb-4 leading-relaxed text-gray-700 sm:mb-6"
 									style={{
 										fontFamily: "Noto Sans HK, sans-serif",
@@ -1634,9 +1634,9 @@ export default function GanZhi({
 											"clamp(0.875rem, 2.5vw, 1rem)",
 									}}
 								></div>
-
-								{/* Three Cards */}
-								<div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+ */}
+					{/* Three Cards */}
+					{/* <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
 									{(
 										analysisData?.parsedContent?.diZhi
 											?.effects || [
@@ -1701,8 +1701,8 @@ export default function GanZhi({
 										))}
 								</div>
 							</div>
-						)}
-					</div>
+						)} */}
+					{/* </div> */}
 
 					{/* Combined Practical Results Section - Shows for both tabs */}
 					{analysisData?.parsedContent?.practicalResults && (

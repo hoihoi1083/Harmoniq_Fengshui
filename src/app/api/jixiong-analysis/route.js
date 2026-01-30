@@ -3,16 +3,32 @@ export const maxDuration = 120;
 
 export async function POST(req) {
 	try {
-		const { userInfo, locale } = await req.json();
+		const { userInfo, baziData, locale } = await req.json();
 
 		if (!userInfo) {
 			return Response.json(
 				{ error: "Missing user information" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
 		const { concern, birthday, gender, time } = userInfo;
+
+		// Log received BaZi data for debugging
+		if (baziData) {
+			console.log("📊 Processing request:", {
+				concern,
+				problem: userInfo.problem,
+				baziData: {
+					year: baziData.year,
+					month: baziData.month,
+					day: baziData.day,
+					hour: baziData.hour,
+					dayMaster: baziData.dayMaster,
+					dayElement: baziData.dayElement,
+				},
+			});
+		}
 
 		// Determine language based on locale
 		const language =
@@ -47,7 +63,11 @@ ${languageInstruction}，根据以下信息进行精准的吉凶分析：
 - 生日：${birthday}
 - 性别：${gender}
 - 时间：${time}
+- 八字：${baziData ? `${baziData.year}年 ${baziData.month}月 ${baziData.day}日 ${baziData.hour}時` : "需要進一步計算"}
+${baziData && baziData.dayMaster && baziData.dayElement ? `- **日主：${baziData.dayMaster}${baziData.dayElement}** ← 這是用戶的日主，分析時必須使用此日主` : ""}
 - 关注领域：${concern}
+
+${baziData && baziData.dayMaster && baziData.dayElement ? `**重要提醒**：用戶的日主是**${baziData.dayMaster}${baziData.dayElement}**，八字為**${baziData.year}年 ${baziData.month}月 ${baziData.day}日 ${baziData.hour}時**。請在分析時明確使用這個八字，而不是自行推算或使用其他天干地支。` : ""}
 - 当前时间：${currentYear}年${currentMonth}月
 
 **重要时间标示规则**：
@@ -73,9 +93,12 @@ ${languageInstruction}，根据以下信息进行精准的吉凶分析：
 【3个吉象（被动防护，需极致保守方能显现）】：
 请提供3个具体的吉象，每个必须包含：
 - 标题（必须是有意义的四字词语，如：贵人暗助、厚积薄发、稳中得财、暗中得助、技能避险、根基稳固）
-- 详细内容（150-200字，完整描述）
+- 详细内容（以条列式呈现3-4个要点，每个要点40-60字，详细说明原理、时机、具体做法）
 
-重要：标题必须是经典的四字成语或风水术语，绝对不可以是句子的前四个字！
+重要：
+1. 标题必须是经典的四字成语或风水术语，绝对不可以是句子的前四个字！
+2. 内容必须以条列式（bullet points）呈现，每个要点要详细且具体！
+3. 每个要点需包含：原理说明+具体时间+实际操作建议
 
 吉象四字词语示例：
 - 贵人暗助（有长辈或专业人士的帮助）
@@ -85,15 +108,29 @@ ${languageInstruction}，根据以下信息进行精准的吉凶分析：
 - 技能避险（专业技能带来的保护）
 - 根基稳固（基础牢固，稳定发展）
 
-格式如下：
-① [有意义的四字词语]：[详细内容...]
-② [有意义的四字词语]：[详细内容...]  
-③ [有意义的四字词语]：[详细内容...]
+格式如下（必须使用条列式，每个要点要详细）：
+① [有意义的四字词语]：
+• [详细要点1：包含原理+时间+做法，40-60字]
+• [详细要点2：包含原理+时间+做法，40-60字]
+• [详细要点3：包含原理+时间+做法，40-60字]
+② [有意义的四字词语]：
+• [详细要点1：包含原理+时间+做法，40-60字]
+• [详细要点2：包含原理+时间+做法，40-60字]
+• [详细要点3：包含原理+时间+做法，40-60字]
+③ [有意义的四字词语]：
+• [详细要点1：包含原理+时间+做法，40-60字]
+• [详细要点2：包含原理+时间+做法，40-60字]
+• [详细要点3：包含原理+时间+做法，40-60字]
 
 【3个凶象（主导致命，强力影响）】：
 请提供3个具体的凶象，每个必须包含：
 - 标题（必须是有意义的四字词语，如：比劫夺财、小人妨害、决策失误、官非口舌、刑冲动荡、破财损耗）
-- 详细内容（150-200字，完整描述）
+- 详细内容（以条列式呈现3-4个要点，每个要点40-60字，详细说明原理、时机、具体风险）
+
+重要：
+1. 标题必须是经典的四字成语或风水术语，绝对不可以是句子的前四个字！
+2. 内容必须以条列式（bullet points）呈现，每个要点要详细且具体！
+3. 每个要点需包含：原理说明+具体时间+风险提示+预防措施
 
 凶象四字词语示例：
 - 比劫夺财（竞争者抢夺利益）
@@ -103,15 +140,44 @@ ${languageInstruction}，根据以下信息进行精准的吉凶分析：
 - 刑冲动荡（环境变化带来不稳定）
 - 破财损耗（意外支出或投资亏损）
 
-格式如下：
-① [有意义的四字词语]：[详细内容...]
-② [有意义的四字词语]：[详细内容...]
-③ [有意义的四字词语]：[详细内容...]
+格式如下（必须使用条列式，每个要点要详细）：
+① [有意义的四字词语]：
+• [详细要点1：包含原理+时间+风险+预防，40-60字]
+• [详细要点2：包含原理+时间+风险+预防，40-60字]
+• [详细要点3：包含原理+时间+风险+预防，40-60字]
+② [有意义的四字词语]：
+• [详细要点1：包含原理+时间+风险+预防，40-60字]
+• [详细要点2：包含原理+时间+风险+预防，40-60字]
+• [详细要点3：包含原理+时间+风险+预防，40-60字]
+③ [有意义的四字词语]：
+• [详细要点1：包含原理+时间+风险+预防，40-60字]
+• [详细要点2：包含原理+时间+风险+预防，40-60字]
+• [详细要点3：包含原理+时间+风险+预防，40-60字]
 
-【关键季节&注意事项】：
-- 最危险的时期（必须标示具体月份和年份，如：明年3-5月、今年11-12月）
-- 相对安全的时期（必须标示具体月份和年份）
-- 具体的预防措施（若提及时间点，必须明确标注）
+【关键季节分析】：
+请严格按照以下格式输出2026年四季分析，每季一段，不要添加额外内容：
+
+**冬季**
+玄子丑月，水旺
+（2026年1月-3月）分析水旺对用户八字的影响，该季节的运势特点、建议与注意事项。内容100-150字，一段话，不要分点。
+
+**春季**
+寅卯辰月，木旺
+（2026年3月-5月）分析木旺对用户八字的影响，该季节的运势特点、建议与注意事项。内容100-150字，一段话，不要分点。
+
+**夏季**
+巳午未月，火土极旺
+（2026年5月-8月）分析火土旺对用户八字的影响，该季节的运势特点、建议与注意事项。内容100-150字，一段话，不要分点。
+
+**秋季**
+申酉戌月，金旺
+（2026年8月-11月）分析金旺对用户八字的影响，该季节的运势特点、建议与注意事项。内容100-150字，一段话，不要分点。
+
+格式要求：
+1. 必须输出全部四个季节，每季格式完全一致
+2. 每季分三行：季节名、元素描述、时间范围+分析内容
+3. 不要添加序号、不要分点列举、不要加免责声明
+4. 每季内容独立成段，之间空一行
 
 严格要求：
 1. 基于真实的八字分析，${concern === "工作" ? "请按事业运势分析" : ""}
@@ -150,21 +216,21 @@ ${
 						},
 					],
 					stream: false,
-					max_tokens: 2000, // Optimized for server performance under load
+					max_tokens: 3000,
 					temperature: 0.6,
 				}),
-			}
+			},
 		);
 
 		if (!response.ok) {
 			console.error(
 				"DeepSeek API Error:",
 				response.status,
-				response.statusText
+				response.statusText,
 			);
 			return Response.json(
 				{ error: "AI analysis service unavailable" },
-				{ status: 500 }
+				{ status: 500 },
 			);
 		}
 
@@ -174,7 +240,7 @@ ${
 		if (!aiContent) {
 			return Response.json(
 				{ error: "No analysis generated" },
-				{ status: 500 }
+				{ status: 500 },
 			);
 		}
 
@@ -194,9 +260,67 @@ ${
 		console.error("JiXiong Analysis Error:", error);
 		return Response.json(
 			{ error: "Analysis generation failed" },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
+}
+
+// Parse structured bullet content into separate fields
+function parseStructuredContent(title, content, isJixiang) {
+	const result = {
+		title: title,
+		content: content, // Keep original for fallback
+	};
+
+	// Split by bullet points
+	const bullets = content.split(/\n•\s*/).filter(b => b.trim());
+	
+	// For 吉象 (auspicious), look for: 原理, 時機, 做法
+	// For 凶象 (inauspicious), look for: 原理, 時機, 風險, 預防
+	
+	bullets.forEach(bullet => {
+		const trimmed = bullet.trim();
+		
+		if (isJixiang) {
+			if (/^原理[：:]/i.test(trimmed)) {
+				result.principle = trimmed.replace(/^原理[：:]\s*/i, '').trim();
+			} else if (/^時機[：:]/i.test(trimmed)) {
+				result.timing = trimmed.replace(/^時機[：:]\s*/i, '').trim();
+			} else if (/^做法[：:]/i.test(trimmed)) {
+				result.method = trimmed.replace(/^做法[：:]\s*/i, '').trim();
+			}
+		} else {
+			if (/^原理[：:]/i.test(trimmed)) {
+				result.principle = trimmed.replace(/^原理[：:]\s*/i, '').trim();
+			} else if (/^時機[：:]/i.test(trimmed)) {
+				result.timing = trimmed.replace(/^時機[：:]\s*/i, '').trim();
+			} else if (/^風險[：:]/i.test(trimmed)) {
+				result.risk = trimmed.replace(/^風險[：:]\s*/i, '').trim();
+			} else if (/^預防[：:]/i.test(trimmed)) {
+				result.prevention = trimmed.replace(/^預防[：:]\s*/i, '').trim();
+			}
+		}
+	});
+	
+	// If structured fields found, use them; otherwise keep original content
+	if (isJixiang && (result.principle || result.timing || result.method)) {
+		// Successfully parsed 吉象 structure
+		result.content = [
+			result.principle && `• 原理：${result.principle}`,
+			result.timing && `• 時機：${result.timing}`,
+			result.method && `• 做法：${result.method}`
+		].filter(Boolean).join('\n');
+	} else if (!isJixiang && (result.principle || result.timing || result.risk || result.prevention)) {
+		// Successfully parsed 凶象 structure
+		result.content = [
+			result.principle && `• 原理：${result.principle}`,
+			result.timing && `• 時機：${result.timing}`,
+			result.risk && `• 風險：${result.risk}`,
+			result.prevention && `• 預防：${result.prevention}`
+		].filter(Boolean).join('\n');
+	}
+	
+	return result;
 }
 
 function parseJiXiongContent(content) {
@@ -243,13 +367,13 @@ function parseJiXiongContent(content) {
 		// If we can't find the sections, try to extract from the full content directly
 		if (!jixiangContent && !xiongxiangContent) {
 			console.log(
-				"🔄 Trying to extract items directly from full content"
+				"🔄 Trying to extract items directly from full content",
 			);
 			const allItems = extractNumberedItems(content);
 
 			if (allItems.length >= 3) {
 				console.log(
-					`✅ Extracted ${allItems.length} items from full content`
+					`✅ Extracted ${allItems.length} items from full content`,
 				);
 
 				// Split items between jixiang and xiongxiang
@@ -277,6 +401,13 @@ function parseJiXiongContent(content) {
 
 		console.log("🎭 Jixiang content found:", !!jixiangContent);
 		console.log("⚡ Xiongxiang content found:", !!xiongxiangContent);
+		console.log("🌸 Season content found:", !!seasonContent);
+		if (seasonContent) {
+			console.log(
+				"🌸 Season content preview:",
+				seasonContent.substring(0, 200),
+			);
+		}
 
 		// Extract individual 吉象 items
 		const jixiang = jixiangContent
@@ -293,7 +424,7 @@ function parseJiXiongContent(content) {
 		// Only use fallback if we have absolutely no content
 		if (jixiang.length === 0 && xiongxiang.length === 0) {
 			console.log(
-				"⚠️ No content extracted, checking if AI response was truncated"
+				"⚠️ No content extracted, checking if AI response was truncated",
 			);
 
 			// Check if the response seems truncated
@@ -302,7 +433,7 @@ function parseJiXiongContent(content) {
 
 			if (seemsTruncated) {
 				console.log(
-					"� Response seems truncated, returning error instead of fallback"
+					"� Response seems truncated, returning error instead of fallback",
 				);
 				return {
 					error: "AI response was truncated, please try again",
@@ -355,7 +486,7 @@ function extractNumberedItems(content) {
 	for (const pattern of patterns) {
 		let match;
 		console.log(
-			`🔍 Trying pattern: ${pattern.toString().substring(0, 50)}...`
+			`🔍 Trying pattern: ${pattern.toString().substring(0, 50)}...`,
 		);
 
 		while ((match = pattern.exec(content)) !== null && items.length < 6) {
@@ -363,7 +494,7 @@ function extractNumberedItems(content) {
 			const description = match[2]?.trim();
 
 			console.log(
-				`📝 Found match - Title: "${title}", Description length: ${description?.length}`
+				`📝 Found match - Title: "${title}", Description length: ${description?.length}`,
 			);
 
 			if (title && description && description.length > 30) {
@@ -391,7 +522,7 @@ function extractNumberedItems(content) {
 					.trim();
 
 				console.log(
-					`✅ Adding item: "${cleanTitle}" - ${cleanDescription.substring(0, 100)}...`
+					`✅ Adding item: "${cleanTitle}" - ${cleanDescription.substring(0, 100)}...`,
 				);
 
 				items.push({
@@ -403,7 +534,7 @@ function extractNumberedItems(content) {
 
 		if (items.length >= 6) {
 			console.log(
-				`✅ Found enough items (${items.length}), stopping extraction`
+				`✅ Found enough items (${items.length}), stopping extraction`,
 			);
 			break;
 		}
@@ -417,7 +548,7 @@ function extractItems(content, type) {
 	const items = [];
 	console.log(
 		`🔍 Extracting ${type} items from content length:`,
-		content.length
+		content.length,
 	);
 
 	// First, try to extract meaningful 4-character idioms from content
@@ -476,13 +607,13 @@ function extractItems(content, type) {
 			// Filter out meaningless phrases (starting with articles, conjunctions, etc.)
 			if (
 				!/^[命局中雖此在因若當的是有為但和與或者其實際上因為所以然而]./.test(
-					phrase
+					phrase,
 				)
 			) {
 				// Check if it's a meaningful phrase by looking at common patterns
 				if (
 					/[助發財星技根源進成升照祥滿劫害誤非沖衡耗身爭變壓礙]/.test(
-						phrase
+						phrase,
 					)
 				) {
 					console.log(`✅ Found meaningful phrase: ${phrase}`);
@@ -548,7 +679,7 @@ function extractItems(content, type) {
 	// If content is empty or too short, return early with contextual titles
 	if (!content || content.length < 50) {
 		console.log(
-			`⚠️ Content too short for ${type}, using contextual titles`
+			`⚠️ Content too short for ${type}, using contextual titles`,
 		);
 		for (let i = 0; i < 3; i++) {
 			const title = generateContextualTitle("", i, type === "吉象");
@@ -589,7 +720,7 @@ function extractItems(content, type) {
 
 						// First try to extract meaningful title from the raw title or description
 						let title = extractMeaningfulTitles(
-							rawTitle + description
+							rawTitle + description,
 						);
 
 						// If no meaningful title found, use the raw title or generate one
@@ -604,25 +735,67 @@ function extractItems(content, type) {
 							if (
 								title.length < 2 ||
 								/^[命局中雖此在因若當的是有為但和與或者其實際上因為所以然而]/.test(
-									title
+									title,
 								)
 							) {
 								title = generateContextualTitle(
 									description,
 									items.length,
-									type === "吉象"
+									type === "吉象",
 								);
 							}
 						}
 
-						items.push({
-							title: title,
-							content: description
-								.replace(/\*\*/g, "")
-								.replace(/---.*$/gs, "")
-								.replace(/###.*$/gs, "")
-								.trim(),
-						});
+						// Split description if it contains multiple separate bullet sets
+						// This happens when AI puts multiple items under one title
+						const cleanDescription = description
+							.replace(/\*\*/g, "")
+							.replace(/---.*$/gs, "")
+							.replace(/###.*$/gs, "")
+							.trim();
+
+						// Check if there are multiple sets of bullets (separated by blank lines or repeated bullet patterns)
+						// Split by double newline or by pattern where bullets restart
+						const bulletSets =
+							cleanDescription.split(/\n\s*\n+(?=•)/);
+
+						if (bulletSets.length > 1 && items.length < 3) {
+							// Multiple sets found - add each as a separate item
+							console.log(
+								`📦 Splitting ${bulletSets.length} bullet sets under "${title}"`,
+							);
+							bulletSets.forEach((bulletSet, idx) => {
+								if (items.length >= 3) return;
+
+								const trimmedSet = bulletSet.trim();
+								if (trimmedSet.length > 30) {
+									// Generate sub-title if needed
+									const subTitle =
+										idx === 0
+											? title
+											: generateContextualTitle(
+													trimmedSet,
+													items.length,
+													type === "吉象",
+												);
+
+									const parsedItem = parseStructuredContent(
+										subTitle,
+										trimmedSet,
+										type === "吉象"
+									);
+									items.push(parsedItem);
+								}
+							});
+						} else {
+							// Single set - add as one item with structured parsing
+							const parsedItem = parseStructuredContent(
+								title,
+								cleanDescription,
+								type === "吉象"
+							);
+							items.push(parsedItem);
+						}
 					}
 				}
 				if (items.length >= 3) break;
@@ -648,7 +821,7 @@ function extractItems(content, type) {
 						console.log(`📝 Found colon item: ${rawTitle}`);
 
 						let title = extractMeaningfulTitles(
-							rawTitle + description
+							rawTitle + description,
 						);
 
 						if (!title) {
@@ -659,21 +832,23 @@ function extractItems(content, type) {
 							if (
 								title.length < 2 ||
 								/^[命局中雖此在因若當的是有為但和與或者其實際上因為所以然而]/.test(
-									title
+									title,
 								)
 							) {
 								title = generateContextualTitle(
 									description,
 									items.length,
-									type === "吉象"
+									type === "吉象",
 								);
 							}
 						}
 
-						items.push({
-							title: title,
-							content: description.replace(/\*\*/g, "").trim(),
-						});
+						const parsedItem = parseStructuredContent(
+							title,
+							description.replace(/\*\*/g, "").trim(),
+							type === "吉象"
+						);
+						items.push(parsedItem);
 					}
 				}
 			}
@@ -690,12 +865,12 @@ function extractItems(content, type) {
 	// If still not enough items, create fallback items with proper titles
 	while (items.length < 3) {
 		console.log(
-			`⚠️ Creating fallback item ${items.length + 1} for ${type}`
+			`⚠️ Creating fallback item ${items.length + 1} for ${type}`,
 		);
 		const title = generateContextualTitle(
 			"",
 			items.length,
-			type === "吉象"
+			type === "吉象",
 		);
 		const fallbackContent =
 			type === "吉象"
