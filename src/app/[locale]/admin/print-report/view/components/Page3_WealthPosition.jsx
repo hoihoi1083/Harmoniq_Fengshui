@@ -7,7 +7,7 @@ export default function Page3_WealthPosition({ data }) {
 	const wealthData = wealth?.analysis || {};
 
 	return (
-		<div className="page-break bg-white px-16 py-12 min-h-[297mm]">
+		<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
 			{/* Page Header with decorative element */}
 			<div className="text-center mb-12 relative">
 				<div

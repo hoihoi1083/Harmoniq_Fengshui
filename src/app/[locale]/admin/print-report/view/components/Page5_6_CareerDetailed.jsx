@@ -44,45 +44,56 @@ export default function Page5_6_CareerDetailed({ data }) {
 	return (
 		<>
 			{/* Page 5: 吉象 (Auspicious) */}
-			<div className="page-break bg-white px-16 py-12 min-h-[297mm]">
+			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
 				{/* Page Header with large decorative character */}
-				<div className="text-center mb-10 relative">
+				<div className="text-center mb-6 relative">
 					<div
-						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 text-[200px] opacity-5 font-bold"
+						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 opacity-5 font-bold"
 						style={{
 							color: color,
 							fontFamily: "Noto Serif TC, serif",
+							fontSize: "140px"
 						}}
 					>
 						吉
 					</div>
 					<h1
-						className="text-5xl font-bold mb-3 relative z-10"
+						className="font-bold mb-2 relative z-10"
 						style={{
 							color: color,
 							fontFamily: "Noto Serif TC, serif",
+							fontSize: "32px"
 						}}
 					>
 						總流年{concernChinese[concern]} · 吉象
 					</h1>
-					<p className="text-gray-600 text-lg">
+					<p className="text-gray-600" style={{ fontSize: "14px" }}>
 						2026年{concern}方面的有利趨勢
 					</p>
 				</div>
 
 				{/* Numbered sections */}
-				<div className="space-y-8">
+				<div className="space-y-5">
 					{auspiciousPoints.length > 0 ? (
 						auspiciousPoints.map((item, index) => (
 							<div
 								key={index}
-								className="flex gap-6 items-start p-6 rounded-xl avoid-break"
-								style={{ backgroundColor: `${color}08` }}
+								className="flex items-start rounded-xl avoid-break"
+								style={{ 
+									backgroundColor: `${color}08`,
+									gap: "16px",
+									padding: "16px"
+								}}
 							>
 								{/* Number badge */}
 								<div
-									className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl"
-									style={{ backgroundColor: color }}
+									className="flex-shrink-0 rounded-full flex items-center justify-center text-white font-bold"
+									style={{ 
+										backgroundColor: color,
+										width: "36px",
+										height: "36px",
+										fontSize: "16px"
+									}}
 								>
 									{index + 1}
 								</div>
@@ -91,13 +102,17 @@ export default function Page5_6_CareerDetailed({ data }) {
 								<div className="flex-1">
 									{item.title && (
 										<h3
-											className="text-xl font-bold mb-3"
-											style={{ color: color }}
+											className="font-bold"
+											style={{ 
+												color: color,
+												fontSize: "15px",
+												marginBottom: "8px"
+											}}
 										>
 											{item.title}
 										</h3>
 									)}
-									<p className="text-gray-800 text-lg leading-relaxed whitespace-pre-line">
+									<p className="text-gray-800 whitespace-pre-line" style={{ fontSize: "13px", lineHeight: "1.6" }}>
 										{item.content}
 									</p>
 								</div>
@@ -105,8 +120,11 @@ export default function Page5_6_CareerDetailed({ data }) {
 						))
 					) : (
 						<div
-							className="p-8 rounded-xl text-center"
-							style={{ backgroundColor: `${color}08` }}
+							className="rounded-xl text-center"
+							style={{ 
+								backgroundColor: `${color}08`,
+								padding: "24px"
+							}}
 						>
 							<p className="text-gray-600">正在分析吉象...</p>
 						</div>
@@ -114,73 +132,94 @@ export default function Page5_6_CareerDetailed({ data }) {
 				</div>
 
 				{/* Footer note */}
-				<div className="mt-12 text-center">
-					<p className="text-gray-500 text-sm">
+				<div className="mt-8 text-center">
+					<p className="text-gray-500" style={{ fontSize: "11px" }}>
 						* 以上吉象可作為您在{concern}規劃時的參考依據
 					</p>
 				</div>
 			</div>
 
 			{/* Page 6: 凶象 (Inauspicious) */}
-			<div className="page-break bg-white px-16 py-12 min-h-[297mm]">
+			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
 				{/* Page Header with large decorative character */}
-				<div className="text-center mb-10 relative">
+				<div className="text-center mb-6 relative">
 					<div
-						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 text-[200px] opacity-5 font-bold text-gray-400"
-						style={{ fontFamily: "Noto Serif TC, serif" }}
+						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 opacity-5 font-bold text-gray-400"
+						style={{ 
+							fontFamily: "Noto Serif TC, serif",
+							fontSize: "140px"
+						}}
 					>
 						凶
 					</div>
 					<h1
-						className="text-5xl font-bold mb-3 relative z-10"
+						className="font-bold mb-2 relative z-10"
 						style={{
 							color: "#666",
 							fontFamily: "Noto Serif TC, serif",
+							fontSize: "32px"
 						}}
 					>
 						總流年{concernChinese[concern]} · 凶象
 					</h1>
-					<p className="text-gray-600 text-lg">
+					<p className="text-gray-600" style={{ fontSize: "14px" }}>
 						2026年{concern}方面需要留意的挑戰
 					</p>
 				</div>
 
 				{/* Numbered sections */}
-				<div className="space-y-8">
+				<div className="space-y-5">
 					{inauspiciousPoints.length > 0 ? (
 						inauspiciousPoints.map((item, index) => (
 							<div
 								key={index}
-								className="flex gap-6 items-start p-6 rounded-xl avoid-break bg-gray-50 border-2 border-gray-200"
+								className="flex items-start rounded-xl avoid-break bg-gray-50 border-2 border-gray-200"
+								style={{
+									gap: "16px",
+									padding: "16px"
+								}}
 							>
 								{/* Number badge */}
-								<div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center bg-gray-400 text-white font-bold text-xl">
+								<div className="flex-shrink-0 rounded-full flex items-center justify-center bg-gray-400 text-white font-bold"
+									style={{
+										width: "36px",
+										height: "36px",
+										fontSize: "16px"
+									}}
+								>
 									{index + 1}
 								</div>
 
 								{/* Content */}
 								<div className="flex-1">
 									{item.title && (
-										<h3 className="text-xl font-bold mb-3 text-gray-700">
+										<h3 className="font-bold text-gray-700"
+											style={{
+												fontSize: "15px",
+												marginBottom: "8px"
+											}}
+										>
 											{item.title}
 										</h3>
 									)}
-									<p className="text-gray-800 text-lg leading-relaxed whitespace-pre-line">
+									<p className="text-gray-800 whitespace-pre-line" style={{ fontSize: "13px", lineHeight: "1.6" }}>
 										{item.content}
 									</p>
 								</div>
 							</div>
 						))
 					) : (
-						<div className="p-8 rounded-xl text-center bg-gray-50">
+						<div className="rounded-xl text-center bg-gray-50"
+							style={{ padding: "24px" }}
+						>
 							<p className="text-gray-600">正在分析凶象...</p>
 						</div>
 					)}
 				</div>
 
 				{/* Footer note */}
-				<div className="mt-12 text-center">
-					<p className="text-gray-500 text-sm">
+				<div className="mt-8 text-center">
+					<p className="text-gray-500" style={{ fontSize: "11px" }}>
 						* 提前了解凶象，可以更好地規避風險，化解不利影響
 					</p>
 				</div>

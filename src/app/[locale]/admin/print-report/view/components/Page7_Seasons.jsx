@@ -7,10 +7,12 @@ export default function Page7_Seasons({ data }) {
 		hasSeasons: !!seasonsData,
 		seasonsCount: seasonsData?.length,
 		seasonsPreview: seasonsData?.[0],
+		seasonsType: typeof seasonsData,
+		seasonsIsArray: Array.isArray(seasonsData),
 	});
 
-	// Use pre-parsed seasons data from API
-	const seasons = seasonsData || [];
+	// Use pre-parsed seasons data from API - ensure it's an array
+	const seasons = Array.isArray(seasonsData) ? seasonsData : [];
 
 	// Legacy parsing function (kept for fallback)
 	const parseSeasonalData = (text) => {
@@ -101,7 +103,7 @@ export default function Page7_Seasons({ data }) {
 	// If we have no parsed seasons, show a placeholder
 	if (!seasons || seasons.length === 0) {
 		return (
-			<div className="page-break bg-white px-16 py-12 min-h-[297mm]">
+			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
 				<div className="mb-10 text-center">
 					<h1
 						className="mb-3 text-5xl font-bold"
@@ -154,8 +156,13 @@ export default function Page7_Seasons({ data }) {
 		return styles[seasonName] || { color: "#6B7280", bgColor: "#6B7280" };
 	};
 
-	return (
-		<div className="page-break bg-white px-8 py-12 min-h-[297mm] w-full">
+	// Split seasons into two pages (2 seasons per page)
+	const firstPageSeasons = seasons.slice(0, 2);
+	const secondPageSeasons = seasons.slice(2, 4);
+
+	// Function to render a season page
+	const renderSeasonPage = (seasonsToRender, pageNumber) => (
+		<div className="page-break bg-white px-8 py-10 h-[297mm] overflow-hidden w-full">
 			{/* Page Header - Title with Date */}
 			<div className="flex items-start justify-between mb-8">
 				<h1
@@ -165,7 +172,7 @@ export default function Page7_Seasons({ data }) {
 						fontFamily: "Noto Serif TC, serif",
 					}}
 				>
-					關鍵季節
+					關鍵季節 {pageNumber === 2 ? "(續)" : ""}
 				</h1>
 				<div className="mt-2 text-sm text-right text-gray-400">
 					{new Date().getMonth() + 1}/{new Date().getDate()}/
@@ -175,12 +182,25 @@ export default function Page7_Seasons({ data }) {
 
 			{/* Seasons List */}
 			<div className="space-y-6">
-				{seasons.map((season, index) => {
+				{seasonsToRender.map((season, index) => {
 					const cleanSeasonName = season.name.replace(/【[^】]*】/g, "");
-				const isCurrentSeason = cleanSeasonName === currentSeasonName;
+					const isCurrentSeason = cleanSeasonName === currentSeasonName;
 					const seasonStyle = getSeasonStyle(cleanSeasonName);
-					const seasonChar = cleanSeasonName.charAt(0); // Get first character: 冬/春/夏/秋				
-				console.log('🎨 Season debug:', { name: season.name, styleColor: seasonStyle.color, seasonColor: season.color });
+					const seasonChar = cleanSeasonName.charAt(0); // Get first character: 冬/春/夏/秋
+					
+					console.log('🎨 Season debug:', { name: season.name, styleColor: seasonStyle.color, seasonColor: season.color });
+					
+					// Clean content by removing disclaimers and core reminders
+					const cleanContent = (season.content || '')
+						.replace(/四季財運核心提醒：[\s\S]*?(?=四季|$)/g, '')
+						.replace(/您的命局喜[\s\S]*?(?=免責聲明|$)/g, '')
+						.replace(/財運與五行[\s\S]*?(?=免責聲明|$)/g, '')
+						.replace(/所有建議[\s\S]*?(?=免責聲明|$)/g, '')
+						.replace(/免責聲明：[\s\S]*$/g, '')
+						.replace(/以上分析[\s\S]*?(?=--|$)/g, '')
+						.replace(/--\s*$/g, '')
+						.trim();
+					
 					return (
 						<div
 							key={index}
@@ -211,9 +231,9 @@ export default function Page7_Seasons({ data }) {
 											fontSize: "140px",
 											fontFamily: "Noto Serif TC, serif",
 											background: `linear-gradient(to bottom, ${seasonStyle.color}, white)`,
-										WebkitBackgroundClip: "text",
-										WebkitTextFillColor: "transparent",
-										backgroundClip: "text",
+											WebkitBackgroundClip: "text",
+											WebkitTextFillColor: "transparent",
+											backgroundClip: "text",
 											fontWeight: "bold",
 										}}
 									>
@@ -269,7 +289,7 @@ export default function Page7_Seasons({ data }) {
 								{/* Season Content */}
 								<div className="prose-sm prose max-w-none">
 									<p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
-										{season.content}
+										{cleanContent}
 									</p>
 								</div>
 							</div>
@@ -278,5 +298,12 @@ export default function Page7_Seasons({ data }) {
 				})}
 			</div>
 		</div>
+	);
+
+	return (
+		<>
+			{renderSeasonPage(firstPageSeasons, 1)}
+			{renderSeasonPage(secondPageSeasons, 2)}
+		</>
 	);
 }

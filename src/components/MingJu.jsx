@@ -2967,18 +2967,18 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 			// Handle sections format (middle tab)
 			if (parsed.sections) {
 				return parsed.sections.map((section, idx) => (
-					<div key={idx} style={{ marginBottom: "40px" }}>
+					<div key={idx} style={{ marginBottom: "16px" }}>
 						<h3
 							style={{
-								fontSize: "15px",
+								fontSize: "14px",
 								fontWeight: "bold",
-								marginBottom: "40px",
+								marginBottom: "8px",
 								color: "#333",
 							}}
 						>
 							{section.title}
 						</h3>
-						<p style={{ marginBottom: "40px", lineHeight: "1.8" }}>
+						<p style={{ marginBottom: "12px", lineHeight: "1.6", fontSize: "12px" }}>
 							{section.content}
 						</p>
 						{section.interactions &&
@@ -2987,8 +2987,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									key={iIdx}
 									style={{
 										marginLeft: "15px",
-										marginBottom: "24px",
-										lineHeight: "1.8",
+										marginBottom: "8px",
+										lineHeight: "1.6",
+										fontSize: "12px",
 									}}
 								>
 									• {interaction}
@@ -3003,18 +3004,18 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 				return (
 					<>
 						{parsed.keywords.map((keyword, idx) => (
-							<div key={idx} style={{ marginBottom: "15px" }}>
+							<div key={idx} style={{ marginBottom: "12px" }}>
 								<h4
 									style={{
-										fontSize: "15px",
+										fontSize: "14px",
 										fontWeight: "bold",
-										marginBottom: "5px",
+										marginBottom: "4px",
 										color: "#333",
 									}}
 								>
 									{keyword.text}
 								</h4>
-								<p style={{ lineHeight: "1.8" }}>
+								<p style={{ lineHeight: "1.6", fontSize: "12px" }}>
 									{keyword.description}
 								</p>
 							</div>
@@ -3159,12 +3160,16 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 				<>
 					{/* Page 2: 日主特性 */}
 					<div
+						className="page-break"
 						style={{
 							width: "210mm",
 							minHeight: "297mm",
-							padding: "20mm 3mm 20mm 3mm",
+							maxHeight: "297mm",
+							padding: "15mm 20mm",
 							position: "relative",
-							pageBreakAfter: "always",
+							backgroundColor: "white",
+							boxSizing: "border-box",
+							overflow: "hidden",
 						}}
 					>
 						{/* Date */}
@@ -3337,9 +3342,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									{characteristics.length > 0 && (
 										<div
 											style={{
-												fontSize: "15px",
-												lineHeight: "1.8",
-												marginBottom: "40px",
+												fontSize: "14px",
+												lineHeight: "1.6",
+												marginBottom: "24px",
 											}}
 										>
 											{characteristics.map(
@@ -3363,19 +3368,19 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 											style={{
 												display: "grid",
 												gridTemplateColumns: "1fr 1fr",
-												gap: "40px 48px",
-												marginTop: "28px",
+												gap: "20px 32px",
+												marginTop: "16px",
 											}}
 										>
 											{sections.map((section, index) => (
 												<div key={index}>
 													<h3
 														style={{
-															fontSize: "18px",
+															fontSize: "16px",
 															fontWeight: "bold",
 															color: concernColor,
 															marginBottom:
-																"24px",
+																"12px",
 														}}
 													>
 														{String(
@@ -3385,8 +3390,8 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 													</h3>
 													<div
 														style={{
-															fontSize: "13px",
-															lineHeight: "1.7",
+															fontSize: "12px",
+															lineHeight: "1.6",
 														}}
 													>
 														{section.content.map(
@@ -3412,13 +3417,13 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 						})()}
 
 						{/* Middle Tab Section */}
-						<div style={{ marginTop: "48px" }}>
+						<div style={{ marginTop: "24px" }}>
 							<div
 								style={{
 									display: "flex",
 									alignItems: "flex-start",
-									gap: "32px",
-									marginBottom: "40px",
+									gap: "24px",
+									marginBottom: "20px",
 								}}
 							>
 								<div
@@ -3431,7 +3436,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								>
 									<h2
 										style={{
-											fontSize: "22px",
+											fontSize: "20px",
 											fontWeight: "bold",
 											color: concernColor,
 											letterSpacing: "0",
@@ -3447,7 +3452,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									</h2>
 									<h2
 										style={{
-											fontSize: "22px",
+											fontSize: "20px",
 											fontWeight: "bold",
 											color: concernColor,
 										}}
@@ -3456,7 +3461,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									</h2>
 									<h2
 										style={{
-											fontSize: "22px",
+											fontSize: "20px",
 											fontWeight: "bold",
 											color: concernColor,
 											letterSpacing: "0",
@@ -3465,19 +3470,19 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 										十神
 									</h2>
 								</div>
-								<div style={{ flex: 1, paddingTop: "24px" }}>
+								<div style={{ flex: 1, paddingTop: "16px" }}>
 									<div
 										style={{
 											height: "3px",
 											backgroundColor: concernColor,
 											width: "80px",
-											marginBottom: "24px",
+											marginBottom: "16px",
 										}}
 									></div>
 									<div
 										style={{
-											fontSize: "15px",
-											lineHeight: "1.8",
+											fontSize: "13px",
+											lineHeight: "1.6",
 										}}
 									>
 										{renderPrintJSON(middleContent)}
@@ -3504,11 +3509,16 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 
 					{/* Page 3: 財星定位 with sections and 總結 */}
 					<div
+						className="page-break"
 						style={{
 							width: "210mm",
 							minHeight: "297mm",
-							padding: "20mm 3mm 20mm 3mm",
+							maxHeight: "297mm",
+							padding: "15mm 20mm",
 							position: "relative",
+							backgroundColor: "white",
+							boxSizing: "border-box",
+							overflow: "hidden",
 						}}
 					>
 						{/* Date */}
@@ -3529,8 +3539,8 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 						<div
 							style={{
 								display: "flex",
-								gap: "32px",
-								marginBottom: "24px",
+								gap: "20px",
+								marginBottom: "16px",
 							}}
 						>
 							<div style={{ display: "flex", gap: "0px" }}>
@@ -3594,9 +3604,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 							<div style={{ flex: 1 }}>
 								<div
 									style={{
-										fontSize: "18px",
-										lineHeight: "1.8",
-										marginBottom: "20px",
+										fontSize: "13px",
+										lineHeight: "1.6",
+										marginBottom: "14px",
 									}}
 								>
 									甚麼是
@@ -3634,26 +3644,26 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 							style={{
 								display: "grid",
 								gridTemplateColumns: "1fr 1fr",
-								gap: "24px",
-								marginBottom: "24px",
+								gap: "16px 20px",
+								marginBottom: "16px",
 							}}
 						>
 							{sections.map((section, index) => (
 								<div key={index}>
 									<h3
 										style={{
-											fontSize: "18px",
+											fontSize: "15px",
 											fontWeight: "bold",
 											color: concernColor,
-											marginBottom: "8px",
+											marginBottom: "6px",
 										}}
 									>
 										{section.title}
 									</h3>
 									<p
 										style={{
-											fontSize: "15px",
-											lineHeight: "1.8",
+											fontSize: "12px",
+											lineHeight: "1.6",
 											textAlign: "justify",
 										}}
 									>
@@ -3669,13 +3679,13 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								style={{
 									display: "flex",
 									alignItems: "flex-start",
-									gap: "10px",
+									gap: "8px",
 									marginBottom: "8px",
 								}}
 							>
 								<h2
 									style={{
-										fontSize: "40px",
+										fontSize: "36px",
 										fontWeight: "bold",
 										color: "#666",
 										whiteSpace: "nowrap",
@@ -3683,7 +3693,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								>
 									總結
 								</h2>
-								<div style={{ flex: 1, paddingTop: "14px" }}>
+								<div style={{ flex: 1, paddingTop: "12px" }}>
 									<div
 										style={{
 											height: "3px",
@@ -3695,8 +3705,8 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 							</div>
 							<p
 								style={{
-									fontSize: "15px",
-									lineHeight: "1.8",
+									fontSize: "12px",
+									lineHeight: "1.6",
 									textAlign: "justify",
 								}}
 							>
@@ -3707,7 +3717,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 						{/* Footer */}
 						<div
 							style={{
-								marginTop: "16px",
+								marginTop: "12px",
 								textAlign: "center",
 								color: "#999",
 								fontSize: "10px",

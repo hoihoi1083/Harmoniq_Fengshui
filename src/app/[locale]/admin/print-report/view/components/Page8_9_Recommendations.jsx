@@ -82,7 +82,7 @@ export default function Page8_9_Recommendations({ data }) {
 	return (
 		<>
 			{/* Page 8: 開運建議 | 建議方案 */}
-			<div className="page-break bg-white px-16 py-12 min-h-[297mm]">
+			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
 				{/* Page Header */}
 				<div className="flex items-start justify-between mb-10 pb-6 border-b-2 border-gray-200">
 					<div>
@@ -172,7 +172,7 @@ export default function Page8_9_Recommendations({ data }) {
 			</div>
 
 			{/* Page 9: 開運建議 | 禁忌行為 */}
-			<div className="page-break bg-white px-16 py-12 min-h-[297mm]">
+			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
 				{/* Page Header */}
 				<div className="flex items-start justify-between mb-10 pb-6 border-b-2 border-gray-200">
 					<div>

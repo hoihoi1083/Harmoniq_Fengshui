@@ -55,58 +55,42 @@ export default function Page4_2026Overview({ data }) {
 	const practicalResults = parsedContent.practicalResults;
 
 	return (
-		<div
+		<div className="page-break bg-white h-[297mm] overflow-hidden relative"
 			style={{
-				width: "210mm",
-				minHeight: "297mm",
-				padding: "20mm 20mm 20mm 20mm",
-				position: "relative",
-				pageBreakBefore: "always",
-				backgroundColor: "#fff",
+				padding: "15mm 20mm",
+				boxSizing: "border-box"
 			}}
 		>
 			{/* Date */}
-			<div
-				style={{
-					position: "absolute",
-					top: "20px",
-					right: "20px",
-					color: "#666",
-					fontSize: "13px",
-					fontWeight: "normal",
-				}}
+			<div className="absolute top-5 right-8 text-gray-500"
+				style={{ fontSize: "11px" }}
 			>
 				12/12/12
 			</div>
 
 			{/* Horizontal Title */}
-			<div
-				style={{
-					marginBottom: "32px",
-					paddingBottom: "16px",
-				}}
-			>
-				<h1
-					style={{
-						fontSize: "52px",
+			<div style={{ marginBottom: "20px", paddingBottom: "8px" }}>
+				<h1 
+					style={{ 
+						fontFamily: "Noto Serif TC, serif",
+						fontSize: "36px",
 						fontWeight: "bold",
 						color: "#666",
-						margin: 0,
-						lineHeight: "1.2",
-						fontFamily: "Noto Serif TC, serif",
+						marginBottom: "0",
+						lineHeight: "1.2"
 					}}
 				>
-					<span style={{ color: "#666" }}>2026</span>
-					<span style={{ margin: "0 12px", color: "#666" }}>|</span>
-					<span style={{ color: "#666" }}>流年</span>
+					<span>2026</span>
+					<span style={{ margin: "0 12px" }}>|</span>
+					<span>流年</span>
 				</h1>
-				<h2
-					style={{
-						fontSize: "52px",
-						fontWeight: "bold",
-						margin: 0,
-						lineHeight: "1.2",
+				<h2 
+					style={{ 
 						fontFamily: "Noto Serif TC, serif",
+						fontSize: "36px",
+						fontWeight: "bold",
+						marginBottom: "0",
+						lineHeight: "1.2"
 					}}
 				>
 					<span style={{ color: "#666" }}>丙午年</span>
@@ -116,89 +100,74 @@ export default function Page4_2026Overview({ data }) {
 			</div>
 
 			{/* Subtitle */}
-			<div
-				style={{
-					fontSize: "16px",
-					color: "#666",
-					marginBottom: "32px",
-					fontWeight: "normal",
-				}}
-			>
+			<div style={{ 
+				fontSize: "14px", 
+				color: "#666",
+				marginBottom: "20px"
+			}}>
 				流年干支作用
 			</div>
 
 			{/* Content in Two Columns */}
-			<div
-				style={{
-					display: "grid",
-					gridTemplateColumns: "1fr 1fr",
-					gap: "40px",
-					marginBottom: "24px",
-				}}
-			>
+			<div style={{
+				display: "grid",
+				gridTemplateColumns: "1fr 1fr",
+				gap: "0 32px",
+				marginBottom: "16px"
+			}}>
 				{/* Left Column - 流年干支作用 */}
 				<div>
-					<h3
-						style={{
-							fontSize: "22px",
-							fontWeight: "bold",
+					<h3 
+						style={{ 
 							color: color,
-							marginBottom: "16px",
-							marginTop: 0,
+							fontFamily: "Noto Serif TC, serif",
+							fontSize: "16px",
+							fontWeight: "bold",
+							marginBottom: "12px",
+							marginTop: "0"
 						}}
 					>
 						流年干支作用
 					</h3>
-					<p
-						style={{
-							fontSize: "15px",
-							lineHeight: "1.8",
-							textAlign: "justify",
-							color: "#333",
-							margin: 0,
-						}}
-					>
+					<p style={{ 
+						fontSize: "13px", 
+						lineHeight: "1.65", 
+						textAlign: "justify",
+						color: "#333",
+						margin: "0"
+					}}>
 						{ganzhiEffect || "內容載入中..."}
 					</p>
 				</div>
 
 				{/* Right Column - 在專案領域的具體表現 */}
 				<div>
-					<h3
-						style={{
-							fontSize: "22px",
-							fontWeight: "bold",
+					<h3 
+						style={{ 
 							color: color,
-							marginBottom: "16px",
-							marginTop: 0,
+							fontFamily: "Noto Serif TC, serif",
+							fontSize: "16px",
+							fontWeight: "bold",
+							marginBottom: "12px",
+							marginTop: "0"
 						}}
 					>
 						在專案領域的具體表現
 					</h3>
-					<div
-						style={{
-							fontSize: "15px",
-							lineHeight: "1.8",
-							textAlign: "justify",
-							color: "#333",
-						}}
-					>
+					<div style={{ 
+						fontSize: "13px", 
+						lineHeight: "1.65", 
+						textAlign: "justify",
+						color: "#333"
+					}}>
 						{practicalResults || "內容載入中..."}
 					</div>
 				</div>
 			</div>
 
 			{/* Footer */}
-			<div
-				style={{
-					position: "absolute",
-					bottom: "20px",
-					left: "20px",
-					textAlign: "left",
-					color: "#000",
-					fontSize: "14px",
-					fontWeight: "bold",
-				}}
+			<div className="absolute bottom-5 left-8 text-black font-bold"
+				style={{ fontSize: "10px" }}
 			>
 				HarmoniQ Bell
 			</div>

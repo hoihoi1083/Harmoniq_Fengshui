@@ -8,10 +8,13 @@ import getWuxingData from "@/lib/nayin.js";
 import Image from "next/image";
 import { getConcernColor } from "@/utils/colorTheme";
 import { MingJu } from "@/components/MingJu";
+import Page2_DayMasterTraits from "./components/Page2_DayMasterTraits";
+import Page3_WealthPosition from "./components/Page3_WealthPosition";
 import Page4_2026Overview from "./components/Page4_2026Overview";
 import Page5_6_CareerDetailed from "./components/Page5_6_CareerDetailed";
 import Page7_Seasons from "./components/Page7_Seasons";
 import Page8_9_Recommendations from "./components/Page8_9_Recommendations";
+import Page10_Summary from "./components/Page10_Summary";
 
 function PrintReportView() {
 	const searchParams = useSearchParams();
@@ -26,6 +29,7 @@ function PrintReportView() {
 	const [jixiongData, setJixiongData] = useState(null);
 	const [seasonData, setSeasonData] = useState(null);
 	const [coreSuggestionData, setCoreSuggestionData] = useState(null);
+	const [overallSummaryData, setOverallSummaryData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	// Get parameters from URL
@@ -190,7 +194,7 @@ function PrintReportView() {
 
 				// 2. Call Question Focus API (same as web-side)
 				// 2-4. Call all APIs in parallel to speed up loading
-			const [questionData, ganzhiData, jixiongResult, seasonResult, specificSuggestionResult] =
+		const [questionData, ganzhiData, jixiongResult, seasonResult, specificSuggestionResult, overallSummaryResult] =
 					await Promise.all([
 						// Question Focus API
 						fetch("/api/question-focus-simple", {
@@ -315,8 +319,8 @@ function PrintReportView() {
 							}),
 						}).then((res) => res.json()),
 
-				// Specific Suggestion Analysis API (Pages 8-9: 針對性建議 + 禁忌行為)
-				fetch("/api/specific-suggestion-analysis", {
+					// Specific Suggestion Analysis API (Pages 8-9: 針對性建議 + 禁忌行為)
+					fetch("/api/specific-suggestion-analysis", {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({
@@ -329,7 +333,18 @@ function PrintReportView() {
 							locale: locale,
 						}),
 					}).then((res) => res.json()),
-			]);
+
+					// Overall Summary Analysis API (Page 10: 破關成蝶，格局煥新)
+					fetch("/api/overall-summary", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							locale: locale,
+							concernType: concern,
+							questionFocusData: "User report for " + concern,
+						}),
+					}).then((res) => res.json()),
+				]);
 
 			console.log("Question Focus API response:", questionData);
 				console.log("Season Analysis API response:", seasonResult);
@@ -366,20 +381,25 @@ function PrintReportView() {
 // Process Specific Suggestion Analysis (針對性建議 + 禁忌行為)
 			if (specificSuggestionResult.success && specificSuggestionResult.data) {
 				setCoreSuggestionData(specificSuggestionResult.data);
-				}
-
-				setIsLoading(false);
-			} catch (error) {
-				console.error("Error loading data:", error);
-				setAiContent(`載入失敗，請重試`);
-				setIsLoading(false);
 			}
-		};
 
-		if (birthday && birthTime) {
-			loadData();
+			// Process Overall Summary Analysis (破關成蝶，格局煥新)
+			if (overallSummaryResult.success && overallSummaryResult.data) {
+				setOverallSummaryData(overallSummaryResult.data);
+			}
+
+			setIsLoading(false);
+		} catch (error) {
+			console.error("Error loading data:", error);
+			setAiContent(`載入失敗，請重試`);
+			setIsLoading(false);
 		}
-	}, [birthday, birthTime, gender, concern, question, locale]);
+	};
+
+	if (birthday && birthTime) {
+		loadData();
+	}
+}, [birthday, birthTime, gender, concern, question, locale]);
 
 	if (isLoading) {
 		return (
@@ -421,29 +441,35 @@ function PrintReportView() {
 				</button>
 			</div>
 
-			{/* A4 Page */}
-			<div
-				className="mx-auto mt-20 bg-white print-container "
-				style={{
-					minHeight: "297mm",
-					padding: "20mm 15mm",
-				}}
-			>
+			{/* A4 Page Container */}
+		<div className="mx-auto mt-20" style={{ padding: "20px" }}>
+				{/* Page 1 - A4 sized with visible boundaries */}
+				<div
+					className="mx-auto bg-white page-break"
+					style={{
+						width: "210mm",
+						minHeight: "297mm",
+						maxHeight: "297mm",
+						padding: "15mm 20mm",
+						boxSizing: "border-box",
+						overflow: "hidden",
+					}}
+				>
 				{/* Header */}
-				<div className="flex items-center justify-between mb-8">
+				<div className="flex items-center justify-between mb-6">
 					<h1
-						className="text-3xl font-bold"
-						style={{ color: getConcernColor(concern) }}
+						className="font-bold"
+						style={{ color: getConcernColor(concern), fontSize: "32px" }}
 					>
 						基礎分析
 					</h1>
 					<div className="text-right">
-						<div className="text-sm text-gray-600">
+						<div style={{ fontSize: "12px" }} className="text-gray-600">
 							{new Date()
 								.toLocaleDateString("zh-TW")
 								.replace(/\//g, "/")}
 						</div>
-						<div className="text-lg text-gray-600">
+						<div style={{ fontSize: "14px" }} className="text-gray-600">
 							生辰：
 							{new Date(birthday).toLocaleDateString(
 								"zh-TW",
@@ -477,19 +503,19 @@ function PrintReportView() {
 							branchToAnimal[yearBranch] || "rabbit";
 
 						return (
-							<div className="p-8 mb-8 border-2 border-gray-400 rounded-2xl">
-								<div className="flex gap-12">
+							<div className="p-6 mb-6 border-2 border-gray-400 rounded-2xl">
+								<div className="flex gap-10">
 									{/* Left side: Zodiac Animal with calligraphy style */}
 									<div className="flex-shrink-0">
-										<div className="relative w-48 h-48">
+										<div className="relative w-44 h-44">
 											{/* Pink circle background */}
 											<div className="absolute inset-0 bg-pink-100 rounded-full opacity-60"></div>
 											{/* Animal image */}
 											<Image
 												src={`/images/animals/${animalName}.png`}
 												alt="zodiac"
-												width={192}
-												height={192}
+												width={176}
+												height={176}
 												className="relative z-10 object-contain"
 											/>
 										</div>
@@ -499,12 +525,12 @@ function PrintReportView() {
 									<div className="flex-1">
 										<div className="flex items-center gap-6">
 											{/* Labels column */}
-											<div className="flex flex-col gap-12 text-center">
-												<div className="text-sm text-gray-500">
+											<div className="flex flex-col gap-10 text-center">
+												<div style={{ fontSize: "14px" }} className="text-gray-500">
 													天
 												</div>
 												<div className="h-4 mx-auto border-l-2 border-gray-300 border-dashed"></div>
-												<div className="text-sm text-gray-500">
+												<div style={{ fontSize: "14px" }} className="text-gray-500">
 													地
 												</div>
 											</div>
@@ -544,14 +570,15 @@ function PrintReportView() {
 															key={pillar.key}
 															className="flex flex-col items-center gap-1"
 														>
-															<div className="mb-1 text-sm text-gray-600">
+															<div className="mb-1" style={{ fontSize: "14px" }}>
 																{pillar.label}
 															</div>
 															<div
-																className="flex items-center justify-center w-16 h-20 text-2xl font-bold text-white"
+																className="flex items-center justify-center w-16 h-18 font-bold text-white"
 																style={{
 																	backgroundColor:
 																		pillar.bgColor,
+																	fontSize: "24px"
 																}}
 															>
 																{
@@ -559,10 +586,11 @@ function PrintReportView() {
 																}
 															</div>
 															<div
-																className="flex items-center justify-center w-16 h-20 text-2xl font-bold text-white"
+																className="flex items-center justify-center w-16 h-18 font-bold text-white"
 																style={{
 																	backgroundColor:
 																		pillar.bgColor,
+																	fontSize: "24px"
 																}}
 															>
 																{
@@ -593,11 +621,11 @@ function PrintReportView() {
 										};
 
 										return (
-											<div className="flex gap-8 mt-8">
-												{/* Left: Five Elements Chart (smaller) */}
-												<div className="w-1/2">
-													<div className="flex items-end justify-center gap-3 mb-2 h-28">
-														{Object.entries(
+												<div className="flex gap-8 mt-6">
+													{/* Left: Five Elements Chart (smaller) */}
+													<div className="w-1/2">
+													<div className="flex items-end justify-center gap-3 mb-2 h-24">{
+														Object.entries(
 															wuxingAnalysis.elementCounts,
 														).map(
 															([
@@ -615,7 +643,7 @@ function PrintReportView() {
 																		className="flex flex-col items-center"
 																	>
 																		<div
-																			className="w-12"
+																		className="w-10"
 																			style={{
 																				backgroundColor:
 																					colors[
@@ -661,13 +689,13 @@ function PrintReportView() {
 
 												{/* Right: Info boxes */}
 												<div className="flex flex-col justify-center w-1/2 space-y-2">
-													<div className="px-4 py-3 font-bold text-center text-white bg-black">
+													<div className="px-4 py-3 font-bold text-center text-white bg-black" style={{ fontSize: "15px" }}>
 														五行 -{" "}
 														{
 															strengthAnalysis.strengthDesc
 														}
 													</div>
-													<div className="px-4 py-2 text-sm text-center text-white bg-black">
+													<div className="px-4 py-2 text-center text-white bg-black" style={{ fontSize: "13px" }}>
 														{wuxingAnalysis
 															.missingElements
 															.length > 0
@@ -682,95 +710,64 @@ function PrintReportView() {
 						);
 					})()}
 
-				{/* Quote Box */}
-				{wuxingAnalysis &&
-					(() => {
-						const strengthAnalysis = analyzeWuxingStrength(
-							wuxingAnalysis.elementCounts,
-						);
-						const usefulGods =
-							determineUsefulGods(strengthAnalysis);
-						return (
-							<div className="p-6 mb-8 italic text-gray-700">
-								根據您的五行配置分析，建議以「
-								{usefulGods.primaryGod || "木"}」為吉運用神，「
-								{usefulGods.auxiliaryGod || "金"}
-								」為幫助用神。應優先運用性質具有成長性行動或有效調節的行動，達到提升整體運勢的效果。在日常生活中，可通過相關聯服方位、色系、職業選擇方式來達到起運的影響力。
-							</div>
-						);
-					})()}
+					{/* Explanatory Text */}
+				<div className="px-4 py-3 mt-5 text-gray-700" style={{ fontSize: "13px", lineHeight: "1.7" }}>
+					根據您的五行配置分析，建議從「天」為吉運用場，「金」為對助用場。應優先運用其雷局或成長性行動或有效圖的行動，達到提升整體運勢的效果。在日常生活中，可運過相應調節方位、色系、職業選擇方式來達到追求的影響力。
+				</div>
 
-				{/* Analysis Sections */}
-				<div className="space-y-6">
-					{/* Combined Section with Left Vertical Text */}
-					<div className="p-8 border-2 border-gray-300">
-						<div className="flex gap-8">
-							{/* Left: Vertical text "疑問" + "重點" */}
-							<div className="flex items-start flex-shrink-0 gap-2">
-								<div
-									className="flex flex-col"
-									style={{ writingMode: "vertical-rl" }}
-								>
-									<span className="text-6xl font-bold tracking-wider text-gray-700">
-										疑問
-									</span>
+				{/* Key Points Section */}
+				{aiContent && (
+					<div className="mt-5 border-2 border-gray-300 rounded-lg" style={{ padding: "16px" }}>
+						<div className="flex gap-6">
+							{/* Left: Vertical Title */}
+							<div className="flex-shrink-0">
+								<h2 className="font-black" style={{ 
+									fontSize: "42px",
+										lineHeight: "1.2",
+										letterSpacing: "0.05em",
+										writingMode: "vertical-rl",
+										textOrientation: "upright"
+									}}>
+										疑重問點
+									</h2>
 								</div>
-								<div
-									className="flex flex-col"
-									style={{ writingMode: "vertical-rl" }}
-								>
-									<span
-										className="text-6xl font-bold tracking-wider"
-										style={{
-											color: getConcernColor(concern),
-										}}
-									>
-										重點
-									</span>
-								</div>
-							</div>
 
-							{/* Right: Content */}
-							<div className="flex-1 pl-8 border-l-2 border-gray-400">
-								{/* Title */}
-								<h2 className="mb-6 text-2xl font-bold text-gray-800">
-									一般{concern}分析
-								</h2>
-
-								{/* Subtitle in concern color */}
-								<h3
-									className="mb-4 text-xl font-bold"
-									style={{ color: getConcernColor(concern) }}
-								>
-									{concern}分析指導
+								{/* Right: Content */}
+							<div className="flex-1 pt-2" style={{ borderLeft: "2px solid #d1d5db", paddingLeft: "16px" }}>
+								<h3 className="mb-2 font-bold" style={{ 
+									fontSize: "16px",
+									color: getConcernColor(concern)
+								}}>
+									一般財運分析
 								</h3>
-
-								{/* Content */}
-								<div className="leading-relaxed text-gray-800 whitespace-pre-wrap">
-									{aiContent ||
-										questionFocus?.content ||
-										"載入中..."}
+								<h4 className="mb-3 font-semibold" style={{ 
+									fontSize: "14px",
+									color: "#B8A870"
+								}}>
+									財運分析指導
+								</h4>
+								<div className="text-gray-700" style={{ fontSize: "13px", lineHeight: "1.7" }}>
+									{aiContent.substring(0, 350)}...
+									<div className="mt-3 text-gray-500" style={{ fontSize: "11px" }}>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					)}
 				</div>
 
-				{/* Page 2 & 3: MingJu Analysis */}
-				<div
-					style={{ pageBreakBefore: "always", padding: "20mm 15mm" }}
-				>
-					<MingJu
-						userInfo={{
-							birthDateTime: birthday,
-							gender: gender,
-							concern: concern,
-							problem: question,
-						}}
-						currentYear={new Date().getFullYear()}
-						isPrintMode={true}
-					/>
-				</div>
+				{/* Pages 2 & 3: MingJu Analysis */}
+				<MingJu
+					userInfo={{
+						birthDateTime: birthday,
+						gender: gender,
+						concern: concern,
+						problem: question,
+					}}
+					currentYear={new Date().getFullYear()}
+					isPrintMode={true}
+				/>
 
 				{/* Page 4: 2026 Year Analysis */}
 				{ganzhiAnalysis && (
@@ -826,7 +823,18 @@ function PrintReportView() {
 					}}
 				/>
 			)}
-		</div>
+
+			{/* Page 10: 破關成蝶，格局煥新 */}
+			{overallSummaryData && (
+				<Page10_Summary
+					data={{
+						summary: overallSummaryData,
+						concern: concern,
+						color: getConcernColor({ concern: concern }),
+					}}
+				/>
+			)}
+			</div>
 
 		{/* Print Styles */}
 		<style jsx global>{`
@@ -834,20 +842,75 @@ function PrintReportView() {
 				.no-print {
 					display: none !important;
 				}
-				.print-container {
-					margin: 0 auto !important;
-					padding: 20mm 15mm !important;
+				body {
+					print-color-adjust: exact;
+					-webkit-print-color-adjust: exact;
+					margin: 0;
+					padding: 0;
+					background: white;
 				}
-					@page {
-						size: A4;
-						margin: 0;
-					}
-					body {
-						print-color-adjust: exact;
-						-webkit-print-color-adjust: exact;
-					}
+				/* Remove container padding and background in print */
+				body > div {
+					margin: 0 !important;
+					padding: 0 !important;
+					background: white !important;
 				}
-			`}</style>
+				.page-break {
+					page-break-after: always;
+					page-break-inside: avoid;
+					width: 210mm !important;
+					height: 297mm !important;
+					max-height: 297mm !important;
+					overflow: hidden !important;
+					box-sizing: border-box;
+					padding: 15mm 20mm !important;
+					margin: 0 !important;
+					box-shadow: none !important;
+					border: none !important;
+				}
+				.page-break:last-child {
+					page-break-after: auto;
+				}
+				@page {
+					size: A4;
+					margin: 0;
+				}
+			}
+			/* Screen preview - show A4 page boundaries clearly */
+			@media screen {
+				.page-break {
+					width: 210mm;
+					min-height: 297mm;
+					max-height: 297mm;
+					overflow: hidden;
+					box-sizing: border-box;
+					margin: 0 auto 20px;
+					box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+					border: 1px solid #d1d5db;
+					position: relative;
+				}
+				.page-break::before {
+					content: '';
+					position: absolute;
+					top: 0;
+					left: 0;
+					right: 0;
+					height: 15mm;
+					border-bottom: 1px dashed #e5e7eb;
+					pointer-events: none;
+				}
+				.page-break::after {
+					content: '';
+					position: absolute;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					height: 15mm;
+					border-top: 1px dashed #e5e7eb;
+					pointer-events: none;
+				}
+			}
+		`}</style>
 		</>
 	);
 }
