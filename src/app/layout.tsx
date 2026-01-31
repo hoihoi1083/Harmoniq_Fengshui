@@ -1,4 +1,4 @@
-import { Inter, Lora } from "next/font/google";
+import { Inter, Lora, Noto_Serif_SC } from "next/font/google";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import MixpanelTracker from "@/components/MixpanelTracker";
 import MixpanelAuthTracker from "@/components/MixpanelAuthTracker";
@@ -7,6 +7,11 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 const lora = Lora({ subsets: ["latin", "symbols"] });
+const notoSerifSC = Noto_Serif_SC({ 
+	subsets: ["latin"], 
+	weight: ["400", "500", "600", "700", "900"],
+	variable: "--font-noto-serif-sc"
+});
 
 export const metadata = {
 	title: "風鈴命理聊天室 | 风铃命理聊天室 - 開啟運勢之門 | 开启运势之门",
@@ -101,7 +106,7 @@ export default function RootLayout({
 					<GoogleAnalytics />
 				</Suspense>
 			</head>
-			<body className={lora.className}>
+			<body className={`${lora.className} ${notoSerifSC.variable}`}>
 				<Suspense fallback={null}>
 					<MixpanelTracker />
 				</Suspense>
