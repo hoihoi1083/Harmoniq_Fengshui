@@ -196,130 +196,119 @@ function PrintReportView() {
 
 				// 2. Call Question Focus API (same as web-side)
 				// 2-4. Call all APIs in parallel to speed up loading
-		const [questionData, ganzhiData, jixiongResult, seasonResult, specificSuggestionResult, overallSummaryResult] =
-					await Promise.all([
-						// Question Focus API
-						fetch("/api/question-focus-simple", {
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								baziData: {
-									year: wuxingResult.wuxingData.year,
-									month: wuxingResult.wuxingData.month,
-									day: wuxingResult.wuxingData.day,
-									hour: wuxingResult.wuxingData.hour,
-									dayMaster: wuxingResult.wuxingData.dayStem,
-									dayElement:
-										wuxingResult.wuxingData.dayStemWuxing,
-								},
+				const [
+					questionData,
+					ganzhiData,
+					jixiongResult,
+					seasonResult,
+					specificSuggestionResult,
+					overallSummaryResult,
+				] = await Promise.all([
+					// Question Focus API
+					fetch("/api/question-focus-simple", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							baziData: {
+								year: wuxingResult.wuxingData.year,
+								month: wuxingResult.wuxingData.month,
+								day: wuxingResult.wuxingData.day,
+								hour: wuxingResult.wuxingData.hour,
+								dayMaster: wuxingResult.wuxingData.dayStem,
+								dayElement:
+									wuxingResult.wuxingData.dayStemWuxing,
+							},
+							concern: concern,
+							problem: question,
+							locale: locale,
+						}),
+					}).then((res) => res.json()),
+
+					// GanZhi Analysis API (Page 4)
+					fetch("/api/ganzhi-analysis", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							userInfo: {
 								concern: concern,
 								problem: question,
-								locale: locale,
-							}),
-						}).then((res) => res.json()),
+								birthDateTime: birthday,
+								gender: gender,
+							},
+							baziData: {
+								year: wuxingResult.wuxingData.year,
+								month: wuxingResult.wuxingData.month,
+								day: wuxingResult.wuxingData.day,
+								hour: wuxingResult.wuxingData.hour,
+								dayMaster: wuxingResult.wuxingData.dayStem,
+								dayElement:
+									wuxingResult.wuxingData.dayStemWuxing,
+							},
+							currentYear: new Date().getFullYear(),
+							locale: locale,
+						}),
+					}).then((res) => res.json()),
 
-						// GanZhi Analysis API (Page 4)
-						fetch("/api/ganzhi-analysis", {
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								userInfo: {
-									concern: concern,
-									problem: question,
-									birthDateTime: birthday,
-									gender: gender,
-								},
-								baziData: {
-									year: wuxingResult.wuxingData.year,
-									month: wuxingResult.wuxingData.month,
-									day: wuxingResult.wuxingData.day,
-									hour: wuxingResult.wuxingData.hour,
-									dayMaster: wuxingResult.wuxingData.dayStem,
-									dayElement:
-										wuxingResult.wuxingData.dayStemWuxing,
-								},
-								currentYear: new Date().getFullYear(),
-								locale: locale,
-							}),
-						}).then((res) => res.json()),
+					// JiXiong Analysis API (Pages 5-6)
+					fetch("/api/jixiong-analysis", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							userInfo: {
+								birthday: birthday,
+								gender: gender,
+								time: birthTime,
+								concern: concern,
+							},
+							baziData: {
+								year: wuxingResult.wuxingData.year,
+								month: wuxingResult.wuxingData.month,
+								day: wuxingResult.wuxingData.day,
+								hour: wuxingResult.wuxingData.hour,
+								dayMaster: wuxingResult.wuxingData.dayStem,
+								dayElement:
+									wuxingResult.wuxingData.dayStemWuxing,
+							},
+							locale: locale,
+						}),
+					}).then((res) => res.json()),
 
-						// JiXiong Analysis API (Pages 5-6)
-						fetch("/api/jixiong-analysis", {
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								userInfo: {
-									birthday: birthday,
-									gender: gender,
-									time: birthTime,
-									concern: concern,
-								},
-								baziData: {
-									year: wuxingResult.wuxingData.year,
-									month: wuxingResult.wuxingData.month,
-									day: wuxingResult.wuxingData.day,
-									hour: wuxingResult.wuxingData.hour,
-									dayMaster: wuxingResult.wuxingData.dayStem,
-									dayElement:
-										wuxingResult.wuxingData.dayStemWuxing,
-								},
-								locale: locale,
-							}),
-						}).then((res) => res.json()),
-
-						// Season Analysis API (Page 7) - Same as web side
-						fetch("/api/season-analysis", {
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								userInfo: {
-									birthday: birthday,
-									gender: gender,
-									time: birthTime,
-									concern: concern,
-								},
-								currentDate: {
-									year: new Date().getFullYear(),
-									month: new Date().getMonth() + 1,
-									currentSeason: (() => {
-										const month = new Date().getMonth() + 1;
-										if (month >= 2 && month <= 4)
-											return "春季";
-										if (month >= 5 && month <= 7)
-											return "夏季";
-										if (month >= 8 && month <= 10)
-											return "秋季";
-										return "冬季";
-									})(),
-									relevantSeasons: (() => {
-										const month = new Date().getMonth() + 1;
-										if (month >= 2 && month <= 4)
-											return [
-												"春季",
-												"夏季",
-												"秋季",
-												"冬季",
-											];
-										if (month >= 5 && month <= 7)
-											return [
-												"夏季",
-												"秋季",
-												"冬季",
-												"春季",
-											];
-										if (month >= 8 && month <= 10)
-											return [
-												"秋季",
-												"冬季",
-												"春季",
-												"夏季",
-											];
-										return ["冬季", "春季", "夏季", "秋季"];
-									})(),
-								},
-								locale: locale,
-							}),
-						}).then((res) => res.json()),
+					// Season Analysis API (Page 7) - Same as web side
+					fetch("/api/season-analysis", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							userInfo: {
+								birthday: birthday,
+								gender: gender,
+								time: birthTime,
+								concern: concern,
+							},
+							currentDate: {
+								year: new Date().getFullYear(),
+								month: new Date().getMonth() + 1,
+								currentSeason: (() => {
+									const month = new Date().getMonth() + 1;
+									if (month >= 2 && month <= 4) return "春季";
+									if (month >= 5 && month <= 7) return "夏季";
+									if (month >= 8 && month <= 10)
+										return "秋季";
+									return "冬季";
+								})(),
+								relevantSeasons: (() => {
+									const month = new Date().getMonth() + 1;
+									if (month >= 2 && month <= 4)
+										return ["春季", "夏季", "秋季", "冬季"];
+									if (month >= 5 && month <= 7)
+										return ["夏季", "秋季", "冬季", "春季"];
+									if (month >= 8 && month <= 10)
+										return ["秋季", "冬季", "春季", "夏季"];
+									return ["冬季", "春季", "夏季", "秋季"];
+								})(),
+							},
+							locale: locale,
+						}),
+					}).then((res) => res.json()),
 
 					// Specific Suggestion Analysis API (Pages 8-9: 針對性建議 + 禁忌行為)
 					fetch("/api/specific-suggestion-analysis", {
@@ -348,9 +337,12 @@ function PrintReportView() {
 					}).then((res) => res.json()),
 				]);
 
-			console.log("Question Focus API response:", questionData);
+				console.log("Question Focus API response:", questionData);
 				console.log("Season Analysis API response:", seasonResult);
-			console.log("Specific Suggestion API response:", specificSuggestionResult);
+				console.log(
+					"Specific Suggestion API response:",
+					specificSuggestionResult,
+				);
 				if (questionData.success && questionData.solution) {
 					setQuestionFocus(questionData.solution);
 					if (questionData.solution.content) {
@@ -380,28 +372,31 @@ function PrintReportView() {
 					setSeasonData(seasonResult.analysis);
 				}
 
-// Process Specific Suggestion Analysis (針對性建議 + 禁忌行為)
-			if (specificSuggestionResult.success && specificSuggestionResult.data) {
-				setCoreSuggestionData(specificSuggestionResult.data);
-			}
+				// Process Specific Suggestion Analysis (針對性建議 + 禁忌行為)
+				if (
+					specificSuggestionResult.success &&
+					specificSuggestionResult.data
+				) {
+					setCoreSuggestionData(specificSuggestionResult.data);
+				}
 
-			// Process Overall Summary Analysis (破關成蝶，格局煥新)
-			if (overallSummaryResult.success && overallSummaryResult.data) {
-				setOverallSummaryData(overallSummaryResult.data);
-			}
+				// Process Overall Summary Analysis (破關成蝶，格局煥新)
+				if (overallSummaryResult.success && overallSummaryResult.data) {
+					setOverallSummaryData(overallSummaryResult.data);
+				}
 
-			setIsLoading(false);
-		} catch (error) {
-			console.error("Error loading data:", error);
-			setAiContent(`載入失敗，請重試`);
-			setIsLoading(false);
+				setIsLoading(false);
+			} catch (error) {
+				console.error("Error loading data:", error);
+				setAiContent(`載入失敗，請重試`);
+				setIsLoading(false);
+			}
+		};
+
+		if (birthday && birthTime) {
+			loadData();
 		}
-	};
-
-	if (birthday && birthTime) {
-		loadData();
-	}
-}, [birthday, birthTime, gender, concern, question, locale]);
+	}, [birthday, birthTime, gender, concern, question, locale]);
 
 	if (isLoading) {
 		return (
@@ -454,72 +449,74 @@ function PrintReportView() {
 				analyzeWuxingStrength={analyzeWuxingStrength}
 			/>
 
-				{/* Pages 2 & 3: MingJu Analysis */}
-				<MingJu
-					userInfo={{
-						birthDateTime: birthday,
-						gender: gender,
-						concern: concern,
-						problem: question,
-					}}
-					currentYear={new Date().getFullYear()}
-					isPrintMode={true}
-				/>
+			{/* Pages 2 & 3: MingJu Analysis */}
+			<MingJu
+				userInfo={{
+					birthDateTime: birthday,
+					gender: gender,
+					concern: concern,
+					problem: question,
+				}}
+				currentYear={new Date().getFullYear()}
+				isPrintMode={true}
+			/>
 
-				{/* Page 4: 2026 Year Analysis */}
-				{ganzhiAnalysis && (
-					<Page4_2026Overview
-						data={{
-							year: {
-								// Pass the raw AI analysis text
-								aiAnalysis:
-									ganzhiAnalysis.aiAnalysis || ganzhiAnalysis,
-							},
-							concern: concern,
-							color: getConcernColor({ concern: concern }),
-						}}
-					/>
-				)}
-
-				{/* Pages 5-6: JiXiong Analysis (吉象 and 凶象) */}
-				{jixiongData && (
-					<Page5_6_CareerDetailed
-						data={{
-							jixiong: jixiongData.parsed || jixiongData,
-							concern: concern,
-							color: getConcernColor({ concern: concern }),
-						}}
-					/>
-				)}
-
-				{/* Page 7: Seasonal Analysis (關鍵季節) */}
-				{seasonData && seasonData.parsed?.seasons && (
-					<>
-						{console.log("🌸 Page7 season data check:", {
-							hasSeasonData: !!seasonData,
-							hasParsed: !!seasonData.parsed,
-							seasonsCount: seasonData.parsed?.seasons?.length,
-						})}
-						<Page7_Seasons
-							data={{
-								seasons: seasonData.parsed.seasons,
-								concern: concern,
-								color: getConcernColor({ concern: concern }),
-							}}
-						/>
-					</>
-				)}
-
-			{/* Pages 8-9: 針對性建議 + 禁忌行為 */}
-			{coreSuggestionData && (coreSuggestionData.suggestions || coreSuggestionData.taboos) && (
-				<Page8_9_Recommendations
+			{/* Page 4: 2026 Year Analysis */}
+			{ganzhiAnalysis && (
+				<Page4_2026Overview
 					data={{
-						summary: coreSuggestionData,
+						year: {
+							// Pass the raw AI analysis text
+							aiAnalysis:
+								ganzhiAnalysis.aiAnalysis || ganzhiAnalysis,
+						},
 						concern: concern,
 						color: getConcernColor({ concern: concern }),
 					}}
 				/>
 			)}
+
+			{/* Pages 5-6: JiXiong Analysis (吉象 and 凶象) */}
+			{jixiongData && (
+				<Page5_6_CareerDetailed
+					data={{
+						jixiong: jixiongData.parsed || jixiongData,
+						concern: concern,
+						color: getConcernColor({ concern: concern }),
+					}}
+				/>
+			)}
+
+			{/* Page 7: Seasonal Analysis (關鍵季節) */}
+			{seasonData && seasonData.parsed?.seasons && (
+				<>
+					{console.log("🌸 Page7 season data check:", {
+						hasSeasonData: !!seasonData,
+						hasParsed: !!seasonData.parsed,
+						seasonsCount: seasonData.parsed?.seasons?.length,
+					})}
+					<Page7_Seasons
+						data={{
+							seasons: seasonData.parsed.seasons,
+							concern: concern,
+							color: getConcernColor({ concern: concern }),
+						}}
+					/>
+				</>
+			)}
+
+			{/* Pages 8-9: 針對性建議 + 禁忌行為 */}
+			{coreSuggestionData &&
+				(coreSuggestionData.suggestions ||
+					coreSuggestionData.taboos) && (
+					<Page8_9_Recommendations
+						data={{
+							summary: coreSuggestionData,
+							concern: concern,
+							color: getConcernColor({ concern: concern }),
+						}}
+					/>
+				)}
 
 			{/* Page 10: 破關成蝶，格局煥新 */}
 			{overallSummaryData && (
@@ -532,81 +529,81 @@ function PrintReportView() {
 				/>
 			)}
 
-		{/* Print Styles */}
-		<style jsx global>{`
-			@media print {
-				.no-print {
-					display: none !important;
+			{/* Print Styles */}
+			<style jsx global>{`
+				@media print {
+					.no-print {
+						display: none !important;
+					}
+					body {
+						print-color-adjust: exact;
+						-webkit-print-color-adjust: exact;
+						margin: 0;
+						padding: 0;
+						background: white;
+					}
+					/* Remove container padding and background in print */
+					body > div {
+						margin: 0 !important;
+						padding: 0 !important;
+						background: white !important;
+					}
+					.page-break {
+						page-break-after: always;
+						page-break-inside: avoid;
+						width: 210mm !important;
+						height: 297mm !important;
+						max-height: 297mm !important;
+						overflow: hidden !important;
+						box-sizing: border-box;
+						padding: 15mm 20mm !important;
+						margin: 0 !important;
+						box-shadow: none !important;
+						border: none !important;
+					}
+					.page-break:last-child {
+						page-break-after: auto;
+					}
+					@page {
+						size: A4;
+						margin: 0;
+					}
 				}
-				body {
-					print-color-adjust: exact;
-					-webkit-print-color-adjust: exact;
-					margin: 0;
-					padding: 0;
-					background: white;
+				/* Screen preview - show A4 page boundaries clearly */
+				@media screen {
+					.page-break {
+						width: 210mm;
+						min-height: 297mm;
+						max-height: 297mm;
+						overflow: hidden;
+						box-sizing: border-box;
+						margin: 0 auto 20px;
+						box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+						border: 1px solid #d1d5db;
+						position: relative;
+					}
+					.page-break::before {
+						content: "";
+						position: absolute;
+						top: 0;
+						left: 0;
+						right: 0;
+						height: 15mm;
+						border-bottom: 1px dashed #e5e7eb;
+						pointer-events: none;
+					}
+					.page-break::after {
+						content: "";
+						position: absolute;
+						bottom: 0;
+						left: 0;
+						right: 0;
+						height: 15mm;
+						border-top: 1px dashed #e5e7eb;
+						pointer-events: none;
+					}
 				}
-				/* Remove container padding and background in print */
-				body > div {
-					margin: 0 !important;
-					padding: 0 !important;
-					background: white !important;
-				}
-				.page-break {
-					page-break-after: always;
-					page-break-inside: avoid;
-					width: 210mm !important;
-					height: 297mm !important;
-					max-height: 297mm !important;
-					overflow: hidden !important;
-					box-sizing: border-box;
-					padding: 15mm 20mm !important;
-					margin: 0 !important;
-					box-shadow: none !important;
-					border: none !important;
-				}
-				.page-break:last-child {
-					page-break-after: auto;
-				}
-				@page {
-					size: A4;
-					margin: 0;
-				}
-			}
-			/* Screen preview - show A4 page boundaries clearly */
-			@media screen {
-				.page-break {
-					width: 210mm;
-					min-height: 297mm;
-					max-height: 297mm;
-					overflow: hidden;
-					box-sizing: border-box;
-					margin: 0 auto 20px;
-					box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-					border: 1px solid #d1d5db;
-					position: relative;
-				}
-				.page-break::before {
-					content: '';
-					position: absolute;
-					top: 0;
-					left: 0;
-					right: 0;
-					height: 15mm;
-					border-bottom: 1px dashed #e5e7eb;
-					pointer-events: none;
-				}
-				.page-break::after {
-					content: '';
-					position: absolute;
-					bottom: 0;
-					left: 0;
-					right: 0;
-					height: 15mm;
-					border-top: 1px dashed #e5e7eb;
-					pointer-events: none;
-				}
-			}
-		`}</style>
+			`}</style>
 		</>
 	);
 }

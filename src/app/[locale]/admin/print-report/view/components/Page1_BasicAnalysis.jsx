@@ -12,7 +12,7 @@ export default function Page1_BasicAnalysis({
 	analyzeWuxingStrength,
 }) {
 	return (
-		<div className="mx-auto mt-20" style={{ padding: "20px" }}>
+		<div className="mx-auto mt-15" style={{ padding: "15px" }}>
 			{/* Page 1 - A4 sized with visible boundaries */}
 			<div
 				className="mx-auto bg-white page-break"
@@ -30,7 +30,7 @@ export default function Page1_BasicAnalysis({
 				<div
 					style={{
 						position: "relative",
-						height: "120px",
+						height: "80px",
 						marginBottom: "0px",
 					}}
 				>
@@ -146,15 +146,16 @@ export default function Page1_BasicAnalysis({
 								<div className="flex gap-10">
 									{/* Left side: Zodiac Animal with calligraphy style */}
 									<div className="flex-shrink-0">
-										<div className="relative w-44 h-44">
-											{/* Pink circle background */}
-											<div className="absolute inset-0 bg-pink-100 rounded-full opacity-60"></div>
+										<div
+											className="relative w-44 h-44"
+											style={{ marginTop: "30px" }}
+										>
 											{/* Animal image */}
 											<Image
 												src={`/images/animals/${animalName}.png`}
 												alt="zodiac"
-												width={176}
-												height={176}
+												width={170}
+												height={170}
 												className="relative z-10 object-contain"
 											/>
 										</div>
@@ -162,26 +163,71 @@ export default function Page1_BasicAnalysis({
 
 									{/* Right side: Four Pillars */}
 									<div className="flex-1">
-										<div className="flex items-center gap-6">
+										<div
+											className="flex items-center gap-6"
+											style={{ position: "relative" }}
+										>
+											{/* Horizontal grey dotted line behind pillars */}
+											<div
+												style={{
+													position: "absolute",
+													top: "47%",
+													left: "0",
+													right: "0",
+													height: "0",
+													borderTop:
+														"2px dashed #cccccc",
+													transform:
+														"translateY(25px)",
+													zIndex: 0,
+												}}
+											></div>
+
 											{/* Labels column */}
-											<div className="flex flex-col gap-10 text-center">
+											<div
+												className="flex flex-col"
+												style={{
+													height: "180px",
+													paddingTop: "55px",
+												}}
+											>
 												<div
-													style={{ fontSize: "14px" }}
-													className="text-gray-500"
+													style={{
+														fontSize: "20px",
+														fontFamily:
+															"Noto Serif TC, serif",
+														fontWeight: 900,
+														marginBottom: "50px",
+														textShadow:
+															"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
+													}}
+													className="text-gray-700"
 												>
 													天
 												</div>
-												<div className="h-4 mx-auto border-l-2 border-gray-300 border-dashed"></div>
 												<div
-													style={{ fontSize: "14px" }}
-													className="text-gray-500"
+													style={{
+														fontSize: "20px",
+														fontFamily:
+															"Noto Serif TC, serif",
+														fontWeight: 900,
+														textShadow:
+															"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
+													}}
+													className="text-gray-700"
 												>
 													地
 												</div>
 											</div>
 
 											{/* Pillars */}
-											<div className="flex gap-4">
+											<div
+												className="flex gap-12"
+												style={{
+													position: "relative",
+													zIndex: 1,
+												}}
+											>
 												{[
 													{
 														key: "year",
@@ -213,42 +259,71 @@ export default function Page1_BasicAnalysis({
 													return (
 														<div
 															key={pillar.key}
-															className="flex flex-col items-center gap-1"
+															className="flex flex-col items-center"
 														>
+															{/* Label */}
 															<div
-																className="mb-1"
+																className="mb-2"
 																style={{
 																	fontSize:
-																		"14px",
+																		"20px",
+																	fontWeight: 900,
+																	color: "#000",
+																	fontFamily:
+																		"Noto Serif TC, serif",
+																	textShadow:
+																		"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
 																}}
 															>
 																{pillar.label}
 															</div>
+															{/* Single pillar box with dotted line */}
 															<div
-																className="flex items-center justify-center w-16 font-bold text-white h-18"
+																className="relative"
 																style={{
+																	width: "40px",
+																	height: "150px",
 																	backgroundColor:
 																		pillar.bgColor,
-																	fontSize:
-																		"24px",
 																}}
 															>
-																{
-																	pillarData.heavenly
-																}
-															</div>
-															<div
-																className="flex items-center justify-center w-16 font-bold text-white h-18"
-																style={{
-																	backgroundColor:
-																		pillar.bgColor,
-																	fontSize:
-																		"24px",
-																}}
-															>
-																{
-																	pillarData.earthly
-																}
+																{/* Top section - Heavenly */}
+																<div
+																	className="flex items-center justify-center font-bold text-white"
+																	style={{
+																		height: "50%",
+																		fontSize:
+																			"26px",
+																		fontWeight: 900,
+																		fontFamily:
+																			"Noto Serif TC, serif",
+																		textShadow:
+																			"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
+																	}}
+																>
+																	{
+																		pillarData.heavenly
+																	}
+																</div>
+
+																{/* Bottom section - Earthly */}
+																<div
+																	className="flex items-center justify-center font-bold text-white"
+																	style={{
+																		height: "50%",
+																		fontSize:
+																			"26px",
+																		fontWeight: 900,
+																		fontFamily:
+																			"Noto Serif TC, serif",
+																		textShadow:
+																			"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
+																	}}
+																>
+																	{
+																		pillarData.earthly
+																	}
+																</div>
 															</div>
 														</div>
 													);
@@ -274,42 +349,81 @@ export default function Page1_BasicAnalysis({
 										};
 
 										return (
-											<div className="flex gap-8 mt-6">
+											<div className="flex gap-8 mt-0">
 												{/* Left: Five Elements Chart (smaller) */}
 												<div className="w-1/2">
-													<div className="flex items-end justify-center h-24 gap-3 mb-2">
-														{Object.entries(
-															wuxingAnalysis.elementCounts,
-														).map(
-															([
-																element,
-																count,
-															]) => {
-																const height =
-																	count * 20 +
-																	20;
-																return (
-																	<div
-																		key={
-																			element
-																		}
-																		className="flex flex-col items-center"
-																	>
+													<div
+														style={{
+															position:
+																"relative",
+														}}
+													>
+														{/* Bars container */}
+														<div
+															className="flex items-end justify-center mb-0 gap-9"
+															style={{
+																height: "150px",
+															}}
+														>
+															{Object.entries(
+																wuxingAnalysis.elementCounts,
+															).map(
+																([
+																	element,
+																	count,
+																]) => {
+																	const height =
+																		count *
+																			30 +
+																		30;
+																	return (
 																		<div
-																			className="w-10"
-																			style={{
-																				backgroundColor:
-																					colors[
-																						element
-																					],
-																				height: `${height}px`,
-																			}}
-																		></div>
+																			key={
+																				element
+																			}
+																			className="flex flex-col items-center"
+																		>
+																			<div
+																				style={{
+																					backgroundColor:
+																						colors[
+																							element
+																						],
+																					height: `${height}px`,
+																					width: "15px",
+																				}}
+																			></div>
+																		</div>
+																	);
+																},
+															)}
+														</div>
+														{/* Black horizontal line */}
+														<div
+															style={{
+																width: "100%",
+																height: "2px",
+																backgroundColor:
+																	"#000000",
+																marginBottom:
+																	"12px",
+															}}
+														></div>
+														{/* Icons with numbers */}
+														<div className="flex justify-center gap-6">
+															{Object.entries(
+																wuxingAnalysis.elementCounts,
+															).map(
+																([
+																	element,
+																	count,
+																]) => {
+																	return (
 																		<div
-																			className="flex items-center justify-center gap-1 mt-1 text-xs font-bold"
-																			style={{
-																				height: "20px",
-																			}}
+																			key={
+																				element
+																			}
+																			className="flex items-center gap-1"
 																		>
 																			<Image
 																				src={`/images/elements/${element}.png`}
@@ -317,35 +431,50 @@ export default function Page1_BasicAnalysis({
 																					element
 																				}
 																				width={
-																					16
+																					20
 																				}
 																				height={
-																					16
+																					20
 																				}
+																				style={{
+																					objectFit:
+																						"contain",
+																				}}
 																				className="inline-block"
 																			/>
-																			<span>
-																				{
-																					element
-																				}
+																			<span
+																				style={{
+																					fontSize:
+																						"14px",
+																					fontWeight:
+																						"bold",
+																				}}
+																			>
 																				{
 																					count
 																				}
 																			</span>
 																		</div>
-																	</div>
-																);
-															},
-														)}
+																	);
+																},
+															)}
+														</div>
 													</div>
 												</div>
 
 												{/* Right: Info boxes */}
-												<div className="flex flex-col justify-center w-1/2 space-y-2">
+												<div className="flex flex-col justify-center w-1/2 space-y-3">
 													<div
-														className="px-4 py-3 font-bold text-center text-white bg-black"
+														className="text-center text-white bg-black"
 														style={{
-															fontSize: "15px",
+															fontSize: "16px",
+															fontFamily:
+																"Noto Serif TC, serif",
+															fontWeight: 900,
+															padding:
+																"16px 20px",
+															textShadow:
+																"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
 														}}
 													>
 														五行 -{" "}
@@ -354,9 +483,16 @@ export default function Page1_BasicAnalysis({
 														}
 													</div>
 													<div
-														className="px-4 py-2 text-center text-white bg-black"
+														className="text-center text-white bg-black"
 														style={{
-															fontSize: "13px",
+															fontSize: "16px",
+															fontFamily:
+																"Noto Serif TC, serif",
+															fontWeight: 900,
+															padding:
+																"16px 20px",
+															textShadow:
+																"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
 														}}
 													>
 														{wuxingAnalysis
@@ -374,70 +510,142 @@ export default function Page1_BasicAnalysis({
 					})()}
 
 				{/* Explanatory Text */}
-				<div
-					className="px-4 py-3 mt-5 text-gray-700"
-					style={{ fontSize: "13px", lineHeight: "1.7" }}
-				>
-					根據您的五行配置分析，建議從「天」為吉運用場，「金」為對助用場。應優先運用其雷局或成長性行動或有效圖的行動，達到提升整體運勢的效果。在日常生活中，可運過相應調節方位、色系、職業選擇方式來達到追求的影響力。
-				</div>
+				{wuxingAnalysis &&
+					(() => {
+						const strengthAnalysis = analyzeWuxingStrength(
+							wuxingAnalysis.elementCounts,
+						);
+						const primaryGod =
+							wuxingAnalysis.missingElements[0] ||
+							strengthAnalysis.weakElements[0] ||
+							"水";
+						const secondaryGod =
+							wuxingAnalysis.missingElements[1] ||
+							strengthAnalysis.weakElements[1] ||
+							"金";
+
+						return (
+							<div
+								style={{
+									position: "relative",
+									marginTop: "20px",
+									padding: "0 20px",
+								}}
+							>
+								<div
+									style={{
+										position: "absolute",
+										left: "30px",
+										top: "-10px",
+										fontSize: "60px",
+										fontFamily: "Georgia, serif",
+										color: "#999999",
+										lineHeight: "1",
+									}}
+								>
+									"
+								</div>
+								<div
+									className="text-gray-700"
+									style={{
+										fontSize: "15px",
+										lineHeight: "20px",
+										fontFamily: "Noto Serif TC, serif",
+										fontWeight: 600,
+										textAlign: "justify",
+										color: "#424242",
+										paddingLeft: "40px",
+									}}
+								>
+									根據你的五行配置分析，建議以「{primaryGod}
+									」為首選用神，「{secondaryGod}
+									」為輔助用神。透過補足所缺的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力
+								</div>
+							</div>
+						);
+					})()}
 
 				{/* Key Points Section */}
 				{aiContent && (
-					<div
-						className="mt-5 border-2 border-gray-300 rounded-lg"
-						style={{ padding: "16px" }}
-					>
+					<div className="mt-0 " style={{ padding: "16px" }}>
 						<div className="flex gap-6">
 							{/* Left: Vertical Title */}
 							<div className="flex-shrink-0">
-								<h2
-									className="font-black"
-									style={{
-										fontSize: "42px",
-										lineHeight: "1.2",
-										letterSpacing: "0.05em",
-										writingMode: "vertical-rl",
-										textOrientation: "upright",
-									}}
-								>
-									疑重問點
-								</h2>
+								<div style={{ display: "flex", gap: "8px" }}>
+									<h2
+										style={{
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontStyle: "normal",
+											fontWeight: 900,
+											fontSize: "48px",
+											lineHeight: "110%",
+											letterSpacing: "0.27em",
+											color: getConcernColor(concern),
+											writingMode: "vertical-rl",
+											textOrientation: "upright",
+										}}
+									>
+										疑問
+									</h2>
+									<h2
+										style={{
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontStyle: "normal",
+											fontWeight: 900,
+											fontSize: "48px",
+											lineHeight: "110%",
+											letterSpacing: "0.27em",
+											color: getConcernColor(concern),
+											writingMode: "vertical-rl",
+											textOrientation: "upright",
+										}}
+									>
+										重點
+									</h2>
+								</div>
 							</div>
-
-							{/* Right: Content */}
 							<div
-								className="flex-1 pt-2"
+								className="flex-1 pt-0"
 								style={{
 									borderLeft: "2px solid #d1d5db",
 									paddingLeft: "16px",
 								}}
 							>
 								<h3
-									className="mb-2 font-bold"
+									className="mb-10 font-bold"
 									style={{
-										fontSize: "16px",
+										fontSize: "25px",
 										color: getConcernColor(concern),
+										fontFamily:
+											"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 									}}
 								>
-									一般財運分析
+									一般{concern}分析
 								</h3>
 								<h4
 									className="mb-3 font-semibold"
 									style={{
-										fontSize: "14px",
-										color: "#B8A870",
+										fontSize: "25px",
+										color: getConcernColor(concern),
+										fontFamily:
+											"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 									}}
 								>
-									財運分析指導
+									{concern}分析指導
 								</h4>
 								<div
 									className="text-gray-700"
 									style={{
-										fontSize: "13px",
-										lineHeight: "1.7",
+										fontSize: "15px",
+										lineHeight: "1.3",
 									}}
 								>
-									{aiContent.substring(0, 350)}...
+									{aiContent
+										.replace(/\*\*/g, "")
+										.substring(0, 350)}
+									...
 									<div
 										className="mt-3 text-gray-500"
 										style={{ fontSize: "11px" }}
@@ -447,6 +655,27 @@ export default function Page1_BasicAnalysis({
 						</div>
 					</div>
 				)}
+
+				{/* Footer with bottom.png image */}
+				<div
+					style={{
+						position: "absolute",
+						bottom: "15mm",
+						left: "20mm",
+						width: "auto",
+						height: "auto",
+					}}
+				>
+					<Image
+						src="/images/report/bottom.png"
+						alt="Footer decoration"
+						width={30}
+						height={10}
+						style={{
+							objectFit: "contain",
+						}}
+					/>
+				</div>
 			</div>
 		</div>
 	);

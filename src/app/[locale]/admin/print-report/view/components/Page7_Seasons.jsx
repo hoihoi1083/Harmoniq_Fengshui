@@ -183,24 +183,32 @@ export default function Page7_Seasons({ data }) {
 			{/* Seasons List */}
 			<div className="space-y-6">
 				{seasonsToRender.map((season, index) => {
-					const cleanSeasonName = season.name.replace(/【[^】]*】/g, "");
-					const isCurrentSeason = cleanSeasonName === currentSeasonName;
+					const cleanSeasonName = season.name.replace(
+						/【[^】]*】/g,
+						"",
+					);
+					const isCurrentSeason =
+						cleanSeasonName === currentSeasonName;
 					const seasonStyle = getSeasonStyle(cleanSeasonName);
 					const seasonChar = cleanSeasonName.charAt(0); // Get first character: 冬/春/夏/秋
-					
-					console.log('🎨 Season debug:', { name: season.name, styleColor: seasonStyle.color, seasonColor: season.color });
-					
+
+					console.log("🎨 Season debug:", {
+						name: season.name,
+						styleColor: seasonStyle.color,
+						seasonColor: season.color,
+					});
+
 					// Clean content by removing disclaimers and core reminders
-					const cleanContent = (season.content || '')
-						.replace(/四季財運核心提醒：[\s\S]*?(?=四季|$)/g, '')
-						.replace(/您的命局喜[\s\S]*?(?=免責聲明|$)/g, '')
-						.replace(/財運與五行[\s\S]*?(?=免責聲明|$)/g, '')
-						.replace(/所有建議[\s\S]*?(?=免責聲明|$)/g, '')
-						.replace(/免責聲明：[\s\S]*$/g, '')
-						.replace(/以上分析[\s\S]*?(?=--|$)/g, '')
-						.replace(/--\s*$/g, '')
+					const cleanContent = (season.content || "")
+						.replace(/四季財運核心提醒：[\s\S]*?(?=四季|$)/g, "")
+						.replace(/您的命局喜[\s\S]*?(?=免責聲明|$)/g, "")
+						.replace(/財運與五行[\s\S]*?(?=免責聲明|$)/g, "")
+						.replace(/所有建議[\s\S]*?(?=免責聲明|$)/g, "")
+						.replace(/免責聲明：[\s\S]*$/g, "")
+						.replace(/以上分析[\s\S]*?(?=--|$)/g, "")
+						.replace(/--\s*$/g, "")
 						.trim();
-					
+
 					return (
 						<div
 							key={index}

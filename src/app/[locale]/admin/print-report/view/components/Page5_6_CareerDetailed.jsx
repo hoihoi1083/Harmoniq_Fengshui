@@ -52,7 +52,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						style={{
 							color: color,
 							fontFamily: "Noto Serif TC, serif",
-							fontSize: "140px"
+							fontSize: "140px",
 						}}
 					>
 						吉
@@ -62,7 +62,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						style={{
 							color: color,
 							fontFamily: "Noto Serif TC, serif",
-							fontSize: "32px"
+							fontSize: "32px",
 						}}
 					>
 						總流年{concernChinese[concern]} · 吉象
@@ -79,20 +79,20 @@ export default function Page5_6_CareerDetailed({ data }) {
 							<div
 								key={index}
 								className="flex items-start rounded-xl avoid-break"
-								style={{ 
+								style={{
 									backgroundColor: `${color}08`,
 									gap: "16px",
-									padding: "16px"
+									padding: "16px",
 								}}
 							>
 								{/* Number badge */}
 								<div
 									className="flex-shrink-0 rounded-full flex items-center justify-center text-white font-bold"
-									style={{ 
+									style={{
 										backgroundColor: color,
 										width: "36px",
 										height: "36px",
-										fontSize: "16px"
+										fontSize: "16px",
 									}}
 								>
 									{index + 1}
@@ -103,16 +103,22 @@ export default function Page5_6_CareerDetailed({ data }) {
 									{item.title && (
 										<h3
 											className="font-bold"
-											style={{ 
+											style={{
 												color: color,
 												fontSize: "15px",
-												marginBottom: "8px"
+												marginBottom: "8px",
 											}}
 										>
 											{item.title}
 										</h3>
 									)}
-									<p className="text-gray-800 whitespace-pre-line" style={{ fontSize: "13px", lineHeight: "1.6" }}>
+									<p
+										className="text-gray-800 whitespace-pre-line"
+										style={{
+											fontSize: "13px",
+											lineHeight: "1.6",
+										}}
+									>
 										{item.content}
 									</p>
 								</div>
@@ -121,9 +127,9 @@ export default function Page5_6_CareerDetailed({ data }) {
 					) : (
 						<div
 							className="rounded-xl text-center"
-							style={{ 
+							style={{
 								backgroundColor: `${color}08`,
-								padding: "24px"
+								padding: "24px",
 							}}
 						>
 							<p className="text-gray-600">正在分析吉象...</p>
@@ -145,9 +151,9 @@ export default function Page5_6_CareerDetailed({ data }) {
 				<div className="text-center mb-6 relative">
 					<div
 						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 opacity-5 font-bold text-gray-400"
-						style={{ 
+						style={{
 							fontFamily: "Noto Serif TC, serif",
-							fontSize: "140px"
+							fontSize: "140px",
 						}}
 					>
 						凶
@@ -157,7 +163,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						style={{
 							color: "#666",
 							fontFamily: "Noto Serif TC, serif",
-							fontSize: "32px"
+							fontSize: "32px",
 						}}
 					>
 						總流年{concernChinese[concern]} · 凶象
@@ -176,15 +182,16 @@ export default function Page5_6_CareerDetailed({ data }) {
 								className="flex items-start rounded-xl avoid-break bg-gray-50 border-2 border-gray-200"
 								style={{
 									gap: "16px",
-									padding: "16px"
+									padding: "16px",
 								}}
 							>
 								{/* Number badge */}
-								<div className="flex-shrink-0 rounded-full flex items-center justify-center bg-gray-400 text-white font-bold"
+								<div
+									className="flex-shrink-0 rounded-full flex items-center justify-center bg-gray-400 text-white font-bold"
 									style={{
 										width: "36px",
 										height: "36px",
-										fontSize: "16px"
+										fontSize: "16px",
 									}}
 								>
 									{index + 1}
@@ -193,23 +200,31 @@ export default function Page5_6_CareerDetailed({ data }) {
 								{/* Content */}
 								<div className="flex-1">
 									{item.title && (
-										<h3 className="font-bold text-gray-700"
+										<h3
+											className="font-bold text-gray-700"
 											style={{
 												fontSize: "15px",
-												marginBottom: "8px"
+												marginBottom: "8px",
 											}}
 										>
 											{item.title}
 										</h3>
 									)}
-									<p className="text-gray-800 whitespace-pre-line" style={{ fontSize: "13px", lineHeight: "1.6" }}>
+									<p
+										className="text-gray-800 whitespace-pre-line"
+										style={{
+											fontSize: "13px",
+											lineHeight: "1.6",
+										}}
+									>
 										{item.content}
 									</p>
 								</div>
 							</div>
 						))
 					) : (
-						<div className="rounded-xl text-center bg-gray-50"
+						<div
+							className="rounded-xl text-center bg-gray-50"
 							style={{ padding: "24px" }}
 						>
 							<p className="text-gray-600">正在分析凶象...</p>

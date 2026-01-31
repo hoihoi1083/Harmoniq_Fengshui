@@ -2978,7 +2978,13 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 						>
 							{section.title}
 						</h3>
-						<p style={{ marginBottom: "12px", lineHeight: "1.6", fontSize: "12px" }}>
+						<p
+							style={{
+								marginBottom: "12px",
+								lineHeight: "1.6",
+								fontSize: "12px",
+							}}
+						>
 							{section.content}
 						</p>
 						{section.interactions &&
@@ -3015,7 +3021,12 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								>
 									{keyword.text}
 								</h4>
-								<p style={{ lineHeight: "1.6", fontSize: "12px" }}>
+								<p
+									style={{
+										lineHeight: "1.6",
+										fontSize: "12px",
+									}}
+								>
 									{keyword.description}
 								</p>
 							</div>

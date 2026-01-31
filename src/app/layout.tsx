@@ -7,10 +7,10 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 const lora = Lora({ subsets: ["latin", "symbols"] });
-const notoSerifSC = Noto_Serif_SC({ 
-	subsets: ["latin"], 
+const notoSerifSC = Noto_Serif_SC({
+	subsets: ["latin"],
 	weight: ["400", "500", "600", "700", "900"],
-	variable: "--font-noto-serif-sc"
+	variable: "--font-noto-serif-sc",
 });
 
 export const metadata = {

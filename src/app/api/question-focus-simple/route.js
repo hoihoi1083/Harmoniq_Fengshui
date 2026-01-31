@@ -74,12 +74,77 @@ export async function POST(request) {
 				? "💡 更详细分析，基于流年，十神，可参阅报告中的其他相关章节"
 				: "💡 更詳細分析，基於流年，十神，可參閱報告中的其他相關章節";
 
+		// Get current year GanZhi
+		const currentYear = new Date().getFullYear();
+		const ganList = [
+			"甲",
+			"乙",
+			"丙",
+			"丁",
+			"戊",
+			"己",
+			"庚",
+			"辛",
+			"壬",
+			"癸",
+		];
+		const zhiList = [
+			"子",
+			"丑",
+			"寅",
+			"卯",
+			"辰",
+			"巳",
+			"午",
+			"未",
+			"申",
+			"酉",
+			"戌",
+			"亥",
+		];
+		const zodiacList = [
+			"鼠",
+			"牛",
+			"虎",
+			"兔",
+			"龍",
+			"蛇",
+			"馬",
+			"羊",
+			"猴",
+			"雞",
+			"狗",
+			"豬",
+		];
+		const zodiacListSimplified = [
+			"鼠",
+			"牛",
+			"虎",
+			"兔",
+			"龙",
+			"蛇",
+			"马",
+			"羊",
+			"猴",
+			"鸡",
+			"狗",
+			"猪",
+		];
+		const ganIndex = (currentYear - 4) % 10;
+		const zhiIndex = (currentYear - 4) % 12;
+		const currentYearGanZhi = ganList[ganIndex] + zhiList[zhiIndex];
+		const currentYearZodiac =
+			locale === "zh-CN"
+				? zodiacListSimplified[zhiIndex]
+				: zodiacList[zhiIndex];
+		const currentYearText = `${currentYear}年${currentYearGanZhi}${currentYearZodiac}年`;
+
 		// Create simple, clear prompt with locale-specific text
 		const prompt =
 			locale === "zh-CN"
 				? `请基于以下信息提供简要分析：
 
-【当前时间】2025年乙巳蛇年
+【当前时间】${currentYearText}
 
 八字信息：
 年柱：${baziData.year}
@@ -101,13 +166,13 @@ export async function POST(request) {
 2. 必须准确引用上述八字四柱数据
 3. 必须基于实际的五行统计进行分析
 4. 针对用户的具体问题，从命理角度解释原因和背景
-5. ⚠️ 当涉及时机分析时，必须关注未来年份（2025年乙巳年起算），例如：2025年乙巳蛇年、2026年丙午马年、2027年丁未羊年等
-6. ⚠️ 绝对禁止提及2024年或过去年份，只能分析当前年份（2025年）和未来年份
+5. ⚠️ 当涉及时机分析时，必须关注未来年份（${currentYear}年${currentYearGanZhi}年起算），例如：${currentYear}年${currentYearGanZhi}${currentYearZodiac}年、${currentYear + 1}年、${currentYear + 2}年等
+6. ⚠️ 绝对禁止提及${currentYear - 2}年、${currentYear - 1}年或过去年份，只能分析当前年份（${currentYear}年）和未来年份
 7. 给出1-2个简要的方向性建议（不要太详细）
 8. 最后加上备注，说明更详细的分析和解决方案在其他章节中，不要指明具体章节名称
 9. 语调要个人化，直接对用户说话
 10. 内容要具体，避免空泛的通用建议
-11. 时机预测要基于五行流年循环，给出准确年份范围（从2025年开始）
+11. 时机预测要基于五行流年循环，给出准确年份范围（从${currentYear}年开始）
 12. ⚠️ 绝对禁止在分析内容中出现：乙巳、丙戌、壬戌、丙午、壬水等错误信息
 13. 结尾必须使用：「${closingNote}」
 
@@ -119,7 +184,7 @@ export async function POST(request) {
 - 结尾统一使用指定文案`
 				: `請基於以下信息提供簡要分析：
 
-【當前時間】2025年乙巳蛇年
+【當前時間】${currentYearText}
 
 八字信息：
 年柱：${baziData.year}
@@ -141,13 +206,13 @@ export async function POST(request) {
 2. 必須準確引用上述八字四柱數據
 3. 必須基於實際的五行統計進行分析
 4. 針對用戶的具體問題，從命理角度解釋原因和背景
-5. ⚠️ 當涉及時機分析時，必須關注未來年份（2025年乙巳年起算），例如：2025年乙巳蛇年、2026年丙午馬年、2027年丁未羊年等
-6. ⚠️ 絕對禁止提及2024年或過去年份，只能分析當前年份（2025年）和未來年份
+5. ⚠️ 當涉及時機分析時，必須關注未來年份（${currentYear}年${currentYearGanZhi}年起算），例如：${currentYear}年${currentYearGanZhi}${currentYearZodiac}年、${currentYear + 1}年、${currentYear + 2}年等
+6. ⚠️ 絕對禁止提及${currentYear - 2}年、${currentYear - 1}年或過去年份，只能分析當前年份（${currentYear}年）和未來年份
 7. 給出1-2個簡要的方向性建議（不要太詳細）
 8. 最後加上備註，說明更詳細的分析和解決方案在其他章節中，不要指明具體章節名稱
 9. 語調要個人化，直接對用戶說話
 10. 內容要具體，避免空泛的通用建議
-11. 時機預測要基於五行流年循環，給出準確年份範圍（從2025年開始）
+11. 時機預測要基於五行流年循環，給出準確年份範圍（從${currentYear}年開始）
 12. ⚠️ 絕對禁止在分析內容中出現：乙巳、丙戌、壬戌、丙午、壬水等錯誤信息
 13. 結尾必須使用：「${closingNote}」
 

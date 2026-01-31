@@ -43,9 +43,9 @@ export default function Page7_KeySeasons({ data }) {
 			<div className="text-center mb-12">
 				<h1
 					className="text-5xl font-bold mb-3"
-					style={{ 
+					style={{
 						color: color,
-						fontFamily: "Noto Serif TC, serif" 
+						fontFamily: "Noto Serif TC, serif",
 					}}
 				>
 					關鍵季節分析
@@ -58,17 +58,14 @@ export default function Page7_KeySeasons({ data }) {
 			{/* Seasons Grid */}
 			<div className="space-y-8">
 				{seasonInfo.map((season, index) => (
-					<div
-						key={index}
-						className="avoid-break"
-					>
+					<div key={index} className="avoid-break">
 						<div className="flex gap-6">
 							{/* Decorative large character */}
 							<div
 								className="flex-shrink-0 w-32 h-32 rounded-2xl flex items-center justify-center text-7xl font-bold text-white"
-								style={{ 
+								style={{
 									backgroundColor: color,
-									fontFamily: "Noto Serif TC, serif" 
+									fontFamily: "Noto Serif TC, serif",
 								}}
 							>
 								{season.character}
@@ -78,18 +75,23 @@ export default function Page7_KeySeasons({ data }) {
 							<div className="flex-1">
 								{/* Season header */}
 								<div className="flex items-center gap-3 mb-4">
-									<span className="text-3xl">{season.icon}</span>
+									<span className="text-3xl">
+										{season.icon}
+									</span>
 									<div>
 										<h2
 											className="text-3xl font-bold"
-											style={{ 
+											style={{
 												color: color,
-												fontFamily: "Noto Serif TC, serif" 
+												fontFamily:
+													"Noto Serif TC, serif",
 											}}
 										>
 											{season.name}
 										</h2>
-										<p className="text-gray-600 text-sm">{season.months}</p>
+										<p className="text-gray-600 text-sm">
+											{season.months}
+										</p>
 									</div>
 								</div>
 
@@ -107,7 +109,8 @@ export default function Page7_KeySeasons({ data }) {
 												運勢概況
 											</h3>
 											<p className="text-gray-800 leading-relaxed">
-												{season.data.overview || "季節分析中..."}
+												{season.data.overview ||
+													"季節分析中..."}
 											</p>
 										</div>
 
@@ -119,7 +122,8 @@ export default function Page7_KeySeasons({ data }) {
 												{concern}重點
 											</h3>
 											<p className="text-gray-800 leading-relaxed">
-												{season.data.concernFocus || `${concern}分析中...`}
+												{season.data.concernFocus ||
+													`${concern}分析中...`}
 											</p>
 										</div>
 
@@ -131,7 +135,8 @@ export default function Page7_KeySeasons({ data }) {
 												行動建議
 											</h3>
 											<p className="text-gray-800 leading-relaxed">
-												{season.data.advice || "建議分析中..."}
+												{season.data.advice ||
+													"建議分析中..."}
 											</p>
 										</div>
 									</div>
