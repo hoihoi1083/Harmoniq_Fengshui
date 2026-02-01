@@ -9,6 +9,8 @@ import Image from "next/image";
 import { getConcernColor } from "@/utils/colorTheme";
 import { MingJu } from "@/components/MingJu";
 import Page1_BasicAnalysis from "./components/Page1_BasicAnalysis";
+import Page2_MingJu_DayMaster from "./components/Page2_MingJu_DayMaster";
+import Page3_MingJu_RightTab from "./components/Page3_MingJu_RightTab";
 import Page2_DayMasterTraits from "./components/Page2_DayMasterTraits";
 import Page3_WealthPosition from "./components/Page3_WealthPosition";
 import Page4_2026Overview from "./components/Page4_2026Overview";

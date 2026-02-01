@@ -15,15 +15,7 @@ const printStyles = `
 		margin: 0mm;
 	}
 	@media print {
-		* {
-			-webkit-print-color-adjust: exact !important;
-			print-color-adjust: exact !important;
-		}
-		body { 
-			margin: 0; 
-			padding: 0;
-			zoom: 100%;
-		}
+		body { margin: 0; padding: 0; }
 		.no-print { display: none !important; }
 		.print-only { display: block !important; }
 		div { page-break-inside: avoid; }
@@ -2978,8 +2970,10 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 					<div key={idx} style={{ marginBottom: "16px" }}>
 						<h3
 							style={{
+								fontSize: "14px",
 								fontWeight: "bold",
 								marginBottom: "8px",
+								color: "#333",
 							}}
 						>
 							{section.title}
@@ -2988,6 +2982,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 							style={{
 								marginBottom: "12px",
 								lineHeight: "1.6",
+								fontSize: "12px",
 							}}
 						>
 							{section.content}
@@ -3000,6 +2995,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 										marginLeft: "15px",
 										marginBottom: "8px",
 										lineHeight: "1.6",
+										fontSize: "12px",
 									}}
 								>
 									• {interaction}
@@ -3017,8 +3013,10 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 							<div key={idx} style={{ marginBottom: "12px" }}>
 								<h4
 									style={{
+										fontSize: "14px",
 										fontWeight: "bold",
 										marginBottom: "4px",
+										color: "#333",
 									}}
 								>
 									{keyword.text}
@@ -3026,6 +3024,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								<p
 									style={{
 										lineHeight: "1.6",
+										fontSize: "12px",
 									}}
 								>
 									{keyword.description}
@@ -3352,7 +3351,6 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 											<div
 												style={{
 													fontSize: "15px",
-													marginTop: "60px",
 													lineHeight: "1.6",
 												}}
 											>
@@ -3589,37 +3587,30 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									style={{
 										display: "flex",
 										alignItems: "flex-start",
-										gap: "10px",
+										gap: "32px",
 										marginBottom: "20px",
 									}}
 								>
-									<div
-										style={{
-											display: "flex",
-											flexDirection: "column",
-											alignItems: "end",
-										}}
-									>
-										<h2
-											style={{
-												fontFamily:
-													"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-												fontStyle: "normal",
-												fontWeight: 900,
-												fontSize: "48px",
-												lineHeight: "110%",
-												letterSpacing: "0.27em",
-												color: concernColor,
-											}}
-										>
-											{
-												getTabLabel(
-													"middle",
-													concern,
-													t,
-												).split("與")[0]
-											}
-										</h2>
+									<div style={{ display: "flex", gap: "8px" }}>
+										{getTabLabel("middle", concern, t).split("與")[0].split("").map((char, idx) => (
+											<h2
+												key={idx}
+												style={{
+													fontFamily:
+														"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+													fontStyle: "normal",
+													fontWeight: 900,
+													fontSize: "48px",
+													lineHeight: "110%",
+													letterSpacing: "0.27em",
+													color: concernColor,
+													writingMode: "vertical-rl",
+													textOrientation: "upright",
+												}}
+											>
+												{char}
+											</h2>
+										))}
 										<h2
 											style={{
 												fontFamily:
@@ -3630,6 +3621,8 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 												lineHeight: "110%",
 												letterSpacing: "0.27em",
 												color: "#666",
+												writingMode: "vertical-rl",
+												textOrientation: "upright",
 											}}
 										>
 											&
@@ -3644,24 +3637,28 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 												lineHeight: "110%",
 												letterSpacing: "0.27em",
 												color: "#666",
+												writingMode: "vertical-rl",
+												textOrientation: "upright",
 											}}
 										>
 											十神
 										</h2>
 									</div>
-									<div style={{ flex: 1, paddingTop: "8px" }}>
+									<div
+										style={{ flex: 1, paddingTop: "16px" }}
+									>
 										<div
 											style={{
-												height: "5px",
+												height: "3px",
 												backgroundColor: concernColor,
-												width: "100px",
+												width: "80px",
 												marginBottom: "16px",
 											}}
 										></div>
 										<div
 											style={{
 												fontSize: "13px",
-												lineHeight: "1.1",
+												lineHeight: "1.6",
 											}}
 										>
 											{renderPrintJSON(middleContent)}
@@ -3674,21 +3671,15 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 							<div
 								style={{
 									position: "absolute",
-									bottom: "15mm",
-									left: "20mm",
-									width: "auto",
-									height: "auto",
+									bottom: "16px",
+									left: 0,
+									right: 0,
+									textAlign: "center",
+									color: "#999",
+									fontSize: "15px",
 								}}
 							>
-								<Image
-									src="/images/report/bottom.png"
-									alt="Footer decoration"
-									width={30}
-									height={10}
-									style={{
-										objectFit: "contain",
-									}}
-								/>
+								HarmoniQ Bell
 							</div>
 						</div>
 					</div>

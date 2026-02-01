@@ -12,7 +12,27 @@ export default function Page1_BasicAnalysis({
 	analyzeWuxingStrength,
 }) {
 	return (
-		<div className="mx-auto mt-15" style={{ padding: "15px" }}>
+		<>
+			<style>{`
+				@page {
+					size: A4;
+					margin: 0mm;
+				}
+				@media print {
+					* {
+						-webkit-print-color-adjust: exact !important;
+						print-color-adjust: exact !important;
+					}
+					body { 
+						margin: 0; 
+						padding: 0;
+						zoom: 100%;
+					}
+					.no-print { display: none !important; }
+					.print-only { display: block !important; }
+				}
+			`}</style>
+			<div className="mx-auto mt-15" style={{ padding: "15px" }}>
 			{/* Page 1 - A4 sized with visible boundaries */}
 			<div
 				className="mx-auto bg-white page-break"
@@ -678,5 +698,5 @@ export default function Page1_BasicAnalysis({
 				</div>
 			</div>
 		</div>
-	);
+	</>	);
 }
