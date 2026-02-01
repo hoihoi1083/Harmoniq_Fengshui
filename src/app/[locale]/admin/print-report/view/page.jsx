@@ -328,15 +328,9 @@ function PrintReportView() {
 					}).then((res) => res.json()),
 
 					// Overall Summary Analysis API (Page 10: 破關成蝶，格局煥新)
-					fetch("/api/overall-summary", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							locale: locale,
-							concernType: concern,
-							questionFocusData: "User report for " + concern,
-						}),
-					}).then((res) => res.json()),
+					// This call needs to happen AFTER other APIs to use their data
+					// For now, we'll make the call and update it with real data after
+					Promise.resolve({ success: false, placeholder: true }),
 				]);
 
 				console.log("Question Focus API response:", questionData);
@@ -345,6 +339,11 @@ function PrintReportView() {
 					"Specific Suggestion API response:",
 					specificSuggestionResult,
 				);
+				console.log(
+					"Overall Summary API response:",
+					overallSummaryResult,
+				);
+
 				if (questionData.success && questionData.solution) {
 					setQuestionFocus(questionData.solution);
 					if (questionData.solution.content) {
@@ -382,9 +381,35 @@ function PrintReportView() {
 					setCoreSuggestionData(specificSuggestionResult.data);
 				}
 
+				// Now call Overall Summary with real data from previous APIs
+				const overallSummaryApiResult = await fetch(
+					"/api/overall-summary",
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							locale: locale,
+							concernType: concern,
+							questionFocusData:
+								questionData.solution?.content || "",
+							ganzhiData: ganzhiData.analysis || null,
+							specificSuggestionData:
+								specificSuggestionResult.data || null,
+						}),
+					},
+				).then((res) => res.json());
+
+				console.log(
+					"Overall Summary API (with real data):",
+					overallSummaryApiResult,
+				);
+
 				// Process Overall Summary Analysis (破關成蝶，格局煥新)
-				if (overallSummaryResult.success && overallSummaryResult.data) {
-					setOverallSummaryData(overallSummaryResult.data);
+				if (
+					overallSummaryApiResult.success &&
+					overallSummaryApiResult.data
+				) {
+					setOverallSummaryData(overallSummaryApiResult.data);
 				}
 
 				setIsLoading(false);

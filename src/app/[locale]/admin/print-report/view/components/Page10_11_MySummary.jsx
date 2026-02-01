@@ -6,8 +6,13 @@ export default function Page10_11_MySummary({ data }) {
 	// Extract summary data
 	const summaryContent = summary?.content || "正在生成您的年度總結...";
 	const luckyColors = summary?.luckyColors || ["紅色", "金色", "紫色"];
-	const luckyAccessories = summary?.luckyAccessories || ["紅繩手鍊", "金屬飾品", "玉石吊墜"];
-	const yearQuote = summary?.quote || "順勢而為，把握機遇，2026年必將收穫滿滿。";
+	const luckyAccessories = summary?.luckyAccessories || [
+		"紅繩手鍊",
+		"金屬飾品",
+		"玉石吊墜",
+	];
+	const yearQuote =
+		summary?.quote || "順勢而為，把握機遇，2026年必將收穫滿滿。";
 
 	const concernEmoji = {
 		財運: "💰",
@@ -20,22 +25,27 @@ export default function Page10_11_MySummary({ data }) {
 		<>
 			{/* Page 10: Main Summary */}
 			<div className="page-break bg-white px-16 py-12 min-h-[297mm]">
+				{/* Date - Top Right */}
+				<div className="text-right text-gray-400 text-sm mb-6">
+					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+				</div>
+
 				{/* Page Header with large decorative year */}
 				<div className="text-center mb-12 relative">
 					<div
 						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 text-[180px] opacity-5 font-bold"
-						style={{ 
+						style={{
 							color: color,
-							fontFamily: "Noto Serif TC, serif" 
+							fontFamily: "Noto Serif TC, serif",
 						}}
 					>
 						我
 					</div>
 					<h1
 						className="text-6xl font-bold mb-3 relative z-10"
-						style={{ 
+						style={{
 							color: color,
-							fontFamily: "Noto Serif TC, serif" 
+							fontFamily: "Noto Serif TC, serif",
 						}}
 					>
 						我的 2026
@@ -62,9 +72,9 @@ export default function Page10_11_MySummary({ data }) {
 				<div className="mb-10">
 					<h2
 						className="text-3xl font-bold mb-6 flex items-center gap-3"
-						style={{ 
+						style={{
 							color: color,
-							fontFamily: "Noto Serif TC, serif" 
+							fontFamily: "Noto Serif TC, serif",
 						}}
 					>
 						<span className="text-4xl">🎨</span>
@@ -92,15 +102,12 @@ export default function Page10_11_MySummary({ data }) {
 							const displayColor = colorMap[colorName] || color;
 
 							return (
-								<div
-									key={index}
-									className="text-center"
-								>
+								<div key={index} className="text-center">
 									<div
 										className="w-24 h-24 rounded-full mx-auto mb-3 border-4"
-										style={{ 
+										style={{
 											backgroundColor: displayColor,
-											borderColor: color
+											borderColor: color,
 										}}
 									></div>
 									<p
@@ -119,9 +126,9 @@ export default function Page10_11_MySummary({ data }) {
 				<div className="mb-10">
 					<h2
 						className="text-3xl font-bold mb-6 flex items-center gap-3"
-						style={{ 
+						style={{
 							color: color,
-							fontFamily: "Noto Serif TC, serif" 
+							fontFamily: "Noto Serif TC, serif",
 						}}
 					>
 						<span className="text-4xl">✨</span>
@@ -132,9 +139,9 @@ export default function Page10_11_MySummary({ data }) {
 							<div
 								key={index}
 								className="p-6 rounded-xl border-2 text-center"
-								style={{ 
+								style={{
 									borderColor: color,
-									backgroundColor: `${color}05`
+									backgroundColor: `${color}05`,
 								}}
 							>
 								<p
@@ -162,9 +169,9 @@ export default function Page10_11_MySummary({ data }) {
 					>
 						<p
 							className="text-3xl leading-loose text-center mb-8"
-							style={{ 
+							style={{
 								fontFamily: "Noto Serif TC, serif",
-								color: "#333"
+								color: "#333",
 							}}
 						>
 							「{yearQuote}」
@@ -186,17 +193,13 @@ export default function Page10_11_MySummary({ data }) {
 						className="inline-block w-32 h-1 rounded"
 						style={{ backgroundColor: color }}
 					></div>
-					
+
 					<div className="text-gray-600">
-						<p className="text-lg mb-2">
-							出生日期：{birthday}
-						</p>
+						<p className="text-lg mb-2">出生日期：{birthday}</p>
 						<p className="text-lg mb-2">
 							性別：{gender === "male" ? "男" : "女"}
 						</p>
-						<p className="text-lg">
-							分析類別：{concern}
-						</p>
+						<p className="text-lg">分析類別：{concern}</p>
 					</div>
 
 					<div
@@ -214,9 +217,9 @@ export default function Page10_11_MySummary({ data }) {
 					<div className="mt-8">
 						<p
 							className="text-2xl font-bold"
-							style={{ 
+							style={{
 								color: color,
-								fontFamily: "Noto Serif TC, serif" 
+								fontFamily: "Noto Serif TC, serif",
 							}}
 						>
 							祝您 2026 年順遂安康！

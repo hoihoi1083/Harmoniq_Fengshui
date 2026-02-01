@@ -270,9 +270,23 @@ const renderPrintJSON = (content) => {
 	}
 };
 
-export default function Page2_MingJu_DayMaster({ userInfo, leftContent, middleContent }) {
+export default function Page2_MingJu_DayMaster({
+	userInfo,
+	leftContent,
+	middleContent,
+}) {
 	const concern = userInfo?.concern || "財運";
 	const concernColor = getConcernColor(concern);
+
+	// Debug logging
+	console.log("📄 Page2 middleContent received:", {
+		type: typeof middleContent,
+		length: middleContent?.length || 0,
+		preview:
+			typeof middleContent === "string"
+				? middleContent.substring(0, 200)
+				: middleContent,
+	});
 
 	// Get BaZi info for display
 	const baziInfo = getAccurateBaziInfo(
@@ -305,8 +319,8 @@ export default function Page2_MingJu_DayMaster({ userInfo, leftContent, middleCo
 			const endIndex =
 				idx < allSections.length - 1
 					? allSections[idx + 1].startIndex -
-					  allSections[idx + 1].title.length -
-					  3
+						allSections[idx + 1].title.length -
+						3
 					: content.length;
 			const sectionContent = content.substring(
 				section.startIndex,
@@ -531,9 +545,7 @@ export default function Page2_MingJu_DayMaster({ userInfo, leftContent, middleCo
 								letterSpacing: "0",
 							}}
 						>
-							{
-								getTabLabel("middle", concern).split("與")[0]
-							}
+							{getTabLabel("middle", concern).split("與")[0]}
 						</h2>
 						<h2
 							style={{

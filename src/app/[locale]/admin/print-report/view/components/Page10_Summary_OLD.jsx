@@ -53,35 +53,35 @@ export default function Page10_Summary({ data }) {
 			{/* Title Section */}
 			<div className="mb-8">
 				<h1
-					className="mb-10 font-bold text-8xl"
+				style={{
+					fontFamily:
+						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+					letterSpacing: "0.2em",
+					fontSize: "72px",
+					fontWeight: "bold",
+					marginBottom: "40px",
+				}}
+			>
+				我的
+				<span
 					style={{
-						fontFamily:
-							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-						letterSpacing: "0.2em",
+						background:
+							"linear-gradient(to bottom, #C43A3A, #880000)",
+						WebkitBackgroundClip: "text",
+						WebkitTextFillColor: "transparent",
+						backgroundClip: "text",
 					}}
 				>
-					我的
-					<span
-						style={{
-							background:
-								"linear-gradient(to bottom, #C43A3A, #880000)",
-							WebkitBackgroundClip: "text",
-							WebkitTextFillColor: "transparent",
-							backgroundClip: "text",
-						}}
-					>
-						{currentYear}
-					</span>
-				</h1>
-				<h2
-					className="text-4xl font-bold"
-					style={{
-						color: "#002C84",
-						fontFamily:
-							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-					}}
-				>
-					{summary.keyPhrase || "破關成蝶 / 格局煥新"}
+					{currentYear}
+				</span>
+			</h1>
+			<h2
+				style={{
+					color: "#002C84",
+					fontFamily:
+						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+					fontSize: "48px",
+					fontWeight: "bold",
 				</h2>
 			</div>
 
@@ -208,7 +208,11 @@ export default function Page10_Summary({ data }) {
 												: "none",
 									}}
 								></div>
-								<p className="text-sm font-medium text-gray-500">
+								<p style={{
+									fontSize: "14px",
+									fontWeight: "500",
+									color: "#6B7280",
+								}}>
 									{colorName}
 								</p>
 							</div>
@@ -238,16 +242,16 @@ export default function Page10_Summary({ data }) {
 							]
 						).map((accessory, index) => (
 							<div key={index} className="text-center">
-								<div
+								<div 
 									className="flex items-center justify-center rounded-full"
 									style={{
 										backgroundColor: "#E5E7EB",
-										width: "90px",
-										height: "90px",
-										padding: "12px",
+										width: "110px",
+										height: "110px",
+										padding: "12px"
 									}}
 								>
-									<span
+									<span 
 										className="text-sm font-medium"
 										style={{ color: "#6B7280" }}
 									>
