@@ -4,6 +4,44 @@ import Image from "next/image";
 export default function Page5_6_CareerDetailed({ data }) {
 	const { jixiong, concern, color } = data;
 
+	// Debug logging
+	console.log("📄 Page5_6_CareerDetailed received data:", {
+		jixiong,
+		jixiangCount: jixiong?.jixiang?.length,
+		xiongxiangCount: jixiong?.xiongxiang?.length,
+	});
+
+	// Log first item details with FULL content
+	if (jixiong?.jixiang?.[0]) {
+		console.log("🎯 First 吉象 item FULL CONTENT:", {
+			title: jixiong.jixiang[0].title,
+			contentLength: jixiong.jixiang[0].content?.length,
+			FULL_CONTENT: jixiong.jixiang[0].content, // Show EVERYTHING
+		});
+
+		// Show what split produces
+		const splitResult = jixiong.jixiang[0].content
+			.replace(/^•\s*/, "")
+			.split(/(?=原理：|時機：|做法：)/g)
+			.filter((part) => part.trim());
+		console.log("📋 Split result:", splitResult);
+	}
+
+	if (jixiong?.xiongxiang?.[0]) {
+		console.log("⚠️ First 凶象 item FULL CONTENT:", {
+			title: jixiong.xiongxiang[0].title,
+			contentLength: jixiong.xiongxiang[0].content?.length,
+			FULL_CONTENT: jixiong.xiongxiang[0].content, // Show EVERYTHING
+		});
+
+		// Show what split produces
+		const splitResult = jixiong.xiongxiang[0].content
+			.replace(/^•\s*/, "")
+			.split(/(?=原理：|時機：|風險：|預防：)/g)
+			.filter((part) => part.trim());
+		console.log("📋 Split result:", splitResult);
+	}
+
 	// Extract jixiong (吉象 and 凶象) data
 	// The data structure is: { jixiang: [{title, content}], xiongxiang: [{title, content}] }
 	const auspiciousItems = jixiong?.jixiang || jixiong?.auspicious || [];
@@ -128,7 +166,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 				</div>
 
 				{/* Numbered sections */}
-				<div className="space-y-5" style={{ marginLeft: "100px" }}>
+				<div className="space-y-1" style={{ marginLeft: "100px" }}>
 					{auspiciousPoints.length > 0 ? (
 						auspiciousPoints.map((item, index) => (
 							<div
@@ -184,7 +222,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 												<p
 													key={idx}
 													style={{
-														marginBottom: "8px",
+														marginBottom: "1px",
 													}}
 												>
 													• {part.trim()}
@@ -313,7 +351,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 				</div>
 
 				{/* Numbered sections */}
-				<div className="space-y-5" style={{ marginLeft: "100px" }}>
+				<div className="space-y-1" style={{ marginLeft: "100px" }}>
 					{inauspiciousPoints.length > 0 ? (
 						inauspiciousPoints.map((item, index) => (
 							<div
@@ -371,7 +409,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 												<p
 													key={idx}
 													style={{
-														marginBottom: "8px",
+														marginBottom: "1px",
 													}}
 												>
 													• {part.trim()}

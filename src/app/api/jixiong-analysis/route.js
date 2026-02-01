@@ -93,12 +93,12 @@ ${baziData && baziData.dayMaster && baziData.dayElement ? `**重要提醒**：�
 【3个吉象（被动防护，需极致保守方能显现）】：
 请提供3个具体的吉象，每个必须包含：
 - 标题（必须是有意义的四字词语，如：贵人暗助、厚积薄发、稳中得财、暗中得助、技能避险、根基稳固）
-- 详细内容（以条列式呈现3-4个要点，每个要点40-60字，详细说明原理、时机、具体做法）
+- 详细内容（以条列式呈现，必须按照以下格式分为3个明确部分：原理、时机、做法）
 
 重要：
 1. 标题必须是经典的四字成语或风水术语，绝对不可以是句子的前四个字！
-2. 内容必须以条列式（bullet points）呈现，每个要点要详细且具体！
-3. 每个要点需包含：原理说明+具体时间+实际操作建议
+2. 内容必须严格按照以下格式呈现：**原理：** + **时机：** + **做法：**
+3. 每个部分都必须有明确的标记，不可省略任何一个部分！
 
 吉象四字词语示例：
 - 贵人暗助（有长辈或专业人士的帮助）
@@ -108,29 +108,33 @@ ${baziData && baziData.dayMaster && baziData.dayElement ? `**重要提醒**：�
 - 技能避险（专业技能带来的保护）
 - 根基稳固（基础牢固，稳定发展）
 
-格式如下（必须使用条列式，每个要点要详细）：
+**格式如下（必须严格遵守此格式）：**
 ① [有意义的四字词语]：
-• [详细要点1：包含原理+时间+做法，40-60字]
-• [详细要点2：包含原理+时间+做法，40-60字]
-• [详细要点3：包含原理+时间+做法，40-60字]
+• 原理：[说明背后的命理原理，30-40字]
+• 时机：[具体时间点，如"明年春季（3-5月）"或"今年立秋（8月7日）后"，20-30字]
+• 做法：[具体的实操建议和方法，50-60字]
+
 ② [有意义的四字词语]：
-• [详细要点1：包含原理+时间+做法，40-60字]
-• [详细要点2：包含原理+时间+做法，40-60字]
-• [详细要点3：包含原理+时间+做法，40-60字]
+• 原理：[说明背后的命理原理，30-40字]
+• 时机：[具体时间点，如"明年夏季（6-8月）"或"今年霜降（10月23日）后"，20-30字]
+• 做法：[具体的实操建议和方法，50-60字]
+
 ③ [有意义的四字词语]：
-• [详细要点1：包含原理+时间+做法，40-60字]
-• [详细要点2：包含原理+时间+做法，40-60字]
-• [详细要点3：包含原理+时间+做法，40-60字]
+• 原理：[说明背后的命理原理，30-40字]
+• 时机：[具体时间点，如"明年秋季（8-11月）"或"今年冬至（12月21日）前后"，20-30字]
+• 做法：[具体的实操建议和方法，50-60字]
+
+**绝对不可以省略"原理："、"时机："、"做法："这三个标记！**
 
 【3个凶象（主导致命，强力影响）】：
 请提供3个具体的凶象，每个必须包含：
 - 标题（必须是有意义的四字词语，如：比劫夺财、小人妨害、决策失误、官非口舌、刑冲动荡、破财损耗）
-- 详细内容（以条列式呈现3-4个要点，每个要点40-60字，详细说明原理、时机、具体风险）
+- 详细内容（以条列式呈现，必须按照以下格式分为4个明确部分：原理、时机、风险、预防）
 
 重要：
 1. 标题必须是经典的四字成语或风水术语，绝对不可以是句子的前四个字！
-2. 内容必须以条列式（bullet points）呈现，每个要点要详细且具体！
-3. 每个要点需包含：原理说明+具体时间+风险提示+预防措施
+2. 内容必须严格按照以下格式呈现：**原理：** + **时机：** + **风险：** + **预防：**
+3. 每个部分都必须有明确的标记，不可省略任何一个部分！
 
 凶象四字词语示例：
 - 比劫夺财（竞争者抢夺利益）
@@ -140,19 +144,26 @@ ${baziData && baziData.dayMaster && baziData.dayElement ? `**重要提醒**：�
 - 刑冲动荡（环境变化带来不稳定）
 - 破财损耗（意外支出或投资亏损）
 
-格式如下（必须使用条列式，每个要点要详细）：
+**格式如下（必须严格遵守此格式）：**
 ① [有意义的四字词语]：
-• [详细要点1：包含原理+时间+风险+预防，40-60字]
-• [详细要点2：包含原理+时间+风险+预防，40-60字]
-• [详细要点3：包含原理+时间+风险+预防，40-60字]
+• 原理：[说明背后的命理原理，30-40字]
+• 时机：[具体时间点，如"明年春季（3-5月）"或"今年立秋（8月7日）后"，20-30字]
+• 风险：[可能出现的具体风险情况，40-50字]
+• 预防：[具体的预防措施和建议，40-50字]
+
 ② [有意义的四字词语]：
-• [详细要点1：包含原理+时间+风险+预防，40-60字]
-• [详细要点2：包含原理+时间+风险+预防，40-60字]
-• [详细要点3：包含原理+时间+风险+预防，40-60字]
+• 原理：[说明背后的命理原理，30-40字]
+• 时机：[具体时间点，如"明年夏季（6-8月）"或"今年霜降（10月23日）后"，20-30字]
+• 风险：[可能出现的具体风险情况，40-50字]
+• 预防：[具体的预防措施和建议，40-50字]
+
 ③ [有意义的四字词语]：
-• [详细要点1：包含原理+时间+风险+预防，40-60字]
-• [详细要点2：包含原理+时间+风险+预防，40-60字]
-• [详细要点3：包含原理+时间+风险+预防，40-60字]
+• 原理：[说明背后的命理原理，30-40字]
+• 时机：[具体时间点，如"明年秋季（8-11月）"或"今年冬至（12月21日）前后"，20-30字]
+• 风险：[可能出现的具体风险情况，40-50字]
+• 预防：[具体的预防措施和建议，40-50字]
+
+**绝对不可以省略"原理："、"时机："、"风险："、"预防："这四个标记！**
 
 【关键季节分析】：
 请严格按照以下格式输出2026年四季分析，每季一段，不要添加额外内容：
@@ -272,8 +283,17 @@ function parseStructuredContent(title, content, isJixiang) {
 		content: content, // Keep original for fallback
 	};
 
+	console.log(
+		`🔧 parseStructuredContent called for "${title}", content length: ${content.length}`,
+	);
+	console.log(`🔧 First 150 chars of content:`, content.substring(0, 150));
+
 	// Split by bullet points
 	const bullets = content.split(/\n•\s*/).filter((b) => b.trim());
+	console.log(
+		`🔧 Found ${bullets.length} bullets after split:`,
+		bullets.map((b) => b.substring(0, 50)),
+	);
 
 	// For 吉象 (auspicious), look for: 原理, 時機, 做法
 	// For 凶象 (inauspicious), look for: 原理, 時機, 風險, 預防
@@ -282,23 +302,33 @@ function parseStructuredContent(title, content, isJixiang) {
 		const trimmed = bullet.trim();
 
 		if (isJixiang) {
-			if (/^原理[：:]/i.test(trimmed)) {
-				result.principle = trimmed.replace(/^原理[：:]\s*/i, "").trim();
-			} else if (/^時機[：:]/i.test(trimmed)) {
-				result.timing = trimmed.replace(/^時機[：:]\s*/i, "").trim();
-			} else if (/^做法[：:]/i.test(trimmed)) {
-				result.method = trimmed.replace(/^做法[：:]\s*/i, "").trim();
+			if (/^•?\s*原理[：:]/i.test(trimmed)) {
+				result.principle = trimmed
+					.replace(/^•?\s*原理[：:]\s*/i, "")
+					.trim();
+			} else if (/^•?\s*時機[：:]/i.test(trimmed)) {
+				result.timing = trimmed
+					.replace(/^•?\s*時機[：:]\s*/i, "")
+					.trim();
+			} else if (/^•?\s*做法[：:]/i.test(trimmed)) {
+				result.method = trimmed
+					.replace(/^•?\s*做法[：:]\s*/i, "")
+					.trim();
 			}
 		} else {
-			if (/^原理[：:]/i.test(trimmed)) {
-				result.principle = trimmed.replace(/^原理[：:]\s*/i, "").trim();
-			} else if (/^時機[：:]/i.test(trimmed)) {
-				result.timing = trimmed.replace(/^時機[：:]\s*/i, "").trim();
-			} else if (/^風險[：:]/i.test(trimmed)) {
-				result.risk = trimmed.replace(/^風險[：:]\s*/i, "").trim();
-			} else if (/^預防[：:]/i.test(trimmed)) {
+			if (/^•?\s*原理[：:]/i.test(trimmed)) {
+				result.principle = trimmed
+					.replace(/^•?\s*原理[：:]\s*/i, "")
+					.trim();
+			} else if (/^•?\s*時機[：:]/i.test(trimmed)) {
+				result.timing = trimmed
+					.replace(/^•?\s*時機[：:]\s*/i, "")
+					.trim();
+			} else if (/^•?\s*風險[：:]/i.test(trimmed)) {
+				result.risk = trimmed.replace(/^•?\s*風險[：:]\s*/i, "").trim();
+			} else if (/^•?\s*預防[：:]/i.test(trimmed)) {
 				result.prevention = trimmed
-					.replace(/^預防[：:]\s*/i, "")
+					.replace(/^•?\s*預防[：:]\s*/i, "")
 					.trim();
 			}
 		}
@@ -726,6 +756,10 @@ function extractItems(content, type) {
 
 					if (rawTitle && description) {
 						console.log(`📝 Found numbered item: ${rawTitle}`);
+						console.log(
+							`📝 Description preview (first 200 chars):`,
+							description.substring(0, 200),
+						);
 
 						// First try to extract meaningful title from the raw title or description
 						let title = extractMeaningfulTitles(

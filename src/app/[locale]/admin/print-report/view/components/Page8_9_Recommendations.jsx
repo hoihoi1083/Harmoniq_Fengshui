@@ -1,5 +1,7 @@
 // Page 8-9: 開運建議 (針對性建議) + 禁忌行為
 
+import Image from "next/image";
+
 export default function Page8_9_Recommendations({ data }) {
 	const { summary, concern, color } = data;
 
@@ -76,138 +78,264 @@ export default function Page8_9_Recommendations({ data }) {
 		},
 	];
 
-	const displaySuggestions = suggestions.length > 0 ? suggestions : defaultSuggestions;
+	const displaySuggestions =
+		suggestions.length > 0 ? suggestions : defaultSuggestions;
 	const displayTaboos = taboos.length > 0 ? taboos : defaultTaboos;
 
 	return (
 		<>
 			{/* Page 8: 開運建議 | 建議方案 */}
-			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
+			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden relative">
 				{/* Page Header */}
-				<div className="flex items-start justify-between mb-10 pb-6 border-b-2 border-gray-200">
-					<div>
+				<div className="relative pb-6 mb-10">
+					{/* Date - Top Right */}
+					<div
+						style={{
+							position: "absolute",
+							right: "0",
+							top: "0",
+							fontFamily: "Noto Serif TC, serif",
+							fontWeight: 400,
+							fontSize: "20px",
+							color: "#424242",
+							textAlign: "right",
+						}}
+					>
+						{new Date()
+							.toLocaleDateString("zh-TW")
+							.replace(/\//g, "/")}
+					</div>
+
+					{/* Main header content */}
+					<div className="flex gap-6">
+						{/* Left: 開運建議 */}
 						<h1
-							className="text-4xl font-bold mb-2"
-							style={{ 
+							className="text-4xl font-bold"
+							style={{
 								color: color,
-								fontFamily: "Noto Serif TC, serif" 
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 							}}
 						>
 							開運建議
 						</h1>
-						<p className="text-gray-600">針對{concern}運勢的實用方法</p>
-					</div>
-					<div className="text-right">
-						<p className="text-2xl font-bold">建議方案</p>
-						<p className="text-sm text-gray-500">針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。</p>
+
+						{/* Vertical divider */}
+						<div className="w-[2px] bg-gray-400"></div>
+
+						{/* Right: Title and description */}
+						<div>
+							<p className="mb-2 text-xl font-bold text-blue-600">
+								建議方案
+							</p>
+							<p className="text-sm text-gray-500">
+								針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。
+							</p>
+						</div>
 					</div>
 				</div>
 
 				{/* Two-column layout for suggestions */}
 				<div className="grid grid-cols-2 gap-8">
-					{/* Left column: 01, 03, 05 */}
+					{/* Left column: 01, 02 */}
 					<div className="space-y-10">
-						{[0, 2, 4].map((index) => {
+						{[0, 1].map((index) => {
 							const suggestion = displaySuggestions[index];
 							if (!suggestion) return null;
-							
+
 							return (
 								<div key={index} className="avoid-break">
 									<div className="mb-4">
-										<h2 className="text-3xl font-bold mb-2">
-											{String(index + 1).padStart(2, '0')}
+										<h2 className="mb-2 text-3xl font-bold">
+											{String(index + 1).padStart(2, "0")}
 										</h2>
-										<h3 className="text-xl font-bold mb-3" style={{ fontFamily: "Noto Serif TC, serif" }}>
+										<h3
+											className="mb-3 text-xl font-bold"
+											style={{
+												fontFamily:
+													"Noto Serif TC, serif",
+											}}
+										>
 											{suggestion.title}
 										</h3>
 										{suggestion.category && (
 											<span
-												className="inline-block px-3 py-1 text-sm font-medium text-white mb-3"
-												style={{ backgroundColor: "#3b82f6" }}
+												className="inline-block px-3 py-1 mb-3 text-sm font-medium text-white"
+												style={{
+													backgroundColor: "#3b82f6",
+												}}
 											>
 												{suggestion.category}
 											</span>
 										)}
 									</div>
-									<div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+									<div className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
 										{suggestion.description}
 									</div>
+									{/* Horizontal line - 1/4 width */}
+									<div className="w-1/4 h-[2px] bg-gray-300 mt-4"></div>
 								</div>
 							);
 						})}
 					</div>
 
-					{/* Right column: 02, 04 */}
+					{/* Right column: 03, 04, 05 */}
 					<div className="space-y-10">
-						{[1, 3].map((index) => {
+						{[2, 3, 4].map((index) => {
 							const suggestion = displaySuggestions[index];
 							if (!suggestion) return null;
-							
+
 							return (
 								<div key={index} className="avoid-break">
 									<div className="mb-4">
-										<h2 className="text-3xl font-bold mb-2">
-											{String(index + 1).padStart(2, '0')}
+										<h2 className="mb-2 text-3xl font-bold">
+											{String(index + 1).padStart(2, "0")}
 										</h2>
-										<h3 className="text-xl font-bold mb-3" style={{ fontFamily: "Noto Serif TC, serif" }}>
+										<h3
+											className="mb-3 text-xl font-bold"
+											style={{
+												fontFamily:
+													"Noto Serif TC, serif",
+											}}
+										>
 											{suggestion.title}
 										</h3>
 										{suggestion.category && (
 											<span
-												className="inline-block px-3 py-1 text-sm font-medium text-white mb-3"
-												style={{ backgroundColor: "#3b82f6" }}
+												className="inline-block px-3 py-1 mb-3 text-sm font-medium text-white"
+												style={{
+													backgroundColor: "#3b82f6",
+												}}
 											>
 												{suggestion.category}
 											</span>
 										)}
 									</div>
-									<div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+									<div className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
 										{suggestion.description}
 									</div>
+									{/* Horizontal line - 1/4 width */}
+									<div className="w-1/4 h-[2px] bg-gray-300 mt-4"></div>
 								</div>
 							);
 						})}
 					</div>
 				</div>
+
+				{/* Large decorative character at bottom */}
+				<div
+					className="absolute font-bold"
+					style={{
+						left: "30%",
+						bottom: "0%",
+						transform: "translateX(-50%)",
+						color: "#13326F",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontSize: "400px",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						opacity: 0.15,
+					}}
+				>
+					宜
+				</div>
+
+				{/* Footer with bottom.png image */}
+				<div
+					style={{
+						position: "absolute",
+						bottom: "15mm",
+						left: "10mm",
+						width: "auto",
+						height: "auto",
+					}}
+				>
+					<Image
+						src="/images/report/bottom.png"
+						alt="Footer decoration"
+						width={30}
+						height={10}
+						style={{
+							objectFit: "contain",
+						}}
+					/>
+				</div>
 			</div>
 
 			{/* Page 9: 開運建議 | 禁忌行為 */}
-			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
+			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden relative">
 				{/* Page Header */}
-				<div className="flex items-start justify-between mb-10 pb-6 border-b-2 border-gray-200">
-					<div>
+				<div className="relative pb-6 mb-10">
+					{/* Date - Top Right */}
+					<div
+						style={{
+							position: "absolute",
+							right: "0",
+							top: "0",
+							fontFamily: "Noto Serif TC, serif",
+							fontWeight: 400,
+							fontSize: "20px",
+							color: "#424242",
+							textAlign: "right",
+						}}
+					>
+						{new Date()
+							.toLocaleDateString("zh-TW")
+							.replace(/\//g, "/")}
+					</div>
+
+					{/* Main header content */}
+					<div className="flex gap-6">
+						{/* Left: 開運建議 */}
 						<h1
-							className="text-4xl font-bold mb-2"
-							style={{ 
+							className="text-4xl font-bold"
+							style={{
 								color: color,
-								fontFamily: "Noto Serif TC, serif" 
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 							}}
 						>
 							開運建議
 						</h1>
-						<p className="text-gray-600">針對{concern}運勢的實用方法</p>
-					</div>
-					<div className="text-right">
-						<p className="text-2xl font-bold text-red-600">禁忌行為</p>
-						<p className="text-sm text-gray-500">針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。</p>
+
+						{/* Vertical divider */}
+						<div className="w-[2px] bg-gray-400"></div>
+
+						{/* Right: Title and description */}
+						<div>
+							<p className="mb-2 text-xl font-bold text-red-600">
+								禁忌行為
+							</p>
+							<p className="text-sm text-gray-500">
+								針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。
+							</p>
+						</div>
 					</div>
 				</div>
 
 				{/* Two-column layout for taboos */}
 				<div className="grid grid-cols-2 gap-8">
-					{/* Left column: 01, 03, 05 */}
+					{/* Left column: 01, 02 */}
 					<div className="space-y-10">
-						{[0, 2, 4].map((index) => {
+						{[0, 1].map((index) => {
 							const taboo = displayTaboos[index];
 							if (!taboo) return null;
-							
+
 							return (
 								<div key={index} className="avoid-break">
 									<div className="mb-4">
-										<h2 className="text-3xl font-bold mb-2">
-											{String(index + 1).padStart(2, '0')}
+										<h2 className="mb-2 text-3xl font-bold">
+											{String(index + 1).padStart(2, "0")}
 										</h2>
-										<h3 className="text-xl font-bold mb-3" style={{ fontFamily: "Noto Serif TC, serif" }}>
+										<h3
+											className="mb-3 text-xl font-bold"
+											style={{
+												fontFamily:
+													"Noto Serif TC, serif",
+											}}
+										>
 											{taboo.title}
 										</h3>
 										<div className="flex gap-2 mb-3">
@@ -215,31 +343,41 @@ export default function Page8_9_Recommendations({ data }) {
 												{taboo.level || "警惕"}
 											</span>
 											<span className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600">
-												⚠️ 後果：{taboo.consequence || "影響運勢"}
+												⚠️ 後果：
+												{taboo.consequence ||
+													"影響運勢"}
 											</span>
 										</div>
 									</div>
-									<div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+									<div className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
 										{taboo.description}
 									</div>
+									{/* Horizontal line - 1/4 width */}
+									<div className="w-1/4 h-[2px] bg-gray-300 mt-4"></div>
 								</div>
 							);
 						})}
 					</div>
 
-					{/* Right column: 02, 04 */}
+					{/* Right column: 03, 04, 05 */}
 					<div className="space-y-10">
-						{[1, 3].map((index) => {
+						{[2, 3, 4].map((index) => {
 							const taboo = displayTaboos[index];
 							if (!taboo) return null;
-							
+
 							return (
 								<div key={index} className="avoid-break">
 									<div className="mb-4">
-										<h2 className="text-3xl font-bold mb-2">
-											{String(index + 1).padStart(2, '0')}
+										<h2 className="mb-2 text-3xl font-bold">
+											{String(index + 1).padStart(2, "0")}
 										</h2>
-										<h3 className="text-xl font-bold mb-3" style={{ fontFamily: "Noto Serif TC, serif" }}>
+										<h3
+											className="mb-3 text-xl font-bold"
+											style={{
+												fontFamily:
+													"Noto Serif TC, serif",
+											}}
+										>
 											{taboo.title}
 										</h3>
 										<div className="flex gap-2 mb-3">
@@ -247,17 +385,62 @@ export default function Page8_9_Recommendations({ data }) {
 												{taboo.level || "警惕"}
 											</span>
 											<span className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600">
-												⚠️ 後果：{taboo.consequence || "影響運勢"}
+												⚠️ 後果：
+												{taboo.consequence ||
+													"影響運勢"}
 											</span>
 										</div>
 									</div>
-									<div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+									<div className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
 										{taboo.description}
 									</div>
+									{/* Horizontal line - 1/4 width */}
+									<div className="w-1/4 h-[2px] bg-gray-300 mt-4"></div>
 								</div>
 							);
 						})}
 					</div>
+				</div>
+
+				{/* Large decorative character at bottom */}
+				<div
+					className="absolute font-bold"
+					style={{
+						left: "30%",
+						bottom: "0%",
+						transform: "translateX(-50%)",
+						color: "#50001B",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontSize: "400px",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						opacity: 0.15,
+					}}
+				>
+					禁
+				</div>
+
+				{/* Footer with bottom.png image */}
+				<div
+					style={{
+						position: "absolute",
+						bottom: "15mm",
+						left: "10mm",
+						width: "auto",
+						height: "auto",
+					}}
+				>
+					<Image
+						src="/images/report/bottom.png"
+						alt="Footer decoration"
+						width={30}
+						height={10}
+						style={{
+							objectFit: "contain",
+						}}
+					/>
 				</div>
 			</div>
 		</>
