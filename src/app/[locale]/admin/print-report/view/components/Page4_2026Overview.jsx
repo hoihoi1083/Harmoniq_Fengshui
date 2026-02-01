@@ -1,4 +1,5 @@
 // Page 4: 2026流年詳解 - Styled exactly like the attached image
+import Image from "next/image";
 
 export default function Page4_2026Overview({ data }) {
 	const { year, concern, color } = data;
@@ -54,6 +55,114 @@ export default function Page4_2026Overview({ data }) {
 	const ganzhiEffect = parsedContent.ganzhiEffect;
 	const practicalResults = parsedContent.practicalResults;
 
+	// Parse the practical results section structure
+	const parsePracticalResults = (text) => {
+		if (!text) return [];
+
+		// Split by main sections (時間點與變化, 影響程度與形式, 可能情況與挑戰)
+		const sections = [];
+		const mainSectionRegex =
+			/^- (時間點與變化|影響程度與形式|可能情況與挑戰)：/gm;
+
+		let matches = [...text.matchAll(mainSectionRegex)];
+
+		for (let i = 0; i < matches.length; i++) {
+			const sectionTitle = matches[i][1];
+			const startIndex = matches[i].index + matches[i][0].length;
+			const endIndex =
+				i < matches.length - 1 ? matches[i + 1].index : text.length;
+			const sectionContent = text.substring(startIndex, endIndex).trim();
+
+			// For 時間點與變化, parse time period subsections
+			if (sectionTitle === "時間點與變化") {
+				const timeSubsections = [];
+
+				// Split by time period patterns: 年初（1-3月）, 年中（4-6月，農曆三月至五月）, etc.
+				// Match patterns like: 年初（...）： or 年中（...）：
+				const timePattern =
+					/(?:年初|年中|下半年|年末|\*\*明年\*\*[^：（]*?)（[^）]+）：/g;
+				const matches = [...sectionContent.matchAll(timePattern)];
+
+				if (matches.length > 0) {
+					for (let i = 0; i < matches.length; i++) {
+						const timeTitle = matches[i][0]
+							.replace(/：$/, "")
+							.trim(); // Remove trailing ：
+						const startIdx =
+							matches[i].index + matches[i][0].length;
+						const endIdx =
+							i < matches.length - 1
+								? matches[i + 1].index
+								: sectionContent.length;
+						const sectionText = sectionContent
+							.substring(startIdx, endIdx)
+							.trim();
+
+						// Split by 💡 實際場景：marker
+						const parts = sectionText.split(/💡\s*實際場景：/);
+						const mainContent = parts[0].trim();
+
+						// Parse scenarios (if exists)
+						const scenarios = [];
+						if (parts.length > 1) {
+							// The scenario content might contain multiple items separated by commas or 、
+							const scenarioText = parts[1].trim();
+							// Split by patterns like "，X月" or "、X月" to separate individual scenarios
+							const items = scenarioText.split(/[，、](?=\d+月)/);
+							for (const item of items) {
+								const cleaned = item.trim();
+								if (cleaned) {
+									scenarios.push(cleaned);
+								}
+							}
+						}
+
+						timeSubsections.push({
+							title: timeTitle,
+							mainContent: mainContent,
+							scenarios:
+								scenarios.length > 0
+									? scenarios
+									: [
+											parts.length > 1
+												? scenarioText || ""
+												: "",
+										],
+						});
+					}
+				}
+
+				// If no time subsections found, treat as regular section
+				if (timeSubsections.length > 0) {
+					sections.push({
+						title: sectionTitle,
+						timeSubsections,
+					});
+				} else {
+					// No time periods found, treat as regular content
+					const parts = sectionContent.split(/💡 實際場景：/);
+					sections.push({
+						title: sectionTitle,
+						mainContent: parts[0].trim().replace(/^- /, ""),
+						scenario: parts[1] ? parts[1].trim() : "",
+					});
+				}
+			} else {
+				// For other sections, just split by 💡 實際場景
+				const parts = sectionContent.split(/💡 實際場景：/);
+				sections.push({
+					title: sectionTitle,
+					mainContent: parts[0].trim().replace(/^- /, ""),
+					scenario: parts[1] ? parts[1].trim() : "",
+				});
+			}
+		}
+
+		return sections;
+	};
+
+	const structuredResults = parsePracticalResults(practicalResults);
+
 	return (
 		<div
 			className="page-break bg-white h-[297mm] overflow-hidden relative"
@@ -62,109 +171,196 @@ export default function Page4_2026Overview({ data }) {
 				boxSizing: "border-box",
 			}}
 		>
-			{/* Date */}
+			{/* Header with title and date on same line */}
 			<div
-				className="absolute top-5 right-8 text-gray-500"
-				style={{ fontSize: "11px" }}
+				style={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "space-between",
+					marginBottom: "10px",
+					paddingBottom: "8px",
+					borderBottom: "1px solid #e5e7eb",
+				}}
 			>
-				12/12/12
-			</div>
-
-			{/* Horizontal Title */}
-			<div style={{ marginBottom: "20px", paddingBottom: "8px" }}>
 				<h1
 					style={{
-						fontFamily: "Noto Serif TC, serif",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "36px",
 						fontWeight: "bold",
 						color: "#666",
-						marginBottom: "0",
+						margin: "0",
 						lineHeight: "1.2",
 					}}
 				>
-					<span>2026</span>
-					<span style={{ margin: "0 12px" }}>|</span>
-					<span>流年</span>
+					2026丙午年 <span style={{ margin: "0 12px" }}>|</span>{" "}
+					<span style={{ color: color }}>流年詳解</span>
 				</h1>
-				<h2
+				<div
 					style={{
+						fontSize: "20px",
+						color: "#666",
 						fontFamily: "Noto Serif TC, serif",
-						fontSize: "36px",
-						fontWeight: "bold",
-						marginBottom: "0",
-						lineHeight: "1.2",
 					}}
 				>
-					<span style={{ color: "#666" }}>丙午年</span>
-					<span style={{ margin: "0 12px", color: "#666" }}>|</span>
-					<span style={{ color: color }}>詳解</span>
-				</h2>
-			</div>
-
-			{/* Subtitle */}
-			<div
-				style={{
-					fontSize: "14px",
-					color: "#666",
-					marginBottom: "20px",
-				}}
-			>
-				流年干支作用
-			</div>
-
-			{/* Content in Two Columns */}
-			<div
-				style={{
-					display: "grid",
-					gridTemplateColumns: "1fr 1fr",
-					gap: "0 32px",
-					marginBottom: "16px",
-				}}
-			>
-				{/* Left Column - 流年干支作用 */}
-				<div>
-					<h3
-						style={{
-							color: color,
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "16px",
-							fontWeight: "bold",
-							marginBottom: "12px",
-							marginTop: "0",
-						}}
-					>
-						流年干支作用
-					</h3>
-					<p
-						style={{
-							fontSize: "13px",
-							lineHeight: "1.65",
-							textAlign: "justify",
-							color: "#333",
-							margin: "0",
-						}}
-					>
-						{ganzhiEffect || "內容載入中..."}
-					</p>
+					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
 				</div>
+			</div>
 
-				{/* Right Column - 在專案領域的具體表現 */}
-				<div>
-					<h3
-						style={{
-							color: color,
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "16px",
-							fontWeight: "bold",
-							marginBottom: "12px",
-							marginTop: "0",
-						}}
-					>
-						在專案領域的具體表現
-					</h3>
+			{/* Content Section 1 - 流年干支作用 */}
+			<div style={{ marginBottom: "10px" }}>
+				<h3
+					style={{
+						color: color,
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontSize: "20px",
+						fontWeight: "bold",
+						marginBottom: "5px",
+						marginTop: "0",
+					}}
+				>
+					01 流年干支作用
+				</h3>
+				<p
+					style={{
+						fontSize: "13px",
+						lineHeight: "1.65",
+						textAlign: "justify",
+						color: "#333",
+						margin: "0",
+					}}
+				>
+					{ganzhiEffect || "內容載入中..."}
+				</p>
+			</div>
+
+			{/* Content Section 2 - 在專案領域的具體表現 */}
+			<div style={{ marginBottom: "32px" }}>
+				<h3
+					style={{
+						color: color,
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontSize: "20px",
+						fontWeight: "bold",
+						marginBottom: "5px",
+						marginTop: "0",
+					}}
+				>
+					02 在專案領域的具體表現
+				</h3>
+
+				{structuredResults.length > 0 ? (
+					structuredResults.map((section, idx) => (
+						<div key={idx} style={{ marginBottom: "10px" }}>
+							{/* Section Title */}
+							<h4
+								style={{
+									color: color,
+									fontFamily: "Noto Serif TC, serif",
+									fontSize: "15px",
+									fontWeight: "bold",
+									marginBottom: "5px",
+									marginTop: "0",
+								}}
+							>
+								{section.title}
+							</h4>
+
+							{/* Time subsections for 時間點與變化 */}
+							{section.timeSubsections ? (
+								section.timeSubsections.map(
+									(timeSub, subIdx) => (
+										<div
+											key={subIdx}
+											style={{
+												marginBottom: "5px",
+												marginLeft: "20px",
+											}}
+										>
+											<h5
+												style={{
+													fontSize: "13px",
+													fontWeight: "bold",
+													color: color,
+													marginBottom: "5px",
+													marginTop: "0",
+												}}
+											>
+												{timeSub.title}
+											</h5>
+											{timeSub.mainContent && (
+												<p
+													style={{
+														fontSize: "14px",
+														lineHeight: "1.65",
+														color: "#333",
+														margin: "0 0 5px 0",
+													}}
+												>
+													{timeSub.mainContent}
+												</p>
+											)}
+											{/* {timeSub.scenarios && timeSub.scenarios.length > 0 && (
+												<div
+													style={{
+														fontSize: "13px",
+														lineHeight: "1.65",
+														color: "#555",
+														margin: "6px 0 0 0",
+														backgroundColor: "#f9f9f9",
+														padding: "8px 12px",
+														borderRadius: "4px",
+													}}
+												>
+													<span style={{ fontWeight: "900", color: "#333" }}>
+														實際場景：
+													</span>
+													{timeSub.scenarios.join('，')}
+												</div>
+											)} */}
+										</div>
+									),
+								)
+							) : (
+								/* Regular sections */
+								<>
+									<p
+										style={{
+											fontSize: "13px",
+											lineHeight: "1.65",
+											color: "#333",
+											margin: "0 0 8px 0",
+											marginLeft: "20px",
+										}}
+									>
+										{section.mainContent}
+									</p>
+									{section.scenario && (
+										<p
+											style={{
+												fontSize: "13px",
+												lineHeight: "1.65",
+												color: "#555",
+												margin: "0",
+												marginLeft: "20px",
+											}}
+										>
+											<span style={{ fontWeight: "900" }}>
+												實際場景：
+											</span>
+											{section.scenario}
+										</p>
+									)}
+								</>
+							)}
+						</div>
+					))
+				) : (
 					<div
 						style={{
-							fontSize: "13px",
+							fontSize: "14px",
 							lineHeight: "1.65",
 							textAlign: "justify",
 							color: "#333",
@@ -172,15 +368,28 @@ export default function Page4_2026Overview({ data }) {
 					>
 						{practicalResults || "內容載入中..."}
 					</div>
-				</div>
+				)}
 			</div>
 
 			{/* Footer */}
 			<div
-				className="absolute bottom-5 left-8 text-black font-bold"
-				style={{ fontSize: "10px" }}
+				style={{
+					position: "absolute",
+					bottom: "15mm",
+					left: "20mm",
+					width: "auto",
+					height: "auto",
+				}}
 			>
-				HarmoniQ Bell
+				<Image
+					src="/images/report/bottom.png"
+					alt="Footer decoration"
+					width={30}
+					height={10}
+					style={{
+						objectFit: "contain",
+					}}
+				/>
 			</div>
 		</div>
 	);
