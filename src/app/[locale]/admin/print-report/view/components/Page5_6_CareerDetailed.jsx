@@ -136,7 +136,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 								className="flex items-start rounded-xl avoid-break"
 								style={{
 									gap: "16px",
-									padding: "16px",
+									padding: "20px",
 								}}
 							>
 								{/* Content */}
@@ -321,7 +321,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 								className="flex items-start rounded-xl avoid-break"
 								style={{
 									gap: "16px",
-									padding: "16px",
+									padding: "10px",
 								}}
 							>
 								{/* Content */}
@@ -363,7 +363,9 @@ export default function Page5_6_CareerDetailed({ data }) {
 									>
 										{item.content
 											.replace(/^•\s*/, "")
-											.split(/(?=原理：|時機：|做法：)/g)
+											.split(
+												/(?=原理：|時機：|風險：|預防：)/g,
+											)
 											.filter((part) => part.trim())
 											.map((part, idx) => (
 												<p
