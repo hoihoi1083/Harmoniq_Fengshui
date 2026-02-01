@@ -1,4 +1,5 @@
 // Page 5-6: 總流年{Concern} - Detailed analysis with numbered sections and large decorative characters
+import Image from "next/image";
 
 export default function Page5_6_CareerDetailed({ data }) {
 	const { jixiong, concern, color } = data;
@@ -44,36 +45,90 @@ export default function Page5_6_CareerDetailed({ data }) {
 	return (
 		<>
 			{/* Page 5: 吉象 (Auspicious) */}
-			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
+			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden relative">
+				{/* Date in top right */}
+				<div
+					style={{
+						position: "absolute",
+						top: "50px",
+						right: "30px",
+						color: "#666",
+					}}
+				>
+					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+				</div>
+
 				{/* Page Header with large decorative character */}
-				<div className="text-center mb-6 relative">
+				<div className="relative mb-6">
 					<div
-						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 opacity-5 font-bold"
+						className="absolute font-bold"
 						style={{
-							color: color,
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "140px",
+							left: "0%",
+							top: "255.96%",
+							bottom: "67.7%",
+							color: "#13326F",
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							fontSize: "200px",
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+							opacity: 0.15,
 						}}
 					>
 						吉
 					</div>
-					<h1
-						className="font-bold mb-2 relative z-10"
+
+					{/* Header with vertical 總 and horizontal text */}
+					<div
 						style={{
-							color: color,
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "32px",
+							display: "flex",
+							gap: "10px",
+							marginBottom: "90px",
 						}}
 					>
-						總流年{concernChinese[concern]} · 吉象
-					</h1>
-					<p className="text-gray-600" style={{ fontSize: "14px" }}>
-						2026年{concern}方面的有利趨勢
-					</p>
+						<div style={{ display: "flex", gap: "4px" }}>
+							<h2
+								style={{
+									fontFamily:
+										"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+									fontStyle: "normal",
+									fontWeight: 900,
+									fontSize: "48px",
+									color: "#666",
+								}}
+							>
+								總
+							</h2>
+						</div>
+
+						<div
+							style={{
+								flex: 1,
+								borderLeft: "2px solid #d1d5db",
+								paddingLeft: "30px",
+								display: "flex",
+							}}
+						>
+							<h1
+								className="relative z-10 font-bold"
+								style={{
+									color: color,
+									fontFamily:
+										"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+									fontWeight: 900,
+
+									fontSize: "48px",
+								}}
+							>
+								流年{concernChinese[concern]}
+							</h1>
+						</div>
+					</div>
 				</div>
 
 				{/* Numbered sections */}
-				<div className="space-y-5">
+				<div className="space-y-5" style={{ marginLeft: "100px" }}>
 					{auspiciousPoints.length > 0 ? (
 						auspiciousPoints.map((item, index) => (
 							<div
@@ -85,48 +140,64 @@ export default function Page5_6_CareerDetailed({ data }) {
 									padding: "16px",
 								}}
 							>
-								{/* Number badge */}
-								<div
-									className="flex-shrink-0 rounded-full flex items-center justify-center text-white font-bold"
-									style={{
-										backgroundColor: color,
-										width: "36px",
-										height: "36px",
-										fontSize: "16px",
-									}}
-								>
-									{index + 1}
-								</div>
-
 								{/* Content */}
-								<div className="flex-1">
-									{item.title && (
-										<h3
-											className="font-bold"
+								<div className="flex-1 ">
+									<div className="flex items-center gap-3">
+										<div
+											className="flex-shrink-0 font-bold"
 											style={{
 												color: color,
-												fontSize: "15px",
-												marginBottom: "8px",
+												fontSize: "30px",
+												fontFamily:
+													"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+												minWidth: "30px",
 											}}
 										>
-											{item.title}
-										</h3>
-									)}
-									<p
-										className="text-gray-800 whitespace-pre-line"
+											{String(index + 1).padStart(2, "0")}
+										</div>
+										{item.title && (
+											<h3
+												className="font-bold"
+												style={{
+													color: color,
+													fontSize: "25px",
+													fontFamily:
+														"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+												}}
+											>
+												{item.title}
+											</h3>
+										)}
+									</div>
+									<div
+										className="text-gray-800"
 										style={{
-											fontSize: "13px",
+											fontSize: "14px",
 											lineHeight: "1.6",
+											marginLeft: "45px",
 										}}
 									>
-										{item.content}
-									</p>
+										{item.content
+											.replace(/^•\s*/, "")
+											.split(/(?=原理：|時機：|做法：)/g)
+											.filter((part) => part.trim())
+											.map((part, idx) => (
+												<p
+													key={idx}
+													style={{
+														marginBottom: "8px",
+													}}
+												>
+													• {part.trim()}
+												</p>
+											))}
+									</div>
 								</div>
 							</div>
 						))
 					) : (
 						<div
-							className="rounded-xl text-center"
+							className="text-center rounded-xl"
 							style={{
 								backgroundColor: `${color}08`,
 								padding: "24px",
@@ -137,20 +208,34 @@ export default function Page5_6_CareerDetailed({ data }) {
 					)}
 				</div>
 
-				{/* Footer note */}
-				<div className="mt-8 text-center">
-					<p className="text-gray-500" style={{ fontSize: "11px" }}>
-						* 以上吉象可作為您在{concern}規劃時的參考依據
-					</p>
+				{/* Footer with bottom.png image */}
+				<div
+					style={{
+						position: "absolute",
+						bottom: "15mm",
+						left: "20mm",
+						width: "auto",
+						height: "auto",
+					}}
+				>
+					<Image
+						src="/images/report/bottom.png"
+						alt="Footer decoration"
+						width={30}
+						height={10}
+						style={{
+							objectFit: "contain",
+						}}
+					/>
 				</div>
 			</div>
 
 			{/* Page 6: 凶象 (Inauspicious) */}
 			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
 				{/* Page Header with large decorative character */}
-				<div className="text-center mb-6 relative">
+				<div className="relative mb-6 text-center">
 					<div
-						className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 opacity-5 font-bold text-gray-400"
+						className="absolute top-0 font-bold text-gray-400 transform -translate-x-1/2 -translate-y-8 left-1/2 opacity-5"
 						style={{
 							fontFamily: "Noto Serif TC, serif",
 							fontSize: "140px",
@@ -159,7 +244,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						凶
 					</div>
 					<h1
-						className="font-bold mb-2 relative z-10"
+						className="relative z-10 mb-2 font-bold"
 						style={{
 							color: "#666",
 							fontFamily: "Noto Serif TC, serif",
@@ -179,7 +264,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						inauspiciousPoints.map((item, index) => (
 							<div
 								key={index}
-								className="flex items-start rounded-xl avoid-break bg-gray-50 border-2 border-gray-200"
+								className="flex items-start border-2 border-gray-200 rounded-xl avoid-break bg-gray-50"
 								style={{
 									gap: "16px",
 									padding: "16px",
@@ -187,7 +272,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 							>
 								{/* Number badge */}
 								<div
-									className="flex-shrink-0 rounded-full flex items-center justify-center bg-gray-400 text-white font-bold"
+									className="flex items-center justify-center flex-shrink-0 font-bold text-white bg-gray-400 rounded-full"
 									style={{
 										width: "36px",
 										height: "36px",
@@ -224,7 +309,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						))
 					) : (
 						<div
-							className="rounded-xl text-center bg-gray-50"
+							className="text-center rounded-xl bg-gray-50"
 							style={{ padding: "24px" }}
 						>
 							<p className="text-gray-600">正在分析凶象...</p>
