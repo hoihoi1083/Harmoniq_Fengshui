@@ -3351,7 +3351,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 										return characteristics.length > 0 ? (
 											<div
 												style={{
-													fontSize: "15px",
+													fontSize: "14px",
 													marginTop: "60px",
 													lineHeight: "1.6",
 												}}
@@ -3480,7 +3480,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 																		fontFamily:
 																			"Noto Serif TC, serif",
 																		fontSize:
-																			"22px",
+																			"20px",
 																		fontWeight: 900,
 																		textShadow:
 																			"0.3px 0 0 currentColor, -0.3px 0 0 currentColor",
@@ -3524,7 +3524,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 																<div
 																	style={{
 																		fontSize:
-																			"15px",
+																			"14px",
 																		lineHeight:
 																			"1.5",
 																	}}
@@ -3714,8 +3714,8 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 							<div
 								style={{
 									position: "absolute",
-									top: "16px",
-									right: "16px",
+									top: "50px",
+									right: "30px",
 									color: "#666",
 								}}
 							>
@@ -3728,76 +3728,97 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 							<div
 								style={{
 									display: "flex",
-									gap: "20px",
-									marginBottom: "16px",
+									gap: "32px",
+									marginBottom: "10px",
 								}}
 							>
-								<div style={{ display: "flex", gap: "0px" }}>
-									{/* First Column: 財星 */}
-									<div style={{ writingMode: "vertical-rl" }}>
-										<span
-											style={{
-												fontSize: "60px",
-												fontWeight: "bold",
-												color: concernColor,
-												letterSpacing: "0",
-											}}
-										>
-											{getTabLabel(
-												"right",
-												concern,
-												t,
-											).charAt(0)}
-										</span>
-										<span
-											style={{
-												fontSize: "60px",
-												fontWeight: "bold",
-												color: concernColor,
-												letterSpacing: "0",
-											}}
-										>
-											{getTabLabel(
-												"right",
-												concern,
-												t,
-											).charAt(1)}
-										</span>
-									</div>
+								<div style={{ display: "flex", gap: "4px" }}>
+									{/* First Column: 財星/事星/感星 */}
+									<h2
+										style={{
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontStyle: "normal",
+											fontWeight: 900,
+											fontSize: "48px",
+											lineHeight: "110%",
+											letterSpacing: "0.27em",
+											color: concernColor,
+											writingMode: "vertical-rl",
+											textOrientation: "upright",
+										}}
+									>
+										{getTabLabel(
+											"right",
+											concern,
+											t,
+										).substring(0, 2)}
+									</h2>
 									{/* Second Column: 定位 */}
-									<div style={{ writingMode: "vertical-rl" }}>
-										<span
-											style={{
-												fontSize: "60px",
-												fontWeight: "bold",
-												color: concernColor,
-												letterSpacing: "0",
-											}}
-										>
-											定
-										</span>
-										<span
-											style={{
-												fontSize: "60px",
-												fontWeight: "bold",
-												color: concernColor,
-												letterSpacing: "0",
-											}}
-										>
-											位
-										</span>
-									</div>
+									<h2
+										style={{
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontStyle: "normal",
+											fontWeight: 900,
+											fontSize: "48px",
+											lineHeight: "110%",
+											letterSpacing: "0.27em",
+											color: "#666",
+											writingMode: "vertical-rl",
+											textOrientation: "upright",
+										}}
+									>
+										定位
+									</h2>
 								</div>
 
-								{/* Description */}
-								<div style={{ flex: 1 }}>
+								{/* Description with vertical line */}
+								<div
+									style={{
+										flex: 1,
+										borderLeft: "2px solid #d1d5db",
+										paddingLeft: "16px",
+										display: "flex",
+										alignItems: "flex-end",
+									}}
+								>
 									<div
 										style={{
 											fontSize: "13px",
 											lineHeight: "1.6",
-											marginBottom: "14px",
 										}}
 									>
+										甚麼是
+										{getTabLabel(
+											"right",
+											concern,
+											t,
+										).substring(0, 2)}
+										甚麼是
+										{getTabLabel(
+											"right",
+											concern,
+											t,
+										).substring(0, 2)}
+										甚麼是
+										{getTabLabel(
+											"right",
+											concern,
+											t,
+										).substring(0, 2)}
+										甚麼是
+										{getTabLabel(
+											"right",
+											concern,
+											t,
+										).substring(0, 2)}
+										甚麼是
+										{getTabLabel(
+											"right",
+											concern,
+											t,
+										).substring(0, 2)}
 										甚麼是
 										{getTabLabel(
 											"right",
@@ -3838,25 +3859,25 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								style={{
 									display: "grid",
 									gridTemplateColumns: "1fr 1fr",
-									gap: "16px 20px",
-									marginBottom: "16px",
+									gap: "2px 20px",
+									marginBottom: "40px",
 								}}
 							>
 								{sections.map((section, index) => (
 									<div key={index}>
 										<h3
 											style={{
-												fontSize: "15px",
+												fontSize: "17px",
 												fontWeight: "bold",
 												color: concernColor,
-												marginBottom: "6px",
+												marginBottom: "5px",
 											}}
 										>
 											{section.title}
 										</h3>
 										<p
 											style={{
-												fontSize: "12px",
+												fontSize: "14px",
 												lineHeight: "1.6",
 												textAlign: "justify",
 											}}
@@ -3873,53 +3894,69 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									style={{
 										display: "flex",
 										alignItems: "flex-start",
-										gap: "8px",
-										marginBottom: "8px",
+										gap: "20px",
 									}}
 								>
+									{/* Vertical 總結 */}
 									<h2
 										style={{
-											fontSize: "36px",
-											fontWeight: "bold",
-											color: "#666",
-											whiteSpace: "nowrap",
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontStyle: "normal",
+											fontWeight: 900,
+											fontSize: "60px",
+											lineHeight: "110%",
+											letterSpacing: "0.27em",
+											color: concernColor,
+											textOrientation: "upright",
 										}}
 									>
 										總結
 									</h2>
-									<div
-										style={{ flex: 1, paddingTop: "12px" }}
-									>
+									{/* Content area */}
+									<div style={{ flex: 1 }}>
+										{/* Horizontal line */}
 										<div
 											style={{
-												height: "3px",
+												height: "6px",
 												backgroundColor: concernColor,
-												width: "70px",
+												width: "100px",
+												marginBottom: "45px",
 											}}
 										></div>
+										{/* Summary text */}
+										<p
+											style={{
+												fontSize: "14px",
+												lineHeight: "1.6",
+												textAlign: "justify",
+											}}
+										>
+											{summary}
+										</p>
 									</div>
 								</div>
-								<p
-									style={{
-										fontSize: "12px",
-										lineHeight: "1.6",
-										textAlign: "justify",
-									}}
-								>
-									{summary}
-								</p>
 							</div>
 
 							{/* Footer */}
 							<div
 								style={{
-									marginTop: "12px",
-									textAlign: "center",
-									color: "#999",
-									fontSize: "10px",
+									position: "absolute",
+									bottom: "15mm",
+									left: "20mm",
+									width: "auto",
+									height: "auto",
 								}}
 							>
-								HarmoniQ Bell
+								<Image
+									src="/images/report/bottom.png"
+									alt="Footer decoration"
+									width={30}
+									height={10}
+									style={{
+										objectFit: "contain",
+									}}
+								/>
 							</div>
 						</div>
 					</div>
