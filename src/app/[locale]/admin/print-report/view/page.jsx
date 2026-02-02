@@ -92,7 +92,7 @@ function PrintReportView() {
 	const analyzeWuxingStrength = (elementCounts) => {
 		const total = Object.values(elementCounts).reduce(
 			(sum, count) => sum + count,
-			0
+			0,
 		);
 		const strongElements = [];
 		const weakElements = [];
@@ -117,7 +117,7 @@ function PrintReportView() {
 		} else {
 			const maxCount = Math.max(...Object.values(elementCounts));
 			const dominant = Object.entries(elementCounts).find(
-				([_, count]) => count === maxCount
+				([_, count]) => count === maxCount,
 			)?.[0];
 			strengthDesc = dominant ? `${dominant}為主` : "五行平衡";
 		}
@@ -164,7 +164,7 @@ function PrintReportView() {
 				const fullDateTime = `${birthday} ${birthTime.match(/(\d+):00/)?.[1] || "12"}:00`;
 				const wuxingResult = calculateWuxingAnalysis(
 					fullDateTime,
-					gender
+					gender,
 				);
 
 				if (!wuxingResult)
@@ -337,11 +337,11 @@ function PrintReportView() {
 				console.log("Season Analysis API response:", seasonResult);
 				console.log(
 					"Specific Suggestion API response:",
-					specificSuggestionResult
+					specificSuggestionResult,
 				);
 				console.log(
 					"Overall Summary API response:",
-					overallSummaryResult
+					overallSummaryResult,
 				);
 
 				if (questionData.success && questionData.solution) {
@@ -350,7 +350,7 @@ function PrintReportView() {
 						let content = questionData.solution.content;
 						content = content.replace(
 							/您好，根據您提供的八字（[^）]+）[^：]+：\s*/g,
-							""
+							"",
 						);
 						setAiContent(content);
 					}
@@ -396,12 +396,12 @@ function PrintReportView() {
 							specificSuggestionData:
 								specificSuggestionResult.data || null,
 						}),
-					}
+					},
 				).then((res) => res.json());
 
 				console.log(
 					"Overall Summary API (with real data):",
-					overallSummaryApiResult
+					overallSummaryApiResult,
 				);
 
 				// Process Overall Summary Analysis (破關成蝶，格局煥新)
