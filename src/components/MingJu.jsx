@@ -3210,8 +3210,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								<div style={{ display: "flex", gap: "4px" }}>
 									<h2
 										style={{
-											fontFamily:
-												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontFamily: "Noto Serif SC, serif",
 											fontStyle: "normal",
 											fontWeight: 900,
 											fontSize: "48px",
@@ -3226,8 +3225,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									</h2>
 									<h2
 										style={{
-											fontFamily:
-												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontFamily: "Noto Serif SC, serif",
 											fontStyle: "normal",
 											fontWeight: 900,
 											fontSize: "48px",

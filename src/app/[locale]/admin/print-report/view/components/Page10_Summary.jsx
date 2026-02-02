@@ -37,7 +37,10 @@ export default function Page10_Summary({ data }) {
 	};
 
 	return (
-		<div className="page-break relative bg-white px-12 py-10 h-[297mm] overflow-hidden flex flex-col">
+		<div
+			className="page-break page-10-summary relative bg-white h-[297mm] overflow-hidden flex flex-col"
+			style={{ padding: "15mm 20mm" }}
+		>
 			{/* Page Number - Top Right */}
 			<div
 				style={{

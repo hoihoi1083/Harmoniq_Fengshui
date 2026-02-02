@@ -102,7 +102,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						className="absolute font-bold"
 						style={{
 							left: "0%",
-							top: "255.96%",
+							top: "300.96%",
 							bottom: "67.7%",
 							color: "#13326F",
 							fontFamily:
@@ -125,15 +125,29 @@ export default function Page5_6_CareerDetailed({ data }) {
 							marginBottom: "90px",
 						}}
 					>
-						<div style={{ display: "flex", gap: "4px" }}>
+						<div
+							style={{
+								display: "flex",
+								gap: "4px",
+								flex: "0 0 auto",
+								minWidth: "48px",
+							}}
+						>
 							<h2
 								style={{
+									display: "block",
+									width: "48px",
+									minWidth: "48px",
+									maxWidth: "48px",
 									fontFamily:
 										"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 									fontStyle: "normal",
 									fontWeight: 900,
 									fontSize: "48px",
 									color: "#666",
+									lineHeight: "1",
+									printColorAdjust: "exact",
+									WebkitPrintColorAdjust: "exact",
 								}}
 							>
 								總
@@ -157,6 +171,9 @@ export default function Page5_6_CareerDetailed({ data }) {
 									fontWeight: 900,
 
 									fontSize: "48px",
+									lineHeight: "1",
+									printColorAdjust: "exact",
+									WebkitPrintColorAdjust: "exact",
 								}}
 							>
 								流年{concernChinese[concern]}
@@ -287,7 +304,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						className="absolute font-bold"
 						style={{
 							left: "0%",
-							top: "255.96%",
+							top: "300.96%",
 							bottom: "67.7%",
 							color: "#50001B",
 							fontFamily:
@@ -310,15 +327,29 @@ export default function Page5_6_CareerDetailed({ data }) {
 							marginBottom: "90px",
 						}}
 					>
-						<div style={{ display: "flex", gap: "4px" }}>
+						<div
+							style={{
+								display: "flex",
+								gap: "4px",
+								flex: "0 0 auto",
+								minWidth: "48px",
+							}}
+						>
 							<h2
 								style={{
+									display: "block",
+									width: "48px",
+									minWidth: "48px",
+									maxWidth: "48px",
 									fontFamily:
 										"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 									fontStyle: "normal",
 									fontWeight: 900,
 									fontSize: "48px",
 									color: "#666",
+									lineHeight: "1",
+									printColorAdjust: "exact",
+									WebkitPrintColorAdjust: "exact",
 								}}
 							>
 								總
@@ -342,6 +373,9 @@ export default function Page5_6_CareerDetailed({ data }) {
 									fontWeight: 900,
 
 									fontSize: "48px",
+									lineHeight: "1",
+									printColorAdjust: "exact",
+									WebkitPrintColorAdjust: "exact",
 								}}
 							>
 								流年{concernChinese[concern]}

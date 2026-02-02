@@ -182,6 +182,8 @@ export default function Page3_MingJu_RightTab({ userInfo, rightContent }) {
 				backgroundColor: "white",
 				boxSizing: "border-box",
 				overflow: "hidden",
+				printColorAdjust: "exact",
+				WebkitPrintColorAdjust: "exact",
 			}}
 		>
 			{/* Date */}

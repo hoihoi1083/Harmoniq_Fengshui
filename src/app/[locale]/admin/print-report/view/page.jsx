@@ -92,7 +92,7 @@ function PrintReportView() {
 	const analyzeWuxingStrength = (elementCounts) => {
 		const total = Object.values(elementCounts).reduce(
 			(sum, count) => sum + count,
-			0,
+			0
 		);
 		const strongElements = [];
 		const weakElements = [];
@@ -117,7 +117,7 @@ function PrintReportView() {
 		} else {
 			const maxCount = Math.max(...Object.values(elementCounts));
 			const dominant = Object.entries(elementCounts).find(
-				([_, count]) => count === maxCount,
+				([_, count]) => count === maxCount
 			)?.[0];
 			strengthDesc = dominant ? `${dominant}為主` : "五行平衡";
 		}
@@ -164,7 +164,7 @@ function PrintReportView() {
 				const fullDateTime = `${birthday} ${birthTime.match(/(\d+):00/)?.[1] || "12"}:00`;
 				const wuxingResult = calculateWuxingAnalysis(
 					fullDateTime,
-					gender,
+					gender
 				);
 
 				if (!wuxingResult)
@@ -337,11 +337,11 @@ function PrintReportView() {
 				console.log("Season Analysis API response:", seasonResult);
 				console.log(
 					"Specific Suggestion API response:",
-					specificSuggestionResult,
+					specificSuggestionResult
 				);
 				console.log(
 					"Overall Summary API response:",
-					overallSummaryResult,
+					overallSummaryResult
 				);
 
 				if (questionData.success && questionData.solution) {
@@ -350,7 +350,7 @@ function PrintReportView() {
 						let content = questionData.solution.content;
 						content = content.replace(
 							/您好，根據您提供的八字（[^）]+）[^：]+：\s*/g,
-							"",
+							""
 						);
 						setAiContent(content);
 					}
@@ -396,12 +396,12 @@ function PrintReportView() {
 							specificSuggestionData:
 								specificSuggestionResult.data || null,
 						}),
-					},
+					}
 				).then((res) => res.json());
 
 				console.log(
 					"Overall Summary API (with real data):",
-					overallSummaryApiResult,
+					overallSummaryApiResult
 				);
 
 				// Process Overall Summary Analysis (破關成蝶，格局煥新)
@@ -556,7 +556,7 @@ function PrintReportView() {
 				/>
 			)}
 
-			{/* Print Styles */}
+			{/* Print Styles - aligned with screen so print preview matches browser */}
 			<style jsx global>{`
 				@media print {
 					.no-print {
@@ -583,13 +583,115 @@ function PrintReportView() {
 						max-height: 297mm !important;
 						overflow: hidden !important;
 						box-sizing: border-box;
-						padding: 15mm 20mm !important;
+						/* Match screen padding: px-12 py-10 = 3rem 2.5rem so print matches browser */
+						padding: 2.5rem 3rem !important;
 						margin: 0 !important;
 						box-shadow: none !important;
 						border: none !important;
 					}
 					.page-break:last-child {
 						page-break-after: auto;
+					}
+					/* Override globals.css print rules so report headings/colors match screen */
+					.page-break h1 {
+						font-size: 48px !important;
+						margin-top: 0 !important;
+						margin-bottom: 0 !important;
+						line-height: 1 !important;
+					}
+					.page-break h2 {
+						font-size: 48px !important;
+						margin-top: 0 !important;
+						margin-bottom: 0 !important;
+					}
+					.page-break h3 {
+						font-size: 25px !important;
+						margin-top: 0 !important;
+						margin-bottom: 0 !important;
+					}
+					.page-break p,
+					.page-break span,
+					.page-break li {
+						color: inherit !important;
+					}
+					/* Page 10 Summary: restore larger title and varied heading sizes so print matches screen */
+					.page-break.page-10-summary h1 {
+						font-size: 6rem !important;
+						margin-bottom: 5rem !important;
+					}
+					.page-break.page-10-summary h2 {
+						font-size: 2.25rem !important;
+					}
+					.page-break.page-10-summary h3.text-5xl {
+						font-size: 3rem !important;
+					}
+					.page-break.page-10-summary h3.text-3xl {
+						font-size: 1.875rem !important;
+					}
+					.page-break.page-10-summary h3.text-2xl {
+						font-size: 1.5rem !important;
+					}
+					.page-break.page-10-summary h3.mb-6 {
+						margin-bottom: 1.5rem !important;
+					}
+					.page-break.page-10-summary .text-base {
+						font-size: 1rem !important;
+					}
+					.page-break.page-10-summary .text-sm {
+						font-size: 0.875rem !important;
+					}
+					.page-break.page-10-summary .text-xl {
+						font-size: 1.25rem !important;
+					}
+					.page-break.page-10-summary .text-2xl {
+						font-size: 1.5rem !important;
+					}
+					/* Page 10: use same padding as component (15mm 20mm) so print matches browser */
+					.page-break.page-10-summary {
+						padding: 15mm 20mm !important;
+					}
+					/* Lock Page 10 spacing to px so print matches browser (rem can differ in print) */
+					.page-break.page-10-summary .mb-1 {
+						margin-bottom: 4px !important;
+					}
+					.page-break.page-10-summary .mb-2 {
+						margin-bottom: 8px !important;
+					}
+					.page-break.page-10-summary .mb-5 {
+						margin-bottom: 20px !important;
+					}
+					.page-break.page-10-summary .mb-6 {
+						margin-bottom: 24px !important;
+					}
+					.page-break.page-10-summary .mb-8 {
+						margin-bottom: 32px !important;
+					}
+					.page-break.page-10-summary .mb-10 {
+						margin-bottom: 40px !important;
+					}
+					.page-break.page-10-summary .mb-16 {
+						margin-bottom: 64px !important;
+					}
+					.page-break.page-10-summary .mb-20 {
+						margin-bottom: 80px !important;
+					}
+					.page-break.page-10-summary .mt-8 {
+						margin-top: 32px !important;
+					}
+					.page-break.page-10-summary .gap-6 {
+						gap: 24px !important;
+					}
+					.page-break.page-10-summary .gap-8 {
+						gap: 32px !important;
+					}
+					.page-break.page-10-summary .gap-12 {
+						gap: 48px !important;
+					}
+					/* Preserve gradient/background-clip text in print */
+					.page-break.page-10-summary [style*="backgroundClip"],
+					.page-break.page-10-summary [style*="background-clip"] {
+						-webkit-print-color-adjust: exact !important;
+						print-color-adjust: exact !important;
 					}
 					@page {
 						size: A4;
