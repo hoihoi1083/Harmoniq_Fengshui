@@ -357,7 +357,7 @@ export default function Page1_BasicAnalysis({
 									(() => {
 										const strengthAnalysis =
 											analyzeWuxingStrength(
-												wuxingAnalysis.elementCounts
+												wuxingAnalysis.elementCounts,
 											);
 										const colors = {
 											金: "#B2A062",
@@ -385,7 +385,7 @@ export default function Page1_BasicAnalysis({
 															}}
 														>
 															{Object.entries(
-																wuxingAnalysis.elementCounts
+																wuxingAnalysis.elementCounts,
 															).map(
 																([
 																	element,
@@ -414,7 +414,7 @@ export default function Page1_BasicAnalysis({
 																			></div>
 																		</div>
 																	);
-																}
+																},
 															)}
 														</div>
 														{/* Black horizontal line */}
@@ -431,7 +431,7 @@ export default function Page1_BasicAnalysis({
 														{/* Icons with numbers */}
 														<div className="flex justify-center gap-6">
 															{Object.entries(
-																wuxingAnalysis.elementCounts
+																wuxingAnalysis.elementCounts,
 															).map(
 																([
 																	element,
@@ -475,7 +475,7 @@ export default function Page1_BasicAnalysis({
 																			</span>
 																		</div>
 																	);
-																}
+																},
 															)}
 														</div>
 													</div>
@@ -532,7 +532,7 @@ export default function Page1_BasicAnalysis({
 				{wuxingAnalysis &&
 					(() => {
 						const strengthAnalysis = analyzeWuxingStrength(
-							wuxingAnalysis.elementCounts
+							wuxingAnalysis.elementCounts,
 						);
 						const primaryGod =
 							wuxingAnalysis.missingElements[0] ||
@@ -634,7 +634,7 @@ export default function Page1_BasicAnalysis({
 								}}
 							>
 								<h3
-									className="mb-10 font-bold"
+									className="mb-6 font-bold"
 									style={{
 										fontSize: "25px",
 										color: getConcernColor(concern),

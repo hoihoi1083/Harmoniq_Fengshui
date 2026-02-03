@@ -94,7 +94,7 @@ function PrintReportView() {
 	const analyzeWuxingStrength = (elementCounts) => {
 		const total = Object.values(elementCounts).reduce(
 			(sum, count) => sum + count,
-			0
+			0,
 		);
 		const strongElements = [];
 		const weakElements = [];
@@ -119,7 +119,7 @@ function PrintReportView() {
 		} else {
 			const maxCount = Math.max(...Object.values(elementCounts));
 			const dominant = Object.entries(elementCounts).find(
-				([_, count]) => count === maxCount
+				([_, count]) => count === maxCount,
 			)?.[0];
 			strengthDesc = dominant ? `${dominant}為主` : "五行平衡";
 		}
@@ -166,7 +166,7 @@ function PrintReportView() {
 				const fullDateTime = `${birthday} ${birthTime.match(/(\d+):00/)?.[1] || "12"}:00`;
 				const wuxingResult = calculateWuxingAnalysis(
 					fullDateTime,
-					gender
+					gender,
 				);
 
 				if (!wuxingResult)
@@ -339,11 +339,11 @@ function PrintReportView() {
 				console.log("Season Analysis API response:", seasonResult);
 				console.log(
 					"Specific Suggestion API response:",
-					specificSuggestionResult
+					specificSuggestionResult,
 				);
 				console.log(
 					"Overall Summary API response:",
-					overallSummaryResult
+					overallSummaryResult,
 				);
 
 				if (questionData.success && questionData.solution) {
@@ -352,7 +352,7 @@ function PrintReportView() {
 						let content = questionData.solution.content;
 						content = content.replace(
 							/您好，根據您提供的八字（[^）]+）[^：]+：\s*/g,
-							""
+							"",
 						);
 						setAiContent(content);
 					}
@@ -398,12 +398,12 @@ function PrintReportView() {
 							specificSuggestionData:
 								specificSuggestionResult.data || null,
 						}),
-					}
+					},
 				).then((res) => res.json());
 
 				console.log(
 					"Overall Summary API (with real data):",
-					overallSummaryApiResult
+					overallSummaryApiResult,
 				);
 
 				// Process Overall Summary Analysis (破關成蝶，格局煥新)
@@ -567,12 +567,11 @@ function PrintReportView() {
 					.no-print {
 						display: none !important;
 					}
-					html,
 					body {
 						print-color-adjust: exact;
 						-webkit-print-color-adjust: exact;
-						margin: 0 !important;
-						padding: 0 !important;
+						margin: 0;
+						padding: 0;
 						background: white;
 					}
 					/* Remove container padding and background in print */
@@ -581,102 +580,22 @@ function PrintReportView() {
 						padding: 0 !important;
 						background: white !important;
 					}
-					/* Cover must start on page 1 (no page break before it) */
-					.page-break.print-report-cover {
-						page-break-before: avoid !important;
-						break-before: avoid !important;
-						margin-top: 0 !important;
-					}
-					/* Page1: no top margin in print so no blank page after cover */
-					.page-break.print-report-page1 {
-						margin-top: 0 !important;
-					}
-					/* Each .page-break = exactly one printed page; no overlap or doubling */
 					.page-break {
-						page-break-after: always !important;
-						break-after: page !important;
-						page-break-inside: avoid !important;
-						break-inside: avoid !important;
+						page-break-after: always;
+						page-break-inside: avoid;
 						width: 210mm !important;
 						height: 297mm !important;
 						max-height: 297mm !important;
-						min-height: 297mm !important;
 						overflow: hidden !important;
-						box-sizing: border-box !important;
+						box-sizing: border-box;
 						/* Match screen padding: px-12 py-10 = 3rem 2.5rem so print matches browser */
 						padding: 2.5rem 3rem !important;
 						margin: 0 !important;
 						box-shadow: none !important;
 						border: none !important;
-						display: block !important;
 					}
 					.page-break:last-child {
-						page-break-after: auto !important;
-						break-after: auto !important;
-					}
-					/* Hide screen-only dashed lines in print (no horizontal/vertical lines under titles) */
-					.page-break::before,
-					.page-break::after {
-						content: none !important;
-						display: none !important;
-					}
-					/* Page 7 Seasons: no lines under 關鍵季節, lock spacing so print matches browser */
-					.page-break.page-7-seasons {
-						padding: 15mm 20mm !important;
-					}
-					.page-break.page-7-seasons .page-7-header,
-					.page-break.page-7-seasons .page-7-header::before,
-					.page-break.page-7-seasons .page-7-header::after,
-					.page-break.page-7-seasons .page-7-title,
-					.page-break.page-7-seasons .page-7-title::before,
-					.page-break.page-7-seasons .page-7-title::after {
-						border: none !important;
-						outline: none !important;
-						box-shadow: none !important;
-					}
-					.page-break.page-7-seasons .page-7-header::before,
-					.page-break.page-7-seasons .page-7-header::after,
-					.page-break.page-7-seasons .page-7-title::before,
-					.page-break.page-7-seasons .page-7-title::after {
-						content: none !important;
-						display: none !important;
-					}
-					.page-break.page-7-seasons .mb-8 {
-						margin-bottom: 32px !important;
-					}
-					.page-break.page-7-seasons .space-y-10 > * + * {
-						margin-top: 40px !important;
-					}
-					.page-break.page-7-seasons h1 {
-						font-size: 3rem !important;
-					}
-					/* Page 7: lock font sizes so print matches browser (globals overrides .text-sm, .py-6, etc.) */
-					.page-break.page-7-seasons .text-sm {
-						font-size: 0.875rem !important;
-					}
-					.page-break.page-7-seasons .text-md {
-						font-size: 1rem !important;
-					}
-					.page-break.page-7-seasons .py-6 {
-						padding-top: 24px !important;
-						padding-bottom: 24px !important;
-					}
-					.page-break.page-7-seasons .px-1 {
-						padding-left: 4px !important;
-						padding-right: 4px !important;
-					}
-					.page-break.page-7-seasons .mb-2 {
-						margin-bottom: 8px !important;
-					}
-					.page-break.page-7-seasons .prose-sm p,
-					.page-break.page-7-seasons .prose p {
-						font-size: 0.875rem !important;
-						line-height: 1.625 !important;
-					}
-					.page-break.page-7-seasons [style*="backgroundClip"],
-					.page-break.page-7-seasons [style*="background-clip"] {
-						-webkit-print-color-adjust: exact !important;
-						print-color-adjust: exact !important;
+						page-break-after: auto;
 					}
 					/* Override globals.css print rules so report headings/colors match screen */
 					.page-break h1 {
@@ -796,9 +715,6 @@ function PrintReportView() {
 						box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 						border: 1px solid #d1d5db;
 						position: relative;
-					}
-					.page-break.print-report-page1 {
-						margin-top: 3.75rem;
 					}
 					.page-break::before {
 						content: "";

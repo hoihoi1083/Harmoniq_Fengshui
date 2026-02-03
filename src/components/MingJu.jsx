@@ -3858,7 +3858,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									display: "grid",
 									gridTemplateColumns: "1fr 1fr",
 									gap: "2px 20px",
-									marginBottom: "40px",
+									marginBottom: "80px",
 								}}
 							>
 								{sections.map((section, index) => (

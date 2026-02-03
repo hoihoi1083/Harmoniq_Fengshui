@@ -177,7 +177,7 @@ export default function Page4_2026Overview({ data }) {
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "space-between",
-					marginBottom: "10px",
+					marginBottom: "30px",
 					paddingBottom: "8px",
 					borderBottom: "1px solid #e5e7eb",
 				}}
@@ -208,7 +208,7 @@ export default function Page4_2026Overview({ data }) {
 			</div>
 
 			{/* Content Section 1 - 流年干支作用 */}
-			<div style={{ marginBottom: "10px" }}>
+			<div style={{ marginBottom: "30px" }}>
 				<h3
 					style={{
 						color: color,
@@ -216,7 +216,7 @@ export default function Page4_2026Overview({ data }) {
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "20px",
 						fontWeight: "bold",
-						marginBottom: "5px",
+						marginBottom: "20px",
 						marginTop: "0",
 					}}
 				>
@@ -244,7 +244,7 @@ export default function Page4_2026Overview({ data }) {
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "20px",
 						fontWeight: "bold",
-						marginBottom: "5px",
+						marginBottom: "20px",
 						marginTop: "0",
 					}}
 				>

@@ -20,7 +20,7 @@ export default function CoverPage({ concern, productName }) {
 
 	return (
 		<div
-			className="page-break print-report-cover bg-white"
+			className="bg-white page-break"
 			style={{
 				width: "210mm",
 				height: "297mm",
@@ -29,7 +29,7 @@ export default function CoverPage({ concern, productName }) {
 				backgroundColor: "white",
 			}}
 		>
-			{/* Central light rectangle block */}
+			{/* Background watermark pattern */}
 			<div
 				style={{
 					position: "absolute",
@@ -41,8 +41,6 @@ export default function CoverPage({ concern, productName }) {
 					zIndex: 0,
 				}}
 			/>
-
-			{/* Large background characters: 命理報告 on four corners of the rectangle */}
 			{/* Top-left: 命 */}
 			<div
 				style={{
@@ -126,9 +124,9 @@ export default function CoverPage({ concern, productName }) {
 					style={{
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-						fontSize: "18px",
-						fontWeight: 400,
-						letterSpacing: "0.8em",
+						fontSize: "25px",
+						fontWeight: 700,
+						letterSpacing: "1.8em",
 						color: "#000000",
 						marginBottom: "0px",
 					}}
@@ -154,29 +152,14 @@ export default function CoverPage({ concern, productName }) {
 					報告
 				</div>
 
-				{/* Subtitle - Report types */}
-				<div
-					style={{
-						fontFamily:
-							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-						fontSize: "18px",
-						fontWeight: 400,
-						letterSpacing: "0.5em",
-						color: "#000000",
-						marginBottom: "30px",
-					}}
-				>
-					財運、事業、感情、健康報告
-				</div>
-
 				{/* Report type label */}
 				<div
 					style={{
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-						fontSize: "20px",
-						fontWeight: 400,
-						letterSpacing: "0.5em",
+						fontSize: "30px",
+						fontWeight: 700,
+						letterSpacing: "1.5em",
 						color: "#000000",
 					}}
 				>
@@ -199,11 +182,10 @@ export default function CoverPage({ concern, productName }) {
 						style={{
 							fontFamily:
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-							fontSize: "24px",
-							fontWeight: 500,
+							fontSize: "25px",
+							fontWeight: 700,
 							color: "#000000",
 							letterSpacing: "0.3em",
-							borderBottom: "2px solid #000000",
 							paddingBottom: "4px",
 						}}
 					>
@@ -229,8 +211,8 @@ export default function CoverPage({ concern, productName }) {
 				<div
 					style={{
 						fontFamily: "serif",
-						fontSize: "22px",
-						fontWeight: 700,
+						fontSize: "25px",
+						fontWeight: 900,
 						color: "#000000",
 						letterSpacing: "0.05em",
 					}}
@@ -243,8 +225,8 @@ export default function CoverPage({ concern, productName }) {
 			<div
 				style={{
 					position: "absolute",
-					top: "35mm",
-					right: "18mm",
+					top: "50mm",
+					right: "5mm",
 					bottom: "35mm",
 					display: "flex",
 					flexDirection: "column",
@@ -256,13 +238,14 @@ export default function CoverPage({ concern, productName }) {
 				{/* Year rotated along the right edge */}
 				<div
 					style={{
-						fontFamily: "serif",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "90px",
 						fontWeight: 900,
 						color: "#000000",
-						transform: "rotate(90deg)",
 						transformOrigin: "center",
 						letterSpacing: "0.15em",
+						transform: "rotate(-90deg)",
 					}}
 				>
 					{year}
@@ -274,20 +257,21 @@ export default function CoverPage({ concern, productName }) {
 						width: "2px",
 						flexGrow: 1,
 						backgroundColor: "#000000",
-						margin: "18px 0",
+						margin: "100px 0px 50px 60px",
 					}}
 				/>
 
 				{/* Date (month.day) rotated at bottom */}
 				<div
 					style={{
-						fontFamily: "serif",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "90px",
 						fontWeight: 900,
 						color: "#000000",
-						transform: "rotate(90deg)",
 						transformOrigin: "center",
-						letterSpacing: "0.1em",
+						letterSpacing: "0.15em",
+						transform: "rotate(-90deg)",
 					}}
 				>
 					{month}.{day}
