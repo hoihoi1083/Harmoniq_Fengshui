@@ -140,7 +140,7 @@ export default function Page10_Summary({ data }) {
 				</div>
 
 				{/* Right: Quote Bubble */}
-				<div className="flex items-center justify-center">
+				<div className="flex items-center justify-center ml-15">
 					<div
 						className="relative flex items-center justify-center p-5 rounded-full w-55 h-55"
 						style={{ backgroundColor: "#93C5FD" }}

@@ -1,4 +1,5 @@
 // Page 7: 關鍵季節 - Four seasons analysis
+import Image from "next/image";
 
 export default function Page7_Seasons({ data }) {
 	const { seasons: seasonsData, concern, color } = data;
@@ -137,20 +138,20 @@ export default function Page7_Seasons({ data }) {
 	const getSeasonStyle = (seasonName) => {
 		const styles = {
 			冬季: {
-				color: "#568CB8", // Blue - matching web side
-				bgColor: "#568CB8",
+				color: "#6383C2", // Blue - matching web side
+				bgColor: "#6383C2",
 			},
 			春季: {
-				color: "#7cb856", // Green - matching web side
-				bgColor: "#7cb856",
+				color: "#80882E", // Green - matching web side
+				bgColor: "#80882E",
 			},
 			夏季: {
-				color: "#B4003C", // Red - matching web side
-				bgColor: "#B4003C",
+				color: "#6E0B2C", // Red - matching web side
+				bgColor: "#6E0B2C",
 			},
 			秋季: {
-				color: "#DEAB20", // Golden - matching web side
-				bgColor: "#DEAB20",
+				color: "#A17E20", // Golden - matching web side
+				bgColor: "#A17E20",
 			},
 		};
 		return styles[seasonName] || { color: "#6B7280", bgColor: "#6B7280" };
@@ -162,30 +163,55 @@ export default function Page7_Seasons({ data }) {
 
 	// Function to render a season page
 	const renderSeasonPage = (seasonsToRender, pageNumber) => (
-		<div className="page-break bg-white px-8 py-10 h-[297mm] overflow-hidden w-full">
-			{/* Page Header - Title with Date */}
-			<div className="flex items-start justify-between mb-8">
-				<h1
-					className="text-5xl font-bold"
-					style={{
-						color: color,
-						fontFamily: "Noto Serif TC, serif",
-					}}
+		<div
+			className="page-break page-7-seasons bg-white h-[297mm] overflow-hidden w-full"
+			style={{ position: "relative", padding: "15mm 20mm" }}
+		>
+			{/* Page Header - Title with Date (no border/line) */}
+			<div
+				className="mb-8 page-7-header"
+				style={{ border: "none", outline: "none" }}
+			>
+				<div
+					className="flex items-start justify-between"
+					style={{ border: "none", outline: "none" }}
 				>
-					關鍵季節 {pageNumber === 2 ? "(續)" : ""}
-				</h1>
-				<div className="mt-2 text-sm text-right text-gray-400">
-					{new Date().getMonth() + 1}/{new Date().getDate()}/
-					{new Date().getFullYear() % 100}
+					<h1
+						className="text-5xl font-bold page-7-title"
+						style={{
+							color: color,
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							border: "none",
+							boxShadow: "none",
+							textDecoration: "none",
+						}}
+					>
+						關鍵季節 {pageNumber === 2 ? "(續)" : ""}
+					</h1>
+					<div
+						style={{
+							fontFamily: "Noto Serif TC, serif",
+							fontStyle: "extrabold",
+							fontWeight: 400,
+							fontSize: "20px",
+							lineHeight: "14px",
+							color: "#424242",
+							textAlign: "right",
+						}}
+					>
+						{new Date()
+							.toLocaleDateString("zh-TW")
+							.replace(/\//g, "/")}
+					</div>
 				</div>
 			</div>
-
 			{/* Seasons List */}
-			<div className="space-y-6">
+			<div className="space-y-10">
 				{seasonsToRender.map((season, index) => {
 					const cleanSeasonName = season.name.replace(
 						/【[^】]*】/g,
-						"",
+						""
 					);
 					const isCurrentSeason =
 						cleanSeasonName === currentSeasonName;
@@ -236,9 +262,10 @@ export default function Page7_Seasons({ data }) {
 									{/* Large Season Character - Season Color */}
 									<span
 										style={{
-											fontSize: "140px",
-											fontFamily: "Noto Serif TC, serif",
-											background: `linear-gradient(to bottom, ${seasonStyle.color}, white)`,
+											fontSize: "180px",
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											backgroundImage: `linear-gradient(to bottom, ${seasonStyle.color}, #C5C5C5)`,
 											WebkitBackgroundClip: "text",
 											WebkitTextFillColor: "transparent",
 											backgroundClip: "text",
@@ -252,7 +279,7 @@ export default function Page7_Seasons({ data }) {
 
 							{/* Content Box - Overlapping Right Side of Character - NO SHADOW, NO BORDER */}
 							<div
-								className="relative p-6 bg-white rounded-xl"
+								className="relative px-1 py-6 bg-white rounded-xl"
 								style={{
 									marginLeft: "110px",
 								}}
@@ -262,7 +289,7 @@ export default function Page7_Seasons({ data }) {
 									<div
 										style={{
 											position: "absolute",
-											top: "12px",
+											top: "15px",
 											right: "12px",
 											width: "36px",
 											height: "36px",
@@ -271,9 +298,6 @@ export default function Page7_Seasons({ data }) {
 											display: "flex",
 											alignItems: "center",
 											justifyContent: "center",
-											border: "2px solid white",
-											boxShadow:
-												"0 2px 4px rgba(0,0,0,0.2)",
 											zIndex: 10,
 										}}
 									>
@@ -289,14 +313,14 @@ export default function Page7_Seasons({ data }) {
 									</div>
 								)}
 								{/* Season period */}
-								<div className="mb-4">
-									<p className="mb-2 text-sm font-medium text-gray-600">
+								<div className="mb-2">
+									<strong className="mb-2 font-bold text-black text-md">
 										{season.period || season.badge || ""}
-									</p>
+									</strong>
 								</div>
 								{/* Season Content */}
 								<div className="prose-sm prose max-w-none">
-									<p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
+									<p className="text-sm leading-relaxed text-black whitespace-pre-wrap">
 										{cleanContent}
 									</p>
 								</div>
@@ -304,6 +328,27 @@ export default function Page7_Seasons({ data }) {
 						</div>
 					);
 				})}
+			</div>
+
+			{/* Footer with bottom.png image */}
+			<div
+				style={{
+					position: "absolute",
+					bottom: "15mm",
+					left: "20mm",
+					width: "auto",
+					height: "auto",
+				}}
+			>
+				<Image
+					src="/images/report/bottom.png"
+					alt="Footer decoration"
+					width={30}
+					height={10}
+					style={{
+						objectFit: "contain",
+					}}
+				/>
 			</div>
 		</div>
 	);
