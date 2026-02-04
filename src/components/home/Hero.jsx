@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import useMobile from "../../app/hooks/useMobile";
 import { ToastContainer, toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useResponsiveScale } from "../../hooks/useResponsiveScale";
@@ -31,6 +31,14 @@ export default function Hero() {
 
 	// Hero images carousel state (separate)
 	const [heroIndex, setHeroIndex] = useState(0);
+
+	// Desktop hero: two slides (0 = 為您結緣開運, 1 = 購買開運水晶) — auto or manual switch
+	const [desktopHeroSlide, setDesktopHeroSlide] = useState(0);
+
+	// Desktop hero: drag to switch (mouse or touch)
+	const [dragStartX, setDragStartX] = useState(0);
+	const [isDragging, setIsDragging] = useState(false);
+	const DRAG_THRESHOLD = 80;
 
 	// Background overlay effects
 	const backgroundOverlayEffects = [
@@ -116,6 +124,66 @@ export default function Hero() {
 	const handleHeroDotClick = (idx) => {
 		if (idx !== heroIndex) {
 			setHeroIndex(idx);
+		}
+	};
+
+	// Desktop hero: auto-advance every 5.5s
+	useEffect(() => {
+		if (isMobile) return;
+		const interval = setInterval(() => {
+			setDesktopHeroSlide((prev) => (prev + 1) % 2);
+		}, 5500);
+		return () => clearInterval(interval);
+	}, [isMobile]);
+
+	const handleDesktopSlideDot = (idx) => {
+		setDesktopHeroSlide(idx);
+	};
+
+	// Drag to switch desktop hero (mouse) — use ref for startX so move handler sees latest
+	const dragStartXRef = useRef(0);
+	const handleDesktopHeroMouseDown = (e) => {
+		if (isMobile) return;
+		setIsDragging(true);
+		dragStartXRef.current = e.clientX;
+		setDragStartX(e.clientX);
+	};
+	const handleDesktopHeroMouseMove = (e) => {
+		if (!isDragging || isMobile) return;
+		const dx = e.clientX - dragStartXRef.current;
+		if (Math.abs(dx) > DRAG_THRESHOLD) {
+			if (dx > 0) setDesktopHeroSlide(0);
+			else setDesktopHeroSlide(1);
+			setIsDragging(false);
+		}
+	};
+	const handleDesktopHeroMouseUp = () => {
+		setIsDragging(false);
+	};
+
+	// Attach mouse move/up to window when dragging so we don't lose cursor
+	useEffect(() => {
+		if (isMobile || !isDragging) return;
+		window.addEventListener("mousemove", handleDesktopHeroMouseMove);
+		window.addEventListener("mouseup", handleDesktopHeroMouseUp);
+		return () => {
+			window.removeEventListener("mousemove", handleDesktopHeroMouseMove);
+			window.removeEventListener("mouseup", handleDesktopHeroMouseUp);
+		};
+	}, [isMobile, isDragging]);
+
+	// Touch to switch desktop hero (e.g. trackpad or touch screen on desktop)
+	const handleDesktopHeroTouchStart = (e) => {
+		if (isMobile) return;
+		dragStartXRef.current = e.touches[0].clientX;
+	};
+	const handleDesktopHeroTouchEnd = (e) => {
+		if (isMobile) return;
+		const endX = e.changedTouches[0].clientX;
+		const dx = endX - dragStartXRef.current;
+		if (Math.abs(dx) > DRAG_THRESHOLD) {
+			if (dx > 0) setDesktopHeroSlide(0);
+			else setDesktopHeroSlide(1);
 		}
 	};
 
@@ -361,148 +429,304 @@ export default function Hero() {
 		);
 	}
 
-	// DESKTOP LAYOUT (keeping your existing desktop code)
+	// DESKTOP LAYOUT — two slides with auto/manual switch
 	return (
 		<div className="relative w-full">
 			<section
-				className="relative flex items-center w-full"
+				className="relative flex items-center w-full select-none"
 				style={{
 					fontFamily: "Noto Serif TC, serif",
 					height: "100vh",
 					margin: 0,
 					padding: 0,
 					overflow: "hidden",
+					cursor: "default",
 				}}
+				onMouseDown={handleDesktopHeroMouseDown}
+				onMouseLeave={handleDesktopHeroMouseUp}
+				onTouchStart={handleDesktopHeroTouchStart}
+				onTouchEnd={handleDesktopHeroTouchEnd}
 			>
-				{/* Static Background Image - Responsive (right side only) */}
-				<div className="absolute inset-0 z-0 w-full h-full">
-					<Image
-						src={
-							region === "china"
-								? "/images/hero/hero-bg-china.png"
-								: "/images/hero/hero-bg-2.png"
-						}
-						alt="Hero background"
-						fill
-						className="object-cover w-full h-full"
-						style={{
-							objectFit: "cover",
-							width: "100%",
-							height: "100%",
-						}}
-						priority={true}
-					/>
-				</div>
-
-				{/* Dark gradient overlay for text readability */}
+				{/* ========== SLIDE 0: 為您結緣開運 (current) ========== */}
 				<div
-					className="absolute inset-0 z-[1]"
+					className="absolute inset-0 z-[5] transition-opacity duration-500"
 					style={{
-						background:
-							"linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
-					}}
-				/>
-
-				{/* Decorative: Outer faint watermark-like circle (behind solid circle) */}
-				<div
-					className="absolute z-10 pointer-events-none"
-					style={{
-						top: "50%",
-						left: "22%",
-						transform: "translate(-50%, -50%)",
-						width: "980px",
-						height: "980px",
-						border: "130px solid rgba(255, 255, 255, 0.08)",
-						borderRadius: "50%",
-						background: "transparent",
-					}}
-					aria-hidden="true"
-				/>
-
-				{/* Decorative: Partial White Circle on Left (solid inner circle) */}
-				<div
-					className="absolute z-10 pointer-events-none"
-					style={{
-						top: "50%",
-						left: "22%",
-						transform: "translate(-50%, -50%)",
-						width: "520px",
-						height: "520px",
-						border: "2px solid rgba(255, 255, 255, 0.7)",
-						borderRadius: "50%",
-						background: "transparent",
-					}}
-					aria-hidden="true"
-				/>
-
-				{/* Decorative: White Horizontal Line */}
-				<div
-					className="absolute left-0 right-0 z-10 pointer-events-none"
-					style={{
-						top: "52%",
-						height: 0,
-						borderTop: "1px solid rgba(255, 255, 255, 0.6)",
-						width: "100%",
-					}}
-					aria-hidden="true"
-				/>
-
-				{/* Hero Content: Title, Description, Green Button */}
-				<div
-					className="absolute left-0 top-26 bottom-0 z-20 flex flex-col justify-center pl-[8vw] pr-[20%] md:pl-[10vw] md:pr-[35%]"
-					style={{
-						writingMode: "horizontal-tb",
-						direction: "ltr",
+						opacity: desktopHeroSlide === 0 ? 1 : 0,
+						pointerEvents: desktopHeroSlide === 0 ? "auto" : "none",
 					}}
 				>
-					{/* Title */}
-					<h1
-						className="font-bold mb-4"
+					<div className="absolute inset-0 z-0 w-full h-full">
+						<Image
+							src={
+								region === "china"
+									? "/images/hero/hero-bg-china.png"
+									: "/images/hero/hero-bg-2.png"
+							}
+							alt="Hero background"
+							fill
+							className="object-cover w-full h-full"
+							style={{
+								objectFit: "cover",
+								width: "100%",
+								height: "100%",
+							}}
+							priority={true}
+						/>
+					</div>
+					<div
+						className="absolute inset-0 z-[1]"
 						style={{
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "clamp(48px, 5vw, 68px)",
-							lineHeight: "1.1",
-							letterSpacing: "0.02em",
-							color: "#FFFFFF",
-							textShadow: "0 2px 12px rgba(0,0,0,0.3)",
+							background:
+								"linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
+						}}
+					/>
+					{/* Circles */}
+					<div
+						className="absolute z-10 pointer-events-none"
+						style={{
+							top: "50%",
+							left: "22%",
+							transform: "translate(-50%, -50%)",
+							width: "980px",
+							height: "980px",
+							border: "130px solid rgba(255, 255, 255, 0.08)",
+							borderRadius: "50%",
+							background: "transparent",
+						}}
+						aria-hidden="true"
+					/>
+					<div
+						className="absolute z-10 pointer-events-none"
+						style={{
+							top: "50%",
+							left: "22%",
+							transform: "translate(-50%, -50%)",
+							width: "520px",
+							height: "520px",
+							border: "2px solid rgba(255, 255, 255, 0.7)",
+							borderRadius: "50%",
+							background: "transparent",
+						}}
+						aria-hidden="true"
+					/>
+					<div
+						className="absolute left-0 right-0 z-10 pointer-events-none"
+						style={{
+							top: "52%",
+							height: 0,
+							borderTop: "1px solid rgba(255, 255, 255, 0.6)",
+							width: "100%",
+						}}
+						aria-hidden="true"
+					/>
+					<div
+						className="absolute left-0 top-20 bottom-0 z-20 flex flex-col justify-center pl-[8vw] pr-[20%] md:pl-[10vw] md:pr-[35%]"
+						style={{
 							writingMode: "horizontal-tb",
-							whiteSpace: "nowrap",
+							direction: "ltr",
 						}}
 					>
-						{t("title")}
-					</h1>
-
-					{/* Description */}
-					<p
-						className="mb-8"
+						<h1
+							className="font-bold mb-6"
+							style={{
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+								fontSize: "clamp(58px, 5vw, 68px)",
+								lineHeight: "1.1",
+								letterSpacing: "0.02em",
+								color: "#FFFFFF",
+								textShadow: "0 2px 12px rgba(0,0,0,0.3)",
+								writingMode: "horizontal-tb",
+								whiteSpace: "nowrap",
+							}}
+						>
+							{t("title")}
+						</h1>
+						<p
+							className="mb-8"
+							style={{
+								fontFamily: "noto sans hk",
+								fontSize: "clamp(15px, 1.2vw, 18px)",
+								lineHeight: "1.7",
+								color: "rgba(255, 255, 255, 0.95)",
+								textShadow: "0 1px 6px rgba(0,0,0,0.3)",
+								maxWidth: "560px",
+								writingMode: "horizontal-tb",
+							}}
+						>
+							{t("heroDescription")}
+						</p>
+						<Link
+							href="/shop"
+							className="inline-flex items-center justify-center rounded-full font-bold w-fit transition-transform duration-200 hover:scale-105"
+							style={{
+								height: "42px",
+								padding: "0 40px",
+								fontSize: "16px",
+								fontFamily: "noto sans hk",
+								fontweight: "900",
+								backgroundColor: "#A3B116",
+								letterSpacing: "0.01em",
+								color: "#FFFFFF",
+								boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+							}}
+						>
+							{t("shopCta")}
+						</Link>
+					</div>
+					{/* Chart CTA (slide 0 only) */}
+					<div
+						className="absolute z-20"
 						style={{
-							fontFamily: "Noto Sans TC, sans-serif",
-							fontSize: "clamp(15px, 1.2vw, 18px)",
-							lineHeight: "1.7",
-							color: "rgba(255, 255, 255, 0.95)",
-							textShadow: "0 1px 6px rgba(0,0,0,0.3)",
-							maxWidth: "560px",
+							top: "calc(43%)",
+							right: "5%",
+							pointerEvents: "auto",
+						}}
+					>
+						{/* <Link
+							href="/"
+							className="flex items-center justify-center transition-transform duration-200 hover:scale-105"
+						>
+							<Image
+								src="/images/風水妹/chart-button.png"
+								alt={t("cta")}
+								width={400}
+								height={150}
+								className="cursor-pointer w-[300px] h-[300px] md:w-[300px] md:h-[300px] lg:w-[400px] lg:h-[400px]"
+								style={{
+									filter: "drop-shadow(0 8px 32px rgba(163, 177, 22, 0.22))",
+								}}
+							/>
+						</Link> */}
+					</div>
+				</div>
+
+				{/* ========== SLIDE 1: 購買開運水晶 (left text + right image area) ========== */}
+				<div
+					className="absolute inset-0 z-[5] transition-opacity duration-500"
+					style={{
+						opacity: desktopHeroSlide === 1 ? 1 : 0,
+						pointerEvents: desktopHeroSlide === 1 ? "auto" : "none",
+					}}
+				>
+					{/* Background image for slide 1 */}
+					<div className="absolute inset-0 z-0 w-full h-[100vh]">
+						<Image
+							src="/images/hero/hero-bg-2.2.png"
+							alt=""
+							fill
+							className="object-cover"
+							style={{ objectFit: "cover" }}
+						/>
+					</div>
+					{/* Optional dark gradient overlay for text readability */}
+					{/* <div
+						className="absolute inset-0 z-[1]"
+						style={{
+							background:
+								"linear-gradient(to right, rgba(0,0,0,0.35) 0%, transparent 50%)",
+						}}
+					/> */}
+					{/* Left: text block — same position as Slide 0 (absolute top-20 bottom-0, same padding) */}
+					<div
+						className="absolute left-0 top-20 bottom-0 z-10 flex flex-col justify-center pl-[8vw] pr-[20%] md:pl-[10vw] md:pr-[35%]"
+						style={{
 							writingMode: "horizontal-tb",
+							direction: "ltr",
 						}}
 					>
-						{t("heroDescription")}
-					</p>
+						{/* Rectangular shape with blur behind text */}
+						<div
+							className="absolute rounded-2xl -z-10"
+							style={{
+								left: "-0.15rem",
+								right: "0.95rem",
+								top: "-1.25rem",
+								bottom: "-1.25rem",
+								backgroundColor: "rgba(255, 255, 255, 0.45)",
+								backdropFilter: "blur(1px)",
+								WebkitBackdropFilter: "blur(4px)",
+							}}
+						/>
+						<div className="relative z-0">
+							<h1
+								className="font-bold mb-0"
+								style={{
+									fontFamily:
+										"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+									fontSize: "clamp(45px, 4.2vw, 56px)",
+									lineHeight: "1.15",
+									color: "#99A800",
+								}}
+							>
+								{t("slide2Title")}
+							</h1>
+							<h2
+								className="font-bold mb-6"
+								style={{
+									fontFamily:
+										"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+									fontSize: "clamp(64px, 2.2vw, 32px)",
+									lineHeight: "1.3",
+									color: "#191A23",
+								}}
+							>
+								{t("slide2Subtitle")}
+							</h2>
+							<p
+								className="mb-5"
+								style={{
+									fontFamily: "noto sans hk",
+									fontSize: "clamp(18px, 1.1vw, 17px)",
+									color: "#737373",
+									maxWidth: "520px",
+								}}
+							>
+								{t("slide2Description")}
+							</p>
+							<Link
+								href="/shop"
+								className="inline-flex items-center justify-center rounded-full font-bold w-fit transition-transform duration-200 hover:scale-105"
+								style={{
+									height: "42px",
+									padding: "0 40px",
+									fontSize: "16px",
+									fontFamily: "noto sans hk",
+									fontweight: "900",
+									backgroundColor: "#A3B116",
+									letterSpacing: "0.01em",
+									color: "#FFFFFF",
+									boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+								}}
+							>
+								{t("shopCta")}
+							</Link>
+						</div>
+					</div>
+				</div>
 
-					{/* Green CTA Button */}
-					<Link
-						href="/shop"
-						className="inline-flex items-center justify-center rounded-full font-bold w-fit transition-transform duration-200 hover:scale-105"
-						style={{
-							height: "52px",
-							padding: "0 32px",
-							fontSize: "16px",
-							backgroundColor: "#8DC63F",
-							color: "#FFFFFF",
-							boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
-						}}
-					>
-						{t("shopCta")}
-					</Link>
+				{/* Desktop hero carousel dots */}
+				<div
+					className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-3"
+					style={{ pointerEvents: "auto" }}
+				>
+					{[0, 1].map((idx) => (
+						<button
+							key={idx}
+							type="button"
+							aria-label={idx === 0 ? "Slide 1" : "Slide 2"}
+							onClick={() => handleDesktopSlideDot(idx)}
+							className="rounded-full transition-all duration-300"
+							style={{
+								width: idx === desktopHeroSlide ? 24 : 10,
+								height: 10,
+								backgroundColor:
+									idx === desktopHeroSlide
+										? "#8DC63F"
+										: "rgba(0, 0, 0, 0.2)",
+							}}
+						/>
+					))}
 				</div>
 
 				{/* Social icons at top right */}
@@ -546,6 +770,16 @@ export default function Hero() {
 					)}
 				</div>
 
+				{/* Extended Bottom Section - Creates seamless transition */}
+				<div
+					className="absolute bottom-0 left-0 right-0 z-[4]"
+					style={{
+						height: "200px",
+						background:
+							"linear-gradient(to bottom, transparent 0%, rgba(239, 239, 239, 0.3) 70%, rgba(239, 239, 239, 0.8) 100%)",
+					}}
+				/>
+
 				{/* Group below the line: title2, subtitle1 */}
 				{/* <div
 					className="absolute z-20 flex flex-col items-start -translate-x-1/2 left-[40%]"
@@ -583,41 +817,6 @@ export default function Hero() {
 					</span>
 				</div>
  */}
-				{/* Button positioned further right */}
-				<div
-					className="absolute z-20"
-					style={{
-						top: "calc(43%)",
-						right: "5%",
-						pointerEvents: "auto",
-					}}
-				>
-					<Link
-						href="/"
-						className="flex items-center justify-center transition-transform duration-200 hover:scale-105"
-					>
-						<Image
-							src="/images/風水妹/chart-button.png"
-							alt={t("cta")}
-							width={400}
-							height={150}
-							className="cursor-pointer w-[300px] h-[300px] md:w-[300px] md:h-[300px] lg:w-[400px] lg:h-[400px]"
-							style={{
-								filter: "drop-shadow(0 8px 32px rgba(163, 177, 22, 0.22))",
-							}}
-						/>
-					</Link>
-				</div>
-
-				{/* Extended Bottom Section - Creates seamless transition */}
-				<div
-					className="absolute bottom-0 left-0 right-0 z-5"
-					style={{
-						height: "200px",
-						background:
-							"linear-gradient(to bottom, transparent 0%, rgba(239, 239, 239, 0.3) 70%, rgba(239, 239, 239, 0.8) 100%)",
-					}}
-				/>
 			</section>
 		</div>
 	);
