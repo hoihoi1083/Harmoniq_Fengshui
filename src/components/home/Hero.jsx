@@ -639,10 +639,10 @@ export default function Hero() {
 						<div
 							className="absolute rounded-2xl -z-10"
 							style={{
-								left: "-0.15rem",
-								right: "0.95rem",
-								top: "-1.25rem",
-								bottom: "-1.25rem",
+								left: "-0.5rem",
+								right: "26.5rem",
+								top: "7.5rem",
+								bottom: "7.5rem",
 								backgroundColor: "rgba(255, 255, 255, 0.45)",
 								backdropFilter: "blur(1px)",
 								WebkitBackdropFilter: "blur(4px)",
@@ -678,7 +678,7 @@ export default function Hero() {
 								style={{
 									fontFamily: "noto sans hk",
 									fontSize: "clamp(18px, 1.1vw, 17px)",
-									color: "#737373",
+									color: "black",
 									maxWidth: "520px",
 								}}
 							>
