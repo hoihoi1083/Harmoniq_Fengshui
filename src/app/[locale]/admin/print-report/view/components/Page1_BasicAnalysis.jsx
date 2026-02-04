@@ -662,14 +662,44 @@ export default function Page1_BasicAnalysis({
 										lineHeight: "1.3",
 									}}
 								>
-									{aiContent
-										.replace(/\*\*/g, "")
-										.substring(0, 350)}
-									...
-									<div
-										className="mt-3 text-gray-500"
-										style={{ fontSize: "11px" }}
-									></div>
+									{(() => {
+										const raw = (aiContent || "")
+											.replace(/\*\*/g, "")
+											.substring(0, 350);
+										const len = raw.length;
+										// Prefer split at "針對" (start of recommendation paragraph)
+										const atTarget = raw.indexOf("針對");
+										let p1 = raw;
+										let p2 = "";
+										if (atTarget > 20) {
+											p1 = raw.slice(0, atTarget).trim();
+											p2 = raw.slice(atTarget).trim();
+										} else {
+											// Otherwise split at last "。" before midpoint
+											const mid = Math.floor(len / 2);
+											const lastDot = raw.lastIndexOf("。", mid);
+											if (lastDot > 30) {
+												p1 = raw.slice(0, lastDot + 1).trim();
+												p2 = raw.slice(lastDot + 1).trim();
+											}
+										}
+										return (
+											<>
+												{p2 ? (
+													<>
+														<p className="mb-3">{p1}</p>
+														<p>{p2}...</p>
+													</>
+												) : (
+													<p>{p1}...</p>
+												)}
+												<div
+													className="mt-3 text-gray-500"
+													style={{ fontSize: "11px" }}
+												/>
+											</>
+										);
+									})()}
 								</div>
 							</div>
 						</div>

@@ -11,6 +11,8 @@ function PrintReportInputForm() {
 	const concern = searchParams.get("concern") || "財運";
 
 	const [formData, setFormData] = useState({
+		name: "",
+		productName: "梨花木鑰匙珠砂掛墜",
 		gender: "male",
 		birthday: "",
 		birthTime: "",
@@ -41,6 +43,8 @@ function PrintReportInputForm() {
 			birthTime: formData.birthTime,
 			question: formData.question,
 		});
+		if (formData.name) params.set("name", formData.name);
+		if (formData.productName) params.set("productName", formData.productName);
 
 		router.push(`/${locale}/admin/print-report/view?${params.toString()}`);
 	};
@@ -70,6 +74,40 @@ function PrintReportInputForm() {
 
 				{/* Form */}
 				<form onSubmit={handleSubmit} className="bg-white rounded-2xl p-8 shadow-lg">
+					{/* Name */}
+					<div className="mb-6">
+						<label className="block text-gray-700 font-medium mb-3">
+							姓名
+						</label>
+						<input
+							type="text"
+							value={formData.name}
+							onChange={(e) =>
+								setFormData({ ...formData, name: e.target.value })
+							}
+							placeholder="請輸入報告對象姓名（顯示於封面與基礎分析）"
+							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-2"
+							style={{ focusRingColor: concernColors[concern] }}
+						/>
+					</div>
+
+					{/* Product Name */}
+					<div className="mb-6">
+						<label className="block text-gray-700 font-medium mb-3">
+							產品名稱
+						</label>
+						<input
+							type="text"
+							value={formData.productName}
+							onChange={(e) =>
+								setFormData({ ...formData, productName: e.target.value })
+							}
+							placeholder="例：梨花木鑰匙珠砂掛墜（顯示於封面）"
+							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-2"
+							style={{ focusRingColor: concernColors[concern] }}
+						/>
+					</div>
+
 					{/* Gender */}
 					<div className="mb-6">
 						<label className="block text-gray-700 font-medium mb-3">
