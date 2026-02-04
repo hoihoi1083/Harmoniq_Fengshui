@@ -1,10 +1,6 @@
 @import "tailwindcss";
 @config "../../tailwind.config.js";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -68,6 +64,13 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
   }
 
   body {
@@ -155,6 +158,13 @@
   .secondary-foreground {
     color: #25826C
   }
+}
+
+/* Force horizontal text in hero section */
+section#hero,
+section#hero * {
+  writing-mode: horizontal-tb !important;
+  direction: ltr !important;
 }
 
 /* Enhanced Safari-specific fixes for complex layouts */

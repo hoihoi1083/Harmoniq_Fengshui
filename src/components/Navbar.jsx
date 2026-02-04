@@ -67,7 +67,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 
 	return (
 		<nav
-			className={`${isHome && !isNavbarMobile ? "fixed" : "absolute"} top-0 left-0 right-0 z-[70] h-16 ${isHome ? "backdrop-blur-[3px]" : "backdrop-blur-[0px]"}  ${
+			className={`fixed top-0 left-0 right-0 z-[70] h-16 ${isHome ? "backdrop-blur-[3px]" : "backdrop-blur-[0px]"}  ${
 				!isHome && !isContact ? "bg-white shadow-sm" : ""
 			}`}
 			style={{
@@ -209,16 +209,18 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 								>
 									{t("theory")}
 								</button> */}
-							<div
-								className="px-3 py-1 rounded-full font-noto-sans-hk opacity-50 cursor-not-allowed flex items-center gap-1"
-								style={{
-									color: navTextColor,
-								}}
-							>
-								{t("shop")}
-								<span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">Coming Soon</span>
-							</div>
-							<Link
+								<div
+									className="px-3 py-1 rounded-full font-noto-sans-hk opacity-50 cursor-not-allowed flex items-center gap-1"
+									style={{
+										color: navTextColor,
+									}}
+								>
+									{t("shop")}
+									<span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">
+										Coming Soon
+									</span>
+								</div>
+								<Link
 									href="/price"
 									className={`px-3 py-1 rounded-full transition-all font-noto-sans-hk duration-200 hover:opacity-80 ${
 										pathname === "/price"
@@ -352,7 +354,9 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 							style={{ fontFamily: "Noto Serif TC, serif" }}
 						>
 							{t("shop")}
-							<span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Coming Soon</span>
+							<span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">
+								Coming Soon
+							</span>
 						</div>
 						<Link
 							href="/price"

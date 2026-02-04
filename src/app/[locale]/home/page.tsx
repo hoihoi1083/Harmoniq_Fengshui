@@ -21,7 +21,7 @@ export default function Home() {
 		<div className="min-h-screen bg-[#EFEFEF]">
 			<Navbar from="home" />
 			<main>
-				<section id="hero">
+				<section id="hero" style={{ overflow: "hidden" }}>
 					<Hero />
 				</section>
 				{/* <Desire /> */}

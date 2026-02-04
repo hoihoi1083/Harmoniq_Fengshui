@@ -66,7 +66,7 @@ export default function Hero() {
 					} else {
 						const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 						const hours = Math.floor(
-							(diff / (1000 * 60 * 60)) % 24
+							(diff / (1000 * 60 * 60)) % 24,
 						);
 						const minutes = Math.floor((diff / (1000 * 60)) % 60);
 						const seconds = Math.floor((diff / 1000) % 60);
@@ -94,7 +94,7 @@ export default function Hero() {
 			setBgFade(true);
 			setTimeout(() => {
 				setBgOverlayIndex(
-					(prev) => (prev + 1) % backgroundOverlayEffects.length
+					(prev) => (prev + 1) % backgroundOverlayEffects.length,
 				);
 				setBgFade(false);
 			}, 800);
@@ -363,120 +363,147 @@ export default function Hero() {
 
 	// DESKTOP LAYOUT (keeping your existing desktop code)
 	return (
-		<div className="relative w-full overflow-hidden">
+		<div className="relative w-full">
 			<section
-				className="relative flex items-center overflow-hidden"
+				className="relative flex items-center w-full"
 				style={{
 					fontFamily: "Noto Serif TC, serif",
-					minHeight: "100vh",
-					transform: `scale(${scaleRatio})`,
-					transformOrigin: "top center",
-					// width: `${100 / scaleRatio}%`,
-					marginLeft: "auto",
-					marginRight: "auto",
+					height: "100vh",
+					margin: 0,
+					padding: 0,
+					overflow: "hidden",
 				}}
 			>
 				{/* Static Background Image - Responsive (right side only) */}
-				<div
-					className="inset-0 z-0 "
-					style={{ width: `${100 / scaleRatio}%` }}
-				>
+				<div className="absolute inset-0 z-0 w-full h-full">
 					<Image
 						src={
 							region === "china"
 								? "/images/hero/hero-bg-china.png"
-								: "/images/hero/hero-bg.png"
+								: "/images/hero/hero-bg-2.png"
 						}
 						alt="Hero background"
 						fill
-						className="object-cover  scale-110 sm:object-left-top md:object-[left_top] lg:object-[left_top]"
+						className="object-cover w-full h-full"
+						style={{
+							objectFit: "cover",
+							width: "100%",
+							height: "100%",
+						}}
 						priority={true}
 					/>
 				</div>
 
-				{/* Previous overlay for crossfade */}
-				{/* <div
-					className={`absolute inset-0 z-1 w-full transition-opacity duration-1000 ${bgFade ? "opacity-100" : "opacity-0"}`}
+				{/* Dark gradient overlay for text readability */}
+				<div
+					className="absolute inset-0 z-[1]"
 					style={{
-						backgroundColor:
-							backgroundOverlayEffects[prevBgOverlayIndex].color,
-						opacity: bgFade
-							? backgroundOverlayEffects[prevBgOverlayIndex]
-									.opacity
-							: 0,
+						background:
+							"linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
 					}}
-				/> */}
+				/>
 
-				{/* Current overlay */}
-				{/* <div
-					className={`absolute inset-0 z-1 w-full transition-opacity duration-1000 ${bgFade ? "opacity-0" : "opacity-100"}`}
+				{/* Decorative: Outer faint watermark-like circle (behind solid circle) */}
+				<div
+					className="absolute z-10 pointer-events-none"
 					style={{
-						backgroundColor:
-							backgroundOverlayEffects[bgOverlayIndex].color,
-						opacity: bgFade
-							? 0
-							: backgroundOverlayEffects[bgOverlayIndex].opacity,
+						top: "50%",
+						left: "22%",
+						transform: "translate(-50%, -50%)",
+						width: "980px",
+						height: "980px",
+						border: "130px solid rgba(255, 255, 255, 0.08)",
+						borderRadius: "50%",
+						background: "transparent",
 					}}
-				/> */}
+					aria-hidden="true"
+				/>
 
-				{/* Title 1 above the line */}
-				{/* <div
-					className="absolute z-20 -translate-x-1/2 left-1/2"
+				{/* Decorative: Partial White Circle on Left (solid inner circle) */}
+				<div
+					className="absolute z-10 pointer-events-none"
 					style={{
-						top: "25%",
-						left: "33%",
-						width: "832px",
-						height: "160px",
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-						overflow: "hidden",
-						pointerEvents: "none",
+						top: "50%",
+						left: "22%",
+						transform: "translate(-50%, -50%)",
+						width: "520px",
+						height: "520px",
+						border: "2px solid rgba(255, 255, 255, 0.7)",
+						borderRadius: "50%",
+						background: "transparent",
 					}}
-				> */}
-				{/* <span
-						className="block whitespace-nowrap"
+					aria-hidden="true"
+				/>
+
+				{/* Decorative: White Horizontal Line */}
+				<div
+					className="absolute left-0 right-0 z-10 pointer-events-none"
+					style={{
+						top: "52%",
+						height: 0,
+						borderTop: "1px solid rgba(255, 255, 255, 0.6)",
+						width: "100%",
+					}}
+					aria-hidden="true"
+				/>
+
+				{/* Hero Content: Title, Description, Green Button */}
+				<div
+					className="absolute left-0 top-26 bottom-0 z-20 flex flex-col justify-center pl-[8vw] pr-[20%] md:pl-[10vw] md:pr-[35%]"
+					style={{
+						writingMode: "horizontal-tb",
+						direction: "ltr",
+					}}
+				>
+					{/* Title */}
+					<h1
+						className="font-bold mb-4"
 						style={{
-							fontSize: "95px",
-							lineHeight: "160px",
-							fontWeight: 800,
-							color: "#FEF8EF",
 							fontFamily: "Noto Serif TC, serif",
-							width: "100%",
-							textAlign: "center",
+							fontSize: "clamp(48px, 5vw, 68px)",
+							lineHeight: "1.1",
+							letterSpacing: "0.02em",
+							color: "#FFFFFF",
+							textShadow: "0 2px 12px rgba(0,0,0,0.3)",
+							writingMode: "horizontal-tb",
+							whiteSpace: "nowrap",
 						}}
 					>
 						{t("title")}
-					</span>
-				</div> */}
+					</h1>
 
-				{/* Decorative: Centered White Horizontal Line */}
-				{/* <div
-					className="absolute left-0 right-0 z-10 pointer-events-none"
-					style={{
-						top: "45%",
-						height: 0,
-						borderTop: `${2 * scaleRatio}px solid #FEF8EF`,
-						width: "100%",
-						opacity: 0.7,
-					}}
-				/>
- */}
-				{/* Decorative: Large White Circle on Left */}
-				{/* <div
-					className="absolute z-10 pointer-events-none"
-					style={{
-						top: "45%",
-						left: "5vw",
-						transform: "translateY(-50%)",
-						width: `${525 * scaleRatio}px`,
-						height: `${525 * scaleRatio}px`,
-						border: `${2.5 * scaleRatio}px solid #FEF8EF`,
-						borderRadius: "50%",
-						background: "transparent",
-						opacity: 0.7,
-					}}
-				/> */}
+					{/* Description */}
+					<p
+						className="mb-8"
+						style={{
+							fontFamily: "Noto Sans TC, sans-serif",
+							fontSize: "clamp(15px, 1.2vw, 18px)",
+							lineHeight: "1.7",
+							color: "rgba(255, 255, 255, 0.95)",
+							textShadow: "0 1px 6px rgba(0,0,0,0.3)",
+							maxWidth: "560px",
+							writingMode: "horizontal-tb",
+						}}
+					>
+						{t("heroDescription")}
+					</p>
+
+					{/* Green CTA Button */}
+					<Link
+						href="/shop"
+						className="inline-flex items-center justify-center rounded-full font-bold w-fit transition-transform duration-200 hover:scale-105"
+						style={{
+							height: "52px",
+							padding: "0 32px",
+							fontSize: "16px",
+							backgroundColor: "#8DC63F",
+							color: "#FFFFFF",
+							boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+						}}
+					>
+						{t("shopCta")}
+					</Link>
+				</div>
 
 				{/* Social icons at top right */}
 				<div
@@ -515,7 +542,7 @@ export default function Hero() {
 								height={30}
 								style={{ filter: "brightness(0) invert(0.7)" }}
 							/>
-						)
+						),
 					)}
 				</div>
 
