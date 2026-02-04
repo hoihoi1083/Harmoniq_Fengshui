@@ -108,19 +108,19 @@
 		"services": {
 			"steps": {
 				"step1": {
-					"title": "風鈴聊天室",
-					"subtitle": "免費測評命理"
+					"title": "瀏覽水晶",
+					"subtitle": "購買水晶商品"
 				},
 				"step2": {
 					"title": "選擇報告",
-					"subtitle": "挑選心儀測算模式"
+					"subtitle": "挑選心儀測算模式（可預覽）"
 				},
 				"step3": {
 					"title": "填寫信息",
-					"subtitle": "輸入生辰八字"
+					"subtitle": "輸入生辰八字 & 您的疑問"
 				},
 				"step4": {
-					"title": "解鎖專屬定製報告",
+					"title": "解鎖專屬報告",
 					"subtitle": "收到詳細分析和建議"
 				}
 			},

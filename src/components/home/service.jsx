@@ -46,6 +46,12 @@ const ServiceSection = () => {
 	return (
 		<section
 			className={`w-full py-8 md:py-16 bg-[#EFEFEF] rounded-t-[40px] md:rounded-t-[80px] relative z-10 `}
+			style={{
+				backgroundImage: "url(/images/hero/select-bg.png)",
+				backgroundSize: "cover",
+				backgroundPosition: "top",
+				backgroundRepeat: "no-repeat",
+			}}
 		>
 			{/* Step Component at the top */}
 			<div className="flex justify-center hidden w-full mb-8 md:block md:mb-16">

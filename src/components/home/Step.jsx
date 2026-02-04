@@ -53,10 +53,9 @@ const Step = ({ steps }) => {
 								className="absolute inset-0 z-0"
 								style={{
 									backgroundImage: `url(${step.image})`,
-									backgroundSize: "53% auto",
 									backgroundPosition: "center",
 									backgroundRepeat: "no-repeat",
-									opacity: 2.5,
+									opacity: 10.5,
 								}}
 							/>
 
@@ -66,8 +65,8 @@ const Step = ({ steps }) => {
 								<div
 									className="relative flex items-center justify-center mb-3 md:mb-4"
 									style={{
-										width: "40px",
-										height: "40px",
+										width: "45px",
+										height: "45px",
 										borderRadius: "50%",
 										background: "#A3B116",
 										border: "1px solid #A3B116",
@@ -75,12 +74,11 @@ const Step = ({ steps }) => {
 								>
 									<span
 										style={{
-											fontFamily: "Noto Serif TC, serif",
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 											fontWeight: 1000,
-											fontSize: "28px",
+											fontSize: "30px",
 											color: "#FFFFFF",
-											textShadow:
-												"0 2px 4px rgba(0,0,0,0.8)",
 											lineHeight: "1",
 											display: "flex",
 											alignItems: "center",
@@ -252,42 +250,45 @@ const Step = ({ steps }) => {
 						}`}
 						style={{
 							borderRadius: "20px",
-							position: "relative",
 							minHeight: isSmallDesktop ? "120px" : "auto",
 						}}
 					>
+						{/* Background Color */}
+						<div className="absolute inset-0 z-0" />
+
 						{/* Background Image */}
-						<div
-							className="absolute inset-0 z-0"
+						<img
+							src={step.image}
+							alt=""
+							className="absolute inset-0 z-0 object-contain w-auto h-auto"
 							style={{
-								backgroundImage: `url(${step.image})`,
-								backgroundSize: "50% auto",
-								backgroundPosition: "center",
-								backgroundRepeat: "no-repeat",
-								opacity: 2.5,
+								width: "45%",
+								height: "auto",
+								top: "50%",
+								left: "50%",
+								transform: "translate(-50%, -50%)",
 							}}
 						/>
 
 						{/* Content overlay */}
-						<div className="relative z-20 flex flex-col items-start w-full p-2 md:p-3">
+						<div className="relative z-20 flex flex-col items-start w-full p-2 md:p-5">
 							{/* Number with transparent circle effect - Responsive sizing */}
 							<div
-								className="relative flex items-center justify-center mb-3 md:mb-4"
+								className="relative flex items-center justify-center mb-2 md:mb-3"
 								style={{
-									width: "clamp(35px, 4vw, 40px)",
-									height: "clamp(35px, 4vw, 40px)",
+									width: "clamp(50px, 5vw, 40px)",
+									height: "clamp(50px, 5vw, 40px)",
 									borderRadius: "50%",
 									background: "#A3B116",
-									border: "1px solid #A3B116",
 								}}
 							>
 								<span
 									style={{
-										fontFamily: "Noto Serif TC, serif",
+										fontFamily:
+											"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 										fontWeight: 1000,
-										fontSize: "clamp(24px, 3vw, 30px)",
+										fontSize: "clamp(30px, 3vw, 35px)",
 										color: "#FFFFFF",
-										textShadow: "0 2px 4px rgba(0,0,0,0.3)",
 									}}
 								>
 									{step.num}
@@ -314,7 +315,7 @@ const Step = ({ steps }) => {
 										style={{
 											fontFamily:
 												"Noto Sans HK, sans-serif",
-											fontWeight: 800,
+											fontWeight: 600,
 											fontSize: "clamp(16px, 2vw, 18px)",
 											lineHeight:
 												"clamp(28px, 3.5vw, 35px)",
