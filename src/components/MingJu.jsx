@@ -3171,9 +3171,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 			return (
 				<>
 					{/* Page 2: 日主特性 */}
-					<div className="mx-auto mt-15" style={{ padding: "15px" }}>
+					<div className="mx-auto mt-15 print-report-mingju-wrapper" style={{ padding: "15px" }}>
 						<div
-							className="mx-auto bg-white page-break"
+							className="mx-auto bg-white page-break print-report-mingju-page2"
 							style={{
 								width: "210mm",
 								minHeight: "297mm",
@@ -3692,9 +3692,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 					</div>
 
 					{/* Page 3: 財星定位 with sections and 總結 */}
-					<div className="mx-auto mt-15" style={{ padding: "15px" }}>
+					<div className="mx-auto mt-15 print-report-mingju-wrapper" style={{ padding: "15px" }}>
 						<div
-							className="mx-auto bg-white page-break"
+							className="mx-auto bg-white page-break print-report-mingju-page3"
 							style={{
 								top: "20px",
 								left: "20px",

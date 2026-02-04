@@ -698,6 +698,82 @@ function PrintReportView() {
 						-webkit-print-color-adjust: exact !important;
 						print-color-adjust: exact !important;
 					}
+					/* MingJu wrappers: no extra margin/padding in print so spacing matches browser */
+					.print-report-mingju-wrapper {
+						margin-top: 0 !important;
+						padding: 0 !important;
+					}
+					/* MingJu Page 2 (日主特性) & Page 3 (財星定位): same padding and headings as browser */
+					.page-break.print-report-mingju-page2,
+					.page-break.print-report-mingju-page3 {
+						padding: 15mm 20mm !important;
+					}
+					.page-break.print-report-mingju-page2 h2,
+					.page-break.print-report-mingju-page3 h2 {
+						font-size: 48px !important;
+						margin-top: 0 !important;
+						margin-bottom: 0 !important;
+						line-height: 110% !important;
+					}
+					.page-break.print-report-mingju-page2 h3,
+					.page-break.print-report-mingju-page3 h3 {
+						font-size: 17px !important;
+						margin-top: 0 !important;
+						margin-bottom: 5px !important;
+					}
+					.page-break.print-report-mingju-page2 p,
+					.page-break.print-report-mingju-page3 p {
+						font-size: 14px !important;
+						line-height: 1.6 !important;
+					}
+					/* Page 7 關鍵季節: lock padding and spacing so print matches browser */
+					.page-break.page-7-seasons {
+						padding: 15mm 20mm !important;
+					}
+					.page-break.page-7-seasons .page-7-header {
+						margin-bottom: 32px !important;
+					}
+					.page-break.page-7-seasons .page-7-title {
+						font-size: 3rem !important;
+						margin-top: 0 !important;
+						margin-bottom: 0 !important;
+					}
+					/* space-y-10 between season blocks = 40px */
+					.page-break.page-7-seasons .space-y-10 > * + * {
+						margin-top: 40px !important;
+					}
+					.page-break.page-7-seasons .mb-2 {
+						margin-bottom: 8px !important;
+					}
+					.page-break.page-7-seasons .mb-8 {
+						margin-bottom: 32px !important;
+					}
+					.page-break.page-7-seasons .py-6 {
+						padding-top: 24px !important;
+						padding-bottom: 24px !important;
+					}
+					.page-break.page-7-seasons .text-sm {
+						font-size: 0.875rem !important;
+					}
+					.page-break.page-7-seasons .text-md {
+						font-size: 1rem !important;
+					}
+					.page-break.page-7-seasons [style*="backgroundClip"],
+					.page-break.page-7-seasons [style*="background-clip"] {
+						-webkit-print-color-adjust: exact !important;
+						print-color-adjust: exact !important;
+					}
+					/* Current-season 現 badge: keep red background and white text in print */
+					.page-break.page-7-seasons .page-7-current-badge {
+						-webkit-print-color-adjust: exact !important;
+						print-color-adjust: exact !important;
+						background-color: #DC2626 !important;
+					}
+					.page-break.page-7-seasons .page-7-current-badge span {
+						color: white !important;
+						-webkit-print-color-adjust: exact !important;
+						print-color-adjust: exact !important;
+					}
 					@page {
 						size: A4;
 						margin: 0;

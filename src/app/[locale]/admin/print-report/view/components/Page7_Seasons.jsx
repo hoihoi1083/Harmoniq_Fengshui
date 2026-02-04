@@ -284,9 +284,10 @@ export default function Page7_Seasons({ data }) {
 									marginLeft: "110px",
 								}}
 							>
-								{/* Current Season Indicator - Inside Content Box */}
+								{/* Current Season Indicator - Inside Content Box (print-color-adjust so 現 stays white on red) */}
 								{isCurrentSeason && (
 									<div
+										className="page-7-current-badge"
 										style={{
 											position: "absolute",
 											top: "15px",
@@ -299,6 +300,8 @@ export default function Page7_Seasons({ data }) {
 											alignItems: "center",
 											justifyContent: "center",
 											zIndex: 10,
+											WebkitPrintColorAdjust: "exact",
+											printColorAdjust: "exact",
 										}}
 									>
 										<span
@@ -306,6 +309,8 @@ export default function Page7_Seasons({ data }) {
 												color: "white",
 												fontSize: "14px",
 												fontWeight: "bold",
+												WebkitPrintColorAdjust: "exact",
+												printColorAdjust: "exact",
 											}}
 										>
 											現

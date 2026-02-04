@@ -318,7 +318,7 @@ export default function Page8_9_Recommendations({ data }) {
 				{/* Two-column layout for taboos */}
 				<div className="grid grid-cols-2 gap-8">
 					{/* Left column: 01, 02 */}
-					<div className="space-y-10">
+					<div className="space-y-8">
 						{[0, 1].map((index) => {
 							const taboo = displayTaboos[index];
 							if (!taboo) return null;
@@ -360,7 +360,7 @@ export default function Page8_9_Recommendations({ data }) {
 					</div>
 
 					{/* Right column: 03, 04, 05 */}
-					<div className="space-y-10">
+					<div className="space-y-8">
 						{[2, 3, 4].map((index) => {
 							const taboo = displayTaboos[index];
 							if (!taboo) return null;
