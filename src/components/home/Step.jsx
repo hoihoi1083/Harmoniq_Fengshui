@@ -42,7 +42,7 @@ const Step = ({ steps }) => {
 					{steps.map((step) => (
 						<div
 							key={step.num}
-							className="relative flex flex-col items-start justify-center flex-1 ml-3 overflow-hidden rounded-lg md:ml-5 lg:ml-7"
+							className="relative flex flex-col items-start justify-start flex-1 ml-3 overflow-hidden rounded-lg md:ml-5 lg:ml-7"
 							style={{
 								borderRadius: "20px",
 								position: "relative",
@@ -236,14 +236,11 @@ const Step = ({ steps }) => {
 						? "grid grid-cols-2 gap-4 place-items-center justify-center"
 						: "flex"
 				}`}
-				style={{
-					minHeight: "150px",
-				}}
 			>
 				{steps.map((step) => (
 					<div
 						key={step.num}
-						className={`relative flex flex-col items-start justify-center overflow-hidden rounded-lg ${
+						className={`relative flex flex-col items-start justify-start overflow-hidden rounded-lg ${
 							isSmallDesktop
 								? "w-full"
 								: "flex-1 ml-3 md:ml-5 lg:ml-7"

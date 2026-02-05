@@ -2,17 +2,40 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Step from "./Step";
+import ShopFeatureBanner from "./ShopFeatureBanner";
+import ServiceDemoTags from "./ServiceDemoTags";
 import useMobile from "../../app/hooks/useMobile";
 
 const ServiceSection = () => {
 	const t = useTranslations("home.services");
+	const locale = useLocale();
 	const isMobile = useMobile();
 	const [isClient, setIsClient] = useState(false);
+	const [products, setProducts] = useState([]);
+	const [loadingProducts, setLoadingProducts] = useState(true);
 
 	useEffect(() => {
 		setIsClient(true);
+	}, []);
+
+	useEffect(() => {
+		const fetchProducts = async () => {
+			try {
+				const res = await fetch("/api/shop/products?limit=100");
+				const data = await res.json();
+				if (data.success) {
+					setProducts(data.data.products || []);
+				}
+			} catch (error) {
+				console.error("Failed to fetch products:", error);
+			} finally {
+				setLoadingProducts(false);
+			}
+		};
+
+		fetchProducts();
 	}, []);
 
 	// Define steps data for the Step component
@@ -43,6 +66,18 @@ const ServiceSection = () => {
 		},
 	];
 
+	const luckyProducts = products
+		.filter((product) => product.isFeatured)
+		.slice(0, 4);
+
+	const hotProducts = products
+		.filter((product) => (product.soldCount || product.sold || 0) > 0)
+		.sort(
+			(a, b) =>
+				(b.soldCount || b.sold || 0) - (a.soldCount || a.sold || 0),
+		)
+		.slice(0, 4);
+
 	return (
 		<section
 			className={`w-full py-8 md:py-16 bg-[#EFEFEF] rounded-t-[40px] md:rounded-t-[80px] relative z-10 `}
@@ -54,163 +89,327 @@ const ServiceSection = () => {
 			}}
 		>
 			{/* Step Component at the top */}
-			<div className="flex justify-center hidden w-full mb-8 md:block md:mb-16">
+			<div className="flex justify-center hidden w-full mb-1 md:block md:mb-1">
 				<Step steps={steps} />
 			</div>
 
-			{/* Divider line */}
-			<div className="flex justify-center w-full mb-8 md:mb-10">
-				<hr className="w-5/6 border-t border-black md:w-5/6" />
-			</div>
-
+			{/* Shop Preview Section */}
 			<div className="w-full px-4 mx-auto sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80">
-				{/* Feng Shui Service Card */}
-				<div className="mb-8 md:mb-9">
-					<div className="w-full">
-						<div className="flex flex-col items-center gap-8 md:gap-8 lg:gap-20 lg:flex-row">
-							{/* Left Content */}
-							<div className="w-full p-4 md:p-6 lg:p-8 lg:w-1/2">
-								<h2
-									className="mb-4 md:mb-6 text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#635D3B]"
-									style={{
-										fontFamily: "Noto Serif TC, serif",
-									}}
-								>
-									{t("fengshui.title")}
-								</h2>
-
-								<h3
-									className="text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl text-[#A3B116] font-semibold mb-3 md:mb-4"
-									style={{
-										fontFamily: "Noto Sans HK, sans-serif",
-									}}
-								>
-									{t("fengshui.subtitle1")}
-								</h3>
-
-								<p
-									className="text-base md:text-lg lg:text-xl xl:text-2xl text-[#A3B116] font-medium mb-4 md:mb-6"
-									style={{
-										fontFamily: "Noto Sans HK, sans-serif",
-									}}
-								>
-									{t("fengshui.subtitle2")}
+				{/* 2026 Lucky Crystals */}
+				<section className="py-6 md:py-10">
+					<h2
+						className="text-2xl md:text-5xl lg:text-5xl font-bold text-center mb-16 text-[#2C2C2C]"
+						style={{
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						}}
+					>
+						{locale === "zh-CN" ? "2026幸运水晶" : "2026幸運水晶"}
+					</h2>
+					{loadingProducts ? (
+						<div className="flex items-center justify-center py-12">
+							<div className="text-center">
+								<div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6B8E23] mx-auto mb-3" />
+								<p className="text-sm text-gray-600">
+									{locale === "zh-CN"
+										? "加载中..."
+										: "載入中..."}
 								</p>
+							</div>
+						</div>
+					) : luckyProducts.length > 0 ? (
+						<>
+							<div className="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4 md:gap-6">
+								{luckyProducts.map((product) => {
+									const hasDiscount =
+										product.discount &&
+										product.discount.percentage > 0 &&
+										(!product.discount.validUntil ||
+											new Date(
+												product.discount.validUntil,
+											) > new Date());
 
-								<p
-									className="mb-6 md:mb-8 leading-relaxed text-[#515151] text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl"
-									style={{
-										fontFamily: "Noto Sans HK, sans-serif",
-									}}
-								>
-									{t("fengshui.description")}
-								</p>
+									const discountedPrice = hasDiscount
+										? product.price *
+											(1 -
+												product.discount.percentage /
+													100)
+										: product.price;
 
-								<Link href="/demo?category=fengshui">
-									<button className="bg-[#A3B116] hover:bg-[#8A9A14] text-white px-6 md:px-8 lg:px-12 py-3 md:py-4 lg:py-5 rounded-full font-bold transition-colors duration-300 w-full sm:w-auto">
-										<span
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-											}}
-											className="text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl"
+									const rating =
+										product.rating?.average || 4.5;
+
+									return (
+										<Link
+											key={product._id}
+											href={`/${locale}/shop/product/${product._id}`}
+											className="group"
 										>
-											{t("fengshui.button")}
-										</span>
+											<div className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-lg">
+												<div className="relative overflow-hidden bg-gray-100 aspect-square">
+													{product.images &&
+													product.images.length >
+														0 ? (
+														<Image
+															src={
+																product
+																	.images[0]
+															}
+															alt={
+																product.name[
+																	locale
+																] ||
+																product.name
+																	.zh_TW
+															}
+															fill
+															className="object-cover transition-transform duration-300 group-hover:scale-105"
+															sizes="(max-width: 768px) 50vw, 25vw"
+														/>
+													) : (
+														<div className="w-full h-full" />
+													)}
+												</div>
+												<div className="p-3 space-y-2">
+													<h3 className="text-sm md:text-base font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
+														{product.name[locale] ||
+															product.name.zh_TW}
+													</h3>
+													<div className="flex items-center gap-2">
+														<div className="flex">
+															{[...Array(5)].map(
+																(_, i) => (
+																	<svg
+																		key={i}
+																		className={`w-3.5 h-3.5 ${
+																			i <
+																			Math.floor(
+																				rating,
+																			)
+																				? "text-yellow-400"
+																				: "text-gray-300"
+																		}`}
+																		fill="currentColor"
+																		viewBox="0 0 20 20"
+																	>
+																		<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+																	</svg>
+																),
+															)}
+														</div>
+														<span className="text-xs text-gray-500">
+															{rating.toFixed(1)}
+															/5
+														</span>
+													</div>
+													<div className="flex items-center gap-2">
+														<span className="text-lg font-bold text-[#6B8E23]">
+															HK$
+															{hasDiscount
+																? discountedPrice.toFixed(
+																		0,
+																	)
+																: product.price}
+														</span>
+														{hasDiscount && (
+															<>
+																<span className="text-xs text-gray-400 line-through">
+																	HK$
+																	{
+																		product.price
+																	}
+																</span>
+																<span className="text-xs font-semibold text-red-500">
+																	-
+																	{
+																		product
+																			.discount
+																			.percentage
+																	}
+																	%
+																</span>
+															</>
+														)}
+													</div>
+												</div>
+											</div>
+										</Link>
+									);
+								})}
+							</div>
+							<div className="text-center">
+								<Link href={`/${locale}/shop/all`}>
+									<button className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-8 py-3 rounded-full text-sm md:text-base font-semibold shadow-md hover:shadow-lg transition-all">
+										{locale === "zh-CN"
+											? "浏览更多"
+											: "瀏覽更多"}
 									</button>
 								</Link>
 							</div>
+						</>
+					) : null}
+				</section>
 
-							{/* Right Image */}
-							<div className="relative w-full lg:w-1/2">
-								<div className="relative flex items-center justify-center">
-									<Image
-										src="/images/hero/service-1.png"
-										alt={t("fengshui.altText")}
-										width={200}
-										height={200}
-										className="object-contain w-full h-auto max-w-full max-h-full"
-										priority
-									/>
-								</div>
+				{/* Hot Products */}
+				<section className="py-6 md:py-10">
+					<h2
+						className="text-2xl md:text-5xl lg:text-5xl font-bold text-center mb-16 text-[#2C2C2C]"
+						style={{
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						}}
+					>
+						{locale === "zh-CN" ? "热销产品" : "熱銷產品"}
+					</h2>
+					{loadingProducts ? (
+						<div className="flex items-center justify-center py-12">
+							<div className="text-center">
+								<div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#6B8E23] mx-auto mb-3" />
+								<p className="text-sm text-gray-600">
+									{locale === "zh-CN"
+										? "加载中..."
+										: "載入中..."}
+								</p>
 							</div>
 						</div>
-					</div>
-				</div>
+					) : hotProducts.length > 0 ? (
+						<>
+							<div className="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4 md:gap-6">
+								{hotProducts.map((product) => {
+									const hasDiscount =
+										product.discount &&
+										product.discount.percentage > 0 &&
+										(!product.discount.validUntil ||
+											new Date(
+												product.discount.validUntil,
+											) > new Date());
 
-				{/* Destiny Calculation Service Card */}
-				<div className="mb-8 md:mb-16">
-					<div className="w-full mx-auto">
-						<div className="flex flex-col items-center gap-8 md:gap-12 lg:gap-20 lg:flex-row-reverse">
-							{/* Right Content */}
-							<div className="w-full p-4 md:p-6 lg:p-8 xl:p-12 lg:w-1/2">
-								<h2
-									className="mb-4 md:mb-6 text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#635D3B]"
-									style={{
-										fontFamily: "Noto Serif TC, serif",
-									}}
-								>
-									{t("destiny.title")}
-								</h2>
+									const discountedPrice = hasDiscount
+										? product.price *
+											(1 -
+												product.discount.percentage /
+													100)
+										: product.price;
 
-								<h3
-									className="text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl text-[#A3B116] font-semibold mb-3 md:mb-4"
-									style={{
-										fontFamily: "Noto Sans HK, sans-serif",
-									}}
-								>
-									{t("destiny.subtitle1")}
-								</h3>
+									const rating =
+										product.rating?.average || 4.5;
 
-								<p
-									className="text-base md:text-lg lg:text-xl xl:text-2xl text-[#A3B116] font-medium mb-4 md:mb-6"
-									style={{
-										fontFamily: "Noto Sans HK, sans-serif",
-									}}
-								>
-									{t("destiny.subtitle2")}
-								</p>
-
-								<p
-									className="mb-6 md:mb-8 leading-relaxed text-[#515151] text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl"
-									style={{
-										fontFamily: "Noto Sans HK, sans-serif",
-									}}
-								>
-									{t("destiny.description")}
-								</p>
-
-								<Link href="/demo?category=life">
-									<button className="bg-[#A3B116] hover:bg-[#8A9A14] text-white px-6 md:px-8 lg:px-12 py-3 md:py-4 lg:py-5 rounded-full font-bold transition-colors duration-300 w-full sm:w-auto">
-										<span
-											style={{
-												fontFamily:
-													"Noto Sans HK, sans-serif",
-											}}
-											className="text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl"
+									return (
+										<Link
+											key={product._id}
+											href={`/${locale}/shop/product/${product._id}`}
+											className="group"
 										>
-											{t("destiny.button")}
-										</span>
+											<div className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-sm rounded-xl hover:shadow-lg">
+												<div className="relative overflow-hidden bg-gray-100 aspect-square">
+													{product.images &&
+													product.images.length >
+														0 ? (
+														<Image
+															src={
+																product
+																	.images[0]
+															}
+															alt={
+																product.name[
+																	locale
+																] ||
+																product.name
+																	.zh_TW
+															}
+															fill
+															className="object-cover transition-transform duration-300 group-hover:scale-105"
+															sizes="(max-width: 768px) 50vw, 25vw"
+														/>
+													) : (
+														<div className="w-full h-full" />
+													)}
+												</div>
+												<div className="p-3 space-y-2">
+													<h3 className="text-sm md:text-base font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
+														{product.name[locale] ||
+															product.name.zh_TW}
+													</h3>
+													<div className="flex items-center gap-2">
+														<div className="flex">
+															{[...Array(5)].map(
+																(_, i) => (
+																	<svg
+																		key={i}
+																		className={`w-3.5 h-3.5 ${
+																			i <
+																			Math.floor(
+																				rating,
+																			)
+																				? "text-yellow-400"
+																				: "text-gray-300"
+																		}`}
+																		fill="currentColor"
+																		viewBox="0 0 20 20"
+																	>
+																		<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+																	</svg>
+																),
+															)}
+														</div>
+														<span className="text-xs text-gray-500">
+															{rating.toFixed(1)}
+															/5
+														</span>
+													</div>
+													<div className="flex items-center gap-2">
+														<span className="text-lg font-bold text-[#6B8E23]">
+															HK$
+															{hasDiscount
+																? discountedPrice.toFixed(
+																		0,
+																	)
+																: product.price}
+														</span>
+														{hasDiscount && (
+															<>
+																<span className="text-xs text-gray-400 line-through">
+																	HK$
+																	{
+																		product.price
+																	}
+																</span>
+																<span className="text-xs font-semibold text-red-500">
+																	-
+																	{
+																		product
+																			.discount
+																			.percentage
+																	}
+																	%
+																</span>
+															</>
+														)}
+													</div>
+												</div>
+											</div>
+										</Link>
+									);
+								})}
+							</div>
+							<div className="text-center">
+								<Link href={`/${locale}/shop/all`}>
+									<button className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-8 py-3 rounded-full text-sm md:text-base font-semibold shadow-md hover:shadow-lg transition-all">
+										{locale === "zh-CN"
+											? "浏览更多"
+											: "瀏覽更多"}
 									</button>
 								</Link>
 							</div>
+						</>
+					) : null}
+				</section>
 
-							{/* Left Image */}
-							<div className="relative w-full lg:w-1/2">
-								<div className="relative flex items-center justify-center">
-									<Image
-										src="/images/hero/service-2.png"
-										alt={t("destiny.altText")}
-										width={500}
-										height={500}
-										className="object-contain w-full h-auto max-w-full max-h-full"
-										priority
-									/>
-								</div>
-							</div>
-						</div>
-					</div>
+				<div className="py-8 md:py-12">
+					<ShopFeatureBanner />
 				</div>
+
+				<ServiceDemoTags />
 			</div>
 		</section>
 	);

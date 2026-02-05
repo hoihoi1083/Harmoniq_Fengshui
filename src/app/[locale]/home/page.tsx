@@ -13,7 +13,7 @@ import Theory from "@/components/free/theory";
 import FeatureV2 from "@/components/home/FeatureV2";
 import TheoryTips from "@/components/home/TheoryTips";
 import ServiceSection from "@/components/home/service";
-import DemoSection from "@/components/home/DemoSection";
+import TestimonialSection from "@/components/home/TestimonialSection";
 
 import { get } from "@/lib/ajax";
 export default function Home() {
@@ -26,9 +26,9 @@ export default function Home() {
 				</section>
 				{/* <Desire /> */}
 				<ServiceSection />
-				<DemoSection />
+				<TestimonialSection />
 				<div className="lg:-mt-[100px] md:-mt-[80px] sm:mt-0 w-full overflow-hidden">
-					<FeatureV2 />
+					{/* <FeatureV2 /> */}
 				</div>
 				<div className="w-full overflow-hidden">
 					<TheoryTips />
