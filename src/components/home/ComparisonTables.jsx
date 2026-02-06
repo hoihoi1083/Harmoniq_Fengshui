@@ -7,9 +7,9 @@ const ComparisonTables = () => {
 	const locale = useLocale();
 
 	return (
-		<div className="px-4 w-fullpy-12 md:py-20 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80">
+		<div className="w-full px-4 py-12 md:py-20 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80">
 			{/* Shop Comparison Section */}
-			<section className="mb-16 md:mb-24">
+			<section>
 				{/* Title Badge */}
 				<div className="flex items-center justify-start mb-8 md:mb-12">
 					<div
@@ -62,7 +62,7 @@ const ComparisonTables = () => {
 				</div>
 
 				{/* Image Container for Report Comparison Table */}
-				<div className="w-full bg-[#EFEFEF] rounded-2xl p-6 md:p-8 flex items-center justify-center min-h-[300px] md:min-h-[400px]">
+				<div className="w-full bg-[#EFEFEF] rounded-2xl p-6 md:p-8 flex items-center justify-center ">
 					<div className="relative w-full h-full">
 						{/* Placeholder - User will add image later */}
 						<div className="flex items-center justify-center w-full h-full">

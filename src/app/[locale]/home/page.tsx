@@ -8,12 +8,14 @@ import Tips from "@/components/home/Tips";
 import FAQ from "@/components/home/FAQ";
 import Message from "@/components/home/Message";
 import Footer from "@/components/home/Footer";
+import FooterV2 from "@/components/home/FooterV2";
 import Desire from "@/components/home/Desire";
 import Theory from "@/components/free/theory";
 import FeatureV2 from "@/components/home/FeatureV2";
 import TheoryTips from "@/components/home/TheoryTips";
 import ServiceSection from "@/components/home/service";
 import TestimonialSection from "@/components/home/TestimonialSection";
+import FortuneTips from "@/components/home/FortuneTips";
 
 import { get } from "@/lib/ajax";
 export default function Home() {
@@ -27,19 +29,11 @@ export default function Home() {
 				{/* <Desire /> */}
 				<ServiceSection />
 				<TestimonialSection />
-				<div className="lg:-mt-[100px] md:-mt-[80px] sm:mt-0 w-full overflow-hidden">
-					{/* <FeatureV2 /> */}
-				</div>
-				<div className="w-full overflow-hidden">
-					<TheoryTips />
-				</div>
+				<FortuneTips />
 				{/* Hide Tips component on mobile devices */}
 				{/* <Message /> */}
-				<section id="faq">
-					<FAQ />
-				</section>
 			</main>
-			<Footer />
+			<FooterV2 />
 		</div>
 	);
 }

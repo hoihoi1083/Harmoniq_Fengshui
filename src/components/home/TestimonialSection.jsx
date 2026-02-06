@@ -42,7 +42,7 @@ const TestimonialSection = () => {
 			className="relative w-full px-4 py-12 md:py-20 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80"
 			style={{
 				backgroundImage: "url(/images/demo/homepage-demo-bg.png)",
-				backgroundSize: "cover",
+				backgroundSize: "99%",
 				backgroundPosition: "center",
 				backgroundRepeat: "no-repeat",
 			}}

@@ -32,7 +32,7 @@ const ShopFeatureBanner = ({
 
 	return (
 		<section className="w-full">
-			<div className="relative overflow-hidden rounded-[28px] md:rounded-[36px] mb-30">
+			<div className="relative overflow-hidden rounded-[28px] md:rounded-[36px] mb-40">
 				<div className="grid grid-cols-1 md:grid-cols-[0.3fr_0.7fr] items-stretch justify-between">
 					{/* Left Image */}
 					<div className="relative w-full aspect-[16/16]">

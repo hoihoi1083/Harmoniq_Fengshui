@@ -98,7 +98,7 @@ const ServiceSection = () => {
 				{/* 2026 Lucky Crystals */}
 				<section className="py-6 md:py-10">
 					<h2
-						className="text-2xl md:text-5xl lg:text-5xl font-bold text-center mb-16 text-[#2C2C2C]"
+						className="text-2xl md:text-5xl lg:text-5xl font-bold text-center mb-20 text-[#2C2C2C]"
 						style={{
 							fontFamily:
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
@@ -237,7 +237,7 @@ const ServiceSection = () => {
 									);
 								})}
 							</div>
-							<div className="text-center">
+							<div className="text-center mt-15">
 								<Link href={`/${locale}/shop/all`}>
 									<button className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-8 py-3 rounded-full text-sm md:text-base font-semibold shadow-md hover:shadow-lg transition-all">
 										{locale === "zh-CN"
@@ -253,7 +253,7 @@ const ServiceSection = () => {
 				{/* Hot Products */}
 				<section className="py-6 md:py-10">
 					<h2
-						className="text-2xl md:text-5xl lg:text-5xl font-bold text-center mb-16 text-[#2C2C2C]"
+						className="text-2xl md:text-5xl lg:text-5xl font-bold text-center mb-20 text-[#2C2C2C]"
 						style={{
 							fontFamily:
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
@@ -392,7 +392,7 @@ const ServiceSection = () => {
 									);
 								})}
 							</div>
-							<div className="text-center">
+							<div className="text-center mt-15">
 								<Link href={`/${locale}/shop/all`}>
 									<button className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-8 py-3 rounded-full text-sm md:text-base font-semibold shadow-md hover:shadow-lg transition-all">
 										{locale === "zh-CN"
@@ -405,11 +405,12 @@ const ServiceSection = () => {
 					) : null}
 				</section>
 
-				<div className="py-8 md:py-12">
+				<div className="mt-75">
 					<ShopFeatureBanner />
 				</div>
-
-				<ServiceDemoTags />
+				<div className="mt-35">
+					<ServiceDemoTags />
+				</div>
 			</div>
 		</section>
 	);
