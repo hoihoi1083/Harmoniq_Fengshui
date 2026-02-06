@@ -50,7 +50,7 @@ const FortuneTips = () => {
 
 	return (
 		<section
-			className="px-4 py-16 "
+			className="relative w-full px-4 py-12 md:py-20 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80"
 			style={{
 				backgroundImage:
 					"url(/images/demo/homepage-fortunetips-bg.png)",
@@ -59,24 +59,38 @@ const FortuneTips = () => {
 				backgroundRepeat: "no-repeat",
 			}}
 		>
-			<div className="max-w-5xl mx-auto">
+			<div className="mx-auto">
 				{/* Header */}
-				<div className="mb-8">
-					<span className="inline-block bg-[#A4B96D] text-white px-6 py-3 rounded-full text-lg font-medium">
+				<div
+					className="flex items-center justify-center  rounded-full md:w-40 md:h-10 bg-[#A4AF3B] flex-shrink-0 mb-16"
+					style={{
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+					}}
+				>
+					<span className="font-bold text-white text-md md:text-2xl">
 						命理小貼士
 					</span>
 				</div>
 
 				{/* Accordion Items */}
-				<div className="space-y-4">
+				<div className="space-y-4 ">
 					{tips.map((tip, index) => (
 						<div
 							key={index}
 							className={`rounded-lg overflow-hidden transition-all duration-300 ${
 								openIndex === index
-									? "bg-[#191A23]"
-									: "bg-white border-2 border-gray-200"
+									? "border-2 border-[#191A23]"
+									: " border-2 border-[#191A23]"
 							}`}
+							style={
+								openIndex === index
+									? {
+											background:
+												"linear-gradient(to bottom, #363739, #676769)",
+										}
+									: {}
+							}
 						>
 							{/* Header */}
 							<button
@@ -104,10 +118,10 @@ const FortuneTips = () => {
 									</h3>
 								</div>
 								<div
-									className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-2xl font-light ${
+									className={`w-10 h-10 rounded-full border flex items-center justify-center text-4xl font-extrabold ${
 										openIndex === index
-											? "border-white text-white"
-											: "border-gray-400 text-gray-400"
+											? "border-[#F3F3F3] bg-[#F3F3F3] text-black"
+											: "border-[#191A23] bg-[#F3F3F3] text-black"
 									}`}
 								>
 									{openIndex === index ? "−" : "+"}

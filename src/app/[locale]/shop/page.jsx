@@ -66,7 +66,7 @@ export default function ShopPage() {
 				// Count total quantity of all items
 				const totalQuantity = data.data.items.reduce(
 					(total, item) => total + item.quantity,
-					0
+					0,
 				);
 				setCartCount(totalQuantity);
 			}
@@ -96,7 +96,7 @@ export default function ShopPage() {
 				// Count total quantity of all items
 				const totalQuantity = data.data.items.reduce(
 					(total, item) => total + item.quantity,
-					0
+					0,
 				);
 				setCartCount(totalQuantity);
 			} else {
@@ -229,20 +229,21 @@ export default function ShopPage() {
 	const handleNewsletterSubmit = (e) => {
 		e.preventDefault();
 		if (email) {
-			toast.success(
-				locale === "zh-CN" ? "订阅成功！" : "訂閱成功！"
-			);
+			toast.success(locale === "zh-CN" ? "订阅成功！" : "訂閱成功！");
 			setEmail("");
 		}
 	};
 
 	// Get featured products (2026 Lucky Crystals)
 	const luckyProducts = products.filter((p) => p.isFeatured).slice(0, 4);
-	
+
 	// Get hot products (best sellers) - use soldCount since it's the actual DB field
 	const hotProducts = products
 		.filter((p) => (p.soldCount || p.sold || 0) > 0)
-		.sort((a, b) => (b.soldCount || b.sold || 0) - (a.soldCount || a.sold || 0))
+		.sort(
+			(a, b) =>
+				(b.soldCount || b.sold || 0) - (a.soldCount || a.sold || 0),
+		)
 		.slice(0, 4);
 
 	const handleSearchFromNavbar = (term) => {
@@ -259,7 +260,10 @@ export default function ShopPage() {
 
 	return (
 		<div className="min-h-screen bg-white">
-			<ShopNavbar cartCount={cartCount} onSearch={handleSearchFromNavbar} />
+			<ShopNavbar
+				cartCount={cartCount}
+				onSearch={handleSearchFromNavbar}
+			/>
 
 			{/* Hero Banner Section */}
 			<section className="relative bg-gradient-to-br from-[#F5F5F0] via-[#FAFAF8] to-white py-20 lg:py-32 overflow-hidden">
@@ -286,20 +290,22 @@ export default function ShopPage() {
 									</svg>
 								</div>
 							</div>
-							
+
 							<p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl">
 								{locale === "zh-CN"
 									? "浏览我们品类丰富的开运佳品，所有物件均经匠心力作与能量加持，旨在助您调和命理格局，契合个人运势，激发专属您的正向能量。"
 									: "瀏覽我們品類豐富的開運佳品，所有物件均經匠心力作與能量加持，旨在助您調和命理格局，契合個人運勢，激發專屬您的正向能量。"}
 							</p>
-							
+
 							<Button
 								size="lg"
 								className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
 								onClick={() => {
 									document
 										.getElementById("products-section")
-										?.scrollIntoView({ behavior: "smooth" });
+										?.scrollIntoView({
+											behavior: "smooth",
+										});
 								}}
 							>
 								{locale === "zh-CN" ? "开始购物" : "開始購物"}
@@ -317,7 +323,8 @@ export default function ShopPage() {
 									priority
 									onError={(e) => {
 										e.currentTarget.style.display = "none";
-										e.currentTarget.nextElementSibling.style.display = "flex";
+										e.currentTarget.nextElementSibling.style.display =
+											"flex";
 									}}
 								/>
 								{/* Fallback if image not found */}
@@ -325,7 +332,7 @@ export default function ShopPage() {
 									<Sparkles className="w-32 h-32 text-[#6B8E23] opacity-20" />
 								</div>
 							</div>
-							
+
 							{/* Decorative Sparkles */}
 							<div className="absolute bottom-20 right-10 text-[#8B9F3A] opacity-60 animate-pulse">
 								<svg
@@ -352,7 +359,7 @@ export default function ShopPage() {
 						</div>
 					</div>
 				</div>
-				
+
 				{/* Bottom Wave Decoration */}
 				<div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
 			</section>
@@ -373,7 +380,9 @@ export default function ShopPage() {
 							<div className="text-center">
 								<div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#6B8E23] mx-auto mb-4"></div>
 								<p className="text-lg text-gray-600">
-									{locale === "zh-CN" ? "加载中..." : "載入中..."}
+									{locale === "zh-CN"
+										? "加载中..."
+										: "載入中..."}
 								</p>
 							</div>
 						</div>
@@ -385,15 +394,22 @@ export default function ShopPage() {
 										product.discount &&
 										product.discount.percentage > 0 &&
 										(!product.discount.validUntil ||
-											new Date(product.discount.validUntil) > new Date());
+											new Date(
+												product.discount.validUntil,
+											) > new Date());
 
 									const discountedPrice = hasDiscount
-										? product.price * (1 - product.discount.percentage / 100)
+										? product.price *
+											(1 -
+												product.discount.percentage /
+													100)
 										: product.price;
 
 									// Use actual product rating or default to 4.5
-									const rating = product.rating?.average || 4.5;
-									const ratingCount = product.rating?.count || 0;
+									const rating =
+										product.rating?.average || 4.5;
+									const ratingCount =
+										product.rating?.count || 0;
 
 									return (
 										<Link
@@ -404,10 +420,21 @@ export default function ShopPage() {
 											<div className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300">
 												{/* Product Image */}
 												<div className="relative aspect-square overflow-hidden bg-gray-100">
-													{product.images && product.images.length > 0 ? (
+													{product.images &&
+													product.images.length >
+														0 ? (
 														<Image
-															src={product.images[0]}
-															alt={product.name[locale] || product.name.zh_TW}
+															src={
+																product
+																	.images[0]
+															}
+															alt={
+																product.name[
+																	locale
+																] ||
+																product.name
+																	.zh_TW
+															}
 															fill
 															className="object-cover group-hover:scale-110 transition-transform duration-500"
 															sizes="(max-width: 768px) 50vw, 25vw"
@@ -423,45 +450,58 @@ export default function ShopPage() {
 												<div className="p-4 space-y-2">
 													{/* Product Name */}
 													<h3 className="font-semibold text-[#8B7355] text-base line-clamp-2 min-h-[3rem]">
-														{product.name[locale] || product.name.zh_TW}
+														{product.name[locale] ||
+															product.name.zh_TW}
 													</h3>
 
 													{/* Star Rating */}
 													<div className="flex items-center gap-2">
 														<div className="flex gap-0.5">
-															{[...Array(5)].map((_, i) => {
-																const fillPercentage = Math.min(
-																	Math.max(rating - i, 0),
-																	1
-																);
-																return (
-																	<div key={i} className="relative w-4 h-4">
-																		{/* Background star */}
-																		<svg
-																			className="absolute inset-0 text-gray-300"
-																			fill="currentColor"
-																			viewBox="0 0 20 20"
-																		>
-																			<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-																		</svg>
-																		{/* Filled star */}
+															{[...Array(5)].map(
+																(_, i) => {
+																	const fillPercentage =
+																		Math.min(
+																			Math.max(
+																				rating -
+																					i,
+																				0,
+																			),
+																			1,
+																		);
+																	return (
 																		<div
-																			className="absolute inset-0 overflow-hidden"
-																			style={{
-																				width: `${fillPercentage * 100}%`,
-																			}}
+																			key={
+																				i
+																			}
+																			className="relative w-4 h-4"
 																		>
+																			{/* Background star */}
 																			<svg
-																				className="text-yellow-400"
+																				className="absolute inset-0 text-gray-300"
 																				fill="currentColor"
 																				viewBox="0 0 20 20"
 																			>
 																				<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
 																			</svg>
+																			{/* Filled star */}
+																			<div
+																				className="absolute inset-0 overflow-hidden"
+																				style={{
+																					width: `${fillPercentage * 100}%`,
+																				}}
+																			>
+																				<svg
+																					className="text-yellow-400"
+																					fill="currentColor"
+																					viewBox="0 0 20 20"
+																				>
+																					<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+																				</svg>
+																			</div>
 																		</div>
-																	</div>
-																);
-															})}
+																	);
+																},
+															)}
 														</div>
 														<span className="text-sm text-gray-600">
 															{rating}/5
@@ -472,15 +512,29 @@ export default function ShopPage() {
 													<div className="flex items-center justify-between gap-2">
 														<div className="flex items-center gap-2">
 															<span className="text-2xl font-bold text-[#6B8E23]">
-																${hasDiscount ? discountedPrice.toFixed(0) : product.price}
+																$
+																{hasDiscount
+																	? discountedPrice.toFixed(
+																			0,
+																		)
+																	: product.price}
 															</span>
 															{hasDiscount && (
 																<>
 																	<span className="text-sm text-gray-400 line-through">
-																		${product.price}
+																		$
+																		{
+																			product.price
+																		}
 																	</span>
 																	<span className="text-xs font-semibold text-red-500 bg-red-50 px-2 py-1 rounded">
-																		-{product.discount.percentage}%
+																		-
+																		{
+																			product
+																				.discount
+																				.percentage
+																		}
+																		%
 																	</span>
 																</>
 															)}
@@ -489,180 +543,9 @@ export default function ShopPage() {
 															onClick={(e) => {
 																e.preventDefault();
 																e.stopPropagation();
-																handleAddToCart(product);
-															}}
-															className="flex items-center justify-center w-10 h-10 rounded-full bg-[#6B8E23] text-white hover:bg-[#2E7D32] transition-colors"
-														>
-															<ShoppingCart className="w-5 h-5" />
-														</button>
-													</div>
-												</div>
-											</div>
-										</Link>
-									);
-								})}
-							</div>
-							<div className="text-center">
-					<Link href={`/${locale}/shop/all`}>
-						<Button
-							size="lg"
-							className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
-						>
-							{locale === "zh-CN" ? "浏览更多" : "瀏覽更多"}
-						</Button>
-					</Link>
-				</div>
-						</>
-					) : (
-						<div className="text-center py-12">
-							<p className="text-gray-500">
-								{locale === "zh-CN"
-									? "暂无精选商品"
-									: "暫無精選商品"}
-							</p>
-						</div>
-					)}
-				</div>
-			</section>
-
-			{/* Hot Products Section */}
-			<section id="hot-products" className="py-16 bg-white border-t border-gray-200">
-				<div className="container px-4 mx-auto">
-					<h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-gray-900">
-						{locale === "zh-CN" ? "热销产品" : "熱銷產品"}
-					</h2>
-					{loading ? (
-						<div className="flex items-center justify-center py-20">
-							<div className="text-center">
-								<div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#2E7D32] mx-auto mb-4"></div>
-								<p className="text-lg text-gray-600">
-									{locale === "zh-CN" ? "加载中..." : "載入中..."}
-								</p>
-							</div>
-						</div>
-					) : hotProducts.length > 0 ? (
-						<>
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-								{hotProducts.map((product) => {
-									const hasDiscount =
-										product.discount &&
-										product.discount.percentage > 0 &&
-										(!product.discount.validUntil ||
-											new Date(product.discount.validUntil) > new Date());
-
-									const discountedPrice = hasDiscount
-										? product.price * (1 - product.discount.percentage / 100)
-										: product.price;
-
-									const rating = product.rating?.average || 4.0;
-									const ratingCount = product.rating?.count || 0;
-									const soldCount = product.soldCount || product.sold || 0;
-
-									return (
-										<Link
-											key={product._id}
-											href={`/${locale}/shop/product/${product._id}`}
-											className="group"
-										>
-											<div className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full">
-												{/* Product Image with Badges */}
-												<div className="relative h-72 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0">
-													{product.images && product.images.length > 0 ? (
-														<Image
-															src={product.images[0]}
-															alt={product.name[locale] || product.name.zh_TW}
-															fill
-															className="object-cover group-hover:scale-105 transition-transform duration-700"
-															sizes="(max-width: 768px) 100vw, 33vw"
-														/>
-													) : (
-														<div className="flex items-center justify-center h-full">
-															<TrendingUp className="w-20 h-20 text-gray-300" />
-														</div>
-													)}
-													
-													{/* Hot Badge */}
-													<div className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-														🔥 {locale === "zh-CN" ? "热销" : "熱銷"}
-													</div>
-													
-													{/* Discount Badge */}
-													{hasDiscount && (
-														<div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
-															-{product.discount.percentage}%
-														</div>
-													)}
-													
-													{/* Element Badge */}
-													{product.elementType && product.elementType !== "none" && (
-														<div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700 flex items-center gap-1">
-															{product.elementType === "wood" && "🌳"}
-															{product.elementType === "fire" && "🔥"}
-															{product.elementType === "earth" && "🌍"}
-															{product.elementType === "metal" && "⚙️"}
-															{product.elementType === "water" && "💧"}
-															{product.elementType}
-														</div>
-													)}
-												</div>
-
-												{/* Product Info */}
-												<div className="p-5 space-y-3 flex flex-col flex-grow">
-													{/* Category Tags */}
-													<div className="flex gap-2 flex-wrap min-h-[28px]">
-														{product.tags && product.tags.slice(0, 2).map((tag, idx) => (
-															<span key={idx} className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full font-medium">
-																{tag}
-															</span>
-														))}
-													</div>
-													
-													{/* Product Name */}
-													<h3 className="font-bold text-gray-900 text-lg line-clamp-2 h-14 group-hover:text-[#6B8E23] transition-colors">
-														{product.name[locale] || product.name.zh_TW}
-													</h3>
-
-													{/* Rating & Sold Count */}
-													<div className="flex items-center justify-between">
-														<div className="flex items-center gap-1">
-															<div className="flex">
-																{[...Array(5)].map((_, i) => (
-																	<svg
-																		key={i}
-																		className={`w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}`}
-																		fill="currentColor"
-																		viewBox="0 0 20 20"
-																	>
-																		<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-																	</svg>
-																))}
-															</div>
-															<span className="text-xs text-gray-600 ml-1">
-																{rating.toFixed(1)} ({ratingCount > 0 ? ratingCount : "100"})
-															</span>
-														</div>
-														<span className="text-xs text-gray-500">
-															{locale === "zh-CN" ? "已售" : "已售"} {soldCount}
-														</span>
-													</div>
-
-													{/* Price & Action */}
-													<div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-auto">
-														<div className="flex flex-col">
-															{hasDiscount && (
-																<span className="text-xs text-gray-400 line-through">
-																	HK${product.price}
-																</span>
-															)}
-															<span className="text-2xl font-bold text-[#6B8E23]">
-																HK${hasDiscount ? discountedPrice.toFixed(0) : product.price}
-															</span>
-														</div>
-														<button
-															onClick={(e) => {
-																e.preventDefault();
-																e.stopPropagation();
-																handleAddToCart(product);
+																handleAddToCart(
+																	product,
+																);
 															}}
 															className="flex items-center justify-center w-10 h-10 rounded-full bg-[#6B8E23] text-white hover:bg-[#2E7D32] transition-colors"
 														>
@@ -681,7 +564,272 @@ export default function ShopPage() {
 										size="lg"
 										className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
 									>
-										{locale === "zh-CN" ? "浏览更多" : "瀏覽更多"}
+										{locale === "zh-CN"
+											? "浏览更多"
+											: "瀏覽更多"}
+									</Button>
+								</Link>
+							</div>
+						</>
+					) : (
+						<div className="text-center py-12">
+							<p className="text-gray-500">
+								{locale === "zh-CN"
+									? "暂无精选商品"
+									: "暫無精選商品"}
+							</p>
+						</div>
+					)}
+				</div>
+			</section>
+
+			{/* Hot Products Section */}
+			<section
+				id="hot-products"
+				className="py-16 bg-white border-t border-gray-200"
+			>
+				<div className="container px-4 mx-auto">
+					<h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-gray-900">
+						{locale === "zh-CN" ? "热销产品" : "熱銷產品"}
+					</h2>
+					{loading ? (
+						<div className="flex items-center justify-center py-20">
+							<div className="text-center">
+								<div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#2E7D32] mx-auto mb-4"></div>
+								<p className="text-lg text-gray-600">
+									{locale === "zh-CN"
+										? "加载中..."
+										: "載入中..."}
+								</p>
+							</div>
+						</div>
+					) : hotProducts.length > 0 ? (
+						<>
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+								{hotProducts.map((product) => {
+									const hasDiscount =
+										product.discount &&
+										product.discount.percentage > 0 &&
+										(!product.discount.validUntil ||
+											new Date(
+												product.discount.validUntil,
+											) > new Date());
+
+									const discountedPrice = hasDiscount
+										? product.price *
+											(1 -
+												product.discount.percentage /
+													100)
+										: product.price;
+
+									const rating =
+										product.rating?.average || 4.0;
+									const ratingCount =
+										product.rating?.count || 0;
+									const soldCount =
+										product.soldCount || product.sold || 0;
+
+									return (
+										<Link
+											key={product._id}
+											href={`/${locale}/shop/product/${product._id}`}
+											className="group"
+										>
+											<div className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full">
+												{/* Product Image with Badges */}
+												<div className="relative h-72 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0">
+													{product.images &&
+													product.images.length >
+														0 ? (
+														<Image
+															src={
+																product
+																	.images[0]
+															}
+															alt={
+																product.name[
+																	locale
+																] ||
+																product.name
+																	.zh_TW
+															}
+															fill
+															className="object-cover group-hover:scale-105 transition-transform duration-700"
+															sizes="(max-width: 768px) 100vw, 33vw"
+														/>
+													) : (
+														<div className="flex items-center justify-center h-full">
+															<TrendingUp className="w-20 h-20 text-gray-300" />
+														</div>
+													)}
+
+													{/* Hot Badge */}
+													<div className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+														🔥{" "}
+														{locale === "zh-CN"
+															? "热销"
+															: "熱銷"}
+													</div>
+
+													{/* Discount Badge */}
+													{hasDiscount && (
+														<div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+															-
+															{
+																product.discount
+																	.percentage
+															}
+															%
+														</div>
+													)}
+
+													{/* Element Badge */}
+													{product.elementType &&
+														product.elementType !==
+															"none" && (
+															<div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700 flex items-center gap-1">
+																{product.elementType ===
+																	"wood" &&
+																	"🌳"}
+																{product.elementType ===
+																	"fire" &&
+																	"🔥"}
+																{product.elementType ===
+																	"earth" &&
+																	"🌍"}
+																{product.elementType ===
+																	"metal" &&
+																	"⚙️"}
+																{product.elementType ===
+																	"water" &&
+																	"💧"}
+																{
+																	product.elementType
+																}
+															</div>
+														)}
+												</div>
+
+												{/* Product Info */}
+												<div className="p-5 space-y-3 flex flex-col flex-grow">
+													{/* Category Tags */}
+													<div className="flex gap-2 flex-wrap min-h-[28px]">
+														{product.tags &&
+															product.tags
+																.slice(0, 2)
+																.map(
+																	(
+																		tag,
+																		idx,
+																	) => (
+																		<span
+																			key={
+																				idx
+																			}
+																			className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full font-medium"
+																		>
+																			{
+																				tag
+																			}
+																		</span>
+																	),
+																)}
+													</div>
+
+													{/* Product Name */}
+													<h3 className="font-bold text-gray-900 text-lg line-clamp-2 h-14 group-hover:text-[#6B8E23] transition-colors">
+														{product.name[locale] ||
+															product.name.zh_TW}
+													</h3>
+
+													{/* Rating & Sold Count */}
+													<div className="flex items-center justify-between">
+														<div className="flex items-center gap-1">
+															<div className="flex">
+																{[
+																	...Array(5),
+																].map(
+																	(_, i) => (
+																		<svg
+																			key={
+																				i
+																			}
+																			className={`w-4 h-4 ${i < Math.floor(rating) ? "text-yellow-400" : "text-gray-300"}`}
+																			fill="currentColor"
+																			viewBox="0 0 20 20"
+																		>
+																			<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+																		</svg>
+																	),
+																)}
+															</div>
+															<span className="text-xs text-gray-600 ml-1">
+																{rating.toFixed(
+																	1,
+																)}{" "}
+																(
+																{ratingCount > 0
+																	? ratingCount
+																	: "100"}
+																)
+															</span>
+														</div>
+														<span className="text-xs text-gray-500">
+															{locale === "zh-CN"
+																? "已售"
+																: "已售"}{" "}
+															{soldCount}
+														</span>
+													</div>
+
+													{/* Price & Action */}
+													<div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-auto">
+														<div className="flex flex-col">
+															{hasDiscount && (
+																<span className="text-xs text-gray-400 line-through">
+																	HK$
+																	{
+																		product.price
+																	}
+																</span>
+															)}
+															<span className="text-2xl font-bold text-[#6B8E23]">
+																HK$
+																{hasDiscount
+																	? discountedPrice.toFixed(
+																			0,
+																		)
+																	: product.price}
+															</span>
+														</div>
+														<button
+															onClick={(e) => {
+																e.preventDefault();
+																e.stopPropagation();
+																handleAddToCart(
+																	product,
+																);
+															}}
+															className="flex items-center justify-center w-10 h-10 rounded-full bg-[#6B8E23] text-white hover:bg-[#2E7D32] transition-colors"
+														>
+															<ShoppingCart className="w-5 h-5" />
+														</button>
+													</div>
+												</div>
+											</div>
+										</Link>
+									);
+								})}
+							</div>
+							<div className="text-center">
+								<Link href={`/${locale}/shop/all`}>
+									<Button
+										size="lg"
+										className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
+									>
+										{locale === "zh-CN"
+											? "浏览更多"
+											: "瀏覽更多"}
 									</Button>
 								</Link>
 							</div>
@@ -707,21 +855,34 @@ export default function ShopPage() {
 						</h2>
 						<div className="space-y-6">
 							{/* First Row: 耳飾 40% + 手串 60% */}
-							<div className="grid gap-6" style={{ gridTemplateColumns: '40% 60%' }}>
+							<div
+								className="grid gap-6"
+								style={{ gridTemplateColumns: "40% 60%" }}
+							>
 								{/* 耳飾 - 40% */}
 								<Link
 									href={`/${locale}/shop/all`}
-							onClick={() => {
-								if (typeof window !== 'undefined') {
-									sessionStorage.setItem('selectedCategory', 'earring');
-								}
-							}}
+									onClick={() => {
+										if (typeof window !== "undefined") {
+											sessionStorage.setItem(
+												"selectedCategory",
+												"earring",
+											);
+										}
+									}}
 									className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-white block"
 								>
-									<div className="relative w-full" style={{ aspectRatio: '814 / 578' }}>
+									<div
+										className="relative w-full"
+										style={{ aspectRatio: "814 / 578" }}
+									>
 										<Image
 											src="/images/shop-home/earring.png"
-											alt={locale === "zh-CN" ? "耳饰" : "耳飾"}
+											alt={
+												locale === "zh-CN"
+													? "耳饰"
+													: "耳飾"
+											}
 											fill
 											className="object-cover group-hover:scale-105 transition-transform duration-500"
 										/>
@@ -731,17 +892,27 @@ export default function ShopPage() {
 								{/* 手串 - 60% */}
 								<Link
 									href={`/${locale}/shop/all`}
-							onClick={() => {
-								if (typeof window !== 'undefined') {
-									sessionStorage.setItem('selectedCategory', 'bracelet');
-								}
-							}}
+									onClick={() => {
+										if (typeof window !== "undefined") {
+											sessionStorage.setItem(
+												"selectedCategory",
+												"bracelet",
+											);
+										}
+									}}
 									className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-white block"
 								>
-									<div className="relative w-full" style={{ aspectRatio: '1368 / 578' }}>
+									<div
+										className="relative w-full"
+										style={{ aspectRatio: "1368 / 578" }}
+									>
 										<Image
 											src="/images/shop-home/bracelet.png"
-											alt={locale === "zh-CN" ? "手串" : "手串"}
+											alt={
+												locale === "zh-CN"
+													? "手串"
+													: "手串"
+											}
 											fill
 											className="object-cover group-hover:scale-105 transition-transform duration-500"
 										/>
@@ -750,21 +921,34 @@ export default function ShopPage() {
 							</div>
 
 							{/* Second Row: 風水擺件 70% + 戒指 30% */}
-							<div className="grid gap-6" style={{ gridTemplateColumns: '70% 30%' }}>
+							<div
+								className="grid gap-6"
+								style={{ gridTemplateColumns: "70% 30%" }}
+							>
 								{/* 風水擺件 - 70% */}
 								<Link
 									href={`/${locale}/shop/all`}
-							onClick={() => {
-								if (typeof window !== 'undefined') {
-									sessionStorage.setItem('selectedCategory', 'feng-shui');
-								}
-							}}
+									onClick={() => {
+										if (typeof window !== "undefined") {
+											sessionStorage.setItem(
+												"selectedCategory",
+												"feng-shui",
+											);
+										}
+									}}
 									className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-white block"
 								>
-									<div className="relative w-full" style={{ aspectRatio: '1368 / 578' }}>
+									<div
+										className="relative w-full"
+										style={{ aspectRatio: "1368 / 578" }}
+									>
 										<Image
 											src="/images/shop-home/fengshuiproduct.png"
-											alt={locale === "zh-CN" ? "风水摆件" : "風水擺件"}
+											alt={
+												locale === "zh-CN"
+													? "风水摆件"
+													: "風水擺件"
+											}
 											fill
 											className="object-cover group-hover:scale-105 transition-transform duration-500"
 										/>
@@ -774,17 +958,27 @@ export default function ShopPage() {
 								{/* 戒指 - 30% */}
 								<Link
 									href={`/${locale}/shop/all`}
-							onClick={() => {
-								if (typeof window !== 'undefined') {
-									sessionStorage.setItem('selectedCategory', 'ring');
-								}
-							}}
+									onClick={() => {
+										if (typeof window !== "undefined") {
+											sessionStorage.setItem(
+												"selectedCategory",
+												"ring",
+											);
+										}
+									}}
 									className="relative group cursor-pointer overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-white block"
 								>
-									<div className="relative w-full" style={{ aspectRatio: '814 / 578' }}>
+									<div
+										className="relative w-full"
+										style={{ aspectRatio: "814 / 578" }}
+									>
 										<Image
 											src="/images/shop-home/ring.png"
-											alt={locale === "zh-CN" ? "戒指" : "戒指"}
+											alt={
+												locale === "zh-CN"
+													? "戒指"
+													: "戒指"
+											}
 											fill
 											className="object-cover group-hover:scale-105 transition-transform duration-500"
 										/>
@@ -807,7 +1001,9 @@ export default function ShopPage() {
 							<button
 								onClick={() =>
 									setCurrentReview((prev) =>
-										prev === 0 ? reviews.length - 1 : prev - 1
+										prev === 0
+											? reviews.length - 1
+											: prev - 1,
 									)
 								}
 								className="w-10 h-10 rounded-full bg-white border-2 border-[#8B7355] flex items-center justify-center hover:bg-[#8B7355] hover:text-white transition-all"
@@ -817,7 +1013,9 @@ export default function ShopPage() {
 							<button
 								onClick={() =>
 									setCurrentReview((prev) =>
-										prev === reviews.length - 1 ? 0 : prev + 1
+										prev === reviews.length - 1
+											? 0
+											: prev + 1,
 									)
 								}
 								className="w-10 h-10 rounded-full bg-white border-2 border-[#8B7355] flex items-center justify-center hover:bg-[#8B7355] hover:text-white transition-all"
@@ -828,19 +1026,32 @@ export default function ShopPage() {
 					</div>
 					<div className="relative overflow-visible">
 						{/* Review Cards */}
-						<div
-							className="flex transition-all duration-500 ease-in-out gap-6 justify-center items-center"
-						>
+						<div className="flex transition-all duration-500 ease-in-out gap-6 justify-center items-center">
 							{reviews.map((review, index) => {
 								// Calculate positions relative to current review
 								const isActive = index === currentReview;
-								const isPrev = index === (currentReview - 1 + reviews.length) % reviews.length;
-								const isNext = index === (currentReview + 1) % reviews.length;
-								const isPrev2 = index === (currentReview - 2 + reviews.length) % reviews.length;
-								const isNext2 = index === (currentReview + 2) % reviews.length;
-								
-								const isVisible = isActive || isPrev || isNext || isPrev2 || isNext2;
-								
+								const isPrev =
+									index ===
+									(currentReview - 1 + reviews.length) %
+										reviews.length;
+								const isNext =
+									index ===
+									(currentReview + 1) % reviews.length;
+								const isPrev2 =
+									index ===
+									(currentReview - 2 + reviews.length) %
+										reviews.length;
+								const isNext2 =
+									index ===
+									(currentReview + 2) % reviews.length;
+
+								const isVisible =
+									isActive ||
+									isPrev ||
+									isNext ||
+									isPrev2 ||
+									isNext2;
+
 								if (!isVisible) return null;
 
 								return (
@@ -865,7 +1076,9 @@ export default function ShopPage() {
 												</p>
 												{review.verified && (
 													<div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
-														<span className="text-white text-xs">✓</span>
+														<span className="text-white text-xs">
+															✓
+														</span>
 													</div>
 												)}
 											</div>
@@ -890,18 +1103,28 @@ export default function ShopPage() {
 							<div className="flex flex-col md:flex-row items-center justify-between gap-8">
 								<div className="text-white">
 									<h2 className="text-2xl md:text-3xl font-bold">
-										{locale === "zh-CN" ? "随时了解" : "隨時了解"}
+										{locale === "zh-CN"
+											? "随时了解"
+											: "隨時了解"}
 									</h2>
 									<h2 className="text-2xl md:text-3xl font-bold">
-										{locale === "zh-CN" ? "我们的最新优惠" : "我們的最新優惠"}
+										{locale === "zh-CN"
+											? "我们的最新优惠"
+											: "我們的最新優惠"}
 									</h2>
 								</div>
 								<div className="flex flex-col gap-3 w-full md:w-auto md:min-w-[400px]">
 									<Input
 										type="email"
-										placeholder={locale === "zh-CN" ? "输入您的电邮地址" : "輸入您的電郵地址"}
+										placeholder={
+											locale === "zh-CN"
+												? "输入您的电邮地址"
+												: "輸入您的電郵地址"
+										}
 										value={email}
-										onChange={(e) => setEmail(e.target.value)}
+										onChange={(e) =>
+											setEmail(e.target.value)
+										}
 										className="bg-white rounded-full px-6 py-4 text-gray-800"
 									/>
 									<Button
@@ -909,7 +1132,9 @@ export default function ShopPage() {
 										size="lg"
 										className="bg-white text-gray-800 hover:bg-gray-100 rounded-full px-8 py-4 font-bold"
 									>
-										{locale === "zh-CN" ? "订阅我们" : "訂閱我們"}
+										{locale === "zh-CN"
+											? "订阅我们"
+											: "訂閱我們"}
 									</Button>
 								</div>
 							</div>

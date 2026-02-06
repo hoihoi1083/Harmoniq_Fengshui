@@ -111,7 +111,7 @@ const ShopFeatureBanner = ({
 				</div>
 			</div>
 			<div className="relative overflow-hidden rounded-[28px] md:rounded-[36px] ">
-				<div className="grid grid-cols-1 md:grid-cols-[0.7fr_0.3fr] items-stretch justify-between">
+				<div className="grid grid-cols-1 md:grid-cols-[0.7fr_0.3fr] items-stretch justify-between mb-20">
 					<div className="flex flex-col items-center justify-center w-full gap-8 px-1 py-8 md:flex-col md:items-end md:justify-center md:py-10">
 						<div className="flex flex-row items-start gap-6">
 							<div className="flex flex-col items-start gap-1">

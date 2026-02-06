@@ -46,13 +46,13 @@ export default function ServiceDemoTags() {
 		{
 			id: "relationship",
 			name: t("tags.relationship.name"),
-			image: getImagePath("couple.png"),
+			image: getImagePath("relationship.png"),
 			description: t("tags.relationship.description"),
 		},
 		{
 			id: "couple",
 			name: t("tags.couple.name"),
-			image: getImagePath("couple2.png"),
+			image: getImagePath("couple.png"),
 			description: t("tags.couple.description"),
 		},
 		{
@@ -95,7 +95,7 @@ export default function ServiceDemoTags() {
 			} else if (direction === "right" && currentScroll < maxScroll) {
 				container.scrollLeft = Math.min(
 					maxScroll,
-					currentScroll + scrollSpeed
+					currentScroll + scrollSpeed,
 				);
 				autoScrollRef.current = requestAnimationFrame(scroll);
 			} else {
@@ -219,10 +219,10 @@ export default function ServiceDemoTags() {
 	};
 
 	return (
-		<div className="mb-8 overflow-hidden sm:mb-10 md:mb-12 lg:mb-14 xl:mb-16">
+		<div className="mb-5">
 			<div
 				ref={scrollContainerRef}
-				className="flex pb-3 pl-5 space-x-4 overflow-x-auto sm:pb-4 sm:space-x-6 scrollbar-hide sm:pl-10 md:pl-20 lg:pl-25"
+				className="flex px-3 py-4 pb-3 space-x-6 overflow-x-auto sm:pb-4 sm:space-x-8 scrollbar-hide"
 				style={{
 					scrollbarWidth: "none",
 					msOverflowStyle: "none",
@@ -245,14 +245,14 @@ export default function ServiceDemoTags() {
 				{tags.map((tag) => (
 					<div key={tag.id} className="relative flex-shrink-0 group">
 						<div
-							className="relative overflow-hidden transition-transform duration-300 cursor-pointer hover:scale-105"
+							className="relative transition-transform duration-300 rounded-lg cursor-pointer hover:scale-103"
 							onClick={(e) => handleImageClick(e, tag.id)}
 							style={{ userSelect: "none" }}
 						>
 							<img
 								src={tag.image}
 								alt={tag.name}
-								className="object-cover h-56 w-44 sm:w-48 sm:h-60 md:w-56 md:h-72 lg:w-60 lg:h-75"
+								className="object-cover w-40 h-30 sm:w-48 sm:h-36 md:w-56 md:h-42 lg:w-70 lg:h-50"
 								draggable={false}
 							/>
 						</div>

@@ -80,16 +80,17 @@ const ServiceSection = () => {
 
 	return (
 		<section
-			className={`w-full py-8 md:py-16 bg-[#EFEFEF] rounded-t-[40px] md:rounded-t-[80px] relative z-10 `}
+			className={`w-full py-16 bg-[#EFEFEF] rounded-t-[40px] md:rounded-t-[80px] relative z-10 `}
 			style={{
-				backgroundImage: "url(/images/hero/select-bg.png)",
+				backgroundImage:
+					"linear-gradient(to bottom, transparent 93%, rgba(239, 239, 239, 1.0) 100%), url(/images/hero/select-bg.png)",
 				backgroundSize: "cover",
 				backgroundPosition: "top",
 				backgroundRepeat: "no-repeat",
 			}}
 		>
 			{/* Step Component at the top */}
-			<div className="flex justify-center hidden w-full mb-1 md:block md:mb-1">
+			<div className="flex justify-center hidden w-full mb-3 md:block ">
 				<Step steps={steps} />
 			</div>
 
@@ -251,7 +252,7 @@ const ServiceSection = () => {
 				</section>
 
 				{/* Hot Products */}
-				<section className="py-6 md:py-10">
+				<section className="py-20">
 					<h2
 						className="text-2xl md:text-5xl lg:text-5xl font-bold text-center mb-20 text-[#2C2C2C]"
 						style={{
@@ -405,10 +406,10 @@ const ServiceSection = () => {
 					) : null}
 				</section>
 
-				<div className="mt-75">
+				<div className="mt-35">
 					<ShopFeatureBanner />
 				</div>
-				<div className="mt-35">
+				<div className="mt-15">
 					<ServiceDemoTags />
 				</div>
 			</div>

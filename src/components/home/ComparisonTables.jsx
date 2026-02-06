@@ -7,15 +7,16 @@ const ComparisonTables = () => {
 	const locale = useLocale();
 
 	return (
-		<div className="w-full px-4 py-12 md:py-20 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80">
+		<div className="w-full ">
 			{/* Shop Comparison Section */}
 			<section>
 				{/* Title Badge */}
 				<div className="flex items-center justify-start mb-8 md:mb-12">
 					<div
-						className="flex items-center justify-center px-8 py-3 rounded-full md:px-10 md:py-4 bg-[#A4AF3B]"
+						className="flex items-center justify-center  rounded-full md:w-60 md:h-10 bg-[#A4AF3B] flex-shrink-0"
 						style={{
-							fontFamily: "Iowan Old Style, serif",
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						}}
 					>
 						<span className="text-xl font-bold text-white md:text-2xl">
@@ -25,22 +26,17 @@ const ComparisonTables = () => {
 				</div>
 
 				{/* Image Container for Shop Comparison Table */}
-				<div className="w-full bg-[#EFEFEF] rounded-2xl p-6 md:p-8 flex items-center justify-center min-h-[300px] md:min-h-[400px]">
-					<div className="relative w-full h-full">
-						{/* Placeholder - User will add image later */}
-						<div className="flex items-center justify-center w-full h-full">
-							<p className="text-sm text-gray-400 md:text-base">
-								Shop Comparison Table Image
-							</p>
-						</div>
-						{/* Uncomment when image is ready:
+				<div className="flex items-center justify-center w-full mb-20">
+					<div
+						className="relative w-full"
+						style={{ aspectRatio: "3195/1500" }}
+					>
 						<Image
 							src="/images/comparison/shop-comparison.png"
-							alt="Shop Comparison"
+							alt=""
 							fill
 							className="object-contain"
 						/>
-						*/}
 					</div>
 				</div>
 			</section>
@@ -50,9 +46,10 @@ const ComparisonTables = () => {
 				{/* Title Badge */}
 				<div className="flex items-center justify-start mb-8 md:mb-12">
 					<div
-						className="flex items-center justify-center px-8 py-3 rounded-full md:px-10 md:py-4 bg-[#A4AF3B]"
+						className="flex items-center justify-center  rounded-full md:w-60 md:h-10 bg-[#A4AF3B] flex-shrink-0"
 						style={{
-							fontFamily: "Iowan Old Style, serif",
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						}}
 					>
 						<span className="text-xl font-bold text-white md:text-2xl">
@@ -62,22 +59,17 @@ const ComparisonTables = () => {
 				</div>
 
 				{/* Image Container for Report Comparison Table */}
-				<div className="w-full bg-[#EFEFEF] rounded-2xl p-6 md:p-8 flex items-center justify-center ">
-					<div className="relative w-full h-full">
-						{/* Placeholder - User will add image later */}
-						<div className="flex items-center justify-center w-full h-full">
-							<p className="text-sm text-gray-400 md:text-base">
-								Report Comparison Table Image
-							</p>
-						</div>
-						{/* Uncomment when image is ready:
+				<div className="flex items-center justify-center w-full">
+					<div
+						className="relative w-full"
+						style={{ aspectRatio: "3195/1260" }}
+					>
 						<Image
 							src="/images/comparison/report-comparison.png"
-							alt="Report Comparison"
+							alt=""
 							fill
 							className="object-contain"
 						/>
-						*/}
 					</div>
 				</div>
 			</section>

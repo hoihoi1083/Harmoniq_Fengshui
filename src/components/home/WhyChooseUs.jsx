@@ -1,11 +1,10 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 
 const WhyChooseUs = () => {
 	const locale = useLocale();
-	const t = useTranslations("home.whychoose");
 
 	const features = [
 		{
@@ -43,16 +42,17 @@ const WhyChooseUs = () => {
 	];
 
 	return (
-		<section className="relative w-full px-4 py-12 md:py-20 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80 ">
+		<section className="relative w-full px-4 py-12 md:py-20 ">
 			{/* Title Section */}
-			<div className="flex items-center justify-center mb-12 md:mb-16">
+			<div className="flex items-center justify-start mb-12 md:mb-16">
 				<div
-					className="flex items-center justify-center px-8 py-4 rounded-full md:px-12 md:py-6 bg-[#A4AF3B]"
+					className="flex items-center justify-center  rounded-full md:w-60 md:h-10 bg-[#A4AF3B] flex-shrink-0"
 					style={{
-						fontFamily: "Iowan Old Style, serif",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 					}}
 				>
-					<span className="text-2xl font-bold text-white md:text-3xl">
+					<span className="text-2xl font-bold text-white md:text-2xl">
 						{locale === "zh-CN"
 							? "為何選擇我們？"
 							: "為何選擇我們？"}
@@ -68,7 +68,7 @@ const WhyChooseUs = () => {
 						className="flex flex-col items-center h-full text-center"
 					>
 						{/* Icon Container */}
-						<div className="flex items-center justify-center flex-shrink-0 w-20 h-20 mb-4 md:w-24 md:h-24">
+						<div className="flex items-center justify-center flex-shrink-0 w-20 h-20 mb-4 md:w-14 md:h-14">
 							<Image
 								src={feature.icon}
 								alt={feature.title}
@@ -79,12 +79,12 @@ const WhyChooseUs = () => {
 						</div>
 
 						{/* Title */}
-						<h3 className="text-base md:text-lg font-semibold text-[#333333] mb-3">
+						<h3 className="text-base md:text-sm font-semibold text-[#073E31] mb-3">
 							{feature.title}
 						</h3>
 
 						{/* Description */}
-						<p className="text-sm md:text-sm text-[#666666] leading-relaxed">
+						<p className="text-sm md:text-xs w-[80%] text-[#666666] leading-relaxed">
 							{feature.description}
 						</p>
 					</div>
