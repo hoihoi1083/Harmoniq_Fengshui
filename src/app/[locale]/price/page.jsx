@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import FooterV2 from "@/components/home/FooterV2";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,19 @@ import { Button } from "@/components/ui/button";
 
 const PricePage = () => {
 	const locale = useLocale();
+	const router = useRouter();
 	const [email, setEmail] = useState("");
+
+	// Map card IDs to report types
+	const reportTypeMap = {
+		1: "fengshui",
+		2: "life",
+		3: "relationship",
+		4: "couple",
+		5: "wealth",
+		6: "health",
+		7: "career",
+	};
 
 	const handleNewsletterSubmit = () => {
 		// Function to be implemented
@@ -119,8 +132,8 @@ const PricePage = () => {
 			column: "right",
 			image: "/images/price/couple.png",
 			title: locale === "zh-CN" ? "合盤流年測算" : "合盤流年測算",
-			price: "HKD$38",
-			originalPrice: "$68",
+			price: "HKD$88",
+			originalPrice: "$168",
 			features: [
 				locale === "zh-CN" ? "命盤配對分析" : "命盤配對分析",
 				locale === "zh-CN" ? "合盤核心交互" : "合盤核心交互",
@@ -184,12 +197,18 @@ const PricePage = () => {
 	const rightCards = pricingCards.filter((card) => card.column === "right");
 
 	const PricingCard = ({ card }) => (
-		<div className="relative overflow-hidden aspect-[16/9] w-full ">
+		<div
+			className="relative overflow-hidden aspect-[16/9] w-full cursor-pointer group"
+			onClick={() => {
+				const reportType = reportTypeMap[card.id];
+				router.push(`/${locale}/report-preview?type=${reportType}`);
+			}}
+		>
 			<Image
 				src={card.image}
 				alt={card.title}
 				fill
-				className="object-contain"
+				className="object-contain transition-transform group-hover:scale-105"
 				sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
 			/>
 

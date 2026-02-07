@@ -1,7 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import FooterV2 from "@/components/home/FooterV2";
 import { Input } from "@/components/ui/input";
@@ -9,10 +12,99 @@ import { Button } from "@/components/ui/button";
 
 const ReportPreviewPage = () => {
 	const locale = useLocale();
+	const router = useRouter();
+	const { data: session } = useSession();
+	const searchParams = useSearchParams();
+	const reportType = searchParams.get("type") || "fengshui";
+
 	const [email, setEmail] = useState("");
 	const [quantity, setQuantity] = useState(1);
 	const [expandedContent, setExpandedContent] = useState(false);
 	const [selectedRating, setSelectedRating] = useState("最經");
+	const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+	// Carousel scroll state and refs
+	const carouselRef = useRef(null);
+	const autoScrollRef = useRef(null);
+	const [isAutoScrolling, setIsAutoScrolling] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
+	const [dragStart, setDragStart] = useState({ x: 0, scrollLeft: 0 });
+	const [hasDragged, setHasDragged] = useState(false);
+
+	const scrollConfig = {
+		speed: { desktop: 2 },
+		edgeThreshold: 100,
+		smoothness: 1,
+	};
+
+	// Report type configuration with pricing and descriptions
+	const reportConfig = {
+		fengshui: {
+			title: "風水測算報告",
+			price: 188,
+			originalPrice: 388,
+			description:
+				"運用八字與風水結合，分析住宅與辦公環境的磁場能量，提供針對性的改善建議，優化整體運勢。",
+			endpoint: "/api/checkoutSessions/payment3",
+			concernType: "fengshui",
+		},
+		life: {
+			title: "命理測算報告",
+			price: 88,
+			originalPrice: 168,
+			description:
+				"深入分析個人八字命盤，解讀人生軌跡與發展方向，預示未來運勢，提供人生指引。",
+			endpoint: "/api/checkoutSessions/payment4",
+			concernType: "life",
+		},
+		relationship: {
+			title: "感情流年測算",
+			price: 38,
+			originalPrice: 68,
+			description:
+				"針對感情領域的專深分析，洞察感情運勢變化，提供感情建議與催旺方向。",
+			endpoint: "/api/checkoutSessions/payment-fortune-category",
+			concernType: "love",
+		},
+		couple: {
+			title: "合盤流年測算",
+			price: 88,
+			originalPrice: 168,
+			description:
+				"兩人命盤配對分析，深度瞭解彼此性格差異與相處之道，增進感情和諧度。",
+			endpoint: "/api/payment-couple",
+			concernType: "couple",
+		},
+		wealth: {
+			title: "財運流年測算",
+			price: 38,
+			originalPrice: 68,
+			description:
+				"分析財運走勢與偏財機會，預測收入變化，提供理財策略與催旺建議。",
+			endpoint: "/api/checkoutSessions/payment-fortune-category",
+			concernType: "financial",
+		},
+		health: {
+			title: "健康流年測算",
+			price: 38,
+			originalPrice: 68,
+			description:
+				"評估健康狀況與亞健康風險，提供調理建議與預防方向，守護身心健康。",
+			endpoint: "/api/checkoutSessions/payment-fortune-category",
+			concernType: "health",
+		},
+		career: {
+			title: "事業流年測算",
+			price: 88,
+			originalPrice: 168,
+			description:
+				"職業發展趨勢分析，工作機會掌握，事業瓶頸突破，助力職涯成功。",
+			endpoint: "/api/checkoutSessions/payment-fortune-category",
+			concernType: "career",
+		},
+	};
+
+	const currentReport = reportConfig[reportType] || reportConfig.fengshui;
 
 	const handleNewsletterSubmit = () => {
 		// Function to be implemented
@@ -20,6 +112,269 @@ const ReportPreviewPage = () => {
 		setEmail("");
 	};
 
+	// Handle payment - extracted and adapted from page-V1.jsx
+	const handlePayment = useCallback(async () => {
+		// Check if user is logged in
+		if (!session) {
+			console.log("❌ User not logged in, redirecting to login page");
+			router.push(
+				`/${locale}/auth/login?redirect=/report-preview?type=${reportType}`,
+			);
+			return;
+		}
+
+		setIsProcessingPayment(true);
+
+		try {
+			// Get fresh locale from localStorage to ensure consistency
+			const storedRegion = localStorage.getItem("userRegion");
+			const regionToLocaleMap = {
+				china: "zh-CN",
+				hongkong: "zh-TW",
+				taiwan: "zh-TW",
+			};
+			const freshLocale =
+				regionToLocaleMap[storedRegion] || locale || "zh-TW";
+
+			console.log(
+				"💰 Report preview payment - Using locale:",
+				freshLocale,
+				"from region:",
+				storedRegion,
+			);
+
+			// Prepare request body
+			const requestBody = {
+				locale: freshLocale,
+				region: storedRegion,
+			};
+
+			// Add concernType for fortune category endpoint
+			if (
+				currentReport.endpoint ===
+				"/api/checkoutSessions/payment-fortune-category"
+			) {
+				requestBody.concernType = currentReport.concernType;
+			}
+
+			// For couple payment, add couple-specific data
+			if (reportType === "couple") {
+				requestBody.isCoupleAnalysis = true;
+			}
+
+			console.log("Request body:", requestBody);
+
+			// Create checkout session
+			const response = await fetch(currentReport.endpoint, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(requestBody),
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+				console.log("Payment Response:", data);
+
+				// Handle different response structures
+				let checkoutUrl = null;
+				let sessionId = null;
+
+				// Try different response formats
+				if (data.data?.url) {
+					checkoutUrl = data.data.url;
+				} else if (data.url) {
+					checkoutUrl = data.url;
+				} else if (data.sessionId) {
+					sessionId = data.sessionId;
+				} else if (data.data?.id) {
+					sessionId = data.data.id;
+				}
+
+				if (checkoutUrl) {
+					// Redirect to Stripe checkout
+					window.location.href = checkoutUrl;
+				} else if (sessionId) {
+					// Import Stripe and redirect to checkout
+					const stripe = await import("@stripe/stripe-js").then(
+						(mod) =>
+							mod.loadStripe(
+								process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+							),
+					);
+
+					if (stripe) {
+						await stripe.redirectToCheckout({ sessionId });
+					} else {
+						throw new Error("Failed to load Stripe");
+					}
+				} else {
+					console.error(
+						"No checkout URL or session ID found in response:",
+						data,
+					);
+					throw new Error("No checkout information received");
+				}
+			} else {
+				const errorData = await response.json();
+				throw new Error(errorData.error || "Payment error");
+			}
+		} catch (error) {
+			console.error("Payment error:", error);
+			setIsProcessingPayment(false);
+			// You could show an error message to the user here
+		}
+	}, [
+		session,
+		locale,
+		reportType,
+		currentReport.endpoint,
+		currentReport.concernType,
+	]);
+	// Carousel scroll handlers - auto-scroll on mouse proximity and drag
+	const startAutoScroll = useCallback(
+		(direction) => {
+			if (isAutoScrolling) return;
+
+			setIsAutoScrolling(true);
+			const scrollSpeed =
+				scrollConfig.speed.desktop * scrollConfig.smoothness;
+
+			const scroll = () => {
+				if (!carouselRef.current) return;
+
+				const container = carouselRef.current;
+				const currentScroll = container.scrollLeft;
+				const maxScroll = container.scrollWidth - container.clientWidth;
+
+				if (direction === "left" && currentScroll > 0) {
+					container.scrollLeft = Math.max(
+						0,
+						currentScroll - scrollSpeed,
+					);
+					autoScrollRef.current = requestAnimationFrame(scroll);
+				} else if (direction === "right" && currentScroll < maxScroll) {
+					container.scrollLeft = Math.min(
+						maxScroll,
+						currentScroll + scrollSpeed,
+					);
+					autoScrollRef.current = requestAnimationFrame(scroll);
+				} else {
+					stopAutoScroll();
+				}
+			};
+
+			autoScrollRef.current = requestAnimationFrame(scroll);
+		},
+		[isAutoScrolling, scrollConfig.speed.desktop, scrollConfig.smoothness],
+	);
+
+	const stopAutoScroll = useCallback(() => {
+		setIsAutoScrolling(false);
+		if (autoScrollRef.current) {
+			cancelAnimationFrame(autoScrollRef.current);
+			autoScrollRef.current = null;
+		}
+	}, []);
+
+	const handleContainerMouseMove = useCallback(
+		(e) => {
+			if (isDragging) {
+				handleMouseMoveOnDesktop(e);
+			} else {
+				handleMouseMoveForAutoScroll(e);
+			}
+		},
+		[isDragging],
+	);
+
+	const handleMouseMoveForAutoScroll = useCallback(
+		(e) => {
+			if (!carouselRef.current || isDragging) return;
+
+			const container = carouselRef.current;
+			const rect = container.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const containerWidth = rect.width;
+			const edgeThreshold = scrollConfig.edgeThreshold;
+
+			stopAutoScroll();
+
+			if (mouseX < edgeThreshold && container.scrollLeft > 0) {
+				startAutoScroll("left");
+			} else if (mouseX > containerWidth - edgeThreshold) {
+				const maxScroll = container.scrollWidth - container.clientWidth;
+				if (container.scrollLeft < maxScroll) {
+					startAutoScroll("right");
+				}
+			}
+		},
+		[
+			isDragging,
+			scrollConfig.edgeThreshold,
+			stopAutoScroll,
+			startAutoScroll,
+		],
+	);
+
+	const handleCardClick = useCallback(
+		(e, key) => {
+			if (hasDragged) {
+				e.preventDefault();
+				return;
+			}
+
+			router.push(`/${locale}/report-preview?type=${key}`);
+		},
+		[hasDragged, locale, router],
+	);
+
+	const handleMouseDown = useCallback(
+		(e) => {
+			if (!carouselRef.current) return;
+
+			stopAutoScroll();
+
+			setIsDragging(true);
+			setHasDragged(false);
+			setDragStart({
+				x: e.pageX - carouselRef.current.offsetLeft,
+				scrollLeft: carouselRef.current.scrollLeft,
+			});
+		},
+		[stopAutoScroll],
+	);
+
+	const handleMouseMoveOnDesktop = useCallback(
+		(e) => {
+			if (!isDragging || !carouselRef.current) return;
+
+			e.preventDefault();
+			const x = e.pageX - carouselRef.current.offsetLeft;
+			const walk = (x - dragStart.x) * 2;
+
+			if (Math.abs(walk) > 5) {
+				setHasDragged(true);
+			}
+
+			carouselRef.current.scrollLeft = dragStart.scrollLeft - walk;
+		},
+		[isDragging, dragStart.x, dragStart.scrollLeft],
+	);
+
+	const handleMouseUp = useCallback(() => {
+		setIsDragging(false);
+		setTimeout(() => setHasDragged(false), 100);
+	}, []);
+
+	const handleMouseLeave = useCallback(() => {
+		if (!isDragging) {
+			stopAutoScroll();
+		} else if (isDragging) {
+			handleMouseUp();
+		}
+	}, [isDragging, stopAutoScroll, handleMouseUp]);
 	const reviews = [
 		{
 			id: 1,
@@ -43,6 +398,16 @@ const ReportPreviewPage = () => {
 
 	return (
 		<main className="w-full">
+			<style>{`
+				.scrollbar-hide {
+					-ms-overflow-style: none;
+					scrollbar-width: none;
+				}
+				.scrollbar-hide::-webkit-scrollbar {
+					display: none;
+				}
+			`}</style>
+
 			{/* Navbar - Non-sticky */}
 			<div className="[&>nav]:!relative [&>nav]:!top-auto">
 				<Navbar />
@@ -62,9 +427,7 @@ const ReportPreviewPage = () => {
 							</a>
 							<span className="text-gray-400">{">"}</span>
 							<span className="text-gray-900">
-								{locale === "zh-CN"
-									? "命理測算報告預覽"
-									: "命理測算報告預覽"}
+								{currentReport.title}
 							</span>
 						</div>
 					</div>
@@ -99,9 +462,7 @@ const ReportPreviewPage = () => {
 								{/* Title and Rating */}
 								<div>
 									<h1 className="text-2xl font-bold text-[#073E31] mb-3">
-										{locale === "zh-CN"
-											? "命理測算報告"
-											: "命理測算報告"}
+										{currentReport.title}
 									</h1>
 									<div className="flex items-center gap-2">
 										<div className="flex text-yellow-400">
@@ -122,24 +483,27 @@ const ReportPreviewPage = () => {
 								<div className="space-y-2">
 									<div className="flex items-center gap-3">
 										<span className="text-3xl font-bold text-[#073E31]">
-											HK$88.00
+											HK${currentReport.price}.00
 										</span>
 										<span className="text-lg text-gray-400 line-through">
-											HK$188.00
+											HK${currentReport.originalPrice}.00
 										</span>
 										<span className="px-3 py-1 text-sm font-bold text-red-500 rounded bg-red-50">
-											-54%
+											-
+											{Math.round(
+												((currentReport.originalPrice -
+													currentReport.price) /
+													currentReport.originalPrice) *
+													100,
+											)}
+											%
 										</span>
 									</div>
 								</div>
 
 								{/* Description */}
 								<div className="text-sm leading-relaxed text-gray-700">
-									<p>
-										{locale === "zh-CN"
-											? "「金錢流年測算」結合傳統命理與現代符號論分，主要透過個人出生時間（八字、紀農「數字」）盤杞佔卜工具，來推測和分析未來一年（流年）中的財運管勢、擠發機會、財務風險以及應對方向。"
-											: "「金錢流年測算」結合傳統命理與現代符號論分，主要透過個人出生時間（八字、紀農「數字」）盤杞佔卜工具，來推測和分析未來一年（流年）中的財運管勢、擠發機會、財務風險以及應對方向。"}
-									</p>
+									<p>{currentReport.description}</p>
 								</div>
 
 								{/* Expandable Content */}
@@ -202,9 +566,13 @@ const ReportPreviewPage = () => {
 
 								{/* Action Buttons */}
 								<div className="space-y-3">
-									<button className="w-full px-4 py-3 font-semibold text-white transition bg-black rounded-full hover:bg-gray-900">
-										{locale === "zh-CN"
-											? "立即購買"
+									<button
+										onClick={handlePayment}
+										disabled={isProcessingPayment}
+										className="w-full px-4 py-3 font-semibold text-white transition bg-black rounded-full hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+									>
+										{isProcessingPayment
+											? "處理中..."
 											: "立即購買"}
 									</button>
 								</div>
@@ -363,124 +731,90 @@ const ReportPreviewPage = () => {
 						{locale === "zh-CN" ? "更多測算" : "更多測算"}
 					</h2>
 
-					<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-						{/* Card 1 */}
-						<div className="overflow-hidden transition border border-gray-200 rounded-2xl hover:shadow-lg">
-							<div className="relative w-full overflow-hidden bg-gray-100 aspect-square">
-								<Image
-									src="/images/report-preview/fengshui.png"
-									alt="風水運用測算"
-									fill
-									className="object-cover transition hover:scale-105"
-								/>
-							</div>
-							<div className="p-4">
-								<h3 className="font-semibold text-[#073E31] mb-2 text-sm">
-									{locale === "zh-CN"
-										? "風水運用測算"
-										: "風水運用測算"}
-								</h3>
-								<div className="flex items-center gap-2">
-									<span className="text-[#8B9F3A] font-bold">
-										HK$88
-									</span>
-									<span className="text-sm text-gray-400 line-through">
-										HK$368
-									</span>
-									<span className="text-xs font-semibold text-red-500">
-										-76%
-									</span>
-								</div>
-							</div>
-						</div>
+					{/* Scrollable Carousel */}
+					<div className="relative w-full overflow-hidden">
+						<div
+							ref={carouselRef}
+							className="w-full overflow-x-auto scrollbar-hide touch-pan-x"
+							style={{
+								scrollbarWidth: "none",
+								msOverflowStyle: "none",
+								cursor: isDragging ? "grabbing" : "grab",
+							}}
+							onMouseMove={handleContainerMouseMove}
+							onMouseLeave={handleMouseLeave}
+							onMouseDown={handleMouseDown}
+							onMouseUp={handleMouseUp}
+						>
+							<div className="inline-flex gap-6 px-0 pb-4 md:px-4">
+								{Object.entries(reportConfig).map(
+									([key, config]) => {
+										// Skip the current report type
+										if (key === reportType) return null;
 
-						{/* Card 2 */}
-						<div className="overflow-hidden transition border border-gray-200 rounded-2xl hover:shadow-lg">
-							<div className="relative w-full overflow-hidden bg-gray-100 aspect-square">
-								<Image
-									src="/images/report-preview/zodiac.png"
-									alt="生肖運年測算"
-									fill
-									className="object-cover transition hover:scale-105"
-								/>
-							</div>
-							<div className="p-4">
-								<h3 className="font-semibold text-[#073E31] mb-2 text-sm">
-									{locale === "zh-CN"
-										? "生肖運年測算"
-										: "生肖運年測算"}
-								</h3>
-								<div className="flex items-center gap-2">
-									<span className="text-[#8B9F3A] font-bold">
-										HK$88
-									</span>
-									<span className="text-sm text-gray-400 line-through">
-										HK$188
-									</span>
-									<span className="text-xs font-semibold text-red-500">
-										-53%
-									</span>
-								</div>
-							</div>
-						</div>
+										// Calculate discount percentage
+										const discount = Math.round(
+											((config.originalPrice -
+												config.price) /
+												config.originalPrice) *
+												100,
+										);
 
-						{/* Card 3 */}
-						<div className="overflow-hidden transition border border-gray-200 rounded-2xl hover:shadow-lg">
-							<div className="relative w-full overflow-hidden bg-gray-100 aspect-square">
-								<Image
-									src="/images/report-preview/compatibility.png"
-									alt="感情流年測算"
-									fill
-									className="object-cover transition hover:scale-105"
-								/>
-							</div>
-							<div className="p-4">
-								<h3 className="font-semibold text-[#073E31] mb-2 text-sm">
-									{locale === "zh-CN"
-										? "感情流年測算"
-										: "感情流年測算"}
-								</h3>
-								<div className="flex items-center gap-2">
-									<span className="text-[#8B9F3A] font-bold">
-										HK$88
-									</span>
-									<span className="text-sm text-gray-400 line-through">
-										HK$188
-									</span>
-									<span className="text-xs font-semibold text-red-500">
-										-53%
-									</span>
-								</div>
-							</div>
-						</div>
+										// Get image path (using actual images from public/images/report-preview)
+										const imageMap = {
+											fengshui:
+												"/images/report-preview/fengshui.png",
+											life: "/images/report-preview/life.png",
+											relationship:
+												"/images/report-preview/relationship.png",
+											couple: "/images/report-preview/couple.png",
+											wealth: "/images/report-preview/wealth.png",
+											health: "/images/report-preview/health.png",
+											career: "/images/report-preview/career.png",
+										};
 
-						{/* Card 4 */}
-						<div className="overflow-hidden transition border border-gray-200 rounded-2xl hover:shadow-lg">
-							<div className="relative w-full overflow-hidden bg-gray-100 aspect-square">
-								<Image
-									src="/images/report-preview/destiny.png"
-									alt="幸運地年分測算"
-									fill
-									className="object-cover transition hover:scale-105"
-								/>
-							</div>
-							<div className="p-4">
-								<h3 className="font-semibold text-[#073E31] mb-2 text-sm">
-									{locale === "zh-CN"
-										? "幸運地年分測算"
-										: "幸運地年分測算"}
-								</h3>
-								<div className="flex items-center gap-2">
-									<span className="text-[#8B9F3A] font-bold">
-										HK$88
-									</span>
-									<span className="text-sm text-gray-400 line-through">
-										HK$188
-									</span>
-									<span className="text-xs font-semibold text-red-500">
-										-53%
-									</span>
-								</div>
+										return (
+											<div
+												key={key}
+												className="flex-shrink-0 w-64 overflow-hidden transition cursor-pointer"
+												onClick={(e) =>
+													handleCardClick(e, key)
+												}
+											>
+												<div className="relative w-full overflow-hidden aspect-square">
+													<Image
+														src={
+															imageMap[key] ||
+															"/images/report-preview/default.png"
+														}
+														alt={config.title}
+														fill
+														className="object-cover transition hover:scale-110"
+													/>
+												</div>
+												<div className="p-4">
+													<h3 className="font-semibold text-[#073E31] mb-2 text-sm line-clamp-2">
+														{config.title}
+													</h3>
+													<div className="flex items-center gap-2">
+														<span className="text-[#8B9F3A] font-bold text-sm">
+															HK${config.price}
+														</span>
+														<span className="text-xs text-gray-400 line-through">
+															HK$
+															{
+																config.originalPrice
+															}
+														</span>
+														<span className="text-xs font-semibold text-red-500">
+															-{discount}%
+														</span>
+													</div>
+												</div>
+											</div>
+										);
+									},
+								)}
 							</div>
 						</div>
 					</div>
