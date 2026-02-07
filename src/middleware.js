@@ -46,15 +46,15 @@ export default async function middleware(request) {
 		if (hasValidOrigin) {
 			response.headers.set(
 				"Access-Control-Allow-Origin",
-				origin || allowedOrigins[0]
+				origin || allowedOrigins[0],
 			);
 			response.headers.set(
 				"Access-Control-Allow-Methods",
-				"GET, POST, PUT, DELETE, OPTIONS"
+				"GET, POST, PUT, DELETE, OPTIONS",
 			);
 			response.headers.set(
 				"Access-Control-Allow-Headers",
-				"Content-Type, Authorization"
+				"Content-Type, Authorization",
 			);
 		}
 
@@ -72,7 +72,8 @@ export default async function middleware(request) {
 		pathname === "/favicon.ico" ||
 		pathname.includes("/price") || // 添加 price 頁面為公共路由
 		pathname.includes("/customer") || // 允許 customer 頁面
-		pathname.includes("/free"); // 允許 free 頁面
+		pathname.includes("/free") || // 允許 free 頁面
+		pathname.includes("/report-preview"); // 允許 report-preview 頁面
 
 	// Handle internationalization first
 	const response = intlMiddleware(request);
@@ -110,8 +111,8 @@ export default async function middleware(request) {
 		return NextResponse.redirect(
 			new URL(
 				`/${locale}/auth/login?callbackUrl=${request.nextUrl.pathname}`,
-				request.url
-			)
+				request.url,
+			),
 		);
 	}
 	return response;
