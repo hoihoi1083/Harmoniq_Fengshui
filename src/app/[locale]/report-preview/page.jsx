@@ -509,23 +509,19 @@ const ReportPreviewPage = () => {
 								{/* Expandable Content */}
 								<button
 									onClick={() =>
-										setExpandedContent(!expandedContent)
+										(window.location.href = `/demo?category=${reportType}`)
 									}
-									className="flex items-center justify-between w-full px-4 py-3 font-semibold text-white transition bg-black rounded-full hover:bg-gray-900"
+									className="flex items-center justify-center px-4 py-3 font-semibold text-white transition bg-[#7E8A00] rounded-full w-100 hover:bg-gray-900"
 								>
 									<span>
 										{locale === "zh-CN"
 											? "了解詳細報告內容"
 											: "了解詳細報告內容"}
 									</span>
-									<span
-										className={`transform transition ${
-											expandedContent ? "rotate-180" : ""
-										}`}
-									>
-										▼
-									</span>
 								</button>
+
+								{/* Divider Line */}
+								<div className="border-t border-gray-300"></div>
 
 								{/* Word Count */}
 								<div className="flex items-center gap-3 text-sm">
@@ -538,6 +534,8 @@ const ReportPreviewPage = () => {
 											: "約15000字"}
 									</span>
 								</div>
+								{/* Divider Line */}
+								<div className="border-t border-gray-300"></div>
 
 								{/* Quantity Selector */}
 								{/* <div className="flex items-center gap-4">
@@ -569,7 +567,7 @@ const ReportPreviewPage = () => {
 									<button
 										onClick={handlePayment}
 										disabled={isProcessingPayment}
-										className="w-full px-4 py-3 font-semibold text-white transition bg-black rounded-full hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+										className="px-4 py-3 font-semibold text-white transition bg-[#7E8A00] rounded-full w-100 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										{isProcessingPayment
 											? "處理中..."
