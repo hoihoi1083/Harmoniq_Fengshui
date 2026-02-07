@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,10 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { getCurrencySymbol } from "@/utils/regionalPricing";
+import FooterV2 from "@/components/home/FooterV2";
 
 export default function DemoPage() {
 	const t = useTranslations("demoPage");
@@ -25,6 +28,89 @@ export default function DemoPage() {
 	const [showExistingReportDialog, setShowExistingReportDialog] =
 		useState(false);
 	const [couplePreviewType, setCouplePreviewType] = useState("compatibility"); // "compatibility" or "exclusive"
+	// Newsletter email state
+	const [email, setEmail] = useState("");
+
+	// Carousel scroll state and refs
+	const carouselRef = useRef(null);
+	const autoScrollRef = useRef(null);
+	const [isAutoScrolling, setIsAutoScrolling] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
+	const [dragStart, setDragStart] = useState({ x: 0, scrollLeft: 0 });
+	const [hasDragged, setHasDragged] = useState(false);
+
+	const scrollConfig = {
+		speed: { desktop: 2 },
+		edgeThreshold: 100,
+		smoothness: 1,
+	};
+
+	// Report type configuration with pricing and descriptions
+	const reportConfig = {
+		fengshui: {
+			title: "風水測算報告",
+			price: 188,
+			originalPrice: 388,
+			description:
+				"運用八字與風水結合，分析住宅與辦公環境的磁場能量，提供針對性的改善建議，優化整體運勢。",
+			endpoint: "/api/checkoutSessions/payment3",
+			concernType: "fengshui",
+		},
+		life: {
+			title: "命理測算報告",
+			price: 88,
+			originalPrice: 168,
+			description:
+				"深入分析個人八字命盤，解讀人生軌跡與發展方向，預示未來運勢，提供人生指引。",
+			endpoint: "/api/checkoutSessions/payment4",
+			concernType: "life",
+		},
+		relationship: {
+			title: "感情流年測算",
+			price: 38,
+			originalPrice: 68,
+			description:
+				"針對感情領域的專深分析，洞察感情運勢變化，提供感情建議與催旺方向。",
+			endpoint: "/api/checkoutSessions/payment-fortune-category",
+			concernType: "love",
+		},
+		couple: {
+			title: "合盤流年測算",
+			price: 88,
+			originalPrice: 168,
+			description:
+				"兩人命盤配對分析，深度瞭解彼此性格差異與相處之道，增進感情和諧度。",
+			endpoint: "/api/payment-couple",
+			concernType: "couple",
+		},
+		wealth: {
+			title: "財運流年測算",
+			price: 38,
+			originalPrice: 68,
+			description:
+				"分析財運走勢與偏財機會，預測收入變化，提供理財策略與催旺建議。",
+			endpoint: "/api/checkoutSessions/payment-fortune-category",
+			concernType: "financial",
+		},
+		health: {
+			title: "健康流年測算",
+			price: 38,
+			originalPrice: 68,
+			description:
+				"評估健康狀況與亞健康風險，提供調理建議與預防方向，守護身心健康。",
+			endpoint: "/api/checkoutSessions/payment-fortune-category",
+			concernType: "health",
+		},
+		career: {
+			title: "事業流年測算",
+			price: 88,
+			originalPrice: 168,
+			description:
+				"評估事業發展方向，預測機遇與挑戰，提供職業生涯規劃與催旺建議。",
+			endpoint: "/api/checkoutSessions/payment-fortune-category",
+			concernType: "career",
+		},
+	};
 
 	// 🌍 Region detection for dynamic pricing
 	const [currentRegion, setCurrentRegion] = useState("hongkong");
@@ -39,21 +125,10 @@ export default function DemoPage() {
 	useEffect(() => {
 		if (existingReport && activeTag === "fengshui") {
 			console.log(
-				"🧪 TEST: Should show dialog for feng shui with existing report"
+				"🧪 TEST: Should show dialog for feng shui with existing report",
 			);
 		}
 	}, [existingReport, activeTag]);
-	const scrollContainerRef = useRef(null);
-
-	// Helper function to get region-specific demo image
-	const getDemoImagePath = (baseName) => {
-		if (currentRegion === "china") {
-			// For china region, add -china suffix before file extension
-			const nameWithoutExtension = baseName.replace("-demo.png", "");
-			return `/images/demo/${nameWithoutExtension}-demo-china.png`;
-		}
-		return `/images/demo/${baseName}`;
-	};
 
 	// 🌍 Detect region changes for dynamic pricing
 	useEffect(() => {
@@ -64,7 +139,7 @@ export default function DemoPage() {
 				setCurrentRegion(storedRegion);
 				console.log(
 					"🌍 Demo page - Current region updated to:",
-					storedRegion
+					storedRegion,
 				);
 			}
 		};
@@ -108,7 +183,7 @@ export default function DemoPage() {
 
 			console.log(
 				"🔍 Checking for existing reports for user:",
-				session.user.userId
+				session.user.userId,
 			);
 
 			try {
@@ -121,7 +196,7 @@ export default function DemoPage() {
 				console.log("🌐 Current locale:", locale);
 
 				const { status, data } = await get(
-					`/api/reportUserDoc/${session.user.userId}/${locale === "zh-CN" ? "zh" : "tw"}`
+					`/api/reportUserDoc/${session.user.userId}/${locale === "zh-CN" ? "zh" : "tw"}`,
 				);
 
 				console.log("📊 API response - Status:", status, "Data:", data);
@@ -146,73 +221,192 @@ export default function DemoPage() {
 		{
 			id: "fengshui",
 			name: t("tags.fengshui.name"),
-			image: getDemoImagePath("fengshui-demo.png"),
 			description: t("tags.fengshui.description"),
 		},
 		{
 			id: "life",
 			name: t("tags.life.name"),
-			image: getDemoImagePath("life-demo.png"),
 			description: t("tags.life.description"),
 		},
 		{
 			id: "wealth",
 			name: t("tags.wealth.name"),
-			image: getDemoImagePath("wealth-demo.png"),
 			description: t("tags.wealth.description"),
 		},
 		{
 			id: "relationship",
 			name: t("tags.relationship.name"),
-			image: getDemoImagePath("relationship-demo.png"),
 			description: t("tags.relationship.description"),
 		},
 		{
 			id: "couple",
 			name: t("tags.couple.name"),
-			image: getDemoImagePath("couple-demo.png"),
 			description: t("tags.couple.description"),
 		},
 		{
 			id: "health",
 			name: t("tags.health.name"),
-			image: getDemoImagePath("health-demo.png"),
 			description: t("tags.health.description"),
 		},
 		{
 			id: "career",
 			name: t("tags.career.name"),
-			image: getDemoImagePath("career-demo.png"),
 			description: t("tags.career.description"),
 		},
 	];
 
-	// Drag functionality
-	let isDown = false;
-	let startX;
-	let scrollLeft;
+	const activeTagInfo = tags.find((tag) => tag.id === activeTag);
+	const activeTagTitle = activeTagInfo?.name || t("tags.fengshui.name");
 
-	const handleMouseDown = (e) => {
-		isDown = true;
-		startX = e.pageX - scrollContainerRef.current.offsetLeft;
-		scrollLeft = scrollContainerRef.current.scrollLeft;
+	// Newsletter submit handler
+	const handleNewsletterSubmit = () => {
+		console.log("Newsletter subscribed with email:", email);
+		setEmail("");
 	};
 
-	const handleMouseLeave = () => {
-		isDown = false;
-	};
+	// Carousel scroll handlers - auto-scroll on mouse proximity and drag
+	const startAutoScroll = useCallback(
+		(direction) => {
+			if (isAutoScrolling) return;
 
-	const handleMouseUp = () => {
-		isDown = false;
-	};
+			setIsAutoScrolling(true);
+			const scrollSpeed =
+				scrollConfig.speed.desktop * scrollConfig.smoothness;
 
-	const handleMouseMove = (e) => {
-		if (!isDown) return;
-		e.preventDefault();
-		const x = e.pageX - scrollContainerRef.current.offsetLeft;
-		const walk = (x - startX) * 2;
-		scrollContainerRef.current.scrollLeft = scrollLeft - walk;
-	};
+			const scroll = () => {
+				if (!carouselRef.current) return;
+
+				const container = carouselRef.current;
+				const currentScroll = container.scrollLeft;
+				const maxScroll = container.scrollWidth - container.clientWidth;
+
+				if (direction === "left" && currentScroll > 0) {
+					container.scrollLeft = Math.max(
+						0,
+						currentScroll - scrollSpeed,
+					);
+					autoScrollRef.current = requestAnimationFrame(scroll);
+				} else if (direction === "right" && currentScroll < maxScroll) {
+					container.scrollLeft = Math.min(
+						maxScroll,
+						currentScroll + scrollSpeed,
+					);
+					autoScrollRef.current = requestAnimationFrame(scroll);
+				} else {
+					stopAutoScroll();
+				}
+			};
+
+			autoScrollRef.current = requestAnimationFrame(scroll);
+		},
+		[isAutoScrolling, scrollConfig.speed.desktop, scrollConfig.smoothness],
+	);
+
+	const stopAutoScroll = useCallback(() => {
+		setIsAutoScrolling(false);
+		if (autoScrollRef.current) {
+			cancelAnimationFrame(autoScrollRef.current);
+			autoScrollRef.current = null;
+		}
+	}, []);
+
+	const handleContainerMouseMove = useCallback(
+		(e) => {
+			if (isDragging) {
+				handleMouseMoveOnDesktop(e);
+			} else {
+				handleMouseMoveForAutoScroll(e);
+			}
+		},
+		[isDragging],
+	);
+
+	const handleMouseMoveForAutoScroll = useCallback(
+		(e) => {
+			if (!carouselRef.current || isDragging) return;
+
+			const container = carouselRef.current;
+			const rect = container.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const containerWidth = rect.width;
+			const edgeThreshold = scrollConfig.edgeThreshold;
+
+			stopAutoScroll();
+
+			if (mouseX < edgeThreshold && container.scrollLeft > 0) {
+				startAutoScroll("left");
+			} else if (mouseX > containerWidth - edgeThreshold) {
+				const maxScroll = container.scrollWidth - container.clientWidth;
+				if (container.scrollLeft < maxScroll) {
+					startAutoScroll("right");
+				}
+			}
+		},
+		[
+			isDragging,
+			scrollConfig.edgeThreshold,
+			stopAutoScroll,
+			startAutoScroll,
+		],
+	);
+
+	const handleCardClick = useCallback(
+		(e, key) => {
+			if (hasDragged) {
+				e.preventDefault();
+				return;
+			}
+
+			router.push(`/${locale}/demo?category=${key}`);
+		},
+		[hasDragged, locale, router],
+	);
+
+	const handleMouseDown = useCallback(
+		(e) => {
+			if (!carouselRef.current) return;
+
+			stopAutoScroll();
+
+			setIsDragging(true);
+			setHasDragged(false);
+			setDragStart({
+				x: e.pageX - carouselRef.current.offsetLeft,
+				scrollLeft: carouselRef.current.scrollLeft,
+			});
+		},
+		[stopAutoScroll],
+	);
+
+	const handleMouseMoveOnDesktop = useCallback(
+		(e) => {
+			if (!isDragging || !carouselRef.current) return;
+
+			e.preventDefault();
+			const x = e.pageX - carouselRef.current.offsetLeft;
+			const walk = (x - dragStart.x) * 2;
+
+			if (Math.abs(walk) > 5) {
+				setHasDragged(true);
+			}
+
+			carouselRef.current.scrollLeft = dragStart.scrollLeft - walk;
+		},
+		[isDragging, dragStart.x, dragStart.scrollLeft],
+	);
+
+	const handleMouseUp = useCallback(() => {
+		setIsDragging(false);
+		setTimeout(() => setHasDragged(false), 100);
+	}, []);
+
+	const handleMouseLeave = useCallback(() => {
+		if (!isDragging) {
+			stopAutoScroll();
+		} else if (isDragging) {
+			handleMouseUp();
+		}
+	}, [isDragging, stopAutoScroll, handleMouseUp]);
 
 	const getContentForTag = (tagId) => {
 		const content = {
@@ -447,7 +641,7 @@ export default function DemoPage() {
 				"💰 Demo page premium payment - Using fresh locale:",
 				freshLocale,
 				"from stored region:",
-				storedRegion
+				storedRegion,
 			);
 
 			const response = await fetch(endpoint, {
@@ -517,8 +711,8 @@ export default function DemoPage() {
 					const stripe = await import("@stripe/stripe-js").then(
 						(mod) =>
 							mod.loadStripe(
-								process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-							)
+								process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+							),
 					);
 
 					if (stripe) {
@@ -576,7 +770,7 @@ export default function DemoPage() {
 					"💰 Demo page life payment - Using fresh locale:",
 					freshLocale,
 					"from stored region:",
-					storedRegion
+					storedRegion,
 				);
 
 				const response = await fetch("/api/checkoutSessions/payment4", {
@@ -633,7 +827,7 @@ export default function DemoPage() {
 					"💰 Demo page individual payment - Using fresh locale:",
 					freshLocale,
 					"from stored region:",
-					storedRegion
+					storedRegion,
 				);
 
 				const response = await fetch(
@@ -648,7 +842,7 @@ export default function DemoPage() {
 							locale: freshLocale, // 🔥 Fix: Add locale parameter like couple payment
 							region: storedRegion, // Add region parameter for NTD support
 						}),
-					}
+					},
 				);
 
 				if (response.ok) {
@@ -664,8 +858,8 @@ export default function DemoPage() {
 							(mod) =>
 								mod.loadStripe(
 									process.env
-										.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-								)
+										.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+								),
 						);
 
 						if (stripe) {
@@ -678,7 +872,7 @@ export default function DemoPage() {
 					} else {
 						console.error(
 							"No session ID found in demo response:",
-							data
+							data,
 						);
 						throw new Error("No session ID received");
 					}
@@ -759,57 +953,78 @@ export default function DemoPage() {
 			"region",
 			currentRegion,
 			":",
-			pricing
+			pricing,
 		);
 		return pricing;
 	};
 
 	return (
-		<div className="min-h-screen bg-[#EFEFEF]">
+		<div className="min-h-screen bg-white">
 			{/* Navbar */}
-			<Navbar />
+			<div className="[&>nav]:!relative [&>nav]:!top-auto">
+				<Navbar />
+			</div>
 
-			{/* Horizontal Tags Navigation */}
-			<div className="w-[95%] mx-auto px-1 sm:px-2 md:px-4 pt-20 mb-1 md:mb-15">
-				{/* Tags Container with Drag */}
-				<div
-					ref={scrollContainerRef}
-					className="flex px-2 py-6 space-x-2 overflow-x-auto sm:px-4 sm:space-x-3 md:px-12 md:space-x-6 scrollbar-hide cursor-grab active:cursor-grabbing"
-					style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-					onMouseDown={handleMouseDown}
-					onMouseLeave={handleMouseLeave}
-					onMouseUp={handleMouseUp}
-					onMouseMove={handleMouseMove}
-				>
-					{tags.map((tag) => (
-						<div
-							key={tag.id}
-							className={`flex-shrink-0 cursor-pointer transition-all duration-300 ${
-								activeTag === tag.id
-									? "transform scale-105"
-									: "hover:transform hover:scale-110"
-							}`}
-							onClick={() => setActiveTag(tag.id)}
-						>
-							<div className="relative group">
-								{/* Image Container */}
-								<div
-									className={`relative overflow-hidden rounded-xl transition-all duration-300 w-[100px] sm:w-[120px] md:w-[200px] h-[75px] sm:h-[90px] md:h-[150px] ${
-										activeTag === tag.id
-											? " transform -translate-y-2"
-											: " group-hover:transform group-hover:-translate-y-3"
-									}`}
-								>
-									<img
-										src={tag.image}
-										alt={tag.name}
-										className="object-cover object-top w-full h-full transition-transform duration-300 group-hover:scale-110"
-										draggable={false}
-									/>
-								</div>
-							</div>
+			{/* Breadcrumb and Title */}
+			<div className="w-[95%] mx-auto px-1 sm:px-2 md:px-4 pt-6">
+				<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+					<div className="space-y-2">
+						<div className="flex flex-wrap items-center gap-2 mb-10 text-sm text-gray-600">
+							<Link
+								href="/"
+								className="text-gray-900 hover:text-[#8B9F3A]"
+							>
+								{locale === "zh-CN" ? "首頁" : "首頁"}
+							</Link>
+							<span className="text-gray-400">{">"}</span>
+							<Link
+								href="/price"
+								className="text-gray-900 hover:text-[#8B9F3A]"
+							>
+								{locale === "zh-CN" ? "命理測算" : "命理測算"}
+							</Link>
+							<span className="text-gray-400">{">"}</span>
+							<Link
+								href={`/report-preview?type=${activeTag}`}
+								className="text-gray-900 hover:text-[#8B9F3A]"
+							>
+								{locale === "zh-CN" ? "報告預覽" : "報告預覽"}
+							</Link>
+							<span className="text-gray-400">{">"}</span>
+							<span className="text-gray-900">
+								{locale === "zh-CN"
+									? "詳細報告內容"
+									: "詳細報告內容"}
+							</span>
 						</div>
-					))}
+						<h1
+							className="text-4xl font-bold md:text-5xl"
+							style={{
+								fontFamily: "Noto Serif TC, serif",
+								WebkitTextStroke: "1px #073E31",
+							}}
+						>
+							{activeTagTitle}
+						</h1>
+						<div className="flex items-center gap-3 mt-3">
+							<div className="flex text-3xl text-yellow-400 md:text-4xl">
+								{[...Array(4)].map((_, i) => (
+									<span key={i}>★</span>
+								))}
+								<span className="text-gray-400">★</span>
+							</div>
+							<span className="text-lg font-bold text-gray-600 md:text-xl">
+								4.5/5
+							</span>
+						</div>
+					</div>
+					<button
+						onClick={handleDiscountPayment}
+						disabled={isProcessingPayment}
+						className="py-3 font-semibold text-white transition bg-black rounded-full px-30 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						{isProcessingPayment ? t("ui.processing") : "立即購買"}
+					</button>
 				</div>
 			</div>
 
@@ -823,242 +1038,6 @@ export default function DemoPage() {
 						if (content.isSpecial) {
 							return (
 								<div className="space-y-12">
-									{/* Section 1: 流年測算 with buttons - Now showing for all tags including fengshui */}
-									<div className="text-center">
-										<div className="mb-8">
-											<h2
-												className="relative inline-block text-center text-[32px] md:text-[64px] font-extrabold text-[#635D3B] leading-[40px] md:leading-[90px]"
-												style={{
-													fontFamily:
-														"Noto Serif TC,serif",
-													WebkitTextStroke:
-														"1px #635D3B",
-												}}
-											>
-												{content.mainTitle}
-												<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-400 mt-2"></div>
-											</h2>
-										</div>
-										<div className="flex justify-center px-1 space-x-2 sm:space-x-4 md:px-4 md:space-x-10">
-											{/* Overlapping Cards Container */}
-											<div
-												className={`relative flex items-center justify-center w-full max-w-[280px] sm:max-w-sm mb-4 mr-4 sm:mr-8 sm:max-w-md md:max-w-lg lg:max-w-lg md:mb-0 md:mr-20 ${activeTag === "fengshui" ? "pointer-events-none" : ""}`}
-											>
-												{/* Top Card - 限時優惠 (Green Discount) */}
-												<div
-													className="relative z-20 flex items-center w-full h-16 gap-2 px-2 sm:h-20 sm:gap-3 sm:px-3 md:h-28 md:px-7 rounded-xl"
-													style={{
-														background:
-															"linear-gradient(to right, #E8F37A, #A6B41B)",
-														boxShadow:
-															"3px 6px 11.4px rgba(0, 0, 0, 0.25)",
-													}}
-												>
-													<div className="flex flex-col">
-														<div
-															className="px-0 py-1 text-xs sm:text-sm md:text-3xl md:px-3 md:py-2 xl:text-[30px]"
-															style={{
-																fontFamily:
-																	"Noto Serif TC, serif",
-																WebkitTextStroke:
-																	"0.5px #635D3B sm:1.5px #635D3B",
-															}}
-														>
-															{t(
-																"ui.limitedOffer"
-															)}
-														</div>
-														{/* Right Side Button */}
-														<div className="flex items-center mb-1 sm:mb-2">
-															<button
-																className="bg-white text-[#A3B116] px-1 sm:px-4 md:px-10 py-1 rounded-full text-xs sm:text-sm md:text-base font-extrabold hover:bg-gray-100 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-																style={{
-																	background:
-																		"linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-																	boxShadow:
-																		"0 4px 4px rgba(0, 0, 0, 0.25)",
-																	color: "#A1B00E",
-																	fontFamily:
-																		"Noto Sans HK",
-																}}
-																onClick={
-																	handleDiscountPayment
-																}
-																disabled={
-																	isProcessingPayment &&
-																	currentCardType ===
-																		"discount"
-																}
-															>
-																{isProcessingPayment &&
-																currentCardType ===
-																	"discount"
-																	? t(
-																			"ui.processing"
-																		)
-																	: t(
-																			"ui.paymentCalculation"
-																		)}
-															</button>
-														</div>
-													</div>
-
-													{/* Centered Price */}
-													<div className="flex flex-row justify-center flex-1">
-														<span className="relative inline-block">
-															{/* Background stroke layer */}
-															<span
-																className="absolute inset-0 font-noto-sans-hk text-stroke-white"
-																style={{
-																	fontSize:
-																		"clamp(1.5rem, 6vw, 4rem)",
-																	fontWeight:
-																		"900",
-																	WebkitTextFillColor:
-																		"transparent",
-																	WebkitTextStroke:
-																		"8px white", // Slightly thinner for small screens
-																}}
-																aria-hidden="true"
-															>
-																{
-																	getPricing()
-																		.discountPrice
-																}
-															</span>
-															{/* Foreground gradient text */}
-															<span
-																className="relative bg-gradient-to-r from-[#99A800] to-[#5D6600] font-noto-sans-hk bg-clip-text text-transparent"
-																style={{
-																	fontSize:
-																		"clamp(1.5rem, 6vw, 4rem)",
-																	fontWeight:
-																		"900",
-																	backgroundImage:
-																		"linear-gradient(to right, #99A800, #5D6600)",
-																	WebkitBackgroundClip:
-																		"text",
-																}}
-															>
-																{
-																	getPricing()
-																		.discountPrice
-																}
-															</span>
-														</span>
-
-														<div
-															className="text-[8px] sm:text-[10px] text-white md:text-sm font-noto-sans-hk xl:text-base"
-															style={{
-																marginTop:
-																	"auto",
-																marginBottom:
-																	"6px",
-																marginLeft:
-																	"2px",
-																fontWeight:
-																	"bold",
-															}}
-														>
-															{getPricing().unit}
-														</div>
-													</div>
-												</div>
-
-												{/* Bottom Card - 專享版 (White Premium) - Partially Visible */}
-												<div
-													className={`absolute z-10 flex items-center justify-between w-full h-10 px-1 py-1 bg-white border-2 border-gray-300 sm:h-12 sm:px-2 sm:py-2 left-4 sm:left-8 top-15 sm:top-18 md:left-48 md:top-24 md:h-24 md:px-6 md:py-4 rounded-xl ${activeTag === "fengshui" ? "blur-sm" : ""}`}
-													style={{
-														boxShadow:
-															"0 4px 8px rgba(0, 0, 0, 0.25)",
-													}}
-												>
-													<div
-														className="px-1 sm:px-2 py-1 text-sm sm:text-lg md:text-[36px] font-bold text-[#A1A1A1]"
-														style={{
-															fontFamily:
-																"Noto Serif TC, serif",
-															WebkitTextStroke:
-																"0.5px #A1A1A1 sm:1.0px #A1A1A1",
-														}}
-													>
-														{t("ui.premiumVersion")}
-													</div>
-													<div className="flex flex-col items-center">
-														<div
-															className="text-lg font-extrabold text-center sm:text-2xl md:text-4xl xl:text-5xl"
-															style={{
-																fontFamily:
-																	"Noto Sans HK",
-																color: "#A1A1A1",
-															}}
-														>
-															<span
-																style={{
-																	textDecoration:
-																		"line-through",
-																	textDecorationColor:
-																		"#ef4444",
-																	textDecorationThickness:
-																		"2px",
-																}}
-															>
-																{
-																	getPricing()
-																		.originalPrice
-																}
-															</span>
-															<span
-																className="text-[10px] sm:text-xs font-normal md:text-sm xl:text-base"
-																style={{
-																	textDecoration:
-																		"none !important",
-																	textDecorationLine:
-																		"none",
-																}}
-															>
-																{
-																	getPricing()
-																		.unit
-																}
-															</span>
-														</div>
-													</div>
-												</div>
-
-												{/* Coming Soon Overlay for Fengshui */}
-												{activeTag === "fengshui" && (
-													<div className="absolute inset-0 z-30 flex items-center justify-center bg-black/15 backdrop-blur-xs rounded-xl">
-														<div className="bg-gradient-to-r from-[#E8F37A] to-[#A3B116] px-6 py-3 md:px-8 md:py-4 rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
-															<div className="text-center">
-																<div
-																	className="text-xl md:text-2xl font-bold text-[#374A37] mb-1 md:mb-2"
-																	style={{
-																		WebkitTextStroke:
-																			"1px #374A37",
-																	}}
-																>
-																	✨{" "}
-																	{locale ===
-																	"zh-CN"
-																		? "即将推出"
-																		: "即將推出"}{" "}
-																	✨
-																</div>
-																<div className="text-xs md:text-sm text-[#374A37] font-medium">
-																	{locale ===
-																	"zh-CN"
-																		? "敬请期待"
-																		: "敬請期待"}
-																</div>
-															</div>
-														</div>
-													</div>
-												)}
-											</div>
-										</div>
-									</div>
-
 									{/* Section 2: 所需材料 */}
 									<div className="relative text-start">
 										<div className="flex items-center justify-between px-4 mb-8 md:px-0">
@@ -1085,7 +1064,7 @@ export default function DemoPage() {
 												<Image
 													src="/images/風水妹/chart-button.png"
 													alt={t(
-														"ui.paymentCalculation"
+														"ui.paymentCalculation",
 													)}
 													width={250}
 													height={250}
@@ -1111,7 +1090,7 @@ export default function DemoPage() {
 															: "/images/demo/material.png"
 												}
 												alt={t(
-													"sections.materialsNeeded"
+													"sections.materialsNeeded",
 												)}
 												className="h-auto max-w-full md:max-w-[80%] shadow-lg rounded-xl"
 											/>
@@ -1144,7 +1123,7 @@ export default function DemoPage() {
 													<button
 														onClick={() =>
 															setCouplePreviewType(
-																"compatibility"
+																"compatibility",
 															)
 														}
 														className={`px-4 sm:px-10 md:px-18 py-2 sm:py-3 font-bold text-xs sm:text-sm md:text-lg transition-colors duration-300 ${
@@ -1166,13 +1145,13 @@ export default function DemoPage() {
 														}}
 													>
 														{t(
-															"ui.coupleCompatibility"
+															"ui.coupleCompatibility",
 														)}
 													</button>
 													<button
 														onClick={() =>
 															setCouplePreviewType(
-																"exclusive"
+																"exclusive",
 															)
 														}
 														className={`px-4 sm:px-10 md:px-18 py-2 sm:py-3 font-bold text-xs sm:text-sm md:text-lg transition-colors duration-300 ${
@@ -1210,13 +1189,13 @@ export default function DemoPage() {
 															couplePreviewType ===
 															"compatibility"
 																? t(
-																		"ui.coupleCompatibilityReport"
+																		"ui.coupleCompatibilityReport",
 																	)
 																: t(
-																		"ui.exclusivePlanReport"
+																		"ui.exclusivePlanReport",
 																	)
 														}
-														className="h-auto max-w-[70%]"
+														className="h-auto max-w-[100%]"
 													/>
 												</div>
 											</div>
@@ -1228,7 +1207,7 @@ export default function DemoPage() {
 													<button
 														onClick={() =>
 															setCouplePreviewType(
-																"compatibility"
+																"compatibility",
 															)
 														}
 														className={`px-4 sm:px-10 md:px-18 py-2 sm:py-3 font-bold text-xs sm:text-sm md:text-lg transition-colors duration-300 ${
@@ -1250,13 +1229,13 @@ export default function DemoPage() {
 														}}
 													>
 														{t(
-															"content.life.toggleButton1"
+															"content.life.toggleButton1",
 														) || "年運分析"}
 													</button>
 													<button
 														onClick={() =>
 															setCouplePreviewType(
-																"exclusive"
+																"exclusive",
 															)
 														}
 														className={`px-4 sm:px-10 md:px-18 py-2 sm:py-3 font-bold text-xs sm:text-sm md:text-lg transition-colors duration-300 ${
@@ -1278,7 +1257,7 @@ export default function DemoPage() {
 														}}
 													>
 														{t(
-															"content.life.toggleButton2"
+															"content.life.toggleButton2",
 														) || "命格詳解"}
 													</button>
 												</div>
@@ -1296,15 +1275,15 @@ export default function DemoPage() {
 															couplePreviewType ===
 															"compatibility"
 																? t(
-																		"content.life.previewAlt1"
+																		"content.life.previewAlt1",
 																	) ||
 																	"年運分析報告"
 																: t(
-																		"content.life.previewAlt2"
+																		"content.life.previewAlt2",
 																	) ||
 																	"命格詳解報告"
 														}
-														className="h-auto max-w-[70%]"
+														className="h-auto max-w-[100%]"
 													/>
 												</div>
 											</div>
@@ -1314,7 +1293,7 @@ export default function DemoPage() {
 												<img
 													src={content.previewImage}
 													alt={content.previewTitle}
-													className="h-auto max-w-[70%] "
+													className="h-auto max-w-[100%] "
 												/>
 											</div>
 										)}
@@ -1366,6 +1345,10 @@ export default function DemoPage() {
 
 			{/* Add custom CSS for hiding scrollbar and 3D flip animation */}
 			<style jsx>{`
+				.scrollbar-hide {
+					-ms-overflow-style: none;
+					scrollbar-width: none;
+				}
 				.scrollbar-hide::-webkit-scrollbar {
 					display: none;
 				}
@@ -1451,8 +1434,149 @@ export default function DemoPage() {
 				}
 			`}</style>
 
+			{/* More Calculations Section */}
+			<section className="relative w-full px-4 py-12 bg-white">
+				<div className="container mx-auto">
+					{/* Scrollable Carousel */}
+					<div className="relative w-full overflow-hidden">
+						<div
+							ref={carouselRef}
+							className="w-full overflow-x-auto scrollbar-hide touch-pan-x"
+							style={{
+								scrollbarWidth: "none",
+								msOverflowStyle: "none",
+								cursor: isDragging ? "grabbing" : "grab",
+							}}
+							onMouseMove={handleContainerMouseMove}
+							onMouseLeave={handleMouseLeave}
+							onMouseDown={handleMouseDown}
+							onMouseUp={handleMouseUp}
+						>
+							<div className="inline-flex gap-6 px-0 pb-4 md:px-4">
+								{Object.entries(reportConfig).map(
+									([key, config]) => {
+										// Skip the current report type
+										if (key === activeTag) return null;
+
+										// Calculate discount percentage
+										const discount = Math.round(
+											((config.originalPrice -
+												config.price) /
+												config.originalPrice) *
+												100,
+										);
+
+										// Get image path (using actual images from public/images/report-preview)
+										const imageMap = {
+											fengshui:
+												"/images/report-preview/fengshui.png",
+											life: "/images/report-preview/life.png",
+											relationship:
+												"/images/report-preview/relationship.png",
+											couple: "/images/report-preview/couple.png",
+											wealth: "/images/report-preview/wealth.png",
+											health: "/images/report-preview/health.png",
+											career: "/images/report-preview/career.png",
+										};
+
+										return (
+											<div
+												key={key}
+												className="flex-shrink-0 w-64 overflow-hidden transition cursor-pointer"
+												onClick={(e) =>
+													handleCardClick(e, key)
+												}
+											>
+												<div className="relative w-full overflow-hidden aspect-square">
+													<Image
+														src={
+															imageMap[key] ||
+															"/images/report-preview/default.png"
+														}
+														alt={config.title}
+														fill
+														className="object-cover transition hover:scale-110"
+													/>
+												</div>
+												<div className="p-4">
+													<h3 className="font-semibold text-[#073E31] mb-2 text-sm line-clamp-2">
+														{config.title}
+													</h3>
+													<div className="flex items-center gap-2">
+														<span className="text-[#8B9F3A] font-bold text-sm">
+															HK${config.price}
+														</span>
+														<span className="text-xs text-gray-400 line-through">
+															HK$
+															{
+																config.originalPrice
+															}
+														</span>
+														<span className="text-xs font-semibold text-red-500">
+															-{discount}%
+														</span>
+													</div>
+												</div>
+											</div>
+										);
+									},
+								)}
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			{/* Newsletter Banner - Overlapping Footer */}
+			<div className="relative z-10 -mb-6">
+				<div className="container px-4 mx-auto">
+					<div className="bg-[#8B9F3A] rounded-3xl overflow-hidden max-w-5xl mx-auto">
+						<div className="px-8 py-10 md:px-12">
+							<div className="flex flex-col items-center justify-between gap-8 md:flex-row">
+								<div className="text-white">
+									<h2 className="text-2xl font-bold md:text-3xl">
+										{locale === "zh-CN"
+											? "随时了解"
+											: "隨時了解"}
+									</h2>
+									<h2 className="text-2xl font-bold md:text-3xl">
+										{locale === "zh-CN"
+											? "我们的最新优惠"
+											: "我們的最新優惠"}
+									</h2>
+								</div>
+								<div className="flex flex-col gap-3 w-full md:w-auto md:min-w-[400px]">
+									<Input
+										type="email"
+										placeholder={
+											locale === "zh-CN"
+												? "输入您的电邮地址"
+												: "輸入您的電郵地址"
+										}
+										value={email}
+										onChange={(e) =>
+											setEmail(e.target.value)
+										}
+										className="px-6 py-4 text-gray-800 bg-white rounded-full"
+									/>
+									<Button
+										onClick={handleNewsletterSubmit}
+										size="lg"
+										className="px-8 py-4 font-bold text-gray-800 bg-white rounded-full hover:bg-gray-100"
+									>
+										{locale === "zh-CN"
+											? "订阅我们"
+											: "訂閱我們"}
+									</Button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			{/* Footer */}
-			<Footer />
+			<FooterV2 />
 		</div>
 	);
 }

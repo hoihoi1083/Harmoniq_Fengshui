@@ -208,7 +208,7 @@ const PricePage = () => {
 				src={card.image}
 				alt={card.title}
 				fill
-				className="object-contain transition-transform group-hover:scale-105"
+				className="object-contain "
 				sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
 			/>
 
