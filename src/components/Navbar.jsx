@@ -160,7 +160,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 									alt="HarmoniQ Logo"
 									width={681}
 									height={132}
-									className="h-8 mx-2 w-auto"
+									className="w-auto h-8 mx-2"
 									style={{
 										filter: "none",
 										backfaceVisibility: "hidden",
@@ -210,7 +210,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 									{t("theory")}
 								</button> */}
 								<div
-									className="px-3 py-1 rounded-full font-noto-sans-hk opacity-50 cursor-not-allowed flex items-center gap-1"
+									className="flex items-center gap-1 px-3 py-1 rounded-full opacity-50 cursor-not-allowed font-noto-sans-hk"
 									style={{
 										color: navTextColor,
 									}}
@@ -350,7 +350,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 							{t("smartChat")}
 						</Link>
 						<div
-							className="block px-4 py-2 text-gray-400 cursor-not-allowed flex items-center justify-between"
+							className="flex items-center justify-between block px-4 py-2 text-gray-400 cursor-not-allowed"
 							style={{ fontFamily: "Noto Serif TC, serif" }}
 						>
 							{t("shop")}

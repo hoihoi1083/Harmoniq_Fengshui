@@ -13,111 +13,117 @@ const FooterV2 = () => {
 	};
 
 	return (
-		<footer className="bg-[#2C2C2C] w-full text-white pt-24 pb-8 rounded-t-[60px]">
-			<div className="container px-4 py-12 mx-auto">
-				{/* Top Section */}
-				<div className="flex flex-col items-start justify-between gap-8 mb-12 md:flex-row">
-					{/* Left Side - Logo and Links */}
-					<div className="flex flex-col items-start gap-12 md:flex-row">
-						<div>
-							<div className="mb-6">
-								<Image
-									src="/images/logo/logo-desktop.png"
-									alt="HarmoniQ Logo"
-									width={681}
-									height={132}
-									className="w-auto h-8"
-									style={{
-										filter: "brightness(0) invert(1)",
-									}}
-									quality={100}
-								/>
-							</div>
-							<div className="flex gap-6 text-white">
-								<a
-									href={`/${locale}/about`}
-									className="hover:text-[#8B9F3A] transition-colors"
-								>
-									{locale === "zh-CN"
-										? "关于我们"
-										: "關於我們"}
-								</a>
-								<a
-									href={`/${locale}/privacy`}
-									className="hover:text-[#8B9F3A] transition-colors"
-								>
-									{locale === "zh-CN"
-										? "隐私政策"
-										: "隱私政策"}
-								</a>
-								<a
-									href={`/${locale}/terms`}
-									className="hover:text-[#8B9F3A] transition-colors"
-								>
-									{locale === "zh-CN"
-										? "用户条款"
-										: "用戶條款"}
-								</a>
-							</div>
-							<div className="flex gap-4 mt-6">
-								<a
-									href="https://facebook.com"
-									target="_blank"
-									rel="noopener noreferrer"
-									className="transition-opacity hover:opacity-80"
-								>
-									<Image
-										src="/images/footer/Facebook.png"
-										alt="Facebook"
-										width={40}
-										height={40}
-										className="w-10 h-10"
-									/>
-								</a>
-								<a
-									href="https://instagram.com"
-									target="_blank"
-									rel="noopener noreferrer"
-									className="transition-opacity hover:opacity-80"
-								>
-									<Image
-										src="/images/footer/Instagram.png"
-										alt="Instagram"
-										width={40}
-										height={40}
-										className="w-10 h-10"
-									/>
-								</a>
-							</div>
-						</div>
+		<footer className="bg-[#1C1F26] w-full text-white pt-10 pb-10 rounded-t-[60px]">
+			<div className="container px-24 py-5 mx-auto">
+				{/* Top Row: Logo, Links, Socials */}
+				<div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+					<div className="flex items-center gap-8">
+						<Image
+							src="/images/logo/logo-desktop.png"
+							alt="HarmoniQ Logo"
+							width={681}
+							height={132}
+							className="w-auto h-8"
+							quality={100}
+						/>
+						<nav className="items-center hidden gap-8 text-sm text-white/90 md:flex">
+							<a
+								href={`/${locale}/about`}
+								className="hover:text-[#8B9F3A] transition-colors"
+							>
+								{locale === "zh-CN" ? "关于我们" : "關於我們"}
+							</a>
+							<a
+								href={`/${locale}/privacy`}
+								className="hover:text-[#8B9F3A] transition-colors"
+							>
+								{locale === "zh-CN" ? "隐私政策" : "隱私政策"}
+							</a>
+							<a
+								href={`/${locale}/terms`}
+								className="hover:text-[#8B9F3A] transition-colors"
+							>
+								{locale === "zh-CN" ? "用户条款" : "用戶條款"}
+							</a>
+							<a
+								href={`/${locale}/refunds`}
+								className="hover:text-[#8B9F3A] transition-colors"
+							>
+								{locale === "zh-CN"
+									? "退换货政策"
+									: "退換貨政策"}
+							</a>
+						</nav>
 					</div>
+					<div className="flex items-center gap-4">
+						<a
+							href="https://facebook.com"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="transition-opacity hover:opacity-80"
+						>
+							<Image
+								src="/images/footer/Facebook.png"
+								alt="Facebook"
+								width={40}
+								height={40}
+								className="w-9 h-9"
+							/>
+						</a>
+						<a
+							href="https://instagram.com"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="transition-opacity hover:opacity-80"
+						>
+							<Image
+								src="/images/footer/Instagram.png"
+								alt="Instagram"
+								width={40}
+								height={40}
+								className="w-9 h-9"
+							/>
+						</a>
+						<a
+							href="https://www.threads.net"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="transition-opacity hover:opacity-80"
+						>
+							<Image
+								src="/images/footer/Threads.png"
+								alt="Threads"
+								width={40}
+								height={40}
+								className="w-9 h-9"
+							/>
+						</a>
+					</div>
+				</div>
 
-					{/* Right Side - Contact Form */}
-					<div className="w-full md:w-auto">
-						<div className="inline-block bg-[#8B9F3A] text-[#2C2C2C] px-4 py-2 rounded-full font-bold mb-4">
+				{/* Contact Row */}
+				<div className="flex flex-col items-start gap-6 mt-12 lg:flex-row lg:items-center lg:justify-between">
+					<div>
+						<div className="inline-block bg-[#9AA620] text-[#1C1F26] px-4 py-1.5 rounded-lg font-semibold text-sm mb-4">
 							{locale === "zh-CN" ? "联系我们：" : "聯絡我們："}
 						</div>
-						<div className="mb-6 space-y-3">
-							<p className="text-white">
-								{locale === "zh-CN" ? "电邮" : "電郵"}:
-								info@gmail.com
-							</p>
-							<p className="text-white">
-								{locale === "zh-CN" ? "电话" : "電話"}: +852
-								0000 0000
-							</p>
-						</div>
-						<div className="flex gap-3">
+						<p className="text-white/90">
+							{locale === "zh-CN" ? "电邮" : "電郵"}:
+							info@gmail.com
+						</p>
+					</div>
+					<div className="w-full max-w-[560px] rounded-[20px] bg-[#2A2E36] p-4 sm:p-6">
+						<div className="flex flex-col gap-3 sm:flex-row">
 							<Input
 								type="email"
 								placeholder={
 									locale === "zh-CN" ? "您的电邮" : "您的電郵"
 								}
-								className="px-6 py-3 text-white bg-transparent border-2 border-white rounded-full placeholder:text-white/60"
+								className="h-12 px-6 text-white bg-[#2A2E36] border border-white/80 rounded-full placeholder:text-white/70"
 							/>
 							<Button
 								onClick={handleContactSubmit}
-								className="bg-[#8B9F3A] hover:bg-[#6B8E23] text-[#2C2C2C] rounded-full px-8 py-3 font-bold"
+								className="h-12 bg-[#9AA620] hover:bg-[#7E8B1D] text-[#1C1F26] rounded-full px-8 font-semibold"
 							>
 								{locale === "zh-CN" ? "联系我们" : "聯絡我們"}
 							</Button>
@@ -126,16 +132,16 @@ const FooterV2 = () => {
 				</div>
 
 				{/* Bottom Section */}
-				<div className="pt-8 mt-8 border-t border-gray-700">
+				<div className="pt-8 mt-10 border-t border-white/20">
 					<div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-						<p className="text-sm text-gray-400">
+						<p className="text-sm text-white/60">
 							© 2025 HarmoniQ.{" "}
 							{locale === "zh-CN"
 								? "保留所有权利"
 								: "保留所有權利"}
 							.
 						</p>
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-3">
 							{/* Visa */}
 							<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
 								<svg
