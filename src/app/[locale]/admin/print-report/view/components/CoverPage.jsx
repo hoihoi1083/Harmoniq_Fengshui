@@ -243,7 +243,7 @@ export default function CoverPage({ concern, productName }) {
 						width: "2px",
 						flexGrow: 1,
 						backgroundColor: "#000000",
-						margin: "0px 0px 90px 6s0px",
+						margin: "0px 0px 90px 20px",
 					}}
 				/>
 

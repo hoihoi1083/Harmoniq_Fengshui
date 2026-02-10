@@ -108,8 +108,12 @@ ${languageInstruction}，请为用户生成详细的四季运势分析，使用�
 **重要要求：**
 1. **使用白话文解释**，避免过于艰深的专业术语，让一般人都能理解
 2. **季节顺序**：按当前季节开始，依次分析四季（${relevantSeasons.join(" → ")}）
-3. **内容深度**：**每季节120-150字的深度分析，用简单易懂的语言解释五行理论**
-4. **格式标准**：#### **季节名【状态标签】**（月份，五行特性）：详细分析内容
+3. **内容深度**：**每季节包含主要说明、具体建议、简单禁忌的完整分析**
+4. **严格格式标准**：每个季节必须遵循以下结构
+   - 标题行：#### **【季节标签】季节名（月份，五行特性）**
+   - 主要说明：1个段落，100-120字，解释该季节如何影响${concern}
+   - 具体建议部分：以"**具体建议：**"开头，列举3条建议，每条以"- "开头
+   - 简单禁忌部分：以"**简单禁忌：**"开头，列举1条禁忌，以"- "开头
 5. **⚠️ 关注领域限制**：用户关注「${concern}」，**绝对禁止提及其他领域的建议**
    - 如果是「事业」：只谈工作、职场、商业、合作、决策等
    - 如果是「感情」：只谈恋爱、婚姻、人际关系等  
@@ -119,12 +123,29 @@ ${languageInstruction}，请为用户生成详细的四季运势分析，使用�
 6. **生活化解释**：用日常生活的例子来解释五行影响，而不是艰深的命理术语
 
 **分析重点（每季节必须包含，但用白话文表达）：**
-- **季节特性**：用简单语言解释该季节五行的基本特点（如：春天木旺就像树木生长，夏天火旺就像太阳很热）
-- **对身体影响**：用白话解释五行对身体的影响机制（如：金克木就是说秋天的凉意会影响肝脏，因为中医认为肝属木）
+- **季节特性**：用简单语言解释该季节五行的基本特点
 - **对${concern}的影响**：用生活化的语言解释对关注领域的具体影响
-- **时间重点**：提及重要时期但用白话说明（如：「白露之后」改为「9月中旬开始」）
-- **具体建议**：提供3-4个简单易做的生活建议
-- **简单禁忌**：基于五行原理但用白话表达的注意事项
+- **具体建议**：提供3个简短明确的建议，每条建议只用一句话（15-20字以内）
+- **简单禁忌**：提供1个最关键的需要避免的注意事项
+
+**必须的格式化结构（每个季节严格按以下格式）：**
+每个季节的分析必须包含以下部分：
+1. 标题行：#### **【季节标签】季节名（月份，五行特性）**
+2. 主要说明：1个段落，100-120字，解释该季节如何影响${concern}
+3. 具体建议部分：以"**具体建议：**"开头，列举3条简短建议（每条15-20字）
+4. 简单禁忌部分：以"**简单禁忌：**"开头，列举3条禁忌
+
+示例格式（每个季节必须包含这四部分）：
+【当前季节】秋季（申酉戌月，金旺）
+秋季是金气最强的时候，就像秋天收获一样。金代表理性和判断，这个时候特别适合做重要的${concern}决定...
+
+**具体建议：**
+- 整理财务，收回欠款
+- 研究有潜力的投资标的
+- 增加紧急备用金储蓄
+
+**简单禁忌：**
+- 禁忌：最关键的需要避免的事项
 
 **语言要求：**
 - **避免过多专业术语**：如「七杀透干、偏印、财生杀攻身」等艰深词汇
@@ -230,6 +251,9 @@ ${
 			);
 		}
 
+		// Log AI response for debugging
+		console.log("🤖 AI Raw Response (first 500 chars):", aiContent.substring(0, 500));
+
 		// Remove disclaimer text if present
 		aiContent = aiContent.replace(
 			/（以上分析僅基於傳統五行理論，提供生活化建議，實際決策請結合個人情況與專業財務顧問意見。）/g,
@@ -246,6 +270,11 @@ ${
 			concern,
 			currentSeasonName,
 		);
+
+		console.log("📊 Parsed Seasons Count:", parsedContent.seasons.length);
+		parsedContent.seasons.forEach((s, idx) => {
+			console.log(`  Season ${idx + 1}: "${s.name}" - Content length: ${s.content?.length || 0}, Suggestions: ${s.suggestions?.length || 0}, Taboos: ${s.taboos?.length || 0}`);
+		});
 
 		return Response.json({
 			success: true,
@@ -327,82 +356,199 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 		}));
 
 		// Parse content for each season - try multiple formats
-		seasons.forEach((season) => {
+		seasons.forEach((season, seasonIdx) => {
 			let seasonContent = "";
+			let suggestions = [];
+			let taboos = [];
 
 			// Use original season name without time context for parsing
 			const originalSeasonName = season.name.replace(/【[^】]*】/, "");
 
-			// Try different patterns that AI might use
-			const patterns = [
-				// Pattern 1: 【春季（寅卯辰月，木旺）】：
-				new RegExp(
-					`【${originalSeasonName}[^】]*】[：:]?\\s*([\\s\\S]*?)(?=【(?:春季|夏季|秋季|冬季)|####(?:(?:春季|夏季|秋季|冬季))|$)`,
-					"g",
-				),
-				// Pattern 2: **春季（寅卯辰月，木旺）**：
-				new RegExp(
-					`\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=\\*\\*(?:春季|夏季|秋季|冬季)|####\\s*\\*\\*(?:春季|夏季|秋季|冬季)|$)`,
-					"g",
-				),
-				// Pattern 3: #### **春季（寅卯辰月，木旺）**：
-				new RegExp(
-					`####\\s*\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=####\\s*\\*\\*(?:春季|夏季|秋季|冬季)|$)`,
-					"g",
-				),
-				// Pattern 4: 春季（寅卯辰月，木旺）：
-				new RegExp(
-					`${originalSeasonName}（[^）]*）[：:]?\\s*([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)（|####\\s*(?:春季|夏季|秋季|冬季)|$)`,
-					"g",
-				),
-				// Pattern 5: More flexible - season name followed by content (allow ### subsections)
-				new RegExp(
-					`${originalSeasonName}[^\\n]*[：:]([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)【|(?:春季|夏季|秋季|冬季)（|####\\s*(?:春季|夏季|秋季|冬季)|$)`,
-					"g",
-				),
-			];
+			console.log(`\n📍 Parsing season ${seasonIdx + 1}: ${originalSeasonName}`);
 
-			// Try each pattern until we find substantial content
-			for (let pattern of patterns) {
-				pattern.lastIndex = 0; // Reset regex
-				let match;
-				while ((match = pattern.exec(content)) !== null) {
-					if (match[1]) {
-						let rawContent = match[1].trim();
-						// Look for substantial content (more than 50 characters)
-						if (rawContent.length > 50) {
-							seasonContent = rawContent;
-							break;
-						}
-					}
+			// Try to extract full structured content first
+			// Primary pattern: matches 【Season Label】Season Name（months, element） format
+			// Supports both: ### **【】Season**  and  【】Season（）
+			const structuredPattern = new RegExp(
+				`(?:###\\s*)?\\*\\*?【[^】]*】${originalSeasonName}[（(][^）)]*[）)]\\*\\*?\\s*([\\s\\S]*?)(?=###\\s*\\*\\*【|【[^】]*】(?:春季|夏季|秋季|冬季)|####|$)`,
+				"g",
+			);
+
+			let structuredMatch = null;
+			structuredPattern.lastIndex = 0;
+			let match;
+			while ((match = structuredPattern.exec(content)) !== null) {
+				if (match[1]) {
+					structuredMatch = match[1].trim();
+					console.log(`✅ Found structured content (Pattern 1) for ${originalSeasonName}`);
+					break;
 				}
-				if (seasonContent) break;
 			}
 
-			// If still no good content, try more aggressive extraction
-			if (!seasonContent || seasonContent.length < 50) {
-				// Find any occurrence of season name and extract following content
-				const flexiblePatterns = [
+			if (!structuredMatch) {
+				console.log(`❌ No structured content found (Pattern 1) for ${originalSeasonName}, trying Pattern 2...`);
+				// Fallback Pattern 2: Try simpler format with just season name
+				const altPattern = new RegExp(
+					`(?:###|####)?\\s*\\*\\*?【[^】]*】${originalSeasonName}[^\\n]*\\n([\\s\\S]*?)(?=###|####|【|$)`,
+					"g",
+				);
+				altPattern.lastIndex = 0;
+				let altMatch;
+				while ((altMatch = altPattern.exec(content)) !== null) {
+					if (altMatch[1]) {
+						structuredMatch = altMatch[1].trim();
+						console.log(`✅ Found structured content (Pattern 2) for ${originalSeasonName}`);
+						break;
+					}
+				}
+			}
+
+			if (structuredMatch) {
+				// Parse structured content
+				const lines = structuredMatch.split("\n");
+				let mainText = "";
+				let readingMain = true;
+
+				for (let i = 0; i < lines.length; i++) {
+					let line = lines[i].trim();
+					
+					if (line.includes("具体建议") || line.includes("具體建議")) {
+						readingMain = false;
+						// Extract suggestions from lines after this header
+						for (let j = i + 1; j < lines.length; j++) {
+							const suggLine = lines[j].trim();
+							if (
+								suggLine.includes("简单禁忌") ||
+								suggLine.includes("簡單禁忌")
+							) {
+								break;
+							}
+							// Match bullet points (-•*) or numbered lists (1. 2. 3.)
+							if (suggLine) {
+								let cleanSugg = suggLine
+									.replace(/^[-•*·]\s*/, "") // Remove bullet
+									.replace(/^\d+[.。]\s*/, "") // Remove numbering
+									.trim();
+								if (cleanSugg && cleanSugg.length > 2) {
+									suggestions.push(cleanSugg);
+								}
+							}
+						}
+					} else if (
+						line.includes("简单禁忌") ||
+						line.includes("簡單禁忌")
+					) {
+						readingMain = false;
+						// Extract taboos from lines after this header
+						for (let j = i + 1; j < lines.length; j++) {
+							const tabooLine = lines[j].trim();
+							if (tabooLine.startsWith("【") || tabooLine.startsWith("####")) {
+								break;
+							}
+							if (tabooLine) {
+								let cleanTaboo = tabooLine
+									.replace(/^[-•*·]\s*/, "") // Remove bullet
+									.replace(/^\d+[.。]\s*/, "") // Remove numbering
+									.trim();
+								if (cleanTaboo && cleanTaboo.length > 2) {
+									taboos.push(cleanTaboo);
+								}
+							}
+						}
+					}
+
+					if (readingMain && line && !line.startsWith("#")) {
+						mainText += line + " ";
+					}
+				}
+
+				seasonContent = mainText
+					.replace(/【[^】]*】/g, "")
+					.replace(/\*\*/g, "")
+					.replace(/\n/g, " ")
+					.trim();
+				
+				if (seasonContent && suggestions.length > 0) {
+					console.log(`✅ Extracted structured data for ${originalSeasonName}: content=${seasonContent.length}chars, suggestions=${suggestions.length}, taboos=${taboos.length}`);
+				}
+			}
+
+			// Fallback: Try different patterns if structured parsing didn't work
+			if (!seasonContent) {
+				console.log(`\t→ Trying fallback patterns for ${originalSeasonName}...`);
+				const patterns = [
+					// Pattern 1: 【春季（寅卯辰月，木旺）】：
 					new RegExp(
-						`${originalSeasonName}[^\\n]*\\n([\\s\\S]{50,500}?)(?=(?:春季|夏季|秋季|冬季)|$)`,
+						`【${originalSeasonName}[^】]*】[：:]?\\s*([\\s\\S]*?)(?=【(?:春季|夏季|秋季|冬季)|####(?:(?:春季|夏季|秋季|冬季))|$)`,
 						"g",
 					),
+					// Pattern 2: **春季（寅卯辰月，木旺）**：
 					new RegExp(
-						`${originalSeasonName}[^。]*。([\\s\\S]{30,400}?)(?=(?:春季|夏季|秋季|冬季)|$)`,
+						`\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=\\*\\*(?:春季|夏季|秋季|冬季)|####\\s*\\*\\*(?:春季|夏季|秋季|冬季)|$)`,
+						"g",
+					),
+					// Pattern 3: #### **春季（寅卯辰月，木旺）**：
+					new RegExp(
+						`####\\s*\\*\\*${originalSeasonName}[^*]*\\*\\*[：:]?\\s*([\\s\\S]*?)(?=####\\s*\\*\\*(?:春季|夏季|秋季|冬季)|$)`,
+						"g",
+					),
+					// Pattern 4: 春季（寅卯辰月，木旺）：
+					new RegExp(
+						`${originalSeasonName}（[^）]*）[：:]?\\s*([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)（|####\\s*(?:春季|夏季|秋季|冬季)|$)`,
+						"g",
+					),
+					// Pattern 5: More flexible - season name followed by content (allow ### subsections)
+					new RegExp(
+						`${originalSeasonName}[^\\n]*[：:]([\\s\\S]*?)(?=(?:春季|夏季|秋季|冬季)【|(?:春季|夏季|秋季|冬季)（|####\\s*(?:春季|夏季|秋季|冬季)|$)`,
+						"g",
+					),
+					// Pattern 6: SUPER aggressive - just grab anything after season name with 50+ chars
+					new RegExp(
+						`${originalSeasonName}[\\s\\S]{0,100}[\\s\\S]{50,}?(?=(?:春季|夏季|秋季|冬季)|$)`,
 						"g",
 					),
 				];
 
-				for (let pattern of flexiblePatterns) {
-					pattern.lastIndex = 0;
+				// Try each pattern until we find substantial content
+				for (let pattern of patterns) {
+					pattern.lastIndex = 0; // Reset regex
 					let match;
 					while ((match = pattern.exec(content)) !== null) {
-						if (match[1] && match[1].trim().length > 30) {
-							seasonContent = match[1].trim();
+						if (match[1]) {
+							let rawContent = match[1].trim();
+							// Look for substantial content (more than 50 characters)
+							if (rawContent.length > 50) {
+								seasonContent = rawContent;
+								console.log(`\t✓ Fallback pattern found content for ${originalSeasonName}: ${rawContent.substring(0, 60)}...`);
+								break;
+							}
+						} else if (match[0] && match[0].length > 80) {
+							// Fallback: use whole match if capture group is empty
+							seasonContent = match[0].replace(originalSeasonName, "").trim();
+							console.log(`\t✓ Fallback pattern found content (no capture) for ${originalSeasonName}`);
 							break;
 						}
 					}
 					if (seasonContent) break;
+				}
+
+				// FINAL FALLBACK: If still nothing, look for any paragraph with 100+ chars
+				if (!seasonContent) {
+					console.log(`\t→ No patterns matched, trying aggressive text extraction...`);
+					const afterSeason = content.split(originalSeasonName);
+					if (afterSeason.length > 1) {
+						// Take next 500 chars after season name
+						const textAfter = afterSeason[1].substring(0, 500);
+						// Find first paragraph (ends with 。 or ！or ？)
+						const paragraphMatch = textAfter.match(/([^。！？]*[。！？])/);
+						if (paragraphMatch) {
+							seasonContent = paragraphMatch[1]
+								.trim()
+								.substring(0, 200)
+								.trim();
+							console.log(`\t⚠ Using extracted paragraph for ${originalSeasonName}`);
+						}
+					}
 				}
 			}
 
@@ -439,13 +585,20 @@ function parseSeasonContent(content, concern, currentSeasonName = "秋季") {
 				}
 
 				season.content = seasonContent;
+				season.suggestions = suggestions;
+				season.taboos = taboos;
+				console.log(`✨ Using AI content for ${originalSeasonName}`);
 			} else {
 				// Use enhanced fallback content based on concern
-				season.content = getFallbackSeasonContent(
+				console.log(`🔄 Using FALLBACK for ${originalSeasonName} - no structured or flexible content found`);
+				const fallbackContent = getFallbackSeasonContent(
 					originalSeasonName,
 					concern,
 					currentSeasonName,
 				);
+				season.content = fallbackContent.content;
+				season.suggestions = fallbackContent.suggestions;
+				season.taboos = fallbackContent.taboos;
 			}
 		});
 
@@ -465,98 +618,124 @@ function getFallbackSeasonContent(
 	concern,
 	currentSeasonName = "秋季",
 ) {
-	const getSeasonContext = (season) => {
-		if (season === currentSeasonName) {
-			return "【當前季節】";
-		} else {
-			return "【未來參考】";
-		}
-	};
-
-	const fallbacks = {
+	const fallbackData = {
 		財運: {
-			春季: `${getSeasonContext("春季")} 春季是木的能量最強的時候，就像春天樹木開始發芽生長一樣。這個時候最適合學習新技能和建立人脈關係，因為木代表成長和學習。不過要小心的是，木太旺會影響到土（脾胃），所以在投資理財方面要保守一點，不要太衝動。春天的木氣會慢慢生出火氣，讓人想法變多，但也容易變得太樂觀而做出冒險的決定。建議：制定今年的財務目標、多學習理財知識、維持好的工作關係、小心評估新的投資機會。這三個月是為全年打基礎的重要時期。`,
-			夏季: `${getSeasonContext("夏季")} 夏季火的能量最強，就像大太陽很熱一樣，這時候最容易破財！火太旺會讓人情緒激動、容易衝動，很容易因為一時衝動而亂花錢或做錯投資決定。中醫說火克金，金代表錢財，所以夏天是一年中最容易漏財的時候。5-7月期間一定要：嚴格控制開支、絕對不要投機炒股、不要借錢給別人或跟別人合夥、努力保住工作、多存一些緊急備用金。特別是6-7月火氣最旺的時候，更要小心。這段時間保守一點總比後悔好。`,
-			秋季: `${getSeasonContext("秋季")} 秋季金的能量最強，就像秋風涼爽、適合收穫一樣，這是一年中財運最好的時候！金代表收穫和理性思考，這時候頭腦會比較清楚，不容易做錯決定。金克木，可以壓制春夏時期累積的衝動情緒，讓人變得理性。8月開始適合：收回別人欠你的錢、整理投資狀況、尋找穩定的理財方式、談重要的合作案。9月是最好的時機，適合簽合約賺錢。10月要開始為長期做規劃。要好好把握這三個月的黃金時期，為明年的財運打好基礎。`,
-			冬季: `${getSeasonContext("冬季")} 冬季水的能量最強，就像冬天要儲存能量一樣，這是學習理財智慧的好時機。水代表智慧和深度思考，這時候適合冷靜地分析和規劃。水能滅火，可以幫助平復夏天累積的浮躁情緒，讓人重新變得理性。11-1月適合：深入學習投資理財知識、研究市場趨勢、制定明年的財務目標、修復之前因為衝動而搞壞的財務關係。特別是12月最適合做總結和規劃。水有流動的特性，這時候可以調整資產配置。重點是培養理財的智慧和耐心，為明年創造財富做好準備。`,
+			春季: {
+				content: `春季是木的能量最強的時候，就像春天樹木開始發芽生長一樣。這個時候最適合學習新技能和建立人脈關係，因為木代表成長和學習。不過要小心的是，木太旺會影響到土（脾胃），所以在投資理財方面要保守一點。`,
+				suggestions: ["制定財務目標", "學習理財知識", "維持工作關係"],
+				taboos: ["避免衝動投資"],
+			},
+			夏季: {
+				content: `夏季火的能量最強，就像大太陽很熱一樣，這時候最容易破財！火太旺會讓人情緒激動、容易衝動，很容易因為一時衝動而亂花錢或做錯投資決定。中醫說火克金，金代表錢財，所以夏天是一年中最容易漏財的時候。`,
+				suggestions: ["控制開支預算", "增加緊急備用金", "穩定工作收入"],
+				taboos: ["避免衝動消費"],
+			},
+			秋季: {
+				content: `秋季金的能量最強，就像秋風涼爽、適合收穫一樣，這是一年中財運最好的時候！金代表收穫和理性思考，這時候頭腦會比較清楚，不容易做錯決定。金克木，可以壓制春夏時期累積的衝動情緒，讓人變得理性。`,
+				suggestions: ["收回欠款", "整理投資狀況", "尋找穩定理財方式"],
+				taboos: ["謹慎評估新機會"],
+			},
+			冬季: {
+				content: `冬季水的能量最強，就像冬天要儲存能量一樣，這是學習理財智慧的好時機。水代表智慧和深度思考，這時候適合冷靜地分析和規劃。水能滅火，可以幫助平復夏天累積的浮躁情緒，讓人重新變得理性。`,
+				suggestions: ["學習理財知識", "研究市場趨勢", "制定財務目標"],
+				taboos: ["謹慎調整資產配置"],
+			},
 		},
 		健康: {
-			春季: `${getSeasonContext("春季")} 春季木氣旺盛，就像春天萬物生長一樣，這是養肝最好的時候。中醫說肝屬木，春天木的能量強，所以肝臟功能會比較活躍，有助於身體排毒和新陳代謝。不過木太旺可能會影響脾胃（土），所以要注意飲食。春天陽氣上升，容易肝火旺，情緒起伏會比較大。建議：多到戶外運動曬太陽、多吃綠色蔬菜養肝、保持規律作息不要熬夜、學會管理情緒不要太急躁。4月天氣變化大，適合做身體調理。要順應春天向上生長的特性，多活動少坐著，為全年健康打好基礎。`,
-			夏季: `${getSeasonContext("夏季")} 夏季火氣最旺，就像大熱天一樣，對健康是最大的考驗！火太旺會讓心血管系統壓力很大，容易高血壓、心跳快等問題。中醫說火克金，金主肺，所以呼吸系統也容易出問題。火旺還會消耗身體的水分，容易口乾、失眠。一定要：避免在大太陽下曝曬、不要做太激烈的運動、多喝水防止脫水、保持心情平靜不要太激動、規律睡眠不要熬夜、少吃辣的油炸食物。6-7月最熱的時候特別要注意心臟保養。這是一年中最需要小心養生的時期。`,
-			秋季: `${getSeasonContext("秋季")} 秋季金氣當令，就像秋天涼爽乾燥一樣，最適合養肺。中醫說肺屬金，秋天金的能量強，可以幫助修復夏天火熱對肺部造成的傷害。金生水，也開始為冬天的腎臟保養做準備。不過要注意秋燥，皮膚和呼吸道容易乾燥。8月開始適合：吃一些滋潤的食物如梨子、白木耳、多做深呼吸運動強化肺部、注意皮膚保濕、適量進補為冬天做準備。9月是調理肺部的最佳時機。10月要注意保暖。要把握秋天收斂的特性，適度運動但不要太劇烈，為冬天儲存健康能量。`,
-			冬季: `${getSeasonContext("冬季")} 冬季水氣旺盛，就像冬天需要保暖儲存能量一樣，這是養腎的關鍵時期。中醫說腎屬水，冬天水的能量強，腎臟功能會比較活躍。水克火，可以平衡全年火氣對身體的傷害，是修復元氣的最好時機。水生木，也為明年春天做準備。不過要注意保暖，水太寒會影響脾胃。11-1月適合：多吃溫熱的食物如羊肉湯、早睡晚起順應自然、做溫和的運動不要大汗、泡腳保暖。12月是調理腎臟的最佳時期。要順應冬天收藏的特性，多休息少消耗，為明年的健康儲備充足的活力。`,
+			春季: {
+				content: `春季木氣旺盛，就像春天萬物生長一樣，這是養肝最好的時候。中醫說肝屬木，春天木的能量強，所以肝臟功能會比較活躍，有助於身體排毒和新陳代謝。不過木太旺可能會影響脾胃（土），所以要注意飲食。`,
+				suggestions: ["多到戶外運動", "多吃綠色蔬菜", "保持規律作息"],
+				taboos: ["避免過度疲勞"],
+			},
+			夏季: {
+				content: `夏季火氣最旺，就像大熱天一樣，對健康是最大的考驗！火太旺會讓心血管系統壓力很大，容易高血壓、心跳快等問題。中醫說火克金，金主肺，所以呼吸系統也容易出問題。火旺還會消耗身體的水分，容易口乾、失眠。`,
+				suggestions: ["多喝水防脫水", "保持心情平靜", "規律睡眠"],
+				taboos: ["避免在大太陽下曝曬"],
+			},
+			秋季: {
+				content: `秋季金氣當令，就像秋天涼爽乾燥一樣，最適合養肺。中醫說肺屬金，秋天金的能量強，可以幫助修復夏天火熱對肺部造成的傷害。金生水，也開始為冬天的腎臟保養做準備。不過要注意秋燥，皮膚和呼吸道容易乾燥。`,
+				suggestions: ["吃滋潤食物如梨子", "多做深呼吸運動", "注意皮膚保濕"],
+				taboos: ["避免過度乾燥"],
+			},
+			冬季: {
+				content: `冬季水氣旺盛，就像冬天需要保暖儲存能量一樣，這是養腎的關鍵時期。中醫說腎屬水，冬天水的能量強，腎臟功能會比較活躍。水克火，可以平衡全年火氣對身體的傷害，是修復元氣的最好時機。`,
+				suggestions: ["多吃溫熱食物", "早睡晚起", "泡腳保暖"],
+				taboos: ["避免過度疲勞"],
+			},
 		},
 		事業: {
-			春季: `${getSeasonContext("春季")} 春季木氣生發，就像春天植物開始生長一樣，這是學習和發展的好時機。木代表成長和學習，這時候學東西會比較快，也容易得到貴人幫助。木主仁慈，人際關係會比較和諧，適合建立工作上的人脈。不過要注意木旺克土，執行力可能會弱一點，想法很多但要努力去實現。建議：制定今年的職業發展計劃、積極參加訓練課程學習新技能、主動認識同行建立人脈、開始有價值的新專案。4月是把想法變成行動的好時機。要把握春天向上發展的能量，為全年事業打好基礎。`,
-			夏季: `${getSeasonContext("夏季")} 夏季火氣旺盛，就像夏天太熱容易讓人煩躁一樣，在職場上是最危險的時期！火太旺會讓人情緒激動，很容易跟同事或老闆發生衝突，嚴重影響工作關係。火克金，金代表決策力，這時候容易做錯重要決定。火旺還會讓人野心太大，容易因為太急躁而做出錯誤的職業選擇。一定要：控制脾氣避免職場衝突、暫時不要做重大的職業決定、專心把現在的工作做好、維護好現有的人際關係、絕對不要在這時候換工作或創業。6-7月火氣最旺時要特別小心。保持穩定最重要。`,
-			秋季: `${getSeasonContext("秋季")} 秋季金氣當令，就像秋天收穫一樣，這是事業發展的黃金時期！金代表收穫和理性判斷，這時候頭腦清楚，決策能力會大幅提升，是職業突破的最好時機。金克木，可以控制春夏累積的浮躁心情，讓人更專注更有執行力。8月開始適合：總結工作成果爭取老闆認可、積極申請升職加薪、尋找更好的工作機會、展示專業能力。9月是做重要職業決定的最佳時機。10月適合制定長期的職業規劃。要好好把握這個收穫的季節，實現事業上的重要突破。`,
-			冬季: `${getSeasonContext("冬季")} 冬季水氣旺盛，就像冬天需要儲存能量一樣，這是培養職業智慧的關鍵時期。水代表智慧和深度思考，適合學習和規劃。水生木，為明年春天的事業發展做準備。水主流動變化，適合調整職業方向。11-1月適合：深入學習專業知識、關注行業趨勢變化、制定明年的職業目標、養成長期學習的習慣。12月是總結經驗、規劃未來的重要時期。水代表智慧謀略，這時候制定的職業規劃通常比較有遠見。要培養職業智慧和戰略思維，深思熟慮為明年的事業成功做好充分準備。`,
+			春季: {
+				content: `春季木氣生發，就像春天植物開始生長一樣，這是學習和發展的好時機。木代表成長和學習，這時候學東西會比較快，也容易得到貴人幫助。木主仁慈，人際關係會比較和諧，適合建立工作上的人脈。`,
+				suggestions: ["制定職業發展計劃", "學習新技能", "主動建立人脈"],
+				taboos: ["避免執行力弱"],
+			},
+			夏季: {
+				content: `夏季火氣旺盛，就像夏天太熱容易讓人煩躁一樣，在職場上是最危險的時期！火太旺會讓人情緒激動，很容易跟同事或老闆發生衝突，嚴重影響工作關係。火克金，金代表決策力，這時候容易做錯重要決定。`,
+				suggestions: ["控制脾氣避免衝突", "專心做好工作", "維護人際關係"],
+				taboos: ["絕對不要在這時候換工作或創業"],
+			},
+			秋季: {
+				content: `秋季金氣當令，就像秋天收穫一樣，這是事業發展的黃金時期！金代表收穫和理性判斷，這時候頭腦清楚，決策能力會大幅提升，是職業突破的最好時機。金克木，可以控制春夏累積的浮躁心情，讓人更專注更有執行力。`,
+				suggestions: ["總結工作成果", "申請升職加薪", "展示專業能力"],
+				taboos: ["避免過度自信"],
+			},
+			冬季: {
+				content: `冬季水氣旺盛，就像冬天需要儲存能量一樣，這是培養職業智慧的關鍵時期。水代表智慧和深度思考，適合學習和規劃。水生木，為明年春天的事業發展做準備。水主流動變化，適合調整職業方向。`,
+				suggestions: ["深入學習專業", "關注行業趨勢", "制定職業目標"],
+				taboos: ["避免匆促改變"],
+			},
 		},
 		感情: {
-			春季: `${getSeasonContext("春季")} 春季木氣生發，就像春天花開一樣，這是感情萌芽的美好時機。木代表生長和包容，這時候感情容易有新的開始，也容易增進彼此的感情。木主仁愛，會讓人更有愛心和包容心，有助於理解對方。不過要注意木旺克土，感情雖然美好但可能不夠穩定，需要加強感情的基礎。建議：多安排戶外約會活動、真誠地表達自己的想法、一起規劃美好的未來、培養共同的興趣愛好。單身的人容易遇到好的對象，有伴的人感情會升溫。4月適合深入了解對方。要把握春天浪漫的氣氛，讓感情自然成長。`,
-			夏季: `${getSeasonContext("夏季")} 夏季火氣旺盛，就像夏天炎熱一樣，感情容易有劇烈的波動！火太旺會讓人情緒激動，很容易因為小事情吵架，感情關係面臨考驗。火克金，理性思考能力下降，容易做出傷害感情的衝動決定。火旺還會讓人佔有欲和控制欲變強，可能因為嫉妒而破壞和諧。一定要：控制脾氣避免激烈爭吵、給彼此一些冷靜的空間、暫時不要做分手或結婚等重大決定、多看對方的優點、避免在情緒激動時討論敏感話題。6-7月火氣最旺時特別需要情緒管理。這是感情最危險的考驗期。`,
-			秋季: `${getSeasonContext("秋季")} 秋季金氣當令，就像秋天成熟收穫一樣，這是感情深化的好時機。金代表成熟和理性，能夠客觀地看待感情關係，做出明智的感情決定。金克木，可以調節春夏累積的感情波動，讓關係變得穩定成熟。8月開始適合：深入地溝通化解誤會、重新思考感情的未來、考慮訂婚結婚等重要承諾、規劃共同的人生目標。9月是做重要感情決定的最佳時機。10月適合建立穩固的感情基礎。金雖然利於收穫，但要注意不要太冷漠，要保持感情的溫度。把握成熟的秋天，讓感情關係更上一層樓。`,
-			冬季: `${getSeasonContext("冬季")} 冬季水氣旺盛，就像冬天深沉寧靜一樣，這是感情修復和深化的關鍵時期。水代表深情和智慧，能夠包容一切，有助於修復感情創傷和增進理解。水生木，為明年春天感情的新發展做準備。水主變化，適合調整相處的方式。11-1月適合：深夜談心增進理解、分享真實的內心想法、一起修復過去的感情創傷、培養更深的情感連結。12月是總結感情經驗、規劃長期關係的重要時期。水代表智慧和包容，這時候培養的感情深度會影響一輩子。要培養真摯的深情，為明年的感情幸福打好基礎。`,
+			春季: {
+				content: `春季木氣生發，就像春天花開一樣，這是感情萌芽的美好時機。木代表生長和包容，這時候感情容易有新的開始，也容易增進彼此的感情。木主仁愛，會讓人更有愛心和包容心，有助於理解對方。`,
+				suggestions: ["安排戶外約會", "真誠表達想法", "一起規劃未來"],
+				taboos: ["避免感情不穩定"],
+			},
+			夏季: {
+				content: `夏季火氣旺盛，就像夏天炎熱一樣，感情容易有劇烈的波動！火太旺會讓人情緒激動，很容易因為小事情吵架，感情關係面臨考驗。火克金，理性思考能力下降，容易做出傷害感情的衝動決定。`,
+				suggestions: ["控制脾氣避免爭吵", "給彼此冷靜空間", "多看對方優點"],
+				taboos: ["絕對不要在激動時做分手決定"],
+			},
+			秋季: {
+				content: `秋季金氣當令，就像秋天成熟收穫一樣，這是感情深化的好時機。金代表成熟和理性，能夠客觀地看待感情關係，做出明智的感情決定。金克木，可以調節春夏累積的感情波動，讓關係變得穩定成熟。`,
+				suggestions: ["深入溝通化解誤會", "重新思考感情未來", "考慮訂婚結婚"],
+				taboos: ["避免過度理性冷漠"],
+			},
+			冬季: {
+				content: `冬季水氣旺盛，就像冬天深沉寧靜一樣，這是感情修復和深化的關鍵時期。水代表深情和智慧，能夠包容一切，有助於修復感情創傷和增進理解。水生木，為明年春天感情的新發展做準備。`,
+				suggestions: ["深夜談心增進理解", "分享真實想法", "修復感情創傷"],
+				taboos: ["避免過度沉溺"],
+			},
 		},
 	};
 
 	return (
-		fallbacks[concern]?.[seasonName] ||
-		`${seasonName}期間請根據個人情況謹慎分析。`
+		fallbackData[concern]?.[seasonName] || {
+			content: `${seasonName}期間請根據個人情況謹慎分析。`,
+			suggestions: [],
+			taboos: [],
+		}
 	);
 }
 
 function getFallbackSeasonData(concern, currentSeasonName = "秋季") {
-	const seasons = [
-		{
-			name: "春季",
-			period: "寅卯辰月，木旺",
-			icon: "🌸",
-			color: "bg-green-500",
-			content: getFallbackSeasonContent(
-				"春季",
-				concern,
-				currentSeasonName,
-			),
-			keyPoints: ["印星助學", "寅卯辰月", "木旺"],
-		},
-		{
-			name: "夏季",
-			period: "巳午未月，火土極旺",
-			icon: "☀️",
-			color: "bg-red-500",
-			content: getFallbackSeasonContent(
-				"夏季",
-				concern,
-				currentSeasonName,
-			),
-			keyPoints: ["極端防護", "巳午未月", "火旺"],
-		},
-		{
-			name: "秋季",
-			period: "申酉戌月，金旺",
-			icon: "🍂",
-			color: "bg-yellow-500",
-			content: getFallbackSeasonContent(
-				"秋季",
-				concern,
-				currentSeasonName,
-			),
-			keyPoints: ["黃金收穫", "申酉戌月", "金旺"],
-		},
-		{
-			name: "冬季",
-			period: "亥子丑月，水旺",
-			icon: "❄️",
-			color: "bg-blue-500",
-			content: getFallbackSeasonContent(
-				"冬季",
-				concern,
-				currentSeasonName,
-			),
-			keyPoints: ["黃金修復期", "亥子丑月", "水旺"],
-		},
+	const baseSeasonsData = [
+		{ name: "春季", period: "寅卯辰月，木旺" },
+		{ name: "夏季", period: "巳午未月，火土極旺" },
+		{ name: "秋季", period: "申酉戌月，金旺" },
+		{ name: "冬季", period: "亥子丑月，水旺" },
 	];
+
+	const seasons = baseSeasonsData.map((s) => {
+		const fallbackContent = getFallbackSeasonContent(s.name, concern, currentSeasonName);
+		return {
+			name: s.name,
+			period: s.period,
+			content: fallbackContent.content,
+			suggestions: fallbackContent.suggestions,
+			taboos: fallbackContent.taboos,
+		};
+	});
 
 	return {
 		seasons: seasons,

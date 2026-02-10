@@ -427,6 +427,12 @@ function PrintReportView() {
 		}
 	}, [birthday, birthTime, gender, concern, question, locale]);
 
+	// Mark body so global print styles are skipped — print should match screen
+	useEffect(() => {
+		document.body.classList.add("print-report-view");
+		return () => document.body.classList.remove("print-report-view");
+	}, []);
+
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
@@ -619,6 +625,12 @@ function PrintReportView() {
 					.page-break li {
 						color: inherit !important;
 					}
+					/* Page 7 關鍵季節: preserve colored title in print (match browser size + color) */
+					.page-break .page-7-title {
+						-webkit-print-color-adjust: exact !important;
+						print-color-adjust: exact !important;
+						color: var(--page-7-title-color) !important;
+					}
 					/* Page 10 Summary: restore larger title and varied heading sizes so print matches screen */
 					.page-break.page-10-summary h1 {
 						font-size: 6rem !important;
@@ -628,7 +640,7 @@ function PrintReportView() {
 						font-size: 2.25rem !important;
 					}
 					.page-break.page-10-summary h3.text-5xl {
-						font-size: 3rem !important;
+						font-size: 2.25rem !important;
 					}
 					.page-break.page-10-summary h3.text-3xl {
 						font-size: 1.875rem !important;
@@ -734,9 +746,12 @@ function PrintReportView() {
 						margin-bottom: 32px !important;
 					}
 					.page-break.page-7-seasons .page-7-title {
-						font-size: 3rem !important;
+						font-size: 2.25rem !important;
 						margin-top: 0 !important;
 						margin-bottom: 0 !important;
+						-webkit-print-color-adjust: exact !important;
+						print-color-adjust: exact !important;
+						color: var(--page-7-title-color) !important;
 					}
 					/* space-y-10 between season blocks = 40px */
 					.page-break.page-7-seasons .space-y-10 > * + * {

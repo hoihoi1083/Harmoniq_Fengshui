@@ -104,13 +104,18 @@ export default function Page7_Seasons({ data }) {
 	// If we have no parsed seasons, show a placeholder
 	if (!seasons || seasons.length === 0) {
 		return (
-			<div className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden">
+			<div
+				className="page-break bg-white px-12 py-10 h-[297mm] overflow-hidden"
+				style={{ ["--page-7-title-color"]: color }}
+			>
 				<div className="mb-10 text-center">
 					<h1
-						className="mb-3 text-5xl font-bold"
+						className="mb-3 text-5xl font-bold page-7-title"
 						style={{
 							color: color,
 							fontFamily: "Noto Serif TC, serif",
+							WebkitPrintColorAdjust: "exact",
+							printColorAdjust: "exact",
 						}}
 					>
 						關鍵季節
@@ -165,11 +170,15 @@ export default function Page7_Seasons({ data }) {
 	const renderSeasonPage = (seasonsToRender, pageNumber) => (
 		<div
 			className="page-break page-7-seasons bg-white h-[297mm] overflow-hidden w-full"
-			style={{ position: "relative", padding: "15mm 20mm" }}
+			style={{
+				position: "relative",
+				padding: "8mm 20mm",
+				["--page-7-title-color"]: color,
+			}}
 		>
 			{/* Page Header - Title with Date (no border/line) */}
 			<div
-				className="mb-8 page-7-header"
+				className=" page-7-header"
 				style={{ border: "none", outline: "none" }}
 			>
 				<div
@@ -177,7 +186,7 @@ export default function Page7_Seasons({ data }) {
 					style={{ border: "none", outline: "none" }}
 				>
 					<h1
-						className="text-5xl font-bold page-7-title"
+						className="text-4xl font-bold page-7-title"
 						style={{
 							color: color,
 							fontFamily:
@@ -185,6 +194,8 @@ export default function Page7_Seasons({ data }) {
 							border: "none",
 							boxShadow: "none",
 							textDecoration: "none",
+							WebkitPrintColorAdjust: "exact",
+							printColorAdjust: "exact",
 						}}
 					>
 						關鍵季節 {pageNumber === 2 ? "(續)" : ""}
@@ -206,12 +217,12 @@ export default function Page7_Seasons({ data }) {
 					</div>
 				</div>
 			</div>
-			{/* Seasons List */}
-			<div className="space-y-10">
+			{/* Seasons List - All 4 on one page */}
+			<div className="space-y-0">
 				{seasonsToRender.map((season, index) => {
 					const cleanSeasonName = season.name.replace(
 						/【[^】]*】/g,
-						""
+						"",
 					);
 					const isCurrentSeason =
 						cleanSeasonName === currentSeasonName;
@@ -238,22 +249,22 @@ export default function Page7_Seasons({ data }) {
 					return (
 						<div
 							key={index}
-							className="relative avoid-break min-h-[200px]"
+							className="relative avoid-break min-h-[140px]"
 						>
 							{/* Large Background Season Character - Left Side - NO CONTAINER */}
 							<div
 								className="absolute top-0 left-0 flex items-start justify-center"
 								style={{
-									width: "160px",
+									width: "140px",
 									height: "100%",
-									minHeight: "200px",
+									minHeight: "140px",
 								}}
 							>
 								<div
 									className="relative"
 									style={{
-										width: "160px",
-										height: "200px",
+										width: "140px",
+										height: "160px",
 										display: "flex",
 										alignItems: "center",
 										justifyContent: "center",
@@ -262,7 +273,7 @@ export default function Page7_Seasons({ data }) {
 									{/* Large Season Character - Season Color */}
 									<span
 										style={{
-											fontSize: "180px",
+											fontSize: "150px",
 											fontFamily:
 												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 											backgroundImage: `linear-gradient(to bottom, ${seasonStyle.color}, #C5C5C5)`,
@@ -279,9 +290,11 @@ export default function Page7_Seasons({ data }) {
 
 							{/* Content Box - Overlapping Right Side of Character - NO SHADOW, NO BORDER */}
 							<div
-								className="relative px-1 py-6 bg-white rounded-xl"
+								className="relative px-3 py-3 bg-white rounded-lg"
 								style={{
-									marginLeft: "110px",
+									marginLeft: "90px",
+									fontSize: "13px",
+									lineHeight: "1.4",
 								}}
 							>
 								{/* Current Season Indicator - Inside Content Box (print-color-adjust so 現 stays white on red) */}
@@ -290,10 +303,10 @@ export default function Page7_Seasons({ data }) {
 										className="page-7-current-badge"
 										style={{
 											position: "absolute",
-											top: "15px",
-											right: "12px",
-											width: "36px",
-											height: "36px",
+											top: "1px",
+											right: "8px",
+											width: "28px",
+											height: "28px",
 											backgroundColor: "#DC2626",
 											borderRadius: "50%",
 											display: "flex",
@@ -307,7 +320,7 @@ export default function Page7_Seasons({ data }) {
 										<span
 											style={{
 												color: "white",
-												fontSize: "14px",
+												fontSize: "11px",
 												fontWeight: "bold",
 												WebkitPrintColorAdjust: "exact",
 												printColorAdjust: "exact",
@@ -318,17 +331,60 @@ export default function Page7_Seasons({ data }) {
 									</div>
 								)}
 								{/* Season period */}
-								<div className="mb-2">
-									<strong className="mb-2 font-bold text-black text-md">
+								<div className="mb-1">
+									<strong className="font-bold text-black">
 										{season.period || season.badge || ""}
 									</strong>
 								</div>
 								{/* Season Content */}
-								<div className="prose-sm prose max-w-none">
-									<p className="text-sm leading-relaxed text-black whitespace-pre-wrap">
+								<div className="mb-2 prose-sm prose max-w-none">
+									<p className="text-xs leading-relaxed text-black whitespace-pre-wrap">
 										{cleanContent}
 									</p>
 								</div>
+
+								{/* 具體建議 Section */}
+								{season.suggestions &&
+									season.suggestions.length > 0 && (
+										<div className="pt-1 mb-2 border-t border-gray-300">
+											<p className="mb-1 text-xs font-semibold text-black">
+												具體建議：
+											</p>
+											<ul className="text-xs text-black space-y-0.5 pl-3">
+												{season.suggestions
+													.slice(0, 3)
+													.map((sugg, idx) => (
+														<li
+															key={idx}
+															className="list-disc"
+														>
+															{sugg}
+														</li>
+													))}
+											</ul>
+										</div>
+									)}
+
+								{/* 簡單禁忌 Section */}
+								{season.taboos && season.taboos.length > 0 && (
+									<div className="pt-1 border-t border-gray-300">
+										<p className="mb-1 text-xs font-semibold text-black">
+											簡單禁忌：
+										</p>
+										<ul className="text-xs text-black space-y-0.5 pl-3">
+											{season.taboos
+												.slice(0, 3)
+												.map((taboo, idx) => (
+													<li
+														key={idx}
+														className="list-disc"
+													>
+														{taboo}
+													</li>
+												))}
+										</ul>
+									</div>
+								)}
 							</div>
 						</div>
 					);
@@ -358,10 +414,5 @@ export default function Page7_Seasons({ data }) {
 		</div>
 	);
 
-	return (
-		<>
-			{renderSeasonPage(firstPageSeasons, 1)}
-			{renderSeasonPage(secondPageSeasons, 2)}
-		</>
-	);
+	return <>{renderSeasonPage(seasons, 1)}</>;
 }

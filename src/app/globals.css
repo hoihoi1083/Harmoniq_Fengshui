@@ -338,16 +338,21 @@ section#hero * {
 
 /* ===================================
    Print Styles for A4 Paper
+   (Excluded when printing admin print-report so that view matches browser)
    =================================== */
 @media print {
-  /* Page setup for A4 size */
+  /* Page setup for A4 size — only when not on print-report view */
+  body:not(.print-report-view) {
+    /* @page is document-level; print-report view uses its own @page in page.jsx */
+  }
+
   @page {
     size: A4 portrait;
     margin: 5mm 5mm 5mm 5mm;
   }
 
-  /* Basic print styling */
-  body {
+  /* All rules below only apply when NOT on print-report view (print = screen there) */
+  body:not(.print-report-view) {
     background: white !important;
     font-size: 11pt;
     line-height: 1.4;
@@ -356,55 +361,54 @@ section#hero * {
     color-adjust: exact !important;
   }
 
-  /* Hide non-essential elements when printing */
-  nav,
-  footer,
-  .navbar,
-  button:not(.print-visible),
-  [role="navigation"],
-  [data-print-hide] {
+  body:not(.print-report-view) nav,
+  body:not(.print-report-view) footer,
+  body:not(.print-report-view) .navbar,
+  body:not(.print-report-view) button:not(.print-visible),
+  body:not(.print-report-view) [role="navigation"],
+  body:not(.print-report-view) [data-print-hide] {
     display: none !important;
   }
 
-  /* Main container adjustments */
-  .container {
+  body:not(.print-report-view) .container {
     width: 100% !important;
     max-width: none !important;
     padding: 0 5mm !important;
     margin: 0 !important;
   }
 
-  /* Report container specific adjustments */
-  [ref="reportRef"],
-  .mx-auto {
+  body:not(.print-report-view) [ref="reportRef"],
+  body:not(.print-report-view) .mx-auto {
     padding-top: 0 !important;
     margin-top: 0 !important;
   }
 
-  /* Section break control - prevent awkward breaks */
-  .mb-6,
-  .mb-8,
-  [class*="mb-"] {
+  body:not(.print-report-view) .mb-6,
+  body:not(.print-report-view) .mb-8,
+  body:not(.print-report-view) [class*="mb-"] {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  /* Print-specific classes for controlled breaking */
-  .print-no-break {
+  body:not(.print-report-view) .print-no-break {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     margin-bottom: 8pt;
   }
 
-  .print-page-break-before {
+  body:not(.print-report-view) .print-page-break-before {
     page-break-before: always !important;
     break-before: page !important;
     padding-top: 0 !important;
     margin-top: 12pt !important;
   }
 
-  /* Heading styles with proper page break control */
-  h1, h2, h3, h4, h5, h6 {
+  body:not(.print-report-view) h1,
+  body:not(.print-report-view) h2,
+  body:not(.print-report-view) h3,
+  body:not(.print-report-view) h4,
+  body:not(.print-report-view) h5,
+  body:not(.print-report-view) h6 {
     page-break-after: avoid !important;
     break-after: avoid !important;
     page-break-inside: avoid !important;
@@ -415,135 +419,123 @@ section#hero * {
     print-color-adjust: exact !important;
   }
 
-  /* Keep headings with their following content */
-  h1 + *,
-  h2 + *,
-  h3 + * {
+  body:not(.print-report-view) h1 + *,
+  body:not(.print-report-view) h2 + *,
+  body:not(.print-report-view) h3 + * {
     page-break-before: avoid !important;
     break-before: avoid !important;
   }
 
-  /* Large title adjustments for print */
-  h1 {
+  body:not(.print-report-view) h1 {
     font-size: 20pt !important;
     margin-top: 0 !important;
     margin-bottom: 8pt;
     line-height: 1.2 !important;
   }
 
-  h2 {
+  body:not(.print-report-view) h2 {
     font-size: 16pt !important;
   }
 
-  h3 {
+  body:not(.print-report-view) h3 {
     font-size: 14pt !important;
   }
 
-  /* Component sections should stay together when possible */
-  [class*="component"],
-  .report-section,
-  section,
-  article {
+  body:not(.print-report-view) [class*="component"],
+  body:not(.print-report-view) .report-section,
+  body:not(.print-report-view) section,
+  body:not(.print-report-view) article {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     margin-bottom: 12pt;
   }
 
-  /* Cards and boxes - keep content together */
-  [class*="card"],
-  [class*="border"],
-  [class*="shadow"],
-  [class*="rounded"],
-  [class*="bg-"] {
+  body:not(.print-report-view) [class*="card"],
+  body:not(.print-report-view) [class*="border"],
+  body:not(.print-report-view) [class*="shadow"],
+  body:not(.print-report-view) [class*="rounded"],
+  body:not(.print-report-view) [class*="bg-"] {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     box-shadow: none !important;
   }
 
-  /* Preserve background colors for important elements */
-  [class*="bg-purple"],
-  [class*="bg-pink"],
-  [class*="bg-blue"],
-  [class*="bg-green"],
-  [class*="bg-red"],
-  [class*="bg-yellow"],
-  [class*="bg-indigo"] {
+  body:not(.print-report-view) [class*="bg-purple"],
+  body:not(.print-report-view) [class*="bg-pink"],
+  body:not(.print-report-view) [class*="bg-blue"],
+  body:not(.print-report-view) [class*="bg-green"],
+  body:not(.print-report-view) [class*="bg-red"],
+  body:not(.print-report-view) [class*="bg-yellow"],
+  body:not(.print-report-view) [class*="bg-indigo"] {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
 
-  /* Flex and Grid containers - prevent breaking */
-  [class*="flex"],
-  [class*="grid"] {
+  body:not(.print-report-view) [class*="flex"],
+  body:not(.print-report-view) [class*="grid"] {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  /* Table handling */
-  table {
+  body:not(.print-report-view) table {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  thead {
+  body:not(.print-report-view) thead {
     display: table-header-group;
   }
 
-  tr {
+  body:not(.print-report-view) tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  /* Image handling */
-  img {
+  body:not(.print-report-view) img {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     max-width: 100% !important;
     height: auto !important;
   }
 
-  /* Optimize font sizes for print */
-  .text-sm { font-size: 9pt !important; }
-  .text-base { font-size: 11pt !important; }
-  .text-lg { font-size: 12pt !important; }
-  .text-xl { font-size: 14pt !important; }
-  .text-2xl { font-size: 16pt !important; }
-  .text-3xl { font-size: 18pt !important; }
-  .text-4xl { font-size: 20pt !important; }
+  body:not(.print-report-view) .text-sm { font-size: 9pt !important; }
+  body:not(.print-report-view) .text-base { font-size: 11pt !important; }
+  body:not(.print-report-view) .text-lg { font-size: 12pt !important; }
+  body:not(.print-report-view) .text-xl { font-size: 14pt !important; }
+  body:not(.print-report-view) .text-2xl { font-size: 16pt !important; }
+  body:not(.print-report-view) .text-3xl { font-size: 18pt !important; }
+  body:not(.print-report-view) .text-4xl { font-size: 20pt !important; }
 
-  /* Remove unnecessary shadows */
-  [class*="shadow"] {
+  body:not(.print-report-view) [class*="shadow"] {
     box-shadow: none !important;
   }
 
-  /* Spacing adjustments for print density */
-  .py-8 { padding-top: 6pt !important; padding-bottom: 6pt !important; }
-  .py-6 { padding-top: 5pt !important; padding-bottom: 5pt !important; }
-  .py-4 { padding-top: 4pt !important; padding-bottom: 4pt !important; }
-  
-  .px-8 { padding-left: 6pt !important; padding-right: 6pt !important; }
-  .px-6 { padding-left: 5pt !important; padding-right: 5pt !important; }
-  .px-4 { padding-left: 4pt !important; padding-right: 4pt !important; }
+  body:not(.print-report-view) .py-8 { padding-top: 6pt !important; padding-bottom: 6pt !important; }
+  body:not(.print-report-view) .py-6 { padding-top: 5pt !important; padding-bottom: 5pt !important; }
+  body:not(.print-report-view) .py-4 { padding-top: 4pt !important; padding-bottom: 4pt !important; }
+  body:not(.print-report-view) .px-8 { padding-left: 6pt !important; padding-right: 6pt !important; }
+  body:not(.print-report-view) .px-6 { padding-left: 5pt !important; padding-right: 5pt !important; }
+  body:not(.print-report-view) .px-4 { padding-left: 4pt !important; padding-right: 4pt !important; }
 
-  /* Ensure proper text color for readability while preserving colored headings */
-  p, span, li, td, th {
+  body:not(.print-report-view) p,
+  body:not(.print-report-view) span,
+  body:not(.print-report-view) li,
+  body:not(.print-report-view) td,
+  body:not(.print-report-view) th {
     color: #000 !important;
   }
 
-  /* Orphan and widow control */
-  p {
+  body:not(.print-report-view) p {
     orphans: 3;
     widows: 3;
   }
 
-  /* Remove margin-left adjustments that cause layout issues in print */
-  .md\:ml-\[5\%\] {
+  body:not(.print-report-view) .md\:ml-\[5\%\] {
     margin-left: 0 !important;
   }
 
-  /* Ensure proper width for all elements */
-  * {
+  body:not(.print-report-view) * {
     max-width: 100%;
   }
 }
@@ -560,5 +552,98 @@ section#hero * {
   
   .screen-only {
     display: none !important;
+  }
+
+  /* ===================================
+     Page 7 Seasons - Print Overrides
+     Override global print styles to match browser view
+     =================================== */
+  
+  .page-7-seasons .page-7-title {
+    font-size: 36px !important;
+    color: inherit !important;
+  }
+
+  .page-7-seasons .page-7-header {
+    border: none !important;
+    outline: none !important;
+  }
+
+  /* Preserve season character gradient in print */
+  .page-7-seasons span[style*="backgroundImage"],
+  .page-7-seasons span[style*="background-image"] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Preserve current season badge colors */
+  .page-7-seasons .page-7-current-badge {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  .page-7-seasons .page-7-current-badge span {
+    color: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Keep season content spacing as designed */
+  .page-7-seasons .px-3 {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .page-7-seasons .py-3 {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  /* Override text color forcing for content */
+  .page-7-seasons .text-black {
+    color: #000000 !important;
+  }
+
+  /* Preserve font sizes */
+  .page-7-seasons .text-xs {
+    font-size: 12px !important;
+  }
+
+  .page-7-seasons .text-sm {
+    font-size: 13px !important;
+  }
+
+  /* Ensure spacing is preserved */
+  .page-7-seasons .space-y-1 > * + * {
+    margin-top: 4px !important;
+  }
+
+  .page-7-seasons .mb-1 {
+    margin-bottom: 4px !important;
+  }
+
+  .page-7-seasons .mb-2 {
+    margin-bottom: 8px !important;
+  }
+
+  .page-7-seasons .pt-1 {
+    padding-top: 4px !important;
+  }
+
+  /* Preserve list styling */
+  .page-7-seasons ul.space-y-0\.5 > * + * {
+    margin-top: 2px !important;
+  }
+
+  .page-7-seasons .pl-3 {
+    padding-left: 12px !important;
+  }
+
+  /* Avoid breaking seasons across pages */
+  .page-7-seasons .avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
