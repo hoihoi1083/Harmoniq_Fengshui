@@ -134,7 +134,7 @@ export default function CoverPage({ concern, productName }) {
 					個人化訂製專屬
 				</div>
 
-				{/* Main title - 命理報告 */}
+				{/* Report type label */}
 				<div
 					style={{
 						fontFamily:
@@ -147,23 +147,9 @@ export default function CoverPage({ concern, productName }) {
 						marginBottom: "28px",
 					}}
 				>
-					命理
+					{concernText}
 					<br />
 					報告
-				</div>
-
-				{/* Report type label */}
-				<div
-					style={{
-						fontFamily:
-							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-						fontSize: "30px",
-						fontWeight: 700,
-						letterSpacing: "1.5em",
-						color: "#000000",
-					}}
-				>
-					{concernText}運報告
 				</div>
 			</div>
 
@@ -217,7 +203,7 @@ export default function CoverPage({ concern, productName }) {
 						letterSpacing: "0.05em",
 					}}
 				>
-					HarmoniQ Bell
+					風鈴開運吉物
 				</div>
 			</div>
 
@@ -225,7 +211,7 @@ export default function CoverPage({ concern, productName }) {
 			<div
 				style={{
 					position: "absolute",
-					top: "50mm",
+					top: "35mm",
 					right: "5mm",
 					bottom: "35mm",
 					display: "flex",
@@ -236,7 +222,7 @@ export default function CoverPage({ concern, productName }) {
 				}}
 			>
 				{/* Year rotated along the right edge */}
-				<div
+				{/* <div
 					style={{
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
@@ -249,7 +235,7 @@ export default function CoverPage({ concern, productName }) {
 					}}
 				>
 					{year}
-				</div>
+				</div> */}
 
 				{/* Vertical divider line */}
 				<div
@@ -257,7 +243,7 @@ export default function CoverPage({ concern, productName }) {
 						width: "2px",
 						flexGrow: 1,
 						backgroundColor: "#000000",
-						margin: "100px 0px 50px 60px",
+						margin: "0px 0px 90px 6s0px",
 					}}
 				/>
 
@@ -274,7 +260,7 @@ export default function CoverPage({ concern, productName }) {
 						transform: "rotate(-90deg)",
 					}}
 				>
-					{month}.{day}
+					{year}
 				</div>
 			</div>
 		</div>
