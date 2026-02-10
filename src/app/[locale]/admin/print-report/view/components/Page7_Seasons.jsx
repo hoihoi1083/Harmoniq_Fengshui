@@ -182,7 +182,7 @@ export default function Page7_Seasons({ data }) {
 				style={{ border: "none", outline: "none" }}
 			>
 				<div
-					className="flex items-start justify-between"
+					className="flex items-start justify-between mb-8"
 					style={{ border: "none", outline: "none" }}
 				>
 					<h1
