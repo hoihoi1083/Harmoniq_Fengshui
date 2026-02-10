@@ -515,7 +515,7 @@ function PrintReportView() {
 			)}
 
 			{/* Pages 5-6: JiXiong Analysis (吉象 and 凶象) */}
-			{jixiongData && (
+			{/* {jixiongData && (
 				<Page5_6_CareerDetailed
 					data={{
 						jixiong: jixiongData.parsed || jixiongData,
@@ -524,7 +524,7 @@ function PrintReportView() {
 					}}
 				/>
 			)}
-
+ */}
 			{/* Page 7: Seasonal Analysis (關鍵季節) */}
 			{seasonData && seasonData.parsed?.seasons && (
 				<>
@@ -782,7 +782,7 @@ function PrintReportView() {
 					.page-break.page-7-seasons .page-7-current-badge {
 						-webkit-print-color-adjust: exact !important;
 						print-color-adjust: exact !important;
-						background-color: #DC2626 !important;
+						background-color: #dc2626 !important;
 					}
 					.page-break.page-7-seasons .page-7-current-badge span {
 						color: white !important;
