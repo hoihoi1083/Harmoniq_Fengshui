@@ -3168,10 +3168,83 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 			console.log("📋 Final sections count:", sections.length);
 			console.log("📋 Final summary length:", summary?.length || 0);
 
+			// Extract keywords from summary (words in 「」) and split text
+			const extractKeywordsFromSummary = (summaryText) => {
+				if (!summaryText)
+					return {
+						mainKeywords: [],
+						yearKeywords: [],
+						mainText: "",
+						yearText: "",
+					};
+
+				// Split summary first to determine which keywords belong to which section
+				let splitIndex = -1;
+				let mainText = "";
+				let yearText = "";
+
+				// Try to split at year mention (針對20XX or 針對2025乙巳流年 etc.)
+				const yearMatch = summaryText.match(/(針對\d{4}[^，。]+)/);
+				if (yearMatch) {
+					splitIndex = yearMatch.index;
+				} else {
+					// If no year mention found, split by first mention of "建議"
+					const suggestionMatch = summaryText.match(/(建議[^。]+)/);
+					if (suggestionMatch) {
+						splitIndex = suggestionMatch.index;
+					}
+				}
+
+				if (splitIndex > 0) {
+					mainText = summaryText.substring(0, splitIndex);
+					yearText = summaryText.substring(splitIndex);
+
+					// Remove year reference from yearText (針對20XX乙巳流年，etc.) but keep the rest
+					yearText = yearText.replace(/針對\d{4}[^，。]+[，。]?/, "");
+				} else {
+					// Fallback: use full text
+					mainText = summaryText;
+					yearText = "";
+				}
+
+				// Extract keywords from each section separately
+				const mainKeywordMatches = [
+					...mainText.matchAll(/「([^」]+)」/g),
+				];
+				const mainKeywords = mainKeywordMatches.map(
+					(match) => match[1],
+				);
+
+				const yearKeywordMatches = [
+					...yearText.matchAll(/「([^」]+)」/g),
+				];
+				const yearKeywords = yearKeywordMatches.map(
+					(match) => match[1],
+				);
+
+				console.log("🔑 Main keywords:", mainKeywords);
+				console.log("🔑 Year keywords:", yearKeywords);
+
+				// Remove 「」 from the text since keywords are displayed in circles
+				mainText = mainText.replace(/「([^」]+)」/g, "$1");
+				yearText = yearText.replace(/「([^」]+)」/g, "$1");
+
+				return { mainKeywords, yearKeywords, mainText, yearText };
+			};
+
+			const { mainKeywords, yearKeywords, mainText, yearText } =
+				extractKeywordsFromSummary(summary);
+
+			// Get current year Ganzhi info
+			const currentYearInfo = getCurrentYearGanZhi();
+
 			return (
 				<>
 					{/* Page 2: 日主特性 */}
-					<div className="mx-auto mt-15 print-report-mingju-wrapper" style={{ padding: "15px" }}>
+					<div
+						className="mx-auto mt-15 print-report-mingju-wrapper"
+						style={{ padding: "15px" }}
+					>
 						<div
 							className="mx-auto bg-white page-break print-report-mingju-page2"
 							style={{
@@ -3692,7 +3765,10 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 					</div>
 
 					{/* Page 3: 財星定位 with sections and 總結 */}
-					<div className="mx-auto mt-15 print-report-mingju-wrapper" style={{ padding: "15px" }}>
+					<div
+						className="mx-auto mt-15 print-report-mingju-wrapper"
+						style={{ padding: "15px" }}
+					>
 						<div
 							className="mx-auto bg-white page-break print-report-mingju-page3"
 							style={{
@@ -3727,7 +3803,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								style={{
 									display: "flex",
 									gap: "32px",
-									marginBottom: "10px",
+									marginBottom: "50px",
 								}}
 							>
 								<div style={{ display: "flex", gap: "4px" }}>
@@ -3857,81 +3933,232 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								style={{
 									display: "grid",
 									gridTemplateColumns: "1fr 1fr",
-									gap: "2px 20px",
-									marginBottom: "80px",
+									columnGap: "30px",
 								}}
 							>
 								{sections.map((section, index) => (
-									<div key={index}>
+									<div
+										key={index}
+										style={{
+											gridColumn: index === 3 ? "2" : "1",
+										}}
+									>
 										<h3
 											style={{
-												fontSize: "17px",
-												fontWeight: "bold",
+												fontSize: "28px",
+												fontWeight: 900,
 												color: concernColor,
 												marginBottom: "5px",
+												fontFamily:
+													"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 											}}
 										>
 											{section.title}
 										</h3>
 										<p
 											style={{
-												fontSize: "14px",
+												fontSize: "13px",
 												lineHeight: "1.6",
 												textAlign: "justify",
+												marginBottom: "40px",
 											}}
 										>
 											{section.content}
 										</p>
-									</div>
-								))}
-							</div>
-
-							{/* 總結 Section */}
-							<div style={{ marginTop: "16px" }}>
-								<div
-									style={{
-										display: "flex",
-										alignItems: "flex-start",
-										gap: "20px",
-									}}
-								>
-									{/* Vertical 總結 */}
-									<h2
-										style={{
-											fontFamily:
-												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-											fontStyle: "normal",
-											fontWeight: 900,
-											fontSize: "60px",
-											lineHeight: "110%",
-											letterSpacing: "0.27em",
-											color: concernColor,
-											textOrientation: "upright",
-										}}
-									>
-										總結
-									</h2>
-									{/* Content area */}
-									<div style={{ flex: 1 }}>
 										{/* Horizontal line */}
 										<div
 											style={{
-												height: "6px",
+												height: "2px",
 												backgroundColor: concernColor,
 												width: "100px",
-												marginBottom: "45px",
+												marginBottom: "10px",
 											}}
 										></div>
-										{/* Summary text */}
-										<p
-											style={{
-												fontSize: "14px",
-												lineHeight: "1.6",
-												textAlign: "justify",
-											}}
-										>
-											{summary}
-										</p>
+									</div>
+								))}
+								{/* 總結 Section - Redesigned with keyword circles */}
+								<div
+									style={{
+										marginTop: "0px",
+										gridColumn: " 2",
+										gridRow: "1 / span 5",
+										backgroundColor: `${concernColor}10`,
+										padding: "17px",
+									}}
+								>
+									<div>
+										{/* Vertical 綜合而言 */}
+										<div>
+											<h2
+												style={{
+													fontFamily:
+														"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+													fontWeight: 900,
+													fontSize: "28px",
+													color: concernColor,
+													marginBottom: "5px",
+												}}
+											>
+												綜合而言
+											</h2>
+										</div>
+										{/* Content area */}
+										<div style={{ flex: 1 }}>
+											{/* Main summary text */}
+											{mainText && (
+												<p
+													style={{
+														fontSize: "13px",
+														lineHeight: "1.8",
+														textAlign: "justify",
+														marginBottom: "4px",
+													}}
+												>
+													{mainText}
+												</p>
+											)}
+											{/* Main Keywords display */}
+											{mainKeywords.length > 0 && (
+												<div
+													style={{
+														display: "flex",
+														gap: "40px",
+														marginBottom: "15px",
+														justifyContent:
+															"center",
+													}}
+												>
+													{mainKeywords.map(
+														(keyword, idx) => (
+															<div
+																key={idx}
+																style={{
+																	display:
+																		"flex",
+																	alignItems:
+																		"center",
+																	justifyContent:
+																		"center",
+																	width: "100px",
+																	height: "100px",
+																	borderRadius:
+																		"50%",
+																	background: `linear-gradient(${concernColor}90 0%, #DCE0EA 90%)`,
+																	position:
+																		"relative",
+																}}
+															>
+																<span
+																	style={{
+																		fontSize:
+																			"18px",
+																		fontWeight:
+																			"bold",
+																		color: concernColor,
+																		fontFamily:
+																			"Noto Serif TC, serif",
+																		textAlign:
+																			"center",
+																	}}
+																>
+																	{keyword}
+																</span>
+															</div>
+														),
+													)}
+												</div>
+											)}
+
+											{/* Year Section */}
+											{yearText && (
+												<>
+													<h3
+														style={{
+															fontSize: "32px",
+															fontWeight: "900",
+															color: "#999",
+															marginBottom: "5px",
+															fontFamily:
+																"Noto Serif TC, serif",
+														}}
+													>
+														{currentYearInfo.year}
+														{currentYearInfo.ganZhi}
+														年
+													</h3>
+													<p
+														style={{
+															fontSize: "14px",
+															lineHeight: "1.8",
+															textAlign:
+																"justify",
+															marginBottom:
+																"10px",
+														}}
+													>
+														{yearText}
+													</p>
+													{/* Year Keywords display */}
+													{yearKeywords.length >
+														0 && (
+														<div
+															style={{
+																display: "flex",
+																gap: "40px",
+																justifyContent:
+																	"center",
+															}}
+														>
+															{yearKeywords.map(
+																(
+																	keyword,
+																	idx,
+																) => (
+																	<div
+																		key={
+																			idx
+																		}
+																		style={{
+																			display:
+																				"flex",
+																			alignItems:
+																				"center",
+																			justifyContent:
+																				"center",
+																			width: "100px",
+																			height: "100px",
+																			borderRadius:
+																				"50%",
+																			background: `linear-gradient(${concernColor}90 0%, #DCE0EA 90%)`,
+																			position:
+																				"relative",
+																		}}
+																	>
+																		<span
+																			style={{
+																				fontSize:
+																					"18px",
+																				fontWeight:
+																					"bold",
+																				color: concernColor,
+																				fontFamily:
+																					"Noto Serif TC, serif",
+																				textAlign:
+																					"center",
+																			}}
+																		>
+																			{
+																				keyword
+																			}
+																		</span>
+																	</div>
+																),
+															)}
+														</div>
+													)}
+												</>
+											)}
+										</div>
 									</div>
 								</div>
 							</div>

@@ -119,10 +119,7 @@ export default function Page3_MingJu_RightTab({ userInfo, rightContent }) {
 	let contentForSections = rightContent;
 
 	// Parse rightContent if it's JSON format
-	if (
-		typeof rightContent === "string" &&
-		rightContent.startsWith("{")
-	) {
+	if (typeof rightContent === "string" && rightContent.startsWith("{")) {
 		try {
 			const parsed = JSON.parse(rightContent);
 			if (parsed.keywords && Array.isArray(parsed.keywords)) {
@@ -143,8 +140,7 @@ export default function Page3_MingJu_RightTab({ userInfo, rightContent }) {
 
 	// Parse content into sections
 	const parseRightContent = (content) => {
-		if (typeof content !== "string")
-			return { sections: [] };
+		if (typeof content !== "string") return { sections: [] };
 		const parts = content.split("\n\n").filter((p) => p.trim());
 		const sections = [];
 
