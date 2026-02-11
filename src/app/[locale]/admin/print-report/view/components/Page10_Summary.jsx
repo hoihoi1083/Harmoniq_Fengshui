@@ -80,6 +80,7 @@ export default function Page10_Summary({ data }) {
 					className="text-4xl font-bold"
 					style={{
 						color: "#002C84",
+						letterSpacing: "0.2em",
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 					}}

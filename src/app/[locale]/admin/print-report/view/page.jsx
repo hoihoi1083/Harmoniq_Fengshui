@@ -603,6 +603,25 @@ function PrintReportView() {
 					.page-break:last-child {
 						page-break-after: auto;
 					}
+					/* Page 1 基礎分析: same padding and spacing as browser (15mm 20mm, preserve margins) */
+					.page-break.print-report-page1 {
+						padding: 15mm 20mm !important;
+					}
+					.page-break.print-report-page1 h3.mb-6 {
+						margin-bottom: 1.5rem !important;
+					}
+					.page-break.print-report-page1 h4.mb-3 {
+						margin-bottom: 0.75rem !important;
+					}
+					.page-break.print-report-page1 .gap-6 {
+						gap: 1.5rem !important;
+					}
+					.page-break.print-report-page1 .page-1-key-points {
+						padding: 16px !important;
+					}
+					.page-break.print-report-page1 .page-1-key-points p.mb-3 {
+						margin-bottom: 12px !important;
+					}
 					/* Override globals.css print rules so report headings/colors match screen */
 					.page-break h1 {
 						font-size: 48px !important;
@@ -630,6 +649,21 @@ function PrintReportView() {
 						-webkit-print-color-adjust: exact !important;
 						print-color-adjust: exact !important;
 						color: var(--page-7-title-color) !important;
+					}
+					/* Page 8-9 建議/禁忌: keep badge text white and background in print */
+					.page-break .page-8-9-badge-suggestion,
+					.page-break .page-8-9-badge-taboo,
+					.page-break span.bg-red-600 {
+						color: white !important;
+						-webkit-print-color-adjust: exact !important;
+						print-color-adjust: exact !important;
+					}
+					.page-break .page-8-9-badge-suggestion {
+						background-color: #3b82f6 !important;
+					}
+					.page-break .page-8-9-badge-taboo,
+					.page-break span.bg-red-600 {
+						background-color: #dc2626 !important;
 					}
 					/* Page 10 Summary: restore larger title and varied heading sizes so print matches screen */
 					.page-break.page-10-summary h1 {

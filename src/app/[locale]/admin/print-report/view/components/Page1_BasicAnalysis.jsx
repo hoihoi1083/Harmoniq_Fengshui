@@ -1,6 +1,29 @@
 import Image from "next/image";
 import { getConcernColor } from "@/utils/colorTheme";
 
+// 天干 → 五行 (for pillar background by element)
+const TIANGAN_TO_WUXING = {
+	甲: "木",
+	乙: "木",
+	丙: "火",
+	丁: "火",
+	戊: "土",
+	己: "土",
+	庚: "金",
+	辛: "金",
+	壬: "水",
+	癸: "水",
+};
+const WUXING_PILLAR_COLORS = {
+	金: "#B2A062",
+	木: "#567156",
+	水: "#939393",
+	火: "#B4003C",
+	土: "#D09900",
+};
+const getPillarBgColor = (heavenly) =>
+	WUXING_PILLAR_COLORS[TIANGAN_TO_WUXING[heavenly]] || "#8B9556";
+
 export default function Page1_BasicAnalysis({
 	name,
 	birthday,
@@ -251,22 +274,15 @@ export default function Page1_BasicAnalysis({
 													{
 														key: "year",
 														label: "年",
-														bgColor: "#B8A870",
 													},
 													{
 														key: "month",
 														label: "月",
-														bgColor: "#B8A870",
 													},
-													{
-														key: "day",
-														label: "日",
-														bgColor: "#8B9556",
-													},
+													{ key: "day", label: "日" },
 													{
 														key: "hour",
 														label: "時",
-														bgColor: "#B4003C",
 													},
 												].map((pillar) => {
 													const pillarData =
@@ -275,6 +291,10 @@ export default function Page1_BasicAnalysis({
 														];
 													if (!pillarData)
 														return null;
+													const bgColor =
+														getPillarBgColor(
+															pillarData.heavenly,
+														);
 													return (
 														<div
 															key={pillar.key}
@@ -303,7 +323,7 @@ export default function Page1_BasicAnalysis({
 																	width: "40px",
 																	height: "150px",
 																	backgroundColor:
-																		pillar.bgColor,
+																		bgColor,
 																}}
 															>
 																{/* Top section - Heavenly */}
@@ -364,7 +384,7 @@ export default function Page1_BasicAnalysis({
 											木: "#567156",
 											水: "#939393",
 											火: "#B4003C",
-											土: "#DEAB20",
+											土: "#D09900",
 										};
 
 										return (
@@ -585,9 +605,12 @@ export default function Page1_BasicAnalysis({
 						);
 					})()}
 
-				{/* Key Points Section */}
+				{/* Key Points Section - class for print spacing match */}
 				{aiContent && (
-					<div className="mt-0 " style={{ padding: "16px" }}>
+					<div
+						className="mt-0 page-1-key-points"
+						style={{ padding: "16px" }}
+					>
 						<div className="flex gap-6">
 							{/* Left: Vertical Title */}
 							<div className="flex-shrink-0">
@@ -677,17 +700,26 @@ export default function Page1_BasicAnalysis({
 										} else {
 											// Otherwise split at last "。" before midpoint
 											const mid = Math.floor(len / 2);
-											const lastDot = raw.lastIndexOf("。", mid);
+											const lastDot = raw.lastIndexOf(
+												"。",
+												mid,
+											);
 											if (lastDot > 30) {
-												p1 = raw.slice(0, lastDot + 1).trim();
-												p2 = raw.slice(lastDot + 1).trim();
+												p1 = raw
+													.slice(0, lastDot + 1)
+													.trim();
+												p2 = raw
+													.slice(lastDot + 1)
+													.trim();
 											}
 										}
 										return (
 											<>
 												{p2 ? (
 													<>
-														<p className="mb-3">{p1}</p>
+														<p className="mb-3">
+															{p1}
+														</p>
 														<p>{p2}...</p>
 													</>
 												) : (

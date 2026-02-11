@@ -3263,7 +3263,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								style={{
 									position: "absolute",
 									top: "50px",
-									right: "30px",
+									right: "80px",
 									color: "#666",
 								}}
 							>
@@ -3789,7 +3789,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								style={{
 									position: "absolute",
 									top: "50px",
-									right: "30px",
+									right: "80px",
 									color: "#666",
 								}}
 							>
@@ -3933,7 +3933,6 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								style={{
 									display: "grid",
 									gridTemplateColumns: "1fr 1fr",
-									columnGap: "30px",
 								}}
 							>
 								{sections.map((section, index) => (
@@ -3941,6 +3940,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 										key={index}
 										style={{
 											gridColumn: index === 3 ? "2" : "1",
+											padding: "20px",
 										}}
 									>
 										<h3
@@ -3983,7 +3983,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 										gridColumn: " 2",
 										gridRow: "1 / span 5",
 										backgroundColor: `${concernColor}10`,
-										padding: "17px",
+										padding: "20px",
 									}}
 								>
 									<div>

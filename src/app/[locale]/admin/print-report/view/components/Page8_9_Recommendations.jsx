@@ -160,9 +160,12 @@ export default function Page8_9_Recommendations({ data }) {
 										</h3>
 										{suggestion.category && (
 											<span
-												className="inline-block px-3 py-1 mb-3 text-sm font-medium text-white"
+												className="inline-block px-3 py-1 mb-3 text-sm font-medium text-white page-8-9-badge page-8-9-badge-suggestion"
 												style={{
 													backgroundColor: "#3b82f6",
+													WebkitPrintColorAdjust:
+														"exact",
+													printColorAdjust: "exact",
 												}}
 											>
 												{suggestion.category}
@@ -202,9 +205,12 @@ export default function Page8_9_Recommendations({ data }) {
 										</h3>
 										{suggestion.category && (
 											<span
-												className="inline-block px-3 py-1 mb-3 text-sm font-medium text-white"
+												className="inline-block px-3 py-1 mb-3 text-sm font-bold text-white page-8-9-badge page-8-9-badge-suggestion"
 												style={{
 													backgroundColor: "#3b82f6",
+													WebkitPrintColorAdjust:
+														"exact",
+													printColorAdjust: "exact",
 												}}
 											>
 												{suggestion.category}
@@ -339,10 +345,24 @@ export default function Page8_9_Recommendations({ data }) {
 											{taboo.title}
 										</h3>
 										<div className="flex gap-2 mb-3">
-											<span className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600">
+											<span
+												className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600 page-8-9-badge page-8-9-badge-taboo"
+												style={{
+													WebkitPrintColorAdjust:
+														"exact",
+													printColorAdjust: "exact",
+												}}
+											>
 												{taboo.level || "警惕"}
 											</span>
-											<span className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600">
+											<span
+												className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600 page-8-9-badge page-8-9-badge-taboo"
+												style={{
+													WebkitPrintColorAdjust:
+														"exact",
+													printColorAdjust: "exact",
+												}}
+											>
 												⚠️ 後果：
 												{taboo.consequence ||
 													"影響運勢"}
@@ -381,10 +401,24 @@ export default function Page8_9_Recommendations({ data }) {
 											{taboo.title}
 										</h3>
 										<div className="flex gap-2 mb-3">
-											<span className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600">
+											<span
+												className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600 page-8-9-badge page-8-9-badge-taboo"
+												style={{
+													WebkitPrintColorAdjust:
+														"exact",
+													printColorAdjust: "exact",
+												}}
+											>
 												{taboo.level || "警惕"}
 											</span>
-											<span className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600">
+											<span
+												className="inline-block px-3 py-1 text-sm font-medium text-white bg-red-600 page-8-9-badge page-8-9-badge-taboo"
+												style={{
+													WebkitPrintColorAdjust:
+														"exact",
+													printColorAdjust: "exact",
+												}}
+											>
 												⚠️ 後果：
 												{taboo.consequence ||
 													"影響運勢"}
