@@ -481,6 +481,7 @@ function PrintReportView() {
 				birthday={birthday}
 				birthTime={birthTime}
 				concern={concern}
+				question={question}
 				baziData={baziData}
 				wuxingAnalysis={wuxingAnalysis}
 				aiContent={aiContent}

@@ -29,11 +29,15 @@ export default function Page1_BasicAnalysis({
 	birthday,
 	birthTime,
 	concern,
+	question,
 	baziData,
 	wuxingAnalysis,
 	aiContent,
 	analyzeWuxingStrength,
 }) {
+	const defaultQuestion = `我想了解我的${concern}運勢`;
+	const showUserQuestion =
+		question && question.trim() && question.trim() !== defaultQuestion;
 	return (
 		<>
 			<style>{`
@@ -656,17 +660,32 @@ export default function Page1_BasicAnalysis({
 									paddingLeft: "16px",
 								}}
 							>
-								<h3
-									className="mb-6 font-bold"
-									style={{
-										fontSize: "25px",
-										color: getConcernColor(concern),
-										fontFamily:
-											"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-									}}
-								>
-									一般{concern}分析
-								</h3>
+								{showUserQuestion ? (
+									<h3
+										className="mb-6 font-bold"
+										style={{
+											fontSize: "25px",
+											color: getConcernColor(concern),
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+										}}
+									>
+										<strong>您的問題：</strong>
+										{question.trim()}
+									</h3>
+								) : (
+									<h3
+										className="mb-6 font-bold"
+										style={{
+											fontSize: "25px",
+											color: getConcernColor(concern),
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+										}}
+									>
+										一般{concern}分析
+									</h3>
+								)}
 								<h4
 									className="mb-3 font-semibold"
 									style={{
