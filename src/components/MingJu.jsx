@@ -3976,8 +3976,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 										></div>
 									</div>
 								))}
-								{/* 總結 Section - Redesigned with keyword circles */}
+								{/* 總結 Section - Redesigned with keyword circles (class for print spacing match) */}
 								<div
+									className="mingju-zongjie"
 									style={{
 										marginTop: "0px",
 										gridColumn: " 2",
@@ -3996,7 +3997,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 													fontWeight: 900,
 													fontSize: "28px",
 													color: concernColor,
-													marginBottom: "5px",
+													marginBottom: "15px",
 												}}
 											>
 												綜合而言

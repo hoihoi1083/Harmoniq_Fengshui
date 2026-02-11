@@ -773,6 +773,33 @@ function PrintReportView() {
 						font-size: 14px !important;
 						line-height: 1.6 !important;
 					}
+					/* MingJu Page 3 綜合而言: keep section font sizes and spacing so print matches browser */
+					.page-break.print-report-mingju-page3 .mingju-zongjie h2 {
+						font-size: 28px !important;
+						margin-bottom: 15px !important;
+					}
+					.page-break.print-report-mingju-page3 .mingju-zongjie h3 {
+						font-size: 32px !important;
+						margin-bottom: 5px !important;
+					}
+					.page-break.print-report-mingju-page3 .mingju-zongjie p {
+						font-size: 13px !important;
+						line-height: 1.8 !important;
+					}
+					.page-break.print-report-mingju-page3 .mingju-zongjie h3 + p {
+						font-size: 14px !important;
+						margin-bottom: 10px !important;
+					}
+					.page-break.print-report-mingju-page3 .mingju-zongjie p + div[style*="flex"] {
+						gap: 40px !important;
+						margin-bottom: 15px !important;
+					}
+					.page-break.print-report-mingju-page3 .mingju-zongjie [style*="100px"][style*="borderRadius"] span {
+						font-size: 18px !important;
+					}
+					.page-break.print-report-mingju-page3 .mingju-zongjie > div {
+						padding: 20px !important;
+					}
 					/* Page 7 關鍵季節: lock padding and spacing so print matches browser */
 					.page-break.page-7-seasons {
 						padding: 15mm 20mm !important;
