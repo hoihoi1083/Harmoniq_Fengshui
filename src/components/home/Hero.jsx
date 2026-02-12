@@ -275,7 +275,7 @@ export default function Hero() {
 							}
 							alt="Hero background"
 							fill
-							className="object-cover object-center"
+							className="object-cover object-right"
 							priority={true}
 						/>
 					</div>

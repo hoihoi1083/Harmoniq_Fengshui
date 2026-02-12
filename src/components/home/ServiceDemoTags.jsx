@@ -219,10 +219,10 @@ export default function ServiceDemoTags() {
 	};
 
 	return (
-		<div className="mb-5">
+		<div className="w-full mb-6 sm:mb-8 ">
 			<div
 				ref={scrollContainerRef}
-				className="flex px-3 py-4 pb-3 space-x-6 overflow-x-auto sm:pb-4 sm:space-x-8 scrollbar-hide"
+				className="flex gap-4 sm:gap-6 md:gap-8 py-4 overflow-x-auto overflow-y-hidden scrollbar-hide snap-x snap-mandatory touch-pan-x"
 				style={{
 					scrollbarWidth: "none",
 					msOverflowStyle: "none",
@@ -243,16 +243,19 @@ export default function ServiceDemoTags() {
 				onTouchEnd={isMobile ? handleTouchEnd : undefined}
 			>
 				{tags.map((tag) => (
-					<div key={tag.id} className="relative flex-shrink-0 group">
+					<div
+						key={tag.id}
+						className="relative flex-shrink-0 group snap-center"
+					>
 						<div
-							className="relative transition-transform duration-300 rounded-lg cursor-pointer hover:scale-103"
+							className="relative transition-transform duration-300 rounded-lg cursor-pointer hover:scale-102 active:scale-100"
 							onClick={(e) => handleImageClick(e, tag.id)}
 							style={{ userSelect: "none" }}
 						>
 							<img
 								src={tag.image}
 								alt={tag.name}
-								className="object-cover w-40 h-30 sm:w-48 sm:h-36 md:w-56 md:h-42 lg:w-70 lg:h-50"
+								className="object-contain rounded-lg w-38 h-28 sm:w-62 sm:h-43  lg:w-65 "
 								draggable={false}
 							/>
 						</div>

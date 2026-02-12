@@ -112,6 +112,15 @@
     }
   }
 
+  /* Hide scrollbar but keep scroll (e.g. horizontal product carousels) */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Utility class for UI elements that should not be selectable */
   .no-select {
     -webkit-user-select: none;
