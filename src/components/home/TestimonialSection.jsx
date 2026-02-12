@@ -26,9 +26,11 @@ const TestimonialSection = () => {
 		const onDocMouseMove = (e) => {
 			if (!scrollRef.current) return;
 			e.preventDefault();
-			const x = e.clientX - scrollRef.current.getBoundingClientRect().left;
+			const x =
+				e.clientX - scrollRef.current.getBoundingClientRect().left;
 			const walk = x - dragStartRef.current.x;
-			scrollRef.current.scrollLeft = dragStartRef.current.scrollLeft - walk;
+			scrollRef.current.scrollLeft =
+				dragStartRef.current.scrollLeft - walk;
 		};
 
 		const onDocMouseUp = () => {
@@ -89,16 +91,19 @@ const TestimonialSection = () => {
 	];
 
 	return (
-		<section
-			className="relative w-full px-4 py-1 md:py-20 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80"
-			style={{
-				backgroundImage:
-					"linear-gradient(to bottom, transparent 95%, rgba(239, 239, 239, 1.0) 100%),url(/images/demo/homepage-demo-bg.png)",
-				backgroundSize: "99%",
-				backgroundPosition: "center",
-				backgroundRepeat: "no-repeat",
-			}}
-		>
+		<section className="relative w-full px-4 py-12 md:py-1 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80">
+			{/* Background: only on md and up, none on mobile */}
+			<div
+				className="absolute inset-0 hidden md:block pointer-events-none"
+				aria-hidden
+				style={{
+					backgroundImage:
+						"linear-gradient(to bottom, transparent 95%, rgba(239, 239, 239, 1.0) 100%),url(/images/demo/homepage-demo-bg.png)",
+					backgroundSize: "115%",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+				}}
+			/>
 			{/* Title Section */}
 			<div className="flex flex-col md:flex-row md:items-center items-start gap-4 md:gap-6 mb-10 md:mb-16">
 				<div
@@ -126,7 +131,6 @@ const TestimonialSection = () => {
 				onMouseMove={handleMouseMove}
 				onMouseUp={handleMouseUp}
 				onMouseLeave={handleMouseLeave}
-				
 				className={`flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 md:gap-6 mb-12 pb-2 mx-1 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 snap-x snap-mandatory overscroll-behavior-x-contain [scrollbar-width:thin] ${isDragging ? "cursor-grabbing select-none" : "cursor-grab"}`}
 				style={{
 					WebkitOverflowScrolling: "touch",

@@ -13,41 +13,41 @@ const FooterV2 = () => {
 	};
 
 	return (
-		<footer className="bg-[#1C1F26] w-full text-white pt-10 pb-10 rounded-t-[60px]">
-			<div className="container px-24 py-5 mx-auto">
+		<footer className="bg-[#1C1F26] w-full text-white pt-8 pb-8 sm:pt-10 sm:pb-10 rounded-t-2xl sm:rounded-t-3xl md:rounded-t-[60px]">
+			<div className="container px-4 py-5 sm:px-6 md:px-12 lg:px-16 xl:px-24 mx-auto max-w-full">
 				{/* Top Row: Logo, Links, Socials */}
 				<div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-					<div className="flex items-center gap-8">
+					<div className="flex flex-col gap-4 w-full md:w-auto md:flex-row md:items-center md:gap-8">
 						<Image
 							src="/images/logo/logo-desktop.png"
 							alt="HarmoniQ Logo"
 							width={681}
 							height={132}
-							className="w-auto h-8"
+							className="w-50 h-10"
 							quality={100}
 						/>
-						<nav className="items-center hidden gap-8 text-sm text-white/90 md:flex">
+						<nav className="flex flex-col gap-2 md:flex-row md:items-center md:gap-6 lg:gap-8 text-sm text-white/90">
 							<a
 								href={`/${locale}/about`}
-								className="hover:text-[#8B9F3A] transition-colors"
+								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
 								{locale === "zh-CN" ? "关于我们" : "關於我們"}
 							</a>
 							<a
 								href={`/${locale}/privacy`}
-								className="hover:text-[#8B9F3A] transition-colors"
+								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
 								{locale === "zh-CN" ? "隐私政策" : "隱私政策"}
 							</a>
 							<a
 								href={`/${locale}/terms`}
-								className="hover:text-[#8B9F3A] transition-colors"
+								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
 								{locale === "zh-CN" ? "用户条款" : "用戶條款"}
 							</a>
 							<a
 								href={`/${locale}/refunds`}
-								className="hover:text-[#8B9F3A] transition-colors"
+								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
 								{locale === "zh-CN"
 									? "退换货政策"
@@ -55,19 +55,20 @@ const FooterV2 = () => {
 							</a>
 						</nav>
 					</div>
-					<div className="flex items-center gap-4">
+					<div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
 						<a
 							href="https://facebook.com"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="transition-opacity hover:opacity-80"
+							aria-label="Facebook"
 						>
 							<Image
 								src="/images/footer/Facebook.png"
-								alt="Facebook"
+								alt=""
 								width={40}
 								height={40}
-								className="w-9 h-9"
+								className="w-8 h-8 sm:w-9 sm:h-9"
 							/>
 						</a>
 						<a
@@ -75,13 +76,14 @@ const FooterV2 = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 							className="transition-opacity hover:opacity-80"
+							aria-label="Instagram"
 						>
 							<Image
 								src="/images/footer/Instagram.png"
-								alt="Instagram"
+								alt=""
 								width={40}
 								height={40}
-								className="w-9 h-9"
+								className="w-8 h-8 sm:w-9 sm:h-9"
 							/>
 						</a>
 						<a
@@ -89,41 +91,42 @@ const FooterV2 = () => {
 							target="_blank"
 							rel="noopener noreferrer"
 							className="transition-opacity hover:opacity-80"
+							aria-label="Threads"
 						>
 							<Image
 								src="/images/footer/Threads.png"
-								alt="Threads"
+								alt=""
 								width={40}
 								height={40}
-								className="w-9 h-9"
+								className="w-8 h-8 sm:w-9 sm:h-9"
 							/>
 						</a>
 					</div>
 				</div>
 
 				{/* Contact Row */}
-				<div className="flex flex-col items-start gap-6 mt-12 lg:flex-row lg:items-center lg:justify-between">
-					<div>
-						<div className="inline-block bg-[#9AA620] text-[#1C1F26] px-4 py-1.5 rounded-lg font-semibold text-sm mb-4">
+				<div className="flex flex-col items-start gap-6 mt-8 sm:mt-10 md:mt-12 lg:flex-row lg:items-center lg:justify-between">
+					<div className="w-full lg:w-auto">
+						<div className="inline-block bg-[#9AA620] text-[#1C1F26] px-3 py-1.5 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm mb-3 sm:mb-4">
 							{locale === "zh-CN" ? "联系我们：" : "聯絡我們："}
 						</div>
-						<p className="text-white/90">
+						<p className="text-white/90 text-sm sm:text-base">
 							{locale === "zh-CN" ? "电邮" : "電郵"}:
 							info@gmail.com
 						</p>
 					</div>
-					<div className="w-full max-w-[560px] rounded-[20px] bg-[#2A2E36] p-4 sm:p-6">
+					<div className="w-full max-w-full lg:max-w-[560px] rounded-xl sm:rounded-[20px] bg-[#2A2E36] p-4 sm:p-6">
 						<div className="flex flex-col gap-3 sm:flex-row">
 							<Input
 								type="email"
 								placeholder={
 									locale === "zh-CN" ? "您的电邮" : "您的電郵"
 								}
-								className="h-12 px-6 text-white bg-[#2A2E36] border border-white/80 rounded-full placeholder:text-white/70"
+								className="h-11 sm:h-12 px-4 sm:px-6 text-sm sm:text-base text-white bg-[#2A2E36] border border-white/80 rounded-full placeholder:text-white/70"
 							/>
 							<Button
 								onClick={handleContactSubmit}
-								className="h-12 bg-[#9AA620] hover:bg-[#7E8B1D] text-[#1C1F26] rounded-full px-8 font-semibold"
+								className="h-11 sm:h-12 bg-[#9AA620] hover:bg-[#7E8B1D] text-[#1C1F26] rounded-full px-6 sm:px-8 font-semibold text-sm sm:text-base shrink-0"
 							>
 								{locale === "zh-CN" ? "联系我们" : "聯絡我們"}
 							</Button>
@@ -132,21 +135,21 @@ const FooterV2 = () => {
 				</div>
 
 				{/* Bottom Section */}
-				<div className="pt-8 mt-10 border-t border-white/20">
-					<div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-						<p className="text-sm text-white/60">
+				<div className="pt-6 sm:pt-8 mt-8 sm:mt-10 border-t border-white/20">
+					<div className="flex flex-col items-center justify-between gap-4 md:flex-row text-center md:text-left">
+						<p className="text-xs sm:text-sm text-white/60 order-2 md:order-1">
 							© 2025 HarmoniQ.{" "}
 							{locale === "zh-CN"
 								? "保留所有权利"
 								: "保留所有權利"}
 							.
 						</p>
-						<div className="flex items-center gap-3">
+						<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 order-1 md:order-2">
 							{/* Visa */}
-							<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
+							<div className="bg-white rounded px-2 py-1.5 sm:px-3 sm:py-2 flex items-center justify-center min-w-[50px] h-[32px] sm:min-w-[60px] sm:h-[40px]">
 								<svg
 									viewBox="0 0 48 32"
-									className="w-auto h-6"
+									className="w-auto h-5 sm:h-6"
 									fill="none"
 								>
 									<path
@@ -157,10 +160,10 @@ const FooterV2 = () => {
 							</div>
 
 							{/* Mastercard */}
-							<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
+							<div className="bg-white rounded px-2 py-1.5 sm:px-3 sm:py-2 flex items-center justify-center min-w-[50px] h-[32px] sm:min-w-[60px] sm:h-[40px]">
 								<svg
 									viewBox="0 0 48 32"
-									className="w-auto h-6"
+									className="w-auto h-5 sm:h-6"
 									fill="none"
 								>
 									<circle
@@ -180,10 +183,10 @@ const FooterV2 = () => {
 							</div>
 
 							{/* PayPal */}
-							<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
+							<div className="bg-white rounded px-2 py-1.5 sm:px-3 sm:py-2 flex items-center justify-center min-w-[50px] h-[32px] sm:min-w-[60px] sm:h-[40px]">
 								<svg
 									viewBox="0 0 48 32"
-									className="w-auto h-6"
+									className="w-auto h-5 sm:h-6"
 									fill="none"
 								>
 									<path
@@ -198,10 +201,10 @@ const FooterV2 = () => {
 							</div>
 
 							{/* Apple Pay */}
-							<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
+							<div className="bg-white rounded px-2 py-1.5 sm:px-3 sm:py-2 flex items-center justify-center min-w-[50px] h-[32px] sm:min-w-[60px] sm:h-[40px]">
 								<svg
 									viewBox="0 0 48 32"
-									className="w-auto h-6"
+									className="w-auto h-5 sm:h-6"
 									fill="none"
 								>
 									<path
@@ -216,10 +219,10 @@ const FooterV2 = () => {
 							</div>
 
 							{/* Google Pay */}
-							<div className="bg-white rounded px-3 py-2 flex items-center justify-center min-w-[60px] h-[40px]">
+							<div className="bg-white rounded px-2 py-1.5 sm:px-3 sm:py-2 flex items-center justify-center min-w-[50px] h-[32px] sm:min-w-[60px] sm:h-[40px]">
 								<svg
 									viewBox="0 0 48 32"
-									className="w-auto h-6"
+									className="w-auto h-5 sm:h-6"
 									fill="none"
 								>
 									<path

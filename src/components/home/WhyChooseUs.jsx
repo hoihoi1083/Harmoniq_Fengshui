@@ -42,11 +42,11 @@ const WhyChooseUs = () => {
 	];
 
 	return (
-		<section className="relative w-full px-4 py-12 md:py-20 ">
+		<section className="relative w-full px-0 py-8 md:py-10 ">
 			{/* Title Section */}
 			<div className="flex items-center justify-start mb-10 md:mb-16">
 				<div
-					className="flex items-center justify-center rounded-full bg-[#A4AF3B] flex-shrink-0 px-5 py-2.5 min-h-10 w-auto sm:px-6 sm:py-3 md:w-60 md:h-10 md:px-0 md:py-0"
+					className="flex items-center justify-center rounded-full bg-[#A4AF3B] flex-shrink-0 px-5 py-1 min-h-10 w-auto sm:px-6 sm:py-3 md:w-60 md:h-10 md:px-0 md:py-0"
 					style={{
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",

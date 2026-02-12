@@ -254,7 +254,7 @@ export default function Hero() {
 	if (isMobile) {
 		return (
 			<div
-				className="relative w-full min-h-[79vh] overflow-hidden select-none"
+				className="relative w-full min-h-[750px]   overflow-hidden select-none"
 				onTouchStart={handleMobileHeroTouchStart}
 				onTouchEnd={handleMobileHeroTouchEnd}
 			>
@@ -657,10 +657,9 @@ export default function Hero() {
 	return (
 		<div className="relative w-full">
 			<section
-				className="relative flex items-center w-full select-none"
+				className="relative flex items-center h-[90vh] w-full select-none"
 				style={{
 					fontFamily: "Noto Serif TC, serif",
-					height: "100vh",
 					margin: 0,
 					padding: 0,
 					overflow: "hidden",

@@ -49,39 +49,44 @@ const FortuneTips = () => {
 	};
 
 	return (
-		<section
-			className="relative w-full px-4 py-12 md:py-20 sm:px-6 md:px-12 lg:px-20 xl:px-32 2xl:px-80"
-			style={{
-				backgroundImage:
-					"url(/images/demo/homepage-fortunetips-bg.png)",
-				backgroundSize: "cover",
-				backgroundPosition: "center",
-				backgroundRepeat: "no-repeat",
-			}}
-		>
-			<div className="mx-auto">
-				{/* Header */}
-				<div
-					className="flex items-center justify-center  rounded-full md:w-40 md:h-10 bg-[#A4AF3B] flex-shrink-0 mb-16"
-					style={{
-						fontFamily:
-							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-					}}
-				>
-					<span className="font-bold text-white text-md md:text-2xl">
-						命理小貼士
-					</span>
+		<section className="relative w-full px-4 py-1 sm:px-6 md:px-12 md:py-20 lg:px-20 xl:px-32 2xl:px-80">
+			{/* Background: only on md and up, none on mobile */}
+			<div
+				className="absolute inset-0 hidden md:block pointer-events-none"
+				aria-hidden
+				style={{
+					backgroundImage:
+						"url(/images/demo/homepage-fortunetips-bg.png)",
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+				}}
+			/>
+			<div className="relative mx-auto">
+				{/* Header - responsive badge */}
+				<div className="flex items-center justify-start mb-10 md:mb-16">
+					<div
+						className="flex items-center justify-center rounded-full bg-[#A4AF3B] flex-shrink-0 px-5 py-1 min-h-10 w-auto sm:px-6 sm:py-3 md:w-40 md:h-10 md:px-0 md:py-0"
+						style={{
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						}}
+					>
+						<span className="font-bold text-white text-base sm:text-lg md:text-2xl whitespace-nowrap">
+							命理小貼士
+						</span>
+					</div>
 				</div>
 
 				{/* Accordion Items */}
-				<div className="space-y-4 ">
+				<div className="space-y-3 sm:space-y-4">
 					{tips.map((tip, index) => (
 						<div
 							key={index}
-							className={`rounded-lg overflow-hidden transition-all duration-300 ${
-								openIndex === index
-									? "border-2 border-[#191A23]"
-									: " border-2 border-[#191A23]"
+							className={`rounded-lg overflow-hidden transition-all duration-300 border-2 border-[#191A23] ${
+								openIndex !== index
+									? "shadow-[0_1px_0_#000000] md:shadow-none"
+									: ""
 							}`}
 							style={
 								openIndex === index
@@ -95,11 +100,11 @@ const FortuneTips = () => {
 							{/* Header */}
 							<button
 								onClick={() => toggleItem(index)}
-								className="flex items-center justify-between w-full px-8 py-6 transition-colors"
+								className="flex items-center justify-between w-full px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 transition-colors gap-3"
 							>
-								<div className="flex items-center gap-6">
+								<div className="flex items-center gap-3 sm:gap-4 md:gap-6 min-w-0">
 									<span
-										className={`text-5xl font-bold ${
+										className={`text-3xl font-bold flex-shrink-0 sm:text-4xl md:text-5xl ${
 											openIndex === index
 												? "text-white"
 												: "text-gray-900"
@@ -108,7 +113,7 @@ const FortuneTips = () => {
 										{tip.number}
 									</span>
 									<h3
-										className={`text-xl font-medium ${
+										className={`text-base font-medium text-left sm:text-lg md:text-xl ${
 											openIndex === index
 												? "text-white"
 												: "text-gray-900"
@@ -118,7 +123,7 @@ const FortuneTips = () => {
 									</h3>
 								</div>
 								<div
-									className={`w-10 h-10 rounded-full border flex items-center justify-center text-4xl font-extrabold ${
+									className={`w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full border flex items-center justify-center flex-shrink-0 text-2xl sm:text-3xl md:text-4xl font-extrabold ${
 										openIndex === index
 											? "border-[#F3F3F3] bg-[#F3F3F3] text-black"
 											: "border-[#191A23] bg-[#F3F3F3] text-black"
@@ -130,9 +135,9 @@ const FortuneTips = () => {
 
 							{/* Content */}
 							{openIndex === index && (
-								<div className="px-8 pt-2 pb-8">
-									<div className="pt-6 border-t border-gray-600">
-										<p className="leading-relaxed text-white whitespace-pre-line">
+								<div className="px-4 pt-0 pb-6 sm:px-6 sm:pb-7 md:px-8 md:pt-2 md:pb-8">
+									<div className="pt-4 sm:pt-6 border-t border-gray-600">
+										<p className="text-sm sm:text-base leading-relaxed text-white whitespace-pre-line">
 											{tip.content}
 										</p>
 									</div>
