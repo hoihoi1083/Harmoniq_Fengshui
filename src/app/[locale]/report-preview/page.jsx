@@ -414,11 +414,11 @@ const ReportPreviewPage = () => {
 			</div>
 
 			{/* Main Content Area */}
-			<div className="relative w-full pb-12 bg-white">
+			<div className="relative w-full pb-8 sm:pb-12 bg-white">
 				{/* Breadcrumb Navigation */}
-				<div className="px-4 py-8 bg-white ">
+				<div className="px-4 py-4 sm:py-6 md:py-8 bg-white">
 					<div className="container mx-auto">
-						<div className="flex items-center gap-2 text-sm text-gray-600">
+						<div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600">
 							<a
 								href="/"
 								className="text-gray-900 hover:text-[#8B9F3A]"
@@ -434,11 +434,11 @@ const ReportPreviewPage = () => {
 				</div>
 
 				{/* Content Section */}
-				<section className="relative w-full px-4 ">
-					<div className="container mx-auto">
+				<section className="relative w-full px-1 py-2 sm:py-4">
+					<div className="container mx-auto max-w-full">
 						<div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-							{/* Left Column - Images */}
-							<div className="px-6 ">
+							{/* Left Column - Images (bottom on mobile, left on desktop) */}
+							<div className="order-2 px-0 lg:order-1 lg:px-6">
 								<div className="space-y-4">
 									{/* Report Preview Image */}
 									<div className="relative w-full">
@@ -457,14 +457,14 @@ const ReportPreviewPage = () => {
 								</div>
 							</div>
 
-							{/* Right Column - Details */}
-							<div className="space-y-6">
+							{/* Right Column - Details (top on mobile, right on desktop) */}
+							<div className="order-1 space-y-6 lg:order-2">
 								{/* Title and Rating */}
 								<div>
-									<h1 className="text-2xl font-bold text-[#073E31] mb-3">
+									<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#073E31] mb-2 sm:mb-3">
 										{currentReport.title}
 									</h1>
-									<div className="flex items-center gap-2">
+									<div className="flex items-center gap-1.5 sm:gap-2">
 										<div className="flex text-yellow-400">
 											{[...Array(4)].map((_, i) => (
 												<span key={i}>★</span>
@@ -480,12 +480,12 @@ const ReportPreviewPage = () => {
 								</div>
 
 								{/* Price Section */}
-								<div className="space-y-2">
-									<div className="flex items-center gap-3">
-										<span className="text-3xl font-bold text-[#073E31]">
+								<div className="space-y-1 sm:space-y-2">
+									<div className="flex flex-wrap items-center gap-2 sm:gap-3">
+										<span className="text-2xl sm:text-3xl font-bold text-[#073E31]">
 											HK${currentReport.price}.00
 										</span>
-										<span className="text-lg text-gray-400 line-through">
+										<span className="text-base sm:text-lg text-gray-400 line-through">
 											HK${currentReport.originalPrice}.00
 										</span>
 										<span className="px-3 py-1 text-sm font-bold text-red-500 rounded bg-red-50">
@@ -502,7 +502,7 @@ const ReportPreviewPage = () => {
 								</div>
 
 								{/* Description */}
-								<div className="text-sm leading-relaxed text-gray-700">
+								<div className="text-sm sm:text-base leading-relaxed text-gray-700">
 									<p>{currentReport.description}</p>
 								</div>
 
@@ -511,7 +511,7 @@ const ReportPreviewPage = () => {
 									onClick={() =>
 										(window.location.href = `/demo?category=${reportType}`)
 									}
-									className="flex items-center justify-center px-4 py-3 font-semibold text-white transition bg-[#7E8A00] rounded-full w-100 hover:bg-gray-900"
+									className="flex items-center justify-center w-full sm:w-auto px-4 py-3 text-sm sm:text-base font-semibold text-white transition bg-[#7E8A00] rounded-full hover:bg-gray-900"
 								>
 									<span>
 										{locale === "zh-CN"
@@ -524,7 +524,7 @@ const ReportPreviewPage = () => {
 								<div className="border-t border-gray-300"></div>
 
 								{/* Word Count */}
-								<div className="flex items-center gap-3 text-sm">
+								<div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
 									<span className="text-gray-600">
 										{locale === "zh-CN" ? "字數" : "字數"}
 									</span>
@@ -567,7 +567,7 @@ const ReportPreviewPage = () => {
 									<button
 										onClick={handlePayment}
 										disabled={isProcessingPayment}
-										className="px-4 py-3 font-semibold text-white transition bg-[#7E8A00] rounded-full w-100 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+										className="w-full sm:w-auto px-4 py-3 text-sm sm:text-base font-semibold text-white transition bg-[#7E8A00] rounded-full hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										{isProcessingPayment
 											? "處理中..."
@@ -576,14 +576,14 @@ const ReportPreviewPage = () => {
 								</div>
 
 								{/* User Reviews Section */}
-								<div className="pt-6 border-t">
-									<div className="flex items-center justify-between mb-6">
-										<h3 className="text-lg font-semibold text-[#073E31]">
+								<div className="pt-4 sm:pt-6 border-t">
+									<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
+										<h3 className="text-base sm:text-lg font-semibold text-[#073E31]">
 											{locale === "zh-CN"
 												? "用户評論"
 												: "用户評論"}
 										</h3>
-										<div className="flex items-center gap-3">
+										<div className="flex items-center gap-2 sm:gap-3">
 											<select
 												value={selectedRating}
 												onChange={(e) =>
@@ -591,7 +591,7 @@ const ReportPreviewPage = () => {
 														e.target.value,
 													)
 												}
-												className="px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg"
+												className="px-3 py-2 text-xs sm:text-sm bg-white border border-gray-300 rounded-lg"
 											>
 												<option value="最經">
 													{locale === "zh-CN"
@@ -604,7 +604,7 @@ const ReportPreviewPage = () => {
 														: "最新"}
 												</option>
 											</select>
-											<button className="bg-[#8B9F3A] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#7a8e2f]">
+											<button className="bg-[#8B9F3A] text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-[#7a8e2f]">
 												{locale === "zh-CN"
 													? "寫評論"
 													: "寫評論"}
@@ -613,13 +613,13 @@ const ReportPreviewPage = () => {
 									</div>
 
 									{/* Rating Summary */}
-									<div className="flex items-center gap-8 p-4 mb-6 rounded-lg bg-gray-50">
+									<div className="flex items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg bg-gray-50">
 										<div>
-											<div className="text-4xl font-bold text-[#073E31]">
+											<div className="text-3xl sm:text-4xl font-bold text-[#073E31]">
 												4.6
 											</div>
 										</div>
-										<div className="flex-1 space-y-2">
+										<div className="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
 											{[5, 4, 3, 2, 1].map((star) => (
 												<div
 													key={star}
@@ -652,11 +652,11 @@ const ReportPreviewPage = () => {
 									</div>
 
 									{/* Review Cards */}
-									<div className="space-y-4">
+									<div className="space-y-3 sm:space-y-4">
 										{reviews.map((review) => (
 											<div
 												key={review.id}
-												className="p-4 rounded-lg bg-gray-50"
+												className="p-3 sm:p-4 rounded-lg bg-gray-50"
 											>
 												<div className="flex items-start justify-between mb-2">
 													<div className="flex items-center gap-2">
@@ -710,7 +710,7 @@ const ReportPreviewPage = () => {
 									</div>
 
 									{/* Load More Reviews */}
-									<button className="w-full py-3 mt-6 font-semibold text-white transition bg-black rounded-full hover:bg-gray-900">
+									<button className="w-full py-2.5 sm:py-3 mt-4 sm:mt-6 text-sm sm:text-base font-semibold text-white transition bg-black rounded-full hover:bg-gray-900">
 										{locale === "zh-CN"
 											? "更多評價"
 											: "更多評價"}
@@ -723,9 +723,9 @@ const ReportPreviewPage = () => {
 			</div>
 
 			{/* More Calculations Section */}
-			<section className="relative w-full px-4 py-12 bg-white">
-				<div className="container mx-auto">
-					<h2 className="text-3xl font-bold text-center text-[#073E31] mb-12">
+			<section className="relative w-full px-4 py-8 sm:py-10 md:py-12 bg-white">
+				<div className="container mx-auto max-w-full">
+					<h2 className="text-2xl sm:text-3xl font-bold text-center text-[#073E31] mb-8 sm:mb-10 md:mb-12">
 						{locale === "zh-CN" ? "更多測算" : "更多測算"}
 					</h2>
 
@@ -744,7 +744,7 @@ const ReportPreviewPage = () => {
 							onMouseDown={handleMouseDown}
 							onMouseUp={handleMouseUp}
 						>
-							<div className="inline-flex gap-6 px-0 pb-4 md:px-4">
+							<div className="inline-flex gap-4 sm:gap-6 px-0 pb-4 md:px-4">
 								{Object.entries(reportConfig).map(
 									([key, config]) => {
 										// Skip the current report type
@@ -774,7 +774,7 @@ const ReportPreviewPage = () => {
 										return (
 											<div
 												key={key}
-												className="flex-shrink-0 w-64 overflow-hidden transition cursor-pointer"
+												className="flex-shrink-0 w-52 sm:w-64 overflow-hidden transition cursor-pointer"
 												onClick={(e) =>
 													handleCardClick(e, key)
 												}
@@ -790,21 +790,21 @@ const ReportPreviewPage = () => {
 														className="object-cover transition hover:scale-110"
 													/>
 												</div>
-												<div className="p-4">
-													<h3 className="font-semibold text-[#073E31] mb-2 text-sm line-clamp-2">
+												<div className="p-3 sm:p-4">
+													<h3 className="font-semibold text-[#073E31] mb-1.5 sm:mb-2 text-xs sm:text-sm line-clamp-2">
 														{config.title}
 													</h3>
-													<div className="flex items-center gap-2">
-														<span className="text-[#8B9F3A] font-bold text-sm">
+													<div className="flex items-center gap-1.5 sm:gap-2">
+														<span className="text-[#8B9F3A] font-bold text-xs sm:text-sm">
 															HK${config.price}
 														</span>
-														<span className="text-xs text-gray-400 line-through">
+														<span className="text-[10px] sm:text-xs text-gray-400 line-through">
 															HK$
 															{
 																config.originalPrice
 															}
 														</span>
-														<span className="text-xs font-semibold text-red-500">
+														<span className="text-[10px] sm:text-xs font-semibold text-red-500">
 															-{discount}%
 														</span>
 													</div>
@@ -819,25 +819,25 @@ const ReportPreviewPage = () => {
 				</div>
 			</section>
 
-			{/* Newsletter Banner - Overlapping Footer */}
-			<div className="relative z-10 -mb-6">
+			{/* Newsletter Banner - Overlapping Footer (hidden on mobile) */}
+			<div className="relative z-10 hidden -mb-6 md:block">
 				<div className="container px-4 mx-auto">
-					<div className="bg-[#8B9F3A] rounded-3xl overflow-hidden max-w-5xl mx-auto">
-						<div className="px-8 py-10 md:px-12">
-							<div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-								<div className="text-white">
-									<h2 className="text-2xl font-bold md:text-3xl">
+					<div className="bg-[#8B9F3A] rounded-2xl sm:rounded-3xl overflow-hidden max-w-5xl mx-auto">
+						<div className="px-4 py-6 sm:px-6 sm:py-8 md:px-12 md:py-10">
+							<div className="flex flex-col items-center justify-between gap-6 sm:gap-8 md:flex-row">
+								<div className="text-white text-center md:text-left">
+									<h2 className="text-xl sm:text-2xl font-bold md:text-3xl">
 										{locale === "zh-CN"
 											? "随时了解"
 											: "隨時了解"}
 									</h2>
-									<h2 className="text-2xl font-bold md:text-3xl">
+									<h2 className="text-xl sm:text-2xl font-bold md:text-3xl">
 										{locale === "zh-CN"
 											? "我们的最新优惠"
 											: "我們的最新優惠"}
 									</h2>
 								</div>
-								<div className="flex flex-col gap-3 w-full md:w-auto md:min-w-[400px]">
+								<div className="flex flex-col gap-2 sm:gap-3 w-full max-w-sm sm:max-w-none md:w-auto md:min-w-[320px] lg:min-w-[400px]">
 									<Input
 										type="email"
 										placeholder={
@@ -849,12 +849,12 @@ const ReportPreviewPage = () => {
 										onChange={(e) =>
 											setEmail(e.target.value)
 										}
-										className="px-6 py-4 text-gray-800 bg-white rounded-full"
+										className="px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base text-gray-800 bg-white rounded-full"
 									/>
 									<Button
 										onClick={handleNewsletterSubmit}
 										size="lg"
-										className="px-8 py-4 font-bold text-gray-800 bg-white rounded-full hover:bg-gray-100"
+										className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold text-gray-800 bg-white rounded-full hover:bg-gray-100"
 									>
 										{locale === "zh-CN"
 											? "订阅我们"
