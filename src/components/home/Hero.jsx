@@ -275,7 +275,7 @@ export default function Hero() {
 							}
 							alt="Hero background"
 							fill
-							className="object-cover object-rightcenter"
+							className="object-cover object-right"
 							priority={true}
 						/>
 					</div>
@@ -466,7 +466,7 @@ export default function Hero() {
 							src={"/images/hero/hero-bg-2.2.png"}
 							alt="Hero background"
 							fill
-							className="object-cover object-center"
+							className="object-cover object-bottom"
 							priority={true}
 						/>
 					</div>
