@@ -34,6 +34,10 @@ const ProductSchema = new mongoose.Schema({
 		default: "HKD",
 		enum: ["HKD", "CNY", "USD"],
 	},
+	// Region-specific prices (中/港/台) - display uses these when set
+	priceCNY: { type: Number, default: undefined },
+	priceHKD: { type: Number, default: undefined },
+	priceTWD: { type: Number, default: undefined },
 	images: [String],
 	thumbnailImage: String,
 	stock: {

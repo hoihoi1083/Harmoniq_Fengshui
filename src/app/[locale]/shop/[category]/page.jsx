@@ -22,10 +22,13 @@ import FooterV2 from "@/components/home/FooterV2";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
+import { getProductDisplayPrice } from "@/lib/productPrice";
 
 function CategoryPageContent() {
 	const { data: session } = useSession();
 	const params = useParams();
+	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const locale = params.locale;
@@ -1220,13 +1223,10 @@ function CategoryPageContent() {
 												new Date(
 													product.discount.validUntil,
 												) > new Date());
-										const discountedPrice = hasDiscount
-											? product.price *
-												(1 -
-													product.discount
-														.percentage /
-														100)
-											: product.price;
+										const display = getProductDisplayPrice(product, region);
+										const discountedPrice = display.discountedPrice;
+										const displayPrice = display.price;
+										const symbol = display.symbol;
 										const rating =
 											product.rating?.average || 4.0;
 										const ratingCount =
@@ -1387,21 +1387,16 @@ function CategoryPageContent() {
 														{/* Price & Action */}
 														<div className="flex items-center justify-between gap-2 pt-1.5 sm:pt-2 border-t border-gray-100 mt-auto">
 															<div className="flex flex-col min-w-0">
-																{hasDiscount && (
+																{hasDiscount && displayPrice !== discountedPrice && (
 																	<span className="text-[10px] sm:text-xs text-gray-400 line-through">
-																		HK$
-																		{
-																			product.price
-																		}
+																		{symbol}{displayPrice.toFixed(0)}
 																	</span>
 																)}
 																<span className="text-base sm:text-lg md:text-2xl font-bold text-[#6B8E23]">
-																	HK$
+																	{symbol}
 																	{hasDiscount
-																		? discountedPrice.toFixed(
-																				0,
-																			)
-																		: product.price}
+																		? discountedPrice.toFixed(0)
+																		: displayPrice.toFixed(0)}
 																</span>
 															</div>
 															<Button

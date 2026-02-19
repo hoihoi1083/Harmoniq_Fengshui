@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import RegionLanguageSelector from "@/components/RegionLanguageSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -144,6 +145,12 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 
 						{/* Right Actions */}
 						<div className="flex items-center gap-4">
+							{/* Region / Language: 中(CNY) · 港(HKD) · 台(TWD) */}
+							<RegionLanguageSelector
+								navTextColor="#1f2937"
+								compact={true}
+							/>
+
 							{/* Cart */}
 							<Link href={`/${locale}/cart`}>
 								<Button

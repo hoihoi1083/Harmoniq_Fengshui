@@ -36,6 +36,9 @@ export default function AdminShopPage() {
 		category: "charm",
 		price: "",
 		currency: "HKD",
+		priceCNY: "",
+		priceHKD: "",
+		priceTWD: "",
 		stock: "",
 		sold: 0,
 		isDigital: false,
@@ -103,9 +106,15 @@ export default function AdminShopPage() {
 
 		try {
 			// Clean up empty strings
+			const priceHKD = formData.priceHKD !== "" ? parseFloat(formData.priceHKD) : undefined;
+			const priceCNY = formData.priceCNY !== "" ? parseFloat(formData.priceCNY) : undefined;
+			const priceTWD = formData.priceTWD !== "" ? parseFloat(formData.priceTWD) : undefined;
 			const cleanedData = {
 				...formData,
-				price: parseFloat(formData.price),
+				price: priceHKD ?? priceCNY ?? priceTWD ?? parseFloat(formData.price) ?? 0,
+				priceCNY: priceCNY ?? undefined,
+				priceHKD: priceHKD ?? undefined,
+				priceTWD: priceTWD ?? undefined,
 				stock: parseInt(formData.stock) || 0,
 				sold: parseInt(formData.sold) || 0,
 				images: formData.images.filter((img) => img.trim() !== ""),
@@ -150,6 +159,9 @@ export default function AdminShopPage() {
 					price: "",
 					originalPrice: "",
 					currency: "HKD",
+					priceCNY: "",
+					priceHKD: "",
+					priceTWD: "",
 					stock: "",
 					isDigital: false,
 					isFeatured: false,
@@ -188,6 +200,9 @@ export default function AdminShopPage() {
 			category: product.category || "charm",
 			price: product.price ? product.price.toString() : "",
 			currency: product.currency || "HKD",
+			priceCNY: product.priceCNY != null ? product.priceCNY.toString() : "",
+			priceHKD: product.priceHKD != null ? product.priceHKD.toString() : "",
+			priceTWD: product.priceTWD != null ? product.priceTWD.toString() : "",
 			stock: product.stock ? product.stock.toString() : "",
 			sold: product.soldCount || product.sold || 0,
 			isDigital: product.isDigital || false,
@@ -248,6 +263,9 @@ export default function AdminShopPage() {
 			category: "charm",
 			price: "",
 			currency: "HKD",
+			priceCNY: "",
+			priceHKD: "",
+			priceTWD: "",
 			stock: "",
 			sold: 0,
 			isDigital: false,
@@ -608,54 +626,68 @@ export default function AdminShopPage() {
 									</Select>
 								</div>
 
+								</div>
+
+							{/* Prices: 中(CNY) · 港(HKD) · 台(TWD) */}
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 								<div>
-									<Label htmlFor="currency">貨幣 *</Label>
-									<Select
-										value={formData.currency}
-										onValueChange={(value) =>
+									<Label htmlFor="priceCNY">價格 (中 ¥ CNY)</Label>
+									<Input
+										id="priceCNY"
+										type="number"
+										min="0"
+										step="any"
+										value={formData.priceCNY}
+										onChange={(e) =>
 											setFormData({
 												...formData,
-												currency: value,
+												priceCNY: e.target.value,
 											})
 										}
-									>
-										<SelectTrigger>
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="HKD">
-												HKD (港幣)
-											</SelectItem>
-											<SelectItem value="CNY">
-												CNY (人民幣)
-											</SelectItem>
-											<SelectItem value="USD">
-												USD (美元)
-											</SelectItem>
-										</SelectContent>
-									</Select>
+										placeholder="188"
+									/>
+								</div>
+								<div>
+									<Label htmlFor="priceHKD">價格 (港 HK$ HKD)</Label>
+									<Input
+										id="priceHKD"
+										type="number"
+										min="0"
+										step="any"
+										value={formData.priceHKD}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												priceHKD: e.target.value,
+											})
+										}
+										placeholder="188"
+									/>
+								</div>
+								<div>
+									<Label htmlFor="priceTWD">價格 (台 NT$ TWD)</Label>
+									<Input
+										id="priceTWD"
+										type="number"
+										min="0"
+										step="any"
+										value={formData.priceTWD}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												priceTWD: e.target.value,
+											})
+										}
+										placeholder="688"
+									/>
 								</div>
 							</div>
+							<p className="text-xs text-gray-500 mt-1">
+								至少填寫一種價格；前台將依用戶選擇的 中/港/台 顯示對應價格
+							</p>
 
-							{/* Price, Original Price, Stock */}
+							{/* Stock */}
 						<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-							<div>
-								<Label htmlFor="price">價格 *</Label>
-								<Input
-									id="price"
-									type="number"
-									required
-									value={formData.price}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											price: e.target.value,
-										})
-									}
-									placeholder="188"
-							/>
-						</div>
-
 						<div>
 							<Label htmlFor="stock">庫存 *</Label>
 							<Input

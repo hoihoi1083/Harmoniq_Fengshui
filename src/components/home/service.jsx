@@ -7,11 +7,14 @@ import Step from "./Step";
 import ShopFeatureBanner from "./ShopFeatureBanner";
 import ServiceDemoTags from "./ServiceDemoTags";
 import useMobile from "../../app/hooks/useMobile";
+import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
+import { getProductDisplayPrice } from "@/lib/productPrice";
 
 const ServiceSection = () => {
 	const t = useTranslations("home.services");
 	const locale = useLocale();
 	const isMobile = useMobile();
+	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
 	const [isClient, setIsClient] = useState(false);
 	const [products, setProducts] = useState([]);
 	const [loadingProducts, setLoadingProducts] = useState(true);
@@ -176,12 +179,10 @@ const ServiceSection = () => {
 											new Date(
 												product.discount.validUntil,
 											) > new Date());
-									const discountedPrice = hasDiscount
-										? product.price *
-											(1 -
-												product.discount.percentage /
-													100)
-										: product.price;
+									const display = getProductDisplayPrice(product, region);
+									const discountedPrice = display.discountedPrice;
+									const displayPrice = display.price;
+									const symbol = display.symbol;
 									const rating =
 										product.rating?.average || 4.5;
 									return (
@@ -254,20 +255,15 @@ const ServiceSection = () => {
 														</div>
 														<div className="flex items-center gap-2">
 															<span className="text-lg font-bold text-[#6B8E23]">
-																HK$
+																{symbol}
 																{hasDiscount
-																	? discountedPrice.toFixed(
-																			0,
-																		)
-																	: product.price}
+																	? discountedPrice.toFixed(0)
+																	: displayPrice.toFixed(0)}
 															</span>
 															{hasDiscount && (
 																<>
 																	<span className="text-xs text-gray-400 line-through">
-																		HK$
-																		{
-																			product.price
-																		}
+																		{symbol}{displayPrice.toFixed(0)}
 																	</span>
 																	<span className="text-xs font-semibold text-red-500">
 																		-
@@ -299,12 +295,10 @@ const ServiceSection = () => {
 												product.discount.validUntil,
 											) > new Date());
 
-									const discountedPrice = hasDiscount
-										? product.price *
-											(1 -
-												product.discount.percentage /
-													100)
-										: product.price;
+									const display = getProductDisplayPrice(product, region);
+									const discountedPrice = display.discountedPrice;
+									const displayPrice = display.price;
+									const symbol = display.symbol;
 
 									const rating =
 										product.rating?.average || 4.5;
@@ -374,20 +368,15 @@ const ServiceSection = () => {
 													</div>
 													<div className="flex items-center gap-2">
 														<span className="text-lg font-bold text-[#6B8E23]">
-															HK$
+															{symbol}
 															{hasDiscount
-																? discountedPrice.toFixed(
-																		0,
-																	)
-																: product.price}
+																? discountedPrice.toFixed(0)
+																: displayPrice.toFixed(0)}
 														</span>
 														{hasDiscount && (
 															<>
 																<span className="text-xs text-gray-400 line-through">
-																	HK$
-																	{
-																		product.price
-																	}
+																	{symbol}{displayPrice.toFixed(0)}
 																</span>
 																<span className="text-xs font-semibold text-red-500">
 																	-
@@ -464,12 +453,10 @@ const ServiceSection = () => {
 											new Date(
 												product.discount.validUntil,
 											) > new Date());
-									const discountedPrice = hasDiscount
-										? product.price *
-											(1 -
-												product.discount.percentage /
-													100)
-										: product.price;
+									const display = getProductDisplayPrice(product, region);
+									const discountedPrice = display.discountedPrice;
+									const displayPrice = display.price;
+									const symbol = display.symbol;
 									const rating =
 										product.rating?.average || 4.5;
 									return (
@@ -542,20 +529,15 @@ const ServiceSection = () => {
 														</div>
 														<div className="flex items-center gap-2">
 															<span className="text-lg font-bold text-[#6B8E23]">
-																HK$
+																{symbol}
 																{hasDiscount
-																	? discountedPrice.toFixed(
-																			0,
-																		)
-																	: product.price}
+																	? discountedPrice.toFixed(0)
+																	: displayPrice.toFixed(0)}
 															</span>
 															{hasDiscount && (
 																<>
 																	<span className="text-xs text-gray-400 line-through">
-																		HK$
-																		{
-																			product.price
-																		}
+																		{symbol}{displayPrice.toFixed(0)}
 																	</span>
 																	<span className="text-xs font-semibold text-red-500">
 																		-
@@ -587,12 +569,10 @@ const ServiceSection = () => {
 												product.discount.validUntil,
 											) > new Date());
 
-									const discountedPrice = hasDiscount
-										? product.price *
-											(1 -
-												product.discount.percentage /
-													100)
-										: product.price;
+									const display = getProductDisplayPrice(product, region);
+									const discountedPrice = display.discountedPrice;
+									const displayPrice = display.price;
+									const symbol = display.symbol;
 
 									const rating =
 										product.rating?.average || 4.5;
@@ -662,20 +642,15 @@ const ServiceSection = () => {
 													</div>
 													<div className="flex items-center gap-2">
 														<span className="text-lg font-bold text-[#6B8E23]">
-															HK$
+															{symbol}
 															{hasDiscount
-																? discountedPrice.toFixed(
-																		0,
-																	)
-																: product.price}
+																? discountedPrice.toFixed(0)
+																: displayPrice.toFixed(0)}
 														</span>
 														{hasDiscount && (
 															<>
 																<span className="text-xs text-gray-400 line-through">
-																	HK$
-																	{
-																		product.price
-																	}
+																	{symbol}{displayPrice.toFixed(0)}
 																</span>
 																<span className="text-xs font-semibold text-red-500">
 																	-

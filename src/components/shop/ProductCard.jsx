@@ -8,9 +8,13 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart, Sparkles, ZoomIn } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
+import { getProductDisplayPrice } from "@/lib/productPrice";
 
 export default function ProductCard({ product, onAddToCart }) {
 	const locale = useLocale();
+	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
+	const display = getProductDisplayPrice(product, region);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 	const [showZoom, setShowZoom] = useState(false);
 	const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
@@ -40,9 +44,9 @@ export default function ProductCard({ product, onAddToCart }) {
 		(!product.discount.validUntil ||
 			new Date(product.discount.validUntil) > new Date());
 
-	const discountedPrice = hasDiscount
-		? product.price * (1 - product.discount.percentage / 100)
-		: product.price;
+	const discountedPrice = display.discountedPrice;
+	const displayPrice = display.price;
+	const symbol = display.symbol;
 
 	// Get product rating
 	const rating = product.rating?.average || 0;
@@ -272,21 +276,17 @@ export default function ProductCard({ product, onAddToCart }) {
 					{/* Price and Actions */}
 					<div className="flex items-center justify-between pt-3 border-t border-gray-100">
 						<div className="flex flex-col">
-							{hasDiscount && (
+							{hasDiscount && displayPrice !== discountedPrice && (
 								<span className="text-xs text-gray-400 line-through">
-									{product.currency === "HKD" && "HK$"}
-									{product.currency === "CNY" && "¥"}
-									{product.currency === "USD" && "$"}
-									{product.price}
+									{symbol}
+									{displayPrice.toFixed(0)}
 								</span>
 							)}
 							<span className="text-xl font-bold bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] bg-clip-text text-transparent">
-								{product.currency === "HKD" && "HK$"}
-								{product.currency === "CNY" && "¥"}
-								{product.currency === "USD" && "$"}
+								{symbol}
 								{hasDiscount
 									? discountedPrice.toFixed(0)
-									: product.price}
+									: displayPrice.toFixed(0)}
 							</span>
 						</div>
 

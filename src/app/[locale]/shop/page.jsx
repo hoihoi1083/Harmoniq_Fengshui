@@ -23,10 +23,13 @@ import {
 	Mail,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
+import { getProductDisplayPrice } from "@/lib/productPrice";
 
 export default function ShopPage() {
 	const { data: session } = useSession();
 	const locale = useLocale();
+	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
 	const [products, setProducts] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -398,12 +401,10 @@ export default function ShopPage() {
 												product.discount.validUntil,
 											) > new Date());
 
-									const discountedPrice = hasDiscount
-										? product.price *
-											(1 -
-												product.discount.percentage /
-													100)
-										: product.price;
+									const display = getProductDisplayPrice(product, region);
+									const discountedPrice = display.discountedPrice;
+									const displayPrice = display.price;
+									const symbol = display.symbol;
 
 									// Use actual product rating or default to 4.5
 									const rating =
@@ -512,20 +513,15 @@ export default function ShopPage() {
 													<div className="flex items-center justify-between gap-2">
 														<div className="flex items-center gap-2">
 															<span className="text-2xl font-bold text-[#6B8E23]">
-																$
+																{symbol}
 																{hasDiscount
-																	? discountedPrice.toFixed(
-																			0,
-																		)
-																	: product.price}
+																	? discountedPrice.toFixed(0)
+																	: displayPrice.toFixed(0)}
 															</span>
 															{hasDiscount && (
 																<>
 																	<span className="text-sm text-gray-400 line-through">
-																		$
-																		{
-																			product.price
-																		}
+																		{symbol}{displayPrice.toFixed(0)}
 																	</span>
 																	<span className="text-xs font-semibold text-red-500 bg-red-50 px-2 py-1 rounded">
 																		-
@@ -615,12 +611,10 @@ export default function ShopPage() {
 												product.discount.validUntil,
 											) > new Date());
 
-									const discountedPrice = hasDiscount
-										? product.price *
-											(1 -
-												product.discount.percentage /
-													100)
-										: product.price;
+									const display = getProductDisplayPrice(product, region);
+									const discountedPrice = display.discountedPrice;
+									const displayPrice = display.price;
+									const symbol = display.symbol;
 
 									const rating =
 										product.rating?.average || 4.0;
@@ -785,21 +779,16 @@ export default function ShopPage() {
 													{/* Price & Action */}
 													<div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-auto">
 														<div className="flex flex-col">
-															{hasDiscount && (
+															{hasDiscount && displayPrice !== discountedPrice && (
 																<span className="text-xs text-gray-400 line-through">
-																	HK$
-																	{
-																		product.price
-																	}
+																	{symbol}{displayPrice.toFixed(0)}
 																</span>
 															)}
 															<span className="text-2xl font-bold text-[#6B8E23]">
-																HK$
+																{symbol}
 																{hasDiscount
-																	? discountedPrice.toFixed(
-																			0,
-																		)
-																	: product.price}
+																	? discountedPrice.toFixed(0)
+																	: displayPrice.toFixed(0)}
 															</span>
 														</div>
 														<button

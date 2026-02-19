@@ -29,12 +29,15 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import FooterV2 from "@/components/home/FooterV2";
+import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
+import { getProductDisplayPrice } from "@/lib/productPrice";
 
 export default function ProductDetailPage() {
 	const { data: session } = useSession();
 	const params = useParams();
 	const router = useRouter();
 	const locale = useLocale();
+	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
 	const [product, setProduct] = useState(null);
 	const [relatedProducts, setRelatedProducts] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -289,9 +292,10 @@ export default function ProductDetailPage() {
 		(!product.discount.validUntil ||
 			new Date(product.discount.validUntil) > new Date());
 
-	const discountedPrice = hasDiscount
-		? product.price * (1 - product.discount.percentage / 100)
-		: product.price;
+	const display = getProductDisplayPrice(product, region);
+	const discountedPrice = display.discountedPrice;
+	const displayPrice = display.price;
+	const symbol = display.symbol;
 
 	const getElementEmoji = (element) => {
 		const elementEmojis = {
@@ -553,25 +557,19 @@ export default function ProductDetailPage() {
 							</span>
 						</div>
 
-						{/* Price */}
+						{/* Price (by region: 中/港/台) */}
 						<div className="space-y-2">
 							<div className="flex items-baseline gap-3">
 								<span className="text-3xl font-bold text-gray-900">
-									{product?.currency === "HKD" && "HK$"}
-									{product?.currency === "CNY" && "¥"}
-									{product?.currency === "USD" && "$"}
+									{symbol}
 									{hasDiscount
 										? discountedPrice.toFixed(0)
-										: product?.price}
+										: displayPrice.toFixed(0)}
 								</span>
 								{hasDiscount && (
 									<>
 										<span className="text-lg text-gray-400 line-through">
-											{product?.currency === "HKD" &&
-												"HK$"}
-											{product?.currency === "CNY" && "¥"}
-											{product?.currency === "USD" && "$"}
-											{product?.price}
+											{symbol}{displayPrice.toFixed(0)}
 										</span>
 										<Badge className="text-xs text-white bg-red-500">
 											-{product?.discount?.percentage}%
@@ -875,12 +873,10 @@ export default function ProductDetailPage() {
 											relatedProduct.discount.validUntil,
 										) > new Date());
 
-								const discountedPrice = hasDiscount
-									? relatedProduct.price *
-										(1 -
-											relatedProduct.discount.percentage /
-												100)
-									: relatedProduct.price;
+								const relDisplay = getProductDisplayPrice(relatedProduct, region);
+								const discountedPrice = relDisplay.discountedPrice;
+								const displayPrice = relDisplay.price;
+								const relSymbol = relDisplay.symbol;
 
 								const rating =
 									relatedProduct.rating?.average || 4.5;
@@ -983,19 +979,14 @@ export default function ProductDetailPage() {
 												{/* Price */}
 												<div className="flex items-center gap-2">
 													<span className="text-lg font-bold text-gray-900">
-														$
+														{relSymbol}
 														{hasDiscount
-															? discountedPrice.toFixed(
-																	0,
-																)
-															: relatedProduct.price}
+															? discountedPrice.toFixed(0)
+															: displayPrice.toFixed(0)}
 													</span>
 													{hasDiscount && (
 														<span className="text-xs text-gray-400 line-through">
-															$
-															{
-																relatedProduct.price
-															}
+															{relSymbol}{displayPrice.toFixed(0)}
 														</span>
 													)}
 												</div>

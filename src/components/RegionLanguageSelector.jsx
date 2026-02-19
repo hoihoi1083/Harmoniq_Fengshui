@@ -80,20 +80,13 @@ export default function RegionLanguageSelector({
 		const matchingRegion = regions.find((r) => r.locale === currentLocale);
 
 		if (compact) {
-			// Return simplified Chinese character based on ACTUAL URL locale
-			if (currentLocale === "zh-CN") {
-				return "簡";
-			} else {
-				// For Traditional Chinese, show region-specific indicator
-				// Priority: stored region value
-				if (region === "hongkong") return "港";
-				if (region === "taiwan") return "台";
-				// Fallback: try to detect from matchingRegion
-				if (matchingRegion?.key === "hongkong") return "港";
-				if (matchingRegion?.key === "taiwan") return "台";
-				// Default to Taiwan for traditional Chinese
-				return "台";
-			}
+			// Return short label: 中 (China) · 港 (HK) · 台 (Taiwan)
+			if (currentLocale === "zh-CN") return "中";
+			if (region === "hongkong") return "港";
+			if (region === "taiwan") return "台";
+			if (matchingRegion?.key === "hongkong") return "港";
+			if (matchingRegion?.key === "taiwan") return "台";
+			return "台";
 		}
 
 		// Always show display text based on CURRENT URL LOCALE, not stored region
