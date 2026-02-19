@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -52,6 +52,10 @@ export default function ProductDetailPage() {
 	const [email, setEmail] = useState("");
 	const [selectedGiftReport, setSelectedGiftReport] = useState(null);
 	const imageRef = useRef(null);
+	const relatedCarouselRef = useRef(null);
+	const [isDragging, setIsDragging] = useState(false);
+	const dragStart = useRef({ x: 0, scrollLeft: 0 });
+	const didDragRef = useRef(false);
 
 	// Gift report type labels (財運, 感情, 事業, 健康)
 	const GIFT_REPORT_LABELS = {
@@ -270,6 +274,40 @@ export default function ProductDetailPage() {
 		console.log("Newsletter subscribed with email:", email);
 		setEmail("");
 	};
+
+	// Related products carousel: mouse drag to scroll (works from cards or gaps; document listeners so drag continues over cards)
+	const onRelatedDocMove = useCallback((e) => {
+		e.preventDefault();
+		if (!relatedCarouselRef.current) return;
+		const dx = e.pageX - dragStart.current.x;
+		relatedCarouselRef.current.scrollLeft = dragStart.current.scrollLeft - dx;
+		didDragRef.current = true;
+	}, []);
+	const onRelatedDocUp = useCallback(() => {
+		document.removeEventListener("mousemove", onRelatedDocMove, { capture: true });
+		document.removeEventListener("mouseup", onRelatedDocUp, { capture: true });
+		setIsDragging(false);
+		setTimeout(() => { didDragRef.current = false; }, 0);
+	}, [onRelatedDocMove]);
+	const handleRelatedMouseDown = useCallback((e) => {
+		if (!relatedCarouselRef.current) return;
+		didDragRef.current = false;
+		setIsDragging(true);
+		dragStart.current = {
+			x: e.pageX,
+			scrollLeft: relatedCarouselRef.current.scrollLeft,
+		};
+		document.addEventListener("mousemove", onRelatedDocMove, { passive: false, capture: true });
+		document.addEventListener("mouseup", onRelatedDocUp, { capture: true });
+	}, [onRelatedDocMove, onRelatedDocUp]);
+
+	// Clean up document listeners if component unmounts during drag
+	useEffect(() => {
+		return () => {
+			document.removeEventListener("mousemove", onRelatedDocMove, { capture: true });
+			document.removeEventListener("mouseup", onRelatedDocUp, { capture: true });
+		};
+	}, [onRelatedDocMove, onRelatedDocUp]);
 
 	if (loading) {
 		return (
@@ -857,13 +895,23 @@ export default function ProductDetailPage() {
 					</div>
 				</div>
  */}
-				{/* Related Products Section */}
+				{/* Related Products Section - 4 items, carousel on narrow screens */}
 				{relatedProducts.length > 0 && (
 					<div className="pt-16 mt-16 border-t border-gray-200">
 						<h2 className="mb-8 text-2xl font-bold text-center text-gray-900">
 							{locale === "zh-CN" ? "猜你喜欢" : "猜你喜歡"}
 						</h2>
-						<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+						<div
+							ref={relatedCarouselRef}
+							className="flex gap-6 overflow-x-auto overflow-y-hidden scrollbar-hide select-none snap-x snap-mandatory"
+							style={{
+								WebkitOverflowScrolling: "touch",
+								cursor: isDragging ? "grabbing" : "grab",
+							}}
+							onMouseDown={handleRelatedMouseDown}
+							role="region"
+							aria-label={locale === "zh-CN" ? "相关产品" : "相關產品"}
+						>
 							{relatedProducts.map((relatedProduct) => {
 								const hasDiscount =
 									relatedProduct.discount &&
@@ -885,7 +933,11 @@ export default function ProductDetailPage() {
 									<Link
 										key={relatedProduct._id}
 										href={`/${locale}/shop/product/${relatedProduct._id}`}
-										className="group"
+										className="group flex-shrink-0 w-[280px] sm:w-[260px] md:w-[280px] lg:w-[calc(25%-18px)] min-w-[260px] snap-start"
+										style={{ scrollSnapAlign: "start" }}
+										draggable={false}
+										onDragStart={(e) => e.preventDefault()}
+										onClick={(e) => { if (didDragRef.current) e.preventDefault(); }}
 									>
 										<div className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-xl hover:shadow-lg">
 											{/* Product Image */}
@@ -906,6 +958,7 @@ export default function ProductDetailPage() {
 																.zh_TW
 														}
 														fill
+														draggable={false}
 														className="object-cover transition-transform duration-500 group-hover:scale-110"
 														sizes="(max-width: 768px) 50vw, 25vw"
 													/>
@@ -1005,10 +1058,13 @@ export default function ProductDetailPage() {
 												)}
 											</div>
 										</div>
-									</Link>
+											</Link>
 								);
 							})}
 						</div>
+						<p className="mt-3 text-center text-sm text-gray-500 lg:hidden">
+							{locale === "zh-CN" ? "左右滑动或拖动查看更多" : "左右滑動或拖動查看更多"}
+						</p>
 					</div>
 				)}
 			</div>
