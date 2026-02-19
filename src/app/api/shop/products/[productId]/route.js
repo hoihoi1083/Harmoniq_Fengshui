@@ -6,6 +6,8 @@ import { unlink } from "fs/promises";
 import path from "path";
 import mongoose from "mongoose";
 
+export const dynamic = "force-dynamic";
+
 // GET single product by ID
 export async function GET(request, { params }) {
 	try {

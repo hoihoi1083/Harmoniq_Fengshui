@@ -119,6 +119,7 @@ export default function CheckoutPage() {
 					quantity: item.quantity,
 					price: item.product.price,
 					discount: item.product.discount?.percentage || 0,
+					giftReportType: item.giftReportType || undefined,
 				})),
 				shippingInfo,
 				billingInfo: billingSameAsShipping ? shippingInfo : billingInfo,

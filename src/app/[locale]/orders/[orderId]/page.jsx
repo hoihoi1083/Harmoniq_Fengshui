@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+const GIFT_REPORT_LABELS = { wealth: "財運", love: "感情", career: "事業", health: "健康" };
+
 export default function OrderConfirmationPage() {
 	const { data: session } = useSession();
 	const locale = useLocale();
@@ -224,6 +226,11 @@ export default function OrderConfirmationPage() {
 																product
 																	.description
 																	.zh_TW}
+														</p>
+													)}
+													{item.giftReportType && (
+														<p className="text-sm text-[#6B8E23] mb-1">
+															{locale === "zh-CN" ? "贈送報告" : "贈送報告"}: {GIFT_REPORT_LABELS[item.giftReportType] || item.giftReportType}
 														</p>
 													)}
 													<div className="flex justify-between items-center">

@@ -17,6 +17,7 @@ const CartSchema = new mongoose.Schema({
 				default: 1,
 				min: 1,
 			},
+			giftReportType: String, // "wealth" | "love" | "career" | "health" - chosen report as gift
 			addedAt: {
 				type: Date,
 				default: Date.now,

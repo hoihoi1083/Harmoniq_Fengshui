@@ -48,6 +48,7 @@ export default function AdminShopPage() {
 			size: "",
 			weight: "",
 		},
+		giftReportTypes: [], // ["wealth","love","career","health"] - which report types user can choose as gift
 		rating: {
 			average: 0,
 			count: 0,
@@ -160,6 +161,7 @@ export default function AdminShopPage() {
 						size: "",
 						weight: "",
 					},
+					giftReportTypes: [],
 					discount: {
 						percentage: 0,
 						validUntil: "",
@@ -198,6 +200,7 @@ export default function AdminShopPage() {
 				size: product.specifications?.size || "",
 				weight: product.specifications?.weight || "",
 			},
+			giftReportTypes: product.giftReportTypes && product.giftReportTypes.length > 0 ? [...product.giftReportTypes] : [],
 			rating: {
 				average: product.rating?.average || 0,
 				count: product.rating?.count || 0,
@@ -252,22 +255,23 @@ export default function AdminShopPage() {
 			elementType: "none",
 			tags: [],
 			benefits: [""],
-			specifications: {
-				material: "",
-				size: "",
-				weight: "",
-			},
-			rating: {
-				average: 0,
-				count: 0,
-			},
-			discount: {
-				percentage: 0,
-				validUntil: "",
-			},
-			images: [""],
-		});
-	};
+				specifications: {
+					material: "",
+					size: "",
+					weight: "",
+				},
+				giftReportTypes: [],
+				rating: {
+					average: 0,
+					count: 0,
+				},
+				discount: {
+					percentage: 0,
+					validUntil: "",
+				},
+				images: [""],
+			});
+		};
 
 	const handleImageUpload = async (e, index) => {
 		const file = e.target.files?.[0];
@@ -1017,6 +1021,35 @@ export default function AdminShopPage() {
 										}
 										placeholder="例如：200g"
 									/>
+								</div>
+							</div>
+
+							{/* Gift report types (which reports customer can choose as gift) */}
+							<div className="space-y-2">
+								<Label>贈送報告類型（顧客購買時可選一種）</Label>
+								<div className="flex flex-wrap gap-3">
+									{[
+										{ value: "wealth", label: "財運" },
+										{ value: "love", label: "感情" },
+										{ value: "career", label: "事業" },
+										{ value: "health", label: "健康" },
+									].map(({ value, label }) => (
+										<label key={value} className="flex items-center gap-2 cursor-pointer">
+											<input
+												type="checkbox"
+												checked={formData.giftReportTypes?.includes(value)}
+												onChange={(e) => {
+													const current = formData.giftReportTypes || [];
+													const next = e.target.checked
+														? [...current, value]
+														: current.filter((t) => t !== value);
+													setFormData({ ...formData, giftReportTypes: next });
+												}}
+												className="w-4 h-4"
+											/>
+											<span>{label}</span>
+										</label>
+									))}
 								</div>
 							</div>
 

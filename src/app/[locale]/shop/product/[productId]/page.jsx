@@ -47,7 +47,16 @@ export default function ProductDetailPage() {
 	const [showZoom, setShowZoom] = useState(false);
 	const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
 	const [email, setEmail] = useState("");
+	const [selectedGiftReport, setSelectedGiftReport] = useState(null);
 	const imageRef = useRef(null);
+
+	// Gift report type labels (財運, 感情, 事業, 健康)
+	const GIFT_REPORT_LABELS = {
+		wealth: locale === "zh-CN" ? "財運" : "財運",
+		love: locale === "zh-CN" ? "感情" : "感情",
+		career: locale === "zh-CN" ? "事業" : "事業",
+		health: locale === "zh-CN" ? "健康" : "健康",
+	};
 
 	useEffect(() => {
 		if (params.productId) {
@@ -66,7 +75,10 @@ export default function ProductDetailPage() {
 
 	const fetchProduct = async () => {
 		try {
-			const res = await fetch(`/api/shop/products/${params.productId}`);
+			const res = await fetch(`/api/shop/products/${params.productId}`, {
+				cache: "no-store",
+				headers: { "Cache-Control": "no-cache" },
+			});
 			const data = await res.json();
 			if (data.success) {
 				setProduct(data.data);
@@ -203,6 +215,15 @@ export default function ProductDetailPage() {
 			toast.error(locale === "zh-CN" ? "请先登录" : "請先登入");
 			return;
 		}
+		const reportTypes = Array.isArray(product?.giftReportTypes) ? product.giftReportTypes : [];
+		if (reportTypes.length > 0 && !selectedGiftReport) {
+			toast.error(
+				locale === "zh-CN"
+					? "请选择一种赠送报告类型"
+					: "請選擇一種贈送報告類型",
+			);
+			return;
+		}
 
 		setIsAddingToCart(true);
 		try {
@@ -212,6 +233,11 @@ export default function ProductDetailPage() {
 				body: JSON.stringify({
 					productId: product._id,
 					quantity: quantity,
+					...(Array.isArray(product.giftReportTypes) &&
+					product.giftReportTypes.length > 0 &&
+					selectedGiftReport
+						? { giftReportType: selectedGiftReport }
+						: {}),
 				}),
 			});
 
@@ -586,6 +612,40 @@ export default function ProductDetailPage() {
 								>
 									{product.specifications.size}
 								</button>
+							</div>
+						)}
+
+						{/* Gift report type (choose one as gift) */}
+						{Array.isArray(product?.giftReportTypes) &&
+							product.giftReportTypes.length > 0 && (
+							<div className="space-y-3">
+								<span className="text-sm font-medium text-gray-700">
+									{locale === "zh-CN"
+										? "選擇贈送報告類型"
+										: "選擇贈送報告類型"}
+								</span>
+								<div className="flex flex-wrap gap-2">
+									{product.giftReportTypes.map((type) => (
+										<button
+											key={type}
+											type="button"
+											onClick={() =>
+												setSelectedGiftReport(
+													selectedGiftReport === type
+														? null
+														: type,
+												)
+											}
+											className={`px-4 py-2 border-2 rounded-lg text-sm font-medium transition-all ${
+												selectedGiftReport === type
+													? "border-[#6B8E23] bg-[#6B8E23]/10 text-[#6B8E23]"
+													: "border-gray-200 hover:border-gray-300"
+											}`}
+										>
+											{GIFT_REPORT_LABELS[type] || type}
+										</button>
+									))}
+								</div>
 							</div>
 						)}
 

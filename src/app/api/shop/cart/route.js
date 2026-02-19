@@ -37,6 +37,7 @@ export async function GET(request) {
 				_id: item._id,
 				product: item.productId,
 				quantity: item.quantity,
+				giftReportType: item.giftReportType || undefined,
 			})),
 		};
 
@@ -64,7 +65,7 @@ export async function POST(request) {
 			);
 		}
 
-		const { productId, quantity, setAbsolute } = await request.json();
+		const { productId, quantity, setAbsolute, giftReportType } = await request.json();
 
 		if (!productId || !quantity) {
 			return NextResponse.json(
@@ -124,12 +125,12 @@ export async function POST(request) {
 			} else {
 				cart.items[existingItemIndex].quantity += quantity;
 			}
+			if (giftReportType !== undefined) cart.items[existingItemIndex].giftReportType = giftReportType || undefined;
 		} else {
 			// Add new item
-			cart.items.push({
-				productId,
-				quantity,
-			});
+			const newItem = { productId, quantity };
+			if (giftReportType) newItem.giftReportType = giftReportType;
+			cart.items.push(newItem);
 		}
 
 		await cart.save();
@@ -144,6 +145,7 @@ export async function POST(request) {
 				_id: item._id,
 				product: item.productId,
 				quantity: item.quantity,
+				giftReportType: item.giftReportType || undefined,
 			})),
 		};
 
@@ -211,6 +213,7 @@ export async function DELETE(request) {
 				_id: item._id,
 				product: item.productId,
 				quantity: item.quantity,
+				giftReportType: item.giftReportType || undefined,
 			})),
 		};
 

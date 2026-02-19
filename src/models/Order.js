@@ -22,6 +22,7 @@ const OrderSchema = new mongoose.Schema({
 			quantity: Number,
 			price: Number,
 			isDigital: Boolean,
+			giftReportType: String, // "wealth" | "love" | "career" | "health" - chosen report as gift
 		},
 	],
 	subtotal: Number,

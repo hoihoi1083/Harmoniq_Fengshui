@@ -133,6 +133,7 @@ export async function POST(request) {
 				quantity: item.quantity,
 				price: product.price,
 				isDigital: product.isDigital,
+				giftReportType: item.giftReportType || undefined,
 			});
 		}
 

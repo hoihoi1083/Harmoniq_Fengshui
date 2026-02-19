@@ -485,6 +485,11 @@ function AdminOrderDetailContent({ orderId, locale }) {
 												<p className="text-sm text-gray-600 mt-1">
 													數量: {item.quantity}
 												</p>
+												{item.giftReportType && (
+													<p className="text-sm text-green-700 mt-1">
+														贈送報告: {({ wealth: "財運", love: "感情", career: "事業", health: "健康" })[item.giftReportType] || item.giftReportType}
+													</p>
+												)}
 												<p className="text-sm text-blue-600 font-medium mt-1">
 													{order.currency === "HKD"
 														? "HK$"

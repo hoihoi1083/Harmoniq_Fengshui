@@ -69,6 +69,19 @@ const ProductSchema = new mongoose.Schema({
 		size: String, // e.g., "直徑3cm", "長度15cm"
 		weight: String, // e.g., "50g"
 	},
+	// Which report types can be chosen as gift when buying this product (財運/感情/事業/健康)
+	giftReportTypes: {
+		type: [String],
+		default: undefined,
+		validate: {
+			validator(v) {
+				if (!Array.isArray(v) || v.length === 0) return true;
+				const allowed = ["wealth", "love", "career", "health"];
+				return v.every((el) => allowed.includes(el));
+			},
+			message: "giftReportTypes must be one or more of: wealth, love, career, health",
+		},
+	},
 	rating: {
 		average: { type: Number, default: 0 },
 		count: { type: Number, default: 0 },
