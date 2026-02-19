@@ -594,15 +594,52 @@ function CategoryPageContent() {
 	return (
 		<div className="min-h-screen bg-white">
 			<ShopNavbar cartCount={cartCount} />
-			{/* Hero Banner Section */}
-			<section className="relative bg-gradient-to-br pt-10 from-[#F5F5F0] via-[#FAFAF8] to-white   overflow-hidden">
-				<div className="container px-4 mx-auto relative z-10">
-					<div className="grid lg:grid-cols-2 gap-12 items-center">
+			{/* Hero Banner Section - responsive */}
+			<section className="relative bg-gradient-to-br from-[#F5F5F0] via-[#FAFAF8] to-white overflow-hidden pt-6 pb-24 sm:pt-8 sm:pb-28 md:pt-10 md:pb-12 lg:pt-12 lg:pb-16 lg:min-h-[70vh] flex flex-col">
+				{/* Crystal as background: always bottom-right, size scales with viewport */}
+				<div
+					className="absolute inset-0 z-0 pointer-events-none"
+					aria-hidden
+				>
+					<div
+						className="absolute right-0 bottom-0 w-[100vh] h-[100vh] min-h-[320px] max-w-[90vw]"
+						style={{ aspectRatio: "1" }}
+					>
+						<Image
+							src="/images/shop-home/crystal.png"
+							alt=""
+							fill
+							className="object-contain object-[bottom_right] drop-shadow-2xl"
+							priority
+							onError={(e) => {
+								e.currentTarget.style.display = "none";
+								const next = e.currentTarget.nextElementSibling;
+								if (next) next.style.display = "flex";
+							}}
+						/>
+						<div className="hidden absolute inset-0 items-center justify-center bg-transparent">
+							<Sparkles className="w-32 h-32 text-[#6B8E23] opacity-20" />
+						</div>
+						{/* Sparkles at top of image (positioned in visible area; container is 100vh bottom-aligned so top-2 was clipped) */}
+						<div className="absolute top-[35%] left-2 sm:left-4 text-[#8B9F3A] opacity-80 animate-pulse z-10" aria-hidden>
+							<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 sm:w-9 sm:h-9 drop-shadow-sm">
+								<path d="M12 0l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
+							</svg>
+						</div>
+						<div className="absolute top-[35%] right-2 sm:right-4 text-[#8B9F3A] opacity-80 animate-pulse z-10" aria-hidden>
+							<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 sm:w-9 sm:h-9 drop-shadow-sm">
+								<path d="M12 0l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
+							</svg>
+						</div>
+					</div>
+				</div>
+				<div className="container px-4 sm:px-6 mx-auto relative z-10 flex-1 flex flex-col justify-center">
+					<div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 						{/* Left Content */}
-						<div className="space-y-3 lg:space-y-7">
-							<div className="relative">
+						<div className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-7 max-w-xl">
+							<div className="relative pr-10 sm:pr-12">
 								<h1
-									className="text-5xl md:text-6xl lg:text-7xl  text-[#6B8E23]"
+									className="text-[2rem] leading-tight sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl text-[#6B8E23]"
 									style={{
 										fontFamily:
 											"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
@@ -614,27 +651,25 @@ function CategoryPageContent() {
 										: "探索與您氣場相合的水晶能量"}
 								</h1>
 								{/* Decorative Sparkle */}
-								<div className="absolute -right-4 top-0 text-[#8B9F3A] opacity-80">
+								<div className="absolute right-0 top-0 text-[#8B9F3A] opacity-80 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12">
 									<svg
-										width="48"
-										height="48"
 										viewBox="0 0 24 24"
 										fill="currentColor"
-										className="animate-pulse"
+										className="animate-pulse w-full h-full"
 									>
 										<path d="M12 0l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
 									</svg>
 								</div>
 							</div>
 
-							<p className="text-lg md:text-lg text-gray-600 leading-relaxed max-w-xl">
+							<p className="text-base sm:text-lg text-gray-600 leading-relaxed">
 								{locale === "zh-CN"
 									? "浏览我们品类丰富的开运佳品，所有物件均经匠心力作与能量加持，旨在助您调和命理格局，契合个人运势，激发专属您的正向能量。"
 									: "瀏覽我們品類豐富的開運佳品，所有物件均經匠心力作與能量加持，旨在助您調和命理格局，契合個人運勢，激發專屬您的正向能量。"}
 							</p>
 
 							{/* Promo banner - not a button */}
-							<div className="w-full max-w-xl py-4 px-5 mb-10 bg-[#99A800] text-white text-center text-lg font-bold">
+							<div className="w-full py-3 px-4 sm:py-4 sm:px-5 mb-6 sm:mb-8 lg:mb-10 bg-[#99A800] text-white text-center text-sm sm:text-base md:text-lg font-bold">
 								{locale === "zh-CN"
 									? "购买开运水晶 赠送专属水晶能量报告"
 									: "購買開運水晶 贈送專屬水晶能量報告"}
@@ -642,7 +677,7 @@ function CategoryPageContent() {
 
 							<Button
 								size="lg"
-								className="bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-14 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+								className="w-full sm:w-auto bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-8 py-4 sm:px-10 sm:py-5 lg:px-14 lg:py-6 text-base sm:text-lg rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
 								onClick={() => {
 									document
 										.getElementById("products-section")
@@ -655,51 +690,8 @@ function CategoryPageContent() {
 							</Button>
 						</div>
 
-						{/* Right Image */}
-						<div className="relative h-[100px] lg:h-[70vh] top-9 left-15 flex items-end justify-end">
-							<div className="relative w-full h-full">
-								<Image
-									src="/images/shop-home/crystal.png"
-									alt="Crystal Energy"
-									fill
-									className="object-contain drop-shadow-2xl"
-									priority
-									onError={(e) => {
-										e.currentTarget.style.display = "none";
-										e.currentTarget.nextElementSibling.style.display =
-											"flex";
-									}}
-								/>
-								{/* Fallback if image not found */}
-								<div className="hidden absolute inset-0 items-center justify-center">
-									<Sparkles className="w-32 h-32 text-[#6B8E23] opacity-20" />
-								</div>
-							</div>
-
-							{/* Decorative Sparkles */}
-							<div className="absolute bottom-20 right-10 text-[#8B9F3A] opacity-60 animate-pulse">
-								<svg
-									width="64"
-									height="64"
-									viewBox="0 0 24 24"
-									fill="currentColor"
-									style={{ animationDelay: "0.5s" }}
-								>
-									<path d="M12 0l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
-								</svg>
-							</div>
-							<div className="absolute top-20 left-10 text-[#8B9F3A] opacity-40 animate-pulse">
-								<svg
-									width="32"
-									height="32"
-									viewBox="0 0 24 24"
-									fill="currentColor"
-									style={{ animationDelay: "1s" }}
-								>
-									<path d="M12 0l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
-								</svg>
-							</div>
-						</div>
+						{/* Right side empty so background crystal shows through on desktop */}
+						<div className="hidden lg:block" aria-hidden />
 					</div>
 				</div>
 			</section>
@@ -749,10 +741,22 @@ function CategoryPageContent() {
 								type="button"
 								onClick={() => setFilterDrawerOpen(false)}
 								className="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
-								aria-label={locale === "zh-CN" ? "關閉" : "關閉"}
+								aria-label={
+									locale === "zh-CN" ? "關閉" : "關閉"
+								}
 							>
-								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+								<svg
+									className="w-5 h-5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 18L18 6M6 6l12 12"
+									/>
 								</svg>
 							</button>
 						</div>
@@ -1120,46 +1124,48 @@ function CategoryPageContent() {
 								</p>
 								<div className="flex items-center gap-2">
 									<span className="text-sm text-gray-600">
-									{locale === "zh-CN"
-										? "排序："
-										: locale === "zh-TW"
+										{locale === "zh-CN"
 											? "排序："
-											: "Sort by:"}
-								</span>
-								<select
-									value={sortBy}
-									onChange={(e) => setSortBy(e.target.value)}
-									className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B9F3A]"
-								>
-									<option value="most-popular">
-										{locale === "zh-CN"
-											? "最受欢迎"
 											: locale === "zh-TW"
-												? "最受歡迎"
-												: "Most Popular"}
-									</option>
-									<option value="price-low-high">
-										{locale === "zh-CN"
-											? "价格：低至高"
-											: locale === "zh-TW"
-												? "價格：低至高"
-												: "Price: Low to High"}
-									</option>
-									<option value="price-high-low">
-										{locale === "zh-CN"
-											? "价格：高至低"
-											: locale === "zh-TW"
-												? "價格：高至低"
-												: "Price: High to Low"}
-									</option>
-									<option value="newest">
-										{locale === "zh-CN"
-											? "最新上架"
-											: locale === "zh-TW"
+												? "排序："
+												: "Sort by:"}
+									</span>
+									<select
+										value={sortBy}
+										onChange={(e) =>
+											setSortBy(e.target.value)
+										}
+										className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B9F3A]"
+									>
+										<option value="most-popular">
+											{locale === "zh-CN"
+												? "最受欢迎"
+												: locale === "zh-TW"
+													? "最受歡迎"
+													: "Most Popular"}
+										</option>
+										<option value="price-low-high">
+											{locale === "zh-CN"
+												? "价格：低至高"
+												: locale === "zh-TW"
+													? "價格：低至高"
+													: "Price: Low to High"}
+										</option>
+										<option value="price-high-low">
+											{locale === "zh-CN"
+												? "价格：高至低"
+												: locale === "zh-TW"
+													? "價格：高至低"
+													: "Price: High to Low"}
+										</option>
+										<option value="newest">
+											{locale === "zh-CN"
 												? "最新上架"
-												: "Newest"}
-									</option>
-								</select>
+												: locale === "zh-TW"
+													? "最新上架"
+													: "Newest"}
+										</option>
+									</select>
 								</div>
 							</div>
 						</div>
@@ -1445,34 +1451,48 @@ function CategoryPageContent() {
 											{(() => {
 												const pages = [];
 												if (totalPages <= 7) {
-													for (let i = 1; i <= totalPages; i++)
+													for (
+														let i = 1;
+														i <= totalPages;
+														i++
+													)
 														pages.push(i);
 												} else {
-													pages.push(1, 2, 3, "...", totalPages);
+													pages.push(
+														1,
+														2,
+														3,
+														"...",
+														totalPages,
+													);
 												}
-												return pages.map((page, index) =>
-													page === "..." ? (
-														<span
-															key={`ellipsis-${index}`}
-															className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-400 text-sm"
-														>
-															…
-														</span>
-													) : (
-														<button
-															key={page}
-															onClick={() =>
-																setCurrentPage(page)
-															}
-															className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
-																page === currentPage
-																	? "bg-[#8B9F3A] text-white"
-																	: "text-gray-600 hover:bg-gray-100"
-															}`}
-														>
-															{page}
-														</button>
-													),
+												return pages.map(
+													(page, index) =>
+														page === "..." ? (
+															<span
+																key={`ellipsis-${index}`}
+																className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-400 text-sm"
+															>
+																…
+															</span>
+														) : (
+															<button
+																key={page}
+																onClick={() =>
+																	setCurrentPage(
+																		page,
+																	)
+																}
+																className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+																	page ===
+																	currentPage
+																		? "bg-[#8B9F3A] text-white"
+																		: "text-gray-600 hover:bg-gray-100"
+																}`}
+															>
+																{page}
+															</button>
+														),
 												);
 											})()}
 										</div>
