@@ -37,7 +37,9 @@ export default function ProductDetailPage() {
 	const params = useParams();
 	const router = useRouter();
 	const locale = useLocale();
-	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
+	const { region } = useRegionDetectionWithRedirect({
+		skipFirstRedirect: true,
+	});
 	const [product, setProduct] = useState(null);
 	const [relatedProducts, setRelatedProducts] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -222,7 +224,9 @@ export default function ProductDetailPage() {
 			toast.error(locale === "zh-CN" ? "请先登录" : "請先登入");
 			return;
 		}
-		const reportTypes = Array.isArray(product?.giftReportTypes) ? product.giftReportTypes : [];
+		const reportTypes = Array.isArray(product?.giftReportTypes)
+			? product.giftReportTypes
+			: [];
 		if (reportTypes.length > 0 && !selectedGiftReport) {
 			toast.error(
 				locale === "zh-CN"
@@ -280,32 +284,51 @@ export default function ProductDetailPage() {
 		e.preventDefault();
 		if (!relatedCarouselRef.current) return;
 		const dx = e.pageX - dragStart.current.x;
-		relatedCarouselRef.current.scrollLeft = dragStart.current.scrollLeft - dx;
+		relatedCarouselRef.current.scrollLeft =
+			dragStart.current.scrollLeft - dx;
 		didDragRef.current = true;
 	}, []);
 	const onRelatedDocUp = useCallback(() => {
-		document.removeEventListener("mousemove", onRelatedDocMove, { capture: true });
-		document.removeEventListener("mouseup", onRelatedDocUp, { capture: true });
+		document.removeEventListener("mousemove", onRelatedDocMove, {
+			capture: true,
+		});
+		document.removeEventListener("mouseup", onRelatedDocUp, {
+			capture: true,
+		});
 		setIsDragging(false);
-		setTimeout(() => { didDragRef.current = false; }, 0);
+		setTimeout(() => {
+			didDragRef.current = false;
+		}, 0);
 	}, [onRelatedDocMove]);
-	const handleRelatedMouseDown = useCallback((e) => {
-		if (!relatedCarouselRef.current) return;
-		didDragRef.current = false;
-		setIsDragging(true);
-		dragStart.current = {
-			x: e.pageX,
-			scrollLeft: relatedCarouselRef.current.scrollLeft,
-		};
-		document.addEventListener("mousemove", onRelatedDocMove, { passive: false, capture: true });
-		document.addEventListener("mouseup", onRelatedDocUp, { capture: true });
-	}, [onRelatedDocMove, onRelatedDocUp]);
+	const handleRelatedMouseDown = useCallback(
+		(e) => {
+			if (!relatedCarouselRef.current) return;
+			didDragRef.current = false;
+			setIsDragging(true);
+			dragStart.current = {
+				x: e.pageX,
+				scrollLeft: relatedCarouselRef.current.scrollLeft,
+			};
+			document.addEventListener("mousemove", onRelatedDocMove, {
+				passive: false,
+				capture: true,
+			});
+			document.addEventListener("mouseup", onRelatedDocUp, {
+				capture: true,
+			});
+		},
+		[onRelatedDocMove, onRelatedDocUp],
+	);
 
 	// Clean up document listeners if component unmounts during drag
 	useEffect(() => {
 		return () => {
-			document.removeEventListener("mousemove", onRelatedDocMove, { capture: true });
-			document.removeEventListener("mouseup", onRelatedDocUp, { capture: true });
+			document.removeEventListener("mousemove", onRelatedDocMove, {
+				capture: true,
+			});
+			document.removeEventListener("mouseup", onRelatedDocUp, {
+				capture: true,
+			});
 		};
 	}, [onRelatedDocMove, onRelatedDocUp]);
 
@@ -607,7 +630,8 @@ export default function ProductDetailPage() {
 								{hasDiscount && (
 									<>
 										<span className="text-lg text-gray-400 line-through">
-											{symbol}{displayPrice.toFixed(0)}
+											{symbol}
+											{displayPrice.toFixed(0)}
 										</span>
 										<Badge className="text-xs text-white bg-red-500">
 											-{product?.discount?.percentage}%
@@ -654,36 +678,38 @@ export default function ProductDetailPage() {
 						{/* Gift report type (choose one as gift) */}
 						{Array.isArray(product?.giftReportTypes) &&
 							product.giftReportTypes.length > 0 && (
-							<div className="space-y-3">
-								<span className="text-sm font-medium text-gray-700">
-									{locale === "zh-CN"
-										? "選擇贈送報告類型"
-										: "選擇贈送報告類型"}
-								</span>
-								<div className="flex flex-wrap gap-2">
-									{product.giftReportTypes.map((type) => (
-										<button
-											key={type}
-											type="button"
-											onClick={() =>
-												setSelectedGiftReport(
+								<div className="space-y-3">
+									<span className="text-sm font-medium text-gray-700">
+										{locale === "zh-CN"
+											? "選擇贈送報告類型"
+											: "選擇贈送報告類型"}
+									</span>
+									<div className="flex flex-wrap gap-2">
+										{product.giftReportTypes.map((type) => (
+											<button
+												key={type}
+												type="button"
+												onClick={() =>
+													setSelectedGiftReport(
+														selectedGiftReport ===
+															type
+															? null
+															: type,
+													)
+												}
+												className={`px-4 py-2 border-2 rounded-lg text-sm font-medium transition-all ${
 													selectedGiftReport === type
-														? null
-														: type,
-												)
-											}
-											className={`px-4 py-2 border-2 rounded-lg text-sm font-medium transition-all ${
-												selectedGiftReport === type
-													? "border-[#6B8E23] bg-[#6B8E23]/10 text-[#6B8E23]"
-													: "border-gray-200 hover:border-gray-300"
-											}`}
-										>
-											{GIFT_REPORT_LABELS[type] || type}
-										</button>
-									))}
+														? "border-[#6B8E23] bg-[#6B8E23]/10 text-[#6B8E23]"
+														: "border-gray-200 hover:border-gray-300"
+												}`}
+											>
+												{GIFT_REPORT_LABELS[type] ||
+													type}
+											</button>
+										))}
+									</div>
 								</div>
-							</div>
-						)}
+							)}
 
 						{/* Quantity Selector */}
 						<div className="flex items-center gap-4">
@@ -910,7 +936,9 @@ export default function ProductDetailPage() {
 							}}
 							onMouseDown={handleRelatedMouseDown}
 							role="region"
-							aria-label={locale === "zh-CN" ? "相关产品" : "相關產品"}
+							aria-label={
+								locale === "zh-CN" ? "相关产品" : "相關產品"
+							}
 						>
 							{relatedProducts.map((relatedProduct) => {
 								const hasDiscount =
@@ -921,8 +949,12 @@ export default function ProductDetailPage() {
 											relatedProduct.discount.validUntil,
 										) > new Date());
 
-								const relDisplay = getProductDisplayPrice(relatedProduct, region);
-								const discountedPrice = relDisplay.discountedPrice;
+								const relDisplay = getProductDisplayPrice(
+									relatedProduct,
+									region,
+								);
+								const discountedPrice =
+									relDisplay.discountedPrice;
 								const displayPrice = relDisplay.price;
 								const relSymbol = relDisplay.symbol;
 
@@ -937,7 +969,10 @@ export default function ProductDetailPage() {
 										style={{ scrollSnapAlign: "start" }}
 										draggable={false}
 										onDragStart={(e) => e.preventDefault()}
-										onClick={(e) => { if (didDragRef.current) e.preventDefault(); }}
+										onClick={(e) => {
+											if (didDragRef.current)
+												e.preventDefault();
+										}}
 									>
 										<div className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-xl hover:shadow-lg">
 											{/* Product Image */}
@@ -1034,12 +1069,19 @@ export default function ProductDetailPage() {
 													<span className="text-lg font-bold text-gray-900">
 														{relSymbol}
 														{hasDiscount
-															? discountedPrice.toFixed(0)
-															: displayPrice.toFixed(0)}
+															? discountedPrice.toFixed(
+																	0,
+																)
+															: displayPrice.toFixed(
+																	0,
+																)}
 													</span>
 													{hasDiscount && (
 														<span className="text-xs text-gray-400 line-through">
-															{relSymbol}{displayPrice.toFixed(0)}
+															{relSymbol}
+															{displayPrice.toFixed(
+																0,
+															)}
 														</span>
 													)}
 												</div>
@@ -1058,13 +1100,10 @@ export default function ProductDetailPage() {
 												)}
 											</div>
 										</div>
-											</Link>
+									</Link>
 								);
 							})}
 						</div>
-						<p className="mt-3 text-center text-sm text-gray-500 lg:hidden">
-							{locale === "zh-CN" ? "左右滑动或拖动查看更多" : "左右滑動或拖動查看更多"}
-						</p>
 					</div>
 				)}
 			</div>

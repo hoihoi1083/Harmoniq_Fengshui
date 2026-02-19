@@ -16,6 +16,7 @@ import {
 	LogOut,
 	Sparkles,
 	X,
+	Menu,
 } from "lucide-react";
 
 export default function ShopNavbar({ onSearch, cartCount }) {
@@ -25,6 +26,8 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [showUserMenu, setShowUserMenu] = useState(false);
 	const [showPromoBanner, setShowPromoBanner] = useState(true);
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+	const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
 	const handleSearch = (e) => {
 		const value = e.target.value;
@@ -38,7 +41,12 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 		e.preventDefault();
 		if (searchTerm.trim()) {
 			const url = `/${locale}/shop/all?search=${encodeURIComponent(searchTerm.trim())}`;
-			console.log('🔍 ShopNavbar - Searching for:', searchTerm.trim(), 'URL:', url);
+			console.log(
+				"🔍 ShopNavbar - Searching for:",
+				searchTerm.trim(),
+				"URL:",
+				url,
+			);
 			router.push(url);
 		}
 	};
@@ -46,83 +54,79 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 	return (
 		<>
 			{/* Promotional Banner */}
-			{showPromoBanner && (
-				<div className="sticky top-0 z-50 bg-black text-white py-2">
-					<div className="container mx-auto px-4">
-						<div className="flex items-center justify-center relative">
-							<p className="text-sm text-center">
-								{locale === "zh-CN"
-									? "注册即可享首单八折优惠 "
-									: "註冊即可享首單八折優惠 "}
-								<Link
-									href={`/${locale}/register`}
-									className="underline font-semibold hover:text-gray-300 transition-colors"
-								>
-									{locale === "zh-CN" ? "立即注册" : "立即註冊"}
-								</Link>
-							</p>
-							<button
-								onClick={() => setShowPromoBanner(false)}
-								className="absolute right-0 p-1 hover:bg-white/10 rounded transition-colors"
-								aria-label="Close"
-							>
-								<X className="w-4 h-4" />
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
 
 			{/* Main Navbar */}
 			<nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-				<div className="container mx-auto px-4">
-					<div className="flex items-center justify-between h-20">
-						{/* Logo */}
-						<Link
-							href={`/${locale}/shop`}
-							className="flex items-center hover:opacity-80 transition-opacity"
-						>
-							<Image
-								src="/images/logo/logo-desktop.png"
-								alt="HarmoniQ Logo"
-								width={681}
-								height={132}
-								className="h-8 w-auto"
-								style={{
-									filter: "none",
-									backfaceVisibility: "hidden",
-									WebkitFontSmoothing: "antialiased",
-								}}
-								quality={100}
-								priority
-							/>
-						</Link>
+				<div className="container mx-auto px-1 sm:px-6">
+					<div className="flex items-center justify-between h-14 sm:h-20">
+						{/* Mobile: Hamburger + Logo. Desktop: Logo only (links to shop). */}
+						<div className="flex items-center gap-1 min-w-0">
+							{/* Hamburger - mobile only */}
+							<button
+								type="button"
+								onClick={() => setMobileMenuOpen((o) => !o)}
+								className="md:hidden pl-2 pr-0 rounded-md hover:bg-gray-100 text-gray-700 transition-colors shrink-0"
+								aria-label={
+									locale === "zh-CN" ? "菜单" : "選單"
+								}
+							>
+								<Menu className="w-6 h-6" />
+							</button>
+							<Link
+								href={`/${locale}/shop`}
+								className="flex items-center hover:opacity-80 transition-opacity shrink-0"
+							>
+								<Image
+									src="/images/logo/logo-desktop.png"
+									alt="HarmoniQ Logo"
+									width={681}
+									height={132}
+									className="h-6 w-auto sm:h-7 md:h-8"
+									style={{
+										filter: "none",
+										backfaceVisibility: "hidden",
+										WebkitFontSmoothing: "antialiased",
+									}}
+									quality={100}
+									priority
+								/>
+							</Link>
+						</div>
 
-						{/* Navigation Links */}
+						{/* Navigation Links - desktop only */}
 						<div className="hidden md:flex items-center gap-8">
 							<Link
-								href={`/${locale}/shop#products-section`}
-								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors"
+								href={`/${locale}/home`}
+								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
-								{locale === "zh-CN" ? "2026新品" : "2026新品"}
+								首頁
 							</Link>
 							<Link
-								href={`/${locale}/shop#hot-products`}
-								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors"
+								href={`/${locale}`}
+								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
-								{locale === "zh-CN" ? "热销产品" : "熱銷產品"}
+								風鈴資訊室
 							</Link>
 							<Link
-								href={`/${locale}/shop/categories`}
-								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors"
+								href={`/${locale}/shop/all`}
+								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
-								{locale === "zh-CN" ? "分类" : "分類"}
+								風鈴商店
+							</Link>
+							<Link
+								href={`/${locale}/price`}
+								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
+							>
+								測算報告定價
 							</Link>
 						</div>
 
 						{/* Search Bar */}
 						<div className="hidden lg:flex flex-1 max-w-md mx-8">
-							<form onSubmit={handleSearchSubmit} className="relative w-full">
+							<form
+								onSubmit={handleSearchSubmit}
+								className="relative w-full"
+							>
 								<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
 								<Input
 									type="text"
@@ -134,7 +138,7 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 									value={searchTerm}
 									onChange={handleSearch}
 									onKeyDown={(e) => {
-										if (e.key === 'Enter') {
+										if (e.key === "Enter") {
 											handleSearchSubmit(e);
 										}
 									}}
@@ -143,8 +147,19 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 							</form>
 						</div>
 
-						{/* Right Actions */}
-						<div className="flex items-center gap-4">
+						{/* Right Actions: on mobile include Search icon */}
+						<div className="flex items-center gap-2 sm:gap-4">
+							{/* Mobile: Search icon to toggle search bar */}
+							<button
+								type="button"
+								onClick={() => setMobileSearchOpen((o) => !o)}
+								className="lg:hidden p-2 rounded-full hover:bg-gray-100 text-gray-700 transition-colors"
+								aria-label={
+									locale === "zh-CN" ? "搜索" : "搜尋"
+								}
+							>
+								<Search className="w-6 h-6 text-[#6B8E23]" />
+							</button>
 							{/* Region / Language: 中(CNY) · 港(HKD) · 台(TWD) */}
 							<RegionLanguageSelector
 								navTextColor="#1f2937"
@@ -167,15 +182,42 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 								</Button>
 							</Link>
 
-							{/* User Account */}
+							{/* User Account: avatar when logged in, else user icon */}
 							<div className="relative">
 								<Button
 									variant="ghost"
 									size="icon"
-									className="hover:bg-gray-100 rounded-full"
-									onClick={() => setShowUserMenu(!showUserMenu)}
+									className="hover:bg-gray-100 rounded-full p-0 overflow-hidden"
+									onClick={() =>
+										setShowUserMenu(!showUserMenu)
+									}
 								>
-									<User className="w-6 h-6 text-[#6B8E23]" />
+									{session?.user ? (
+										session.user.image ? (
+											<span className="relative block w-8 h-8 rounded-full overflow-hidden bg-gray-200 shrink-0">
+												<Image
+													src={session.user.image}
+													alt=""
+													width={32}
+													height={32}
+													className="object-cover w-full h-full"
+													unoptimized
+												/>
+											</span>
+										) : (
+											<span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#6B8E23] text-white text-sm font-semibold shrink-0">
+												{(
+													session.user.name ||
+													session.user.email ||
+													"?"
+												)
+													.slice(0, 1)
+													.toUpperCase()}
+											</span>
+										)
+									) : (
+										<User className="w-6 h-6 text-[#6B8E23]" />
+									)}
 								</Button>
 
 								{/* User Dropdown Menu */}
@@ -191,17 +233,24 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 												<Link
 													href={`/${locale}/orders`}
 													className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-													onClick={() => setShowUserMenu(false)}
+													onClick={() =>
+														setShowUserMenu(false)
+													}
 												>
 													{locale === "zh-CN"
 														? "我的订单"
 														: "我的訂單"}
 												</Link>
-												{session?.user?.role === "admin" && (
+												{session?.user?.role ===
+													"admin" && (
 													<Link
 														href={`/${locale}/admin/shop`}
 														className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-														onClick={() => setShowUserMenu(false)}
+														onClick={() =>
+															setShowUserMenu(
+																false,
+															)
+														}
 													>
 														{locale === "zh-CN"
 															? "商品管理"
@@ -225,7 +274,9 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 											<Link
 												href={`/${locale}/auth/login`}
 												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-												onClick={() => setShowUserMenu(false)}
+												onClick={() =>
+													setShowUserMenu(false)
+												}
 											>
 												{locale === "zh-CN"
 													? "登录"
@@ -238,9 +289,50 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 						</div>
 					</div>
 
-					{/* Mobile Search Bar */}
-					<div className="lg:hidden pb-4">
-						<form onSubmit={handleSearchSubmit} className="relative w-full">
+					{/* Mobile hamburger menu panel */}
+					{mobileMenuOpen && (
+						<div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
+							<div className="container mx-auto px-4 py-3 space-y-1">
+								<Link
+									href={`/${locale}/home`}
+									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									首頁
+								</Link>
+								<Link
+									href={`/${locale}`}
+									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									風鈴資訊室
+								</Link>
+								<Link
+									href={`/${locale}/shop/all`}
+									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									風鈴商店
+								</Link>
+								<Link
+									href={`/${locale}/price`}
+									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									測算報告定價
+								</Link>
+							</div>
+						</div>
+					)}
+
+					{/* Mobile Search Bar - shown when search icon is toggled */}
+					<div
+						className={`lg:hidden overflow-hidden transition-all duration-200 ${mobileSearchOpen ? "pb-4 max-h-20 opacity-100" : "max-h-0 opacity-0 pb-0"}`}
+					>
+						<form
+							onSubmit={handleSearchSubmit}
+							className="relative w-full"
+						>
 							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
 							<Input
 								type="text"
@@ -252,7 +344,7 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 								value={searchTerm}
 								onChange={handleSearch}
 								onKeyDown={(e) => {
-									if (e.key === 'Enter') {
+									if (e.key === "Enter") {
 										handleSearchSubmit(e);
 									}
 								}}
@@ -262,11 +354,14 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 					</div>
 				</div>
 
-				{/* Click outside to close user menu */}
-				{showUserMenu && (
+				{/* Click outside to close user menu or mobile menu */}
+				{(showUserMenu || mobileMenuOpen) && (
 					<div
 						className="fixed inset-0 z-40"
-						onClick={() => setShowUserMenu(false)}
+						onClick={() => {
+							setShowUserMenu(false);
+							setMobileMenuOpen(false);
+						}}
 					/>
 				)}
 			</nav>
