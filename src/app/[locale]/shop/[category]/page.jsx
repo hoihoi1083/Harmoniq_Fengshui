@@ -28,7 +28,9 @@ import { getProductDisplayPrice } from "@/lib/productPrice";
 function CategoryPageContent() {
 	const { data: session } = useSession();
 	const params = useParams();
-	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
+	const { region } = useRegionDetectionWithRedirect({
+		skipFirstRedirect: true,
+	});
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const locale = params.locale;
@@ -624,13 +626,31 @@ function CategoryPageContent() {
 							<Sparkles className="w-32 h-32 text-[#6B8E23] opacity-20" />
 						</div>
 						{/* Sparkles at top of image (positioned in visible area; container is 100vh bottom-aligned so top-2 was clipped) */}
-						<div className="absolute top-[35%] left-2 sm:left-4 text-[#8B9F3A] opacity-80 animate-pulse z-10" aria-hidden>
-							<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 sm:w-9 sm:h-9 drop-shadow-sm">
+						<div
+							className="absolute top-[35%] left-2 sm:left-4 text-[#8B9F3A] opacity-80 animate-pulse z-10"
+							aria-hidden
+						>
+							<svg
+								width="32"
+								height="32"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								className="w-7 h-7 sm:w-9 sm:h-9 drop-shadow-sm"
+							>
 								<path d="M12 0l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
 							</svg>
 						</div>
-						<div className="absolute top-[35%] right-2 sm:right-4 text-[#8B9F3A] opacity-80 animate-pulse z-10" aria-hidden>
-							<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 sm:w-9 sm:h-9 drop-shadow-sm">
+						<div
+							className="absolute top-[35%] right-2 sm:right-4 text-[#8B9F3A] opacity-80 animate-pulse z-10"
+							aria-hidden
+						>
+							<svg
+								width="32"
+								height="32"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								className="w-7 h-7 sm:w-9 sm:h-9 drop-shadow-sm"
+							>
 								<path d="M12 0l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
 							</svg>
 						</div>
@@ -646,7 +666,7 @@ function CategoryPageContent() {
 									style={{
 										fontFamily:
 											"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-										fontWeight: 1400,
+										fontWeight: 700,
 									}}
 								>
 									{locale === "zh-CN"
@@ -1198,7 +1218,7 @@ function CategoryPageContent() {
 							<>
 								<div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-12">
 									{paginatedProducts.map((product) => {
-										// Handle product name - extract string from object or use directly
+										// Handle product name - Product model uses zh_TW, zh_CN (underscore); locale may be zh-TW, zh-CN (hyphen)
 										let productName = "";
 										if (
 											typeof product.name === "object" &&
@@ -1208,6 +1228,8 @@ function CategoryPageContent() {
 												product.name[locale] ||
 												product.name["zh-TW"] ||
 												product.name["zh-CN"] ||
+												product.name.zh_TW ||
+												product.name.zh_CN ||
 												product.name["en"] ||
 												"";
 										} else {
@@ -1223,8 +1245,12 @@ function CategoryPageContent() {
 												new Date(
 													product.discount.validUntil,
 												) > new Date());
-										const display = getProductDisplayPrice(product, region);
-										const discountedPrice = display.discountedPrice;
+										const display = getProductDisplayPrice(
+											product,
+											region,
+										);
+										const discountedPrice =
+											display.discountedPrice;
 										const displayPrice = display.price;
 										const symbol = display.symbol;
 										const rating =
@@ -1242,7 +1268,7 @@ function CategoryPageContent() {
 												href={`/${locale}/shop/product/${product._id || product.id}`}
 												className="group"
 											>
-												<div className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full">
+												<div className=" rounded-2xl sm:rounded-3xl overflow-hidden  transition-all duration-500 flex flex-col h-full">
 													{/* Product Image with Badges */}
 													<div className="relative h-40 sm:h-56 md:h-64 lg:h-72 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0">
 														{product.images &&
@@ -1311,25 +1337,16 @@ function CategoryPageContent() {
 														{/* Category Tags */}
 														<div className="flex gap-1 sm:gap-2 flex-wrap min-h-[20px] sm:min-h-[28px]">
 															{product.tags &&
-																product.tags
-																	.slice(0, 2)
-																	.map(
-																		(
-																			tag,
-																			idx,
-																		) => (
-																			<span
-																				key={
-																					idx
-																				}
-																				className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full font-medium"
-																			>
-																				{
-																					tag
-																				}
-																			</span>
-																		),
-																	)}
+																product.tags.slice(0, 6).map(
+																	(tag, idx) => (
+																		<span
+																			key={idx}
+																			className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full font-medium"
+																		>
+																			{tag}
+																		</span>
+																	),
+																)}
 														</div>
 
 														{/* Product Name */}
@@ -1387,16 +1404,27 @@ function CategoryPageContent() {
 														{/* Price & Action */}
 														<div className="flex items-center justify-between gap-2 pt-1.5 sm:pt-2 border-t border-gray-100 mt-auto">
 															<div className="flex flex-col min-w-0">
-																{hasDiscount && displayPrice !== discountedPrice && (
-																	<span className="text-[10px] sm:text-xs text-gray-400 line-through">
-																		{symbol}{displayPrice.toFixed(0)}
-																	</span>
-																)}
+																{hasDiscount &&
+																	displayPrice !==
+																		discountedPrice && (
+																		<span className="text-[10px] sm:text-xs text-gray-400 line-through">
+																			{
+																				symbol
+																			}
+																			{displayPrice.toFixed(
+																				0,
+																			)}
+																		</span>
+																	)}
 																<span className="text-base sm:text-lg md:text-2xl font-bold text-[#6B8E23]">
 																	{symbol}
 																	{hasDiscount
-																		? discountedPrice.toFixed(0)
-																		: displayPrice.toFixed(0)}
+																		? discountedPrice.toFixed(
+																				0,
+																			)
+																		: displayPrice.toFixed(
+																				0,
+																			)}
 																</span>
 															</div>
 															<Button

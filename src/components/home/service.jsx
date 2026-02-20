@@ -14,7 +14,9 @@ const ServiceSection = () => {
 	const t = useTranslations("home.services");
 	const locale = useLocale();
 	const isMobile = useMobile();
-	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
+	const { region } = useRegionDetectionWithRedirect({
+		skipFirstRedirect: true,
+	});
 	const [isClient, setIsClient] = useState(false);
 	const [products, setProducts] = useState([]);
 	const [loadingProducts, setLoadingProducts] = useState(true);
@@ -179,8 +181,12 @@ const ServiceSection = () => {
 											new Date(
 												product.discount.validUntil,
 											) > new Date());
-									const display = getProductDisplayPrice(product, region);
-									const discountedPrice = display.discountedPrice;
+									const display = getProductDisplayPrice(
+										product,
+										region,
+									);
+									const discountedPrice =
+										display.discountedPrice;
 									const displayPrice = display.price;
 									const symbol = display.symbol;
 									const rating =
@@ -257,13 +263,20 @@ const ServiceSection = () => {
 															<span className="text-lg font-bold text-[#6B8E23]">
 																{symbol}
 																{hasDiscount
-																	? discountedPrice.toFixed(0)
-																	: displayPrice.toFixed(0)}
+																	? discountedPrice.toFixed(
+																			0,
+																		)
+																	: displayPrice.toFixed(
+																			0,
+																		)}
 															</span>
 															{hasDiscount && (
 																<>
 																	<span className="text-xs text-gray-400 line-through">
-																		{symbol}{displayPrice.toFixed(0)}
+																		{symbol}
+																		{displayPrice.toFixed(
+																			0,
+																		)}
 																	</span>
 																	<span className="text-xs font-semibold text-red-500">
 																		-
@@ -295,8 +308,12 @@ const ServiceSection = () => {
 												product.discount.validUntil,
 											) > new Date());
 
-									const display = getProductDisplayPrice(product, region);
-									const discountedPrice = display.discountedPrice;
+									const display = getProductDisplayPrice(
+										product,
+										region,
+									);
+									const discountedPrice =
+										display.discountedPrice;
 									const displayPrice = display.price;
 									const symbol = display.symbol;
 
@@ -370,13 +387,20 @@ const ServiceSection = () => {
 														<span className="text-lg font-bold text-[#6B8E23]">
 															{symbol}
 															{hasDiscount
-																? discountedPrice.toFixed(0)
-																: displayPrice.toFixed(0)}
+																? discountedPrice.toFixed(
+																		0,
+																	)
+																: displayPrice.toFixed(
+																		0,
+																	)}
 														</span>
 														{hasDiscount && (
 															<>
 																<span className="text-xs text-gray-400 line-through">
-																	{symbol}{displayPrice.toFixed(0)}
+																	{symbol}
+																	{displayPrice.toFixed(
+																		0,
+																	)}
 																</span>
 																<span className="text-xs font-semibold text-red-500">
 																	-
@@ -453,8 +477,12 @@ const ServiceSection = () => {
 											new Date(
 												product.discount.validUntil,
 											) > new Date());
-									const display = getProductDisplayPrice(product, region);
-									const discountedPrice = display.discountedPrice;
+									const display = getProductDisplayPrice(
+										product,
+										region,
+									);
+									const discountedPrice =
+										display.discountedPrice;
 									const displayPrice = display.price;
 									const symbol = display.symbol;
 									const rating =
@@ -531,13 +559,20 @@ const ServiceSection = () => {
 															<span className="text-lg font-bold text-[#6B8E23]">
 																{symbol}
 																{hasDiscount
-																	? discountedPrice.toFixed(0)
-																	: displayPrice.toFixed(0)}
+																	? discountedPrice.toFixed(
+																			0,
+																		)
+																	: displayPrice.toFixed(
+																			0,
+																		)}
 															</span>
 															{hasDiscount && (
 																<>
 																	<span className="text-xs text-gray-400 line-through">
-																		{symbol}{displayPrice.toFixed(0)}
+																		{symbol}
+																		{displayPrice.toFixed(
+																			0,
+																		)}
 																	</span>
 																	<span className="text-xs font-semibold text-red-500">
 																		-
@@ -569,8 +604,12 @@ const ServiceSection = () => {
 												product.discount.validUntil,
 											) > new Date());
 
-									const display = getProductDisplayPrice(product, region);
-									const discountedPrice = display.discountedPrice;
+									const display = getProductDisplayPrice(
+										product,
+										region,
+									);
+									const discountedPrice =
+										display.discountedPrice;
 									const displayPrice = display.price;
 									const symbol = display.symbol;
 
@@ -644,13 +683,20 @@ const ServiceSection = () => {
 														<span className="text-lg font-bold text-[#6B8E23]">
 															{symbol}
 															{hasDiscount
-																? discountedPrice.toFixed(0)
-																: displayPrice.toFixed(0)}
+																? discountedPrice.toFixed(
+																		0,
+																	)
+																: displayPrice.toFixed(
+																		0,
+																	)}
 														</span>
 														{hasDiscount && (
 															<>
 																<span className="text-xs text-gray-400 line-through">
-																	{symbol}{displayPrice.toFixed(0)}
+																	{symbol}
+																	{displayPrice.toFixed(
+																		0,
+																	)}
 																</span>
 																<span className="text-xs font-semibold text-red-500">
 																	-

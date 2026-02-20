@@ -262,7 +262,7 @@ export default function ProductCard({ product, onAddToCart }) {
 					{/* Tags */}
 					{product.tags && product.tags.length > 0 && (
 						<div className="flex flex-wrap gap-1.5">
-							{product.tags.slice(0, 2).map((tag, index) => (
+							{product.tags.map((tag, index) => (
 								<span
 									key={index}
 									className="text-xs px-2.5 py-1 bg-gradient-to-r from-[#73897F]/10 to-[#73897F]/5 text-[#1C312E] rounded-full"
