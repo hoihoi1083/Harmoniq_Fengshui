@@ -167,7 +167,7 @@ export default function MyOrdersPage() {
 								: "快去選購一些幸運物品吧！"}
 						</p>
 						<Button
-							onClick={() => router.push(`/${locale}/shop`)}
+							onClick={() => router.push(`/${locale}/shop/all`)}
 							className="bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] hover:from-[#2A4A3E] hover:to-[#2A4A3E]"
 						>
 							{locale === "zh-CN" ? "开始购物" : "開始購物"}

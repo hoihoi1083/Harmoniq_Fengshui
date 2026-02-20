@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import { AntdSpin } from "antd-spin";
 import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
@@ -131,7 +131,7 @@ export default function RegisterPage() {
 
 	return (
 		<div className="min-h-screen bg-gray-50">
-			<Navbar from="register" />
+			<ShopNavbar />
 			<AntdSpin
 				spinning={isLoading}
 				fullscreen={true}

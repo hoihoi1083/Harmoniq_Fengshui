@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { use } from "react";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 
 export default function BirthdayEntryPage({ params }) {
@@ -143,7 +143,7 @@ export default function BirthdayEntryPage({ params }) {
 	if (!paymentVerified) {
 		return (
 			<div className="min-h-screen bg-[#EFEFEF]">
-				<Navbar />
+				<ShopNavbar />
 				<div className="container px-4 py-20 mx-auto">
 					<div className="max-w-md p-8 mx-auto text-center bg-white rounded-lg shadow-lg">
 						<div className="mb-4 text-6xl text-red-500">⚠️</div>
@@ -166,7 +166,7 @@ export default function BirthdayEntryPage({ params }) {
 
 	return (
 		<div className="min-h-screen bg-[#EFEFEF]">
-			<Navbar />
+			<ShopNavbar />
 			<div className="container px-4 py-20 mx-auto">
 				<div className="max-w-md p-8 mx-auto bg-white shadow-lg rounded-xl">
 					<div className="mb-8 text-center">

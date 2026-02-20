@@ -221,6 +221,10 @@ export default function Hero() {
 				icon: "/images/footer/Instagram.png",
 				href: "https://www.instagram.com/harmoniq_fengshui/",
 			},
+			{
+				icon: "/images/footer/thread-grey.png",
+				href: "https://www.threads.net",
+			},
 		],
 	};
 	const steps = [
@@ -270,7 +274,7 @@ export default function Hero() {
 						<Image
 							src={
 								region === "china"
-									? "/images/hero/hero-bg-china.png"
+									? "/images/hero/hero-bg-2.png"
 									: "/images/hero/hero-bg-2.png"
 							}
 							alt="Hero background"
@@ -319,7 +323,7 @@ export default function Hero() {
 							</div>
 							<div className="ml-2">
 								<Link
-									href="/shop"
+									href="/shop/all"
 									className="inline-flex items-center justify-center rounded-full font-bold w-fit transition-transform duration-200 active:scale-95 hover:scale-105"
 									style={{
 										height: "42px",
@@ -517,7 +521,7 @@ export default function Hero() {
 							</div>
 							<div className="ml-2">
 								<Link
-									href="/shop"
+									href="/shop/all"
 									className="inline-flex items-center justify-center rounded-full font-bold w-fit transition-transform duration-200 active:scale-95 hover:scale-105"
 									style={{
 										height: "42px",
@@ -682,7 +686,7 @@ export default function Hero() {
 						<Image
 							src={
 								region === "china"
-									? "/images/hero/hero-bg-china.png"
+									? "/images/hero/hero-bg-2.png"
 									: "/images/hero/hero-bg-2.png"
 							}
 							alt="Hero background"
@@ -780,7 +784,7 @@ export default function Hero() {
 							{t("heroDescription")}
 						</p>
 						<Link
-							href="/shop"
+							href="/shop/all"
 							className="inline-flex items-center justify-center rounded-full font-bold w-fit transition-transform duration-200 hover:scale-105"
 							style={{
 								height: "42px",
@@ -908,7 +912,7 @@ export default function Hero() {
 								{t("slide2Description")}
 							</p>
 							<Link
-								href="/shop"
+								href="/shop/all"
 								className="inline-flex items-center justify-center rounded-full font-bold w-fit transition-transform duration-200 hover:scale-105"
 								style={{
 									height: "42px",

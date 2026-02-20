@@ -81,7 +81,7 @@ export default function AdminShopPage() {
 			
 			if (!isAdmin) {
 				toast.error("您沒有權限訪問此頁面");
-				router.push(`/${locale}/shop`);
+				router.push(`/${locale}/shop/all`);
 				return;
 			}
 			fetchProducts();

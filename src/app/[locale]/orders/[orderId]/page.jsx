@@ -21,6 +21,14 @@ import { toast } from "sonner";
 
 const GIFT_REPORT_LABELS = { wealth: "財運", love: "感情", career: "事業", health: "健康" };
 
+function getOrderCurrencySymbol(currency) {
+	if (!currency) return "HK$";
+	if (currency === "CNY") return "¥";
+	if (currency === "TWD") return "NT$";
+	if (currency === "USD") return "$";
+	return "HK$";
+}
+
 export default function OrderConfirmationPage() {
 	const { data: session } = useSession();
 	const locale = useLocale();
@@ -241,12 +249,7 @@ export default function OrderConfirmationPage() {
 															: {item.quantity}
 														</span>
 														<span className="text-lg font-bold text-[#1C312E]">
-															{order.currency ===
-																"HKD" && "HK$"}
-															{order.currency ===
-																"CNY" && "¥"}
-															{order.currency ===
-																"USD" && "$"}
+															{getOrderCurrencySymbol(order.currency)}
 															{(
 																finalPrice *
 																item.quantity
@@ -392,7 +395,7 @@ export default function OrderConfirmationPage() {
 										{locale === "zh-CN" ? "小计" : "小計"}
 									</span>
 									<span className="font-medium">
-										HK${(order.subtotal || order.totalAmount || 0).toFixed(0)}
+										{getOrderCurrencySymbol(order.currency)}{(order.subtotal || order.totalAmount || 0).toFixed(0)}
 									</span>
 								</div>
 								<div className="flex justify-between text-sm">
@@ -404,7 +407,7 @@ export default function OrderConfirmationPage() {
 											? locale === "zh-CN"
 												? "免费"
 												: "免費"
-											: `HK$${(order.shippingFee || 0).toFixed(0)}`}
+											: `${getOrderCurrencySymbol(order.currency)}${(order.shippingFee || 0).toFixed(0)}`}
 									</span>
 								</div>
 								<div className="border-t border-gray-200 pt-5 mt-4">
@@ -415,7 +418,7 @@ export default function OrderConfirmationPage() {
 												: "總計"}
 										</span>
 										<span className="text-2xl bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] bg-clip-text text-transparent">
-												HK${(order.total || order.totalAmount || 0).toFixed(0)}
+												{getOrderCurrencySymbol(order.currency)}{(order.totalAmount || order.total || 0).toFixed(0)}
 										</span>
 									</div>
 								</div>
@@ -426,7 +429,7 @@ export default function OrderConfirmationPage() {
 						<div className="space-y-4">
 							<Button
 								className="w-full bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] hover:from-[#2A4A3E] hover:to-[#2A4A3E] h-12 text-base rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
-								onClick={() => router.push(`/${locale}/shop`)}
+								onClick={() => router.push(`/${locale}/shop/all`)}
 							>
 								<Sparkles className="w-4 h-4 mr-2" />
 								{locale === "zh-CN" ? "继续购物" : "繼續購物"}

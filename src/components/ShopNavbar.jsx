@@ -73,8 +73,8 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 								<Menu className="w-6 h-6" />
 							</button>
 							<Link
-								href={`/${locale}/shop`}
-								className="flex items-center hover:opacity-80 transition-opacity shrink-0"
+								href={`/${locale}/home`}
+								className="flex items-center pr-5 hover:opacity-80 transition-opacity shrink-0"
 							>
 								<Image
 									src="/images/logo/logo-desktop.png"

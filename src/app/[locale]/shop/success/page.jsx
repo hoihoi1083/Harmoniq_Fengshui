@@ -181,7 +181,7 @@ export default function ShopSuccessPage() {
 							</Button>
 						)}
 						<Button
-							onClick={() => router.push(`/${locale}/shop`)}
+							onClick={() => router.push(`/${locale}/shop/all`)}
 							variant="outline"
 							className="border-[#73897F]/30 hover:bg-[#73897F]/10 h-12"
 							size="lg"

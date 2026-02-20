@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BirthdayModal from "@/components/BirthdayModal";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
 import { useTranslations } from "next-intl";
 
@@ -88,7 +88,7 @@ export default function Home() {
 	const [displayedContent, setDisplayedContent] = useState("");
 	const [loadingDuration, setLoadingDuration] = useState(15); // 動態載入時間
 	const typingIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(
-		null
+		null,
 	);
 
 	// Keep page position when component mounts - only scroll to top on visibility change
@@ -115,7 +115,7 @@ export default function Home() {
 		return () => {
 			document.removeEventListener(
 				"visibilitychange",
-				handleVisibilityChange
+				handleVisibilityChange,
 			);
 		};
 	}, []);
@@ -171,7 +171,7 @@ export default function Home() {
 					"🔄 檢測到需要轉移對話記錄:",
 					oldAnonymousId,
 					"→",
-					userId
+					userId,
 				);
 			}
 		} else {
@@ -214,7 +214,7 @@ export default function Home() {
 			if (timeDiff < tenMinutes) {
 				console.log(
 					"🔄 Restoring pending message after login:",
-					pendingMessage
+					pendingMessage,
 				);
 				setInputMessage(pendingMessage);
 				setShowLandingPage(false);
@@ -255,7 +255,7 @@ export default function Home() {
 					if (timeDiff < thirtyMinutes) {
 						console.log(
 							"🔄 Resuming payment after login:",
-							paymentContext
+							paymentContext,
 						);
 						localStorage.removeItem("pendingPayment");
 						// Resume payment with saved context
@@ -299,17 +299,17 @@ export default function Home() {
 				console.log("🔍 檢測到空的助手消息，準備觸發打字機效果");
 				// 從sessionStorage獲取待顯示的內容
 				const pendingContent = sessionStorage.getItem(
-					"pending_typewriter_content"
+					"pending_typewriter_content",
 				);
 				if (pendingContent) {
 					console.log(
 						"📝 找到待顯示內容，啟動打字機:",
-						pendingContent.substring(0, 50) + "..."
+						pendingContent.substring(0, 50) + "...",
 					);
 					setTimeout(() => {
 						startTypewriterEffect(
 							messages.length - 1,
-							pendingContent
+							pendingContent,
 						);
 						sessionStorage.removeItem("pending_typewriter_content");
 					}, 100);
@@ -321,13 +321,13 @@ export default function Home() {
 	// 打字機效果函數
 	const startTypewriterEffect = (
 		messageIndex: number,
-		fullContent: string
+		fullContent: string,
 	) => {
 		console.log(
 			"⚡ 開始打字機效果，索引:",
 			messageIndex,
 			"內容長度:",
-			fullContent.length
+			fullContent.length,
 		);
 		setIsTyping(true);
 		setTypingMessageIndex(messageIndex);
@@ -482,7 +482,7 @@ export default function Home() {
 							throw new Error("Stripe public key not configured");
 
 						const stripe = await import("@stripe/stripe-js").then(
-							(mod) => mod.loadStripe(stripePublicKey)
+							(mod) => mod.loadStripe(stripePublicKey),
 						);
 
 						if (stripe) {
@@ -524,11 +524,11 @@ export default function Home() {
 			"🔍 Before checking couple analysis - isCoupleAnalysis:",
 			isCoupleAnalysis,
 			"inputMessage:",
-			inputMessage.trim()
+			inputMessage.trim(),
 		);
 		if (isCoupleAnalysis && inputMessage.trim() === "1") {
 			console.log(
-				"🎯 Couple analysis option 1 selected - redirecting directly to couple payment"
+				"🎯 Couple analysis option 1 selected - redirecting directly to couple payment",
 			);
 
 			const userMessage = {
@@ -602,12 +602,12 @@ export default function Home() {
 						}
 
 						const stripe = await import("@stripe/stripe-js").then(
-							(mod) => mod.loadStripe(stripePublicKey)
+							(mod) => mod.loadStripe(stripePublicKey),
 						);
 
 						if (stripe) {
 							console.log(
-								"🚀 Redirecting to Stripe checkout for couple payment"
+								"🚀 Redirecting to Stripe checkout for couple payment",
 							);
 							await stripe.redirectToCheckout({
 								sessionId: paymentData.sessionId,
@@ -617,12 +617,12 @@ export default function Home() {
 						}
 					} else {
 						throw new Error(
-							"No session ID received from couple payment"
+							"No session ID received from couple payment",
 						);
 					}
 				} else {
 					throw new Error(
-						`Payment API error: ${paymentResponse.status}`
+						`Payment API error: ${paymentResponse.status}`,
 					);
 				}
 			} catch (error) {
@@ -653,7 +653,7 @@ export default function Home() {
 		// 根據問題長度設定載入時間
 		const duration = calculateLoadingDuration(userMessage.content);
 		console.log(
-			`🕒 Question: "${userMessage.content}" (${userMessage.content.length} chars) → Duration: ${duration}s`
+			`🕒 Question: "${userMessage.content}" (${userMessage.content.length} chars) → Duration: ${duration}s`,
 		);
 		setLoadingDuration(duration);
 
@@ -708,7 +708,7 @@ export default function Home() {
 
 			console.log(
 				"🔍 API 回應 (Rate Limit Info Hidden):",
-				cleanedDataForLogging
+				cleanedDataForLogging,
 			);
 			console.log("🔍 data.specificProblem:", data.specificProblem);
 			console.log("🔍 data.concern:", data.concern);
@@ -725,7 +725,7 @@ export default function Home() {
 				// 儲存內容到sessionStorage供useEffect使用
 				sessionStorage.setItem(
 					"pending_typewriter_content",
-					assistantMessage.content
+					assistantMessage.content,
 				);
 
 				// 添加空內容的消息先顯示，然後觸發打字機效果
@@ -737,7 +737,7 @@ export default function Home() {
 				console.log("🎬 準備添加空消息並觸發打字機效果");
 				console.log(
 					"📝 打字機內容長度:",
-					assistantMessage.content.length
+					assistantMessage.content.length,
 				);
 
 				setMessages((prev) => [...prev, emptyAssistantMessage]);
@@ -746,7 +746,7 @@ export default function Home() {
 				if (data.specificProblem) {
 					console.log(
 						"💾 Updating latestSpecificProblem from API response:",
-						data.specificProblem
+						data.specificProblem,
 					);
 					setLatestSpecificProblem(data.specificProblem);
 
@@ -754,7 +754,7 @@ export default function Home() {
 					if (!originalUserQuestion) {
 						console.log(
 							"📝 Setting originalUserQuestion:",
-							data.specificProblem
+							data.specificProblem,
 						);
 						setOriginalUserQuestion(data.specificProblem);
 					}
@@ -764,7 +764,7 @@ export default function Home() {
 				if (data.concern) {
 					console.log(
 						"💾 Updating concern from API response:",
-						data.concern
+						data.concern,
 					);
 					setConcern(data.concern);
 				}
@@ -785,13 +785,13 @@ export default function Home() {
 					data.needsBirthdayInfo,
 					data.shouldTriggerModal,
 					"isCoupleAnalysis:",
-					data.isCoupleAnalysis
+					data.isCoupleAnalysis,
 				);
 
 				// 🎯 Set couple analysis flag if couple birthdays detected
 				if (data.hasCouplesBirthdays || data.isCoupleAnalysis) {
 					console.log(
-						"🎯 Setting couple analysis to true due to couple birthdays detected"
+						"🎯 Setting couple analysis to true due to couple birthdays detected",
 					);
 					setIsCoupleAnalysis(true);
 				}
@@ -804,14 +804,14 @@ export default function Home() {
 					// 🔥 保存原始用戶問題 - 每次都更新最新的具體問題
 					console.log(
 						"🔔 檢查 API 回應中的 specificProblem:",
-						data.specificProblem
+						data.specificProblem,
 					);
 					let problemToUse = "";
 					if (data.specificProblem) {
 						setLatestSpecificProblem(data.specificProblem);
 						console.log(
 							"💾 更新最新具體問題:",
-							data.specificProblem
+							data.specificProblem,
 						);
 
 						// 只在第一次時設置原始問題
@@ -819,7 +819,7 @@ export default function Home() {
 							setOriginalUserQuestion(data.specificProblem);
 							console.log(
 								"📝 設置原始問題:",
-								data.specificProblem
+								data.specificProblem,
 							);
 						}
 						problemToUse = data.specificProblem;
@@ -830,7 +830,7 @@ export default function Home() {
 						"💳 直接觸發付款 - concern:",
 						data.concern,
 						"problem:",
-						problemToUse
+						problemToUse,
 					);
 
 					// 🔥 檢查付款類型，決定使用哪個 API
@@ -840,7 +840,7 @@ export default function Home() {
 						"concern:",
 						data.concern,
 						"problem:",
-						problemToUse
+						problemToUse,
 					);
 
 					// 決定使用哪個付款 API
@@ -863,13 +863,13 @@ export default function Home() {
 					}
 
 					console.log(
-						`💳 使用付款端點: ${paymentEndpoint} (comprehensive: ${useComprehensivePayment}, premium: ${usePremiumPayment}, couple: ${isCouplePayment})`
+						`💳 使用付款端點: ${paymentEndpoint} (comprehensive: ${useComprehensivePayment}, premium: ${usePremiumPayment}, couple: ${isCouplePayment})`,
 					);
 
 					// 🔐 Check if user is logged in before payment
 					if (!session) {
 						console.log(
-							"⚠️ User not logged in, saving payment context and redirecting to login"
+							"⚠️ User not logged in, saving payment context and redirecting to login",
 						);
 
 						// Save payment context to localStorage
@@ -890,7 +890,7 @@ export default function Home() {
 
 						localStorage.setItem(
 							"pendingPayment",
-							JSON.stringify(paymentContext)
+							JSON.stringify(paymentContext),
 						);
 						router.push("/auth/login");
 						return;
@@ -912,7 +912,7 @@ export default function Home() {
 								`💰 Main page ${useComprehensivePayment ? "comprehensive" : "premium"} payment - Using locale:`,
 								freshLocale,
 								"region:",
-								storedRegion
+								storedRegion,
 							);
 
 							// 使用 Stripe Checkout Session APIs (payment4 或 payment2)
@@ -945,7 +945,7 @@ export default function Home() {
 								"💰 Main page couple payment - Using fresh locale:",
 								freshLocale,
 								"from stored region:",
-								storedRegion
+								storedRegion,
 							);
 
 							// 使用 couple payment API
@@ -990,7 +990,7 @@ export default function Home() {
 								"for concernType:",
 								concernType,
 								"from stored region:",
-								storedRegion
+								storedRegion,
 							);
 
 							// 使用新的 fortune category API，與 price page 保持一致
@@ -1014,7 +1014,7 @@ export default function Home() {
 							const paymentData = await paymentResponse.json();
 							console.log(
 								`💳 ${useComprehensivePayment ? "Expert88 ($88)" : usePremiumPayment ? "Premium ($188)" : isCouplePayment ? "Couple ($88)" : "Fortune ($38)"} Payment Response:`,
-								paymentData
+								paymentData,
 							);
 
 							// 🔥 FIX: Check payment type priority - comprehensive/premium should be checked first
@@ -1023,12 +1023,12 @@ export default function Home() {
 								// 處理 comprehensive/premium 付款回應 - 直接重定向到 Stripe URL (使用 data.url 格式)
 								if (paymentData.data?.url) {
 									console.log(
-										`🚀 Redirecting to ${useComprehensivePayment ? "comprehensive" : "premium"} payment checkout`
+										`🚀 Redirecting to ${useComprehensivePayment ? "comprehensive" : "premium"} payment checkout`,
 									);
 									window.location.href = paymentData.data.url;
 								} else {
 									throw new Error(
-										`No checkout URL received from ${useComprehensivePayment ? "Expert88" : "Premium"} payment`
+										`No checkout URL received from ${useComprehensivePayment ? "Expert88" : "Premium"} payment`,
 									);
 								}
 							} else if (isCouplePayment) {
@@ -1039,37 +1039,37 @@ export default function Home() {
 									).then((mod) =>
 										mod.loadStripe(
 											process.env
-												.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-										)
+												.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+										),
 									);
 
 									if (stripe) {
 										console.log(
-											"🚀 Redirecting to Stripe checkout for couple payment"
+											"🚀 Redirecting to Stripe checkout for couple payment",
 										);
 										await stripe.redirectToCheckout({
 											sessionId: paymentData.sessionId,
 										});
 									} else {
 										throw new Error(
-											"Failed to load Stripe"
+											"Failed to load Stripe",
 										);
 									}
 								} else {
 									throw new Error(
-										"No session ID received from couple payment"
+										"No session ID received from couple payment",
 									);
 								}
 							} else {
 								// 處理 fortune 付款回應 - 直接重定向到 Stripe URL (fortune category API 也返回 data.url)
 								if (paymentData.data?.url) {
 									console.log(
-										"🚀 Redirecting to fortune payment checkout"
+										"🚀 Redirecting to fortune payment checkout",
 									);
 									window.location.href = paymentData.data.url;
 								} else {
 									throw new Error(
-										"No checkout URL received from Fortune payment"
+										"No checkout URL received from Fortune payment",
 									);
 								}
 							}
@@ -1080,7 +1080,7 @@ export default function Home() {
 					} catch (paymentError) {
 						console.error(
 							`💳 ${useComprehensivePayment ? "Comprehensive ($88)" : usePremiumPayment ? "Premium ($188)" : isCouplePayment ? "Couple ($88)" : "Fortune ($38)"} payment error:`,
-							paymentError
+							paymentError,
 						);
 						setIsLoading(false);
 						// Show error message to user
@@ -1142,7 +1142,7 @@ export default function Home() {
 		// For couple analysis, generate URL and redirect directly (payment already completed)
 		if (birthdayData.isCoupleAnalysis || isCoupleAnalysis) {
 			console.log(
-				"📊 Couple analysis detected, generating report URL..."
+				"📊 Couple analysis detected, generating report URL...",
 			);
 
 			// 優先使用最新的具體問題，然後是原始問題，最後是 concern
@@ -1246,7 +1246,7 @@ export default function Home() {
 		// 🔧 檢查是否在瀏覽器環境且 fetch 可用
 		if (typeof window === "undefined" || typeof fetch === "undefined") {
 			console.log(
-				"⚠️ loadConversationHistory: Not in browser or fetch unavailable"
+				"⚠️ loadConversationHistory: Not in browser or fetch unavailable",
 			);
 			return;
 		}
@@ -1275,7 +1275,7 @@ export default function Home() {
 			} else {
 				// If no session email in state, try fetching current session
 				console.log(
-					"⚠️ No session email in state, trying to fetch session..."
+					"⚠️ No session email in state, trying to fetch session...",
 				);
 				try {
 					const sessionResponse = await fetch("/api/auth/session", {
@@ -1287,11 +1287,11 @@ export default function Home() {
 						if (sessionData?.user?.email) {
 							queryParams.append(
 								"userEmail",
-								sessionData.user.email
+								sessionData.user.email,
 							);
 							console.log(
 								"📧 [PRIMARY-FETCHED] Added fetched email:",
-								sessionData.user.email
+								sessionData.user.email,
 							);
 						}
 					}
@@ -1341,14 +1341,14 @@ export default function Home() {
 					});
 					setConversationHistory(data.conversations || []);
 					console.log(
-						`📚 載入了 ${data.conversations?.length || 0} 個對話記錄`
+						`📚 載入了 ${data.conversations?.length || 0} 個對話記錄`,
 					);
 				} else {
 					const errorText = await response.text();
 					console.error(
 						"❌ 加載對話歷史失敗:",
 						response.status,
-						errorText
+						errorText,
 					);
 				}
 			} catch (fetchError) {
@@ -1361,7 +1361,7 @@ export default function Home() {
 				) {
 					console.error(
 						"❌ 網絡錯誤: 無法連接到API",
-						fetchError.message
+						fetchError.message,
 					);
 				} else {
 					console.error("❌ Fetch failed:", fetchError.message);
@@ -1378,14 +1378,14 @@ export default function Home() {
 	}; // 轉移匿名對話記錄到註冊用戶
 	const transferAnonymousConversations = async (
 		oldAnonymousId: string,
-		newUserEmail: string
+		newUserEmail: string,
 	) => {
 		try {
 			console.log(
 				"🔄 開始轉移對話記錄:",
 				oldAnonymousId,
 				"→",
-				newUserEmail
+				newUserEmail,
 			);
 
 			// 🔒 檢查是否已設置轉移完成標記，避免重複轉移
@@ -1411,7 +1411,7 @@ export default function Home() {
 				console.log(
 					"✅ 對話記錄轉移成功:",
 					data.transferredCount,
-					"個對話"
+					"個對話",
 				);
 
 				// 🔒 設置轉移完成標記，防止重複轉移
@@ -1436,7 +1436,7 @@ export default function Home() {
 		try {
 			setIsLoading(true);
 			const response = await fetch(
-				`/api/load-conversation?conversationId=${encodeURIComponent(conversationId)}`
+				`/api/load-conversation?conversationId=${encodeURIComponent(conversationId)}`,
 			);
 
 			if (response.ok) {
@@ -1457,14 +1457,14 @@ export default function Home() {
 							aiAnalysis: msg.aiAnalysis || null,
 							systemType: msg.systemType || "smart-chat2",
 							id: msg.id || `loaded-${index}`,
-						})
+						}),
 					);
 
 					// 添加初始歡迎消息（如果還沒有）
 					const hasWelcomeMessage = formattedMessages.some(
 						(msg) =>
 							msg.role === "assistant" &&
-							msg.content.includes("歡迎來到風鈴聊天室")
+							msg.content.includes("歡迎來到風鈴聊天室"),
 					);
 
 					if (!hasWelcomeMessage) {
@@ -1473,7 +1473,7 @@ export default function Home() {
 							content:
 								"你好呀～我是小鈴！✨ 歡迎回到風鈴聊天室！\n\n繼續您之前的對話...",
 							timestamp: new Date(
-								data.metadata?.createdAt || Date.now()
+								data.metadata?.createdAt || Date.now(),
 							),
 							aiAnalysis: null,
 							systemType: "smart-chat2",
@@ -1501,19 +1501,19 @@ export default function Home() {
 				if (data.metadata) {
 					const metadata = data.metadata;
 					setSessionId(
-						metadata.sessionId || `smart-chat2-${Date.now()}`
+						metadata.sessionId || `smart-chat2-${Date.now()}`,
 					);
 					setConcern(metadata.primaryConcern || "");
 					setIsCoupleAnalysis(
 						metadata.userData?.relationshipType === "couple" ||
-							false
+							false,
 					);
 					setReportType("");
 				}
 
 				console.log(
 					"對話加載成功:",
-					data.metadata?.title || conversationId
+					data.metadata?.title || conversationId,
 				);
 			} else {
 				console.error("加載對話失敗:", response.statusText);
@@ -1604,8 +1604,8 @@ export default function Home() {
 	return (
 		<div className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
 			{/* Navigation Bar */}
-			<Navbar from="smart-chat" backgroundColor="EFEFEF" />
-			<div className="relative flex h-[calc(100vh-4rem)] mt-16 overflow-hidden">
+			<ShopNavbar onSearch={() => {}} cartCount={0} />
+			<div className="relative flex h-[calc(100vh-4rem)]  overflow-hidden">
 				{/* 移動端菜單按鈕 */}
 				<button
 					className="fixed z-50 p-2 bg-white rounded-lg shadow-lg xl:hidden top-20 left-2"
@@ -1676,7 +1676,7 @@ export default function Home() {
 											className="p-3 hover:bg-[#d0d0d0] rounded cursor-pointer transition-colors mb-1"
 											onClick={() => {
 												loadSpecificConversation(
-													conversation.conversationId
+													conversation.conversationId,
 												);
 												handleMobileNavigation();
 											}}
@@ -1688,7 +1688,7 @@ export default function Home() {
 											<div className="flex items-center justify-between mt-1 text-xs text-gray-600">
 												<span>
 													{formatConversationTime(
-														conversation.lastUpdated
+														conversation.lastUpdated,
 													)}
 												</span>
 												<span className="bg-[#d0d0d0] text-gray-800 px-2 py-0.5 rounded-full text-xs">
@@ -1705,7 +1705,7 @@ export default function Home() {
 															.map(
 																(
 																	topic,
-																	index
+																	index,
 																) => {
 																	// Convert topic based on current locale
 																	let displayTopic =
@@ -1797,7 +1797,7 @@ export default function Home() {
 																			}
 																		</span>
 																	);
-																}
+																},
 															)}
 														{conversation.topics
 															.length > 2 && (
@@ -2010,7 +2010,7 @@ export default function Home() {
 												value={inputMessage}
 												onChange={(e) =>
 													setInputMessage(
-														e.target.value
+														e.target.value,
 													)
 												}
 												onKeyPress={handleKeyPress}
@@ -2051,7 +2051,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.wealth")
+														t("shortcuts.wealth"),
 													)
 												}
 												className="flex items-center px-2 py-1.5 space-x-1 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap sm:px-3 sm:py-2 sm:space-x-2 md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2068,7 +2068,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.health")
+														t("shortcuts.health"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2085,7 +2085,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.lottery")
+														t("shortcuts.lottery"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2102,7 +2102,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.raise")
+														t("shortcuts.raise"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2119,7 +2119,9 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.promotion")
+														t(
+															"shortcuts.promotion",
+														),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2136,7 +2138,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.dating")
+														t("shortcuts.dating"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2153,7 +2155,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.loveLife")
+														t("shortcuts.loveLife"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2171,8 +2173,8 @@ export default function Home() {
 												onClick={() =>
 													handleShortcutClick(
 														t(
-															"shortcuts.healthConcern"
-														)
+															"shortcuts.healthConcern",
+														),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2184,7 +2186,7 @@ export default function Home() {
 												</div>
 												<span>
 													{t(
-														"shortcuts.healthConcern"
+														"shortcuts.healthConcern",
 													)}
 												</span>
 											</button>
@@ -2193,7 +2195,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.wealth")
+														t("shortcuts.wealth"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2210,7 +2212,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.health")
+														t("shortcuts.health"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2227,7 +2229,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.lottery")
+														t("shortcuts.lottery"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2244,7 +2246,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.raise")
+														t("shortcuts.raise"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2261,7 +2263,9 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.promotion")
+														t(
+															"shortcuts.promotion",
+														),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2278,7 +2282,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.dating")
+														t("shortcuts.dating"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2295,7 +2299,7 @@ export default function Home() {
 											<button
 												onClick={() =>
 													handleShortcutClick(
-														t("shortcuts.loveLife")
+														t("shortcuts.loveLife"),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2313,8 +2317,8 @@ export default function Home() {
 												onClick={() =>
 													handleShortcutClick(
 														t(
-															"shortcuts.healthConcern"
-														)
+															"shortcuts.healthConcern",
+														),
 													)
 												}
 												className="flex items-center px-4 py-2 space-x-2 text-xs font-medium text-gray-700 transition-shadow bg-white border border-gray-200 rounded-lg shadow-md whitespace-nowrap md:px-6 md:py-3 md:text-sm hover:shadow-lg hover:text-gray-900"
@@ -2326,7 +2330,7 @@ export default function Home() {
 												</div>
 												<span>
 													{t(
-														"shortcuts.healthConcern"
+														"shortcuts.healthConcern",
 													)}
 												</span>
 											</button>
@@ -2388,28 +2392,28 @@ export default function Home() {
 															// 檢查是否包含結構化內容的各種模式
 															const hasStructuredOptions =
 																/\*\*[0-9]️⃣.*\*\*/.test(
-																	content
+																	content,
 																) ||
 																/[0-9]️⃣.*/.test(
-																	content
+																	content,
 																) ||
 																/為了提供最適合的分析/.test(
-																	content
+																	content,
 																) ||
 																/📅.*\*\*生日格式範例/.test(
-																	content
+																	content,
 																) ||
 																/告訴小鈴你的生日/.test(
-																	content
+																	content,
 																) ||
 																/小鈴會先給你一個簡單的分析/.test(
-																	content
+																	content,
 																) ||
 																/───────────────────/.test(
-																	content
+																	content,
 																) ||
 																/💎.*\*\*想要更深入的分析嗎/.test(
-																	content
+																	content,
 																);
 
 															if (
@@ -2418,17 +2422,17 @@ export default function Home() {
 																// 使用分隔線來分割內容
 																if (
 																	content.includes(
-																		"───────────────────"
+																		"───────────────────",
 																	)
 																) {
 																	const parts =
 																		content.split(
-																			"───────────────────"
+																			"───────────────────",
 																		);
 																	return parts.map(
 																		(
 																			part,
-																			index
+																			index,
 																		) => {
 																			// 第一部分是AI分析內容，應該加粗
 																			if (
@@ -2460,7 +2464,7 @@ export default function Home() {
 																						part}
 																				</span>
 																			);
-																		}
+																		},
 																	);
 																}
 
@@ -2469,13 +2473,13 @@ export default function Home() {
 																	/(?=為了提供最適合的分析|你想要哪種分析|告訴小鈴你的生日|📅.*\*\*生日格式範例)/;
 																const parts =
 																	content.split(
-																		splitPatterns
+																		splitPatterns,
 																	);
 
 																return parts.map(
 																	(
 																		part,
-																		index
+																		index,
 																	) => {
 																		// 檢查這部分是否為純粹的AI自然回應
 																		const isNaturalResponse =
@@ -2483,19 +2487,19 @@ export default function Home() {
 																				0 &&
 																			part.trim() &&
 																			!part.includes(
-																				"️⃣"
+																				"️⃣",
 																			) &&
 																			!part.includes(
-																				"📅"
+																				"📅",
 																			) &&
 																			!part.includes(
-																				"**生日格式範例"
+																				"**生日格式範例",
 																			) &&
 																			!part.includes(
-																				"告訴小鈴你的生日"
+																				"告訴小鈴你的生日",
 																			) &&
 																			!part.includes(
-																				"小鈴會先給你一個簡單的分析"
+																				"小鈴會先給你一個簡單的分析",
 																			);
 
 																		if (
@@ -2527,7 +2531,7 @@ export default function Home() {
 																				}
 																			</span>
 																		);
-																	}
+																	},
 																);
 															} else {
 																// 檢查是否包含呼叫行動(CTA)部分
@@ -2535,7 +2539,7 @@ export default function Home() {
 																	/(?=想要開始分析的話|想了解的話|想要分析的話)/;
 																const ctaParts =
 																	content.split(
-																		ctaPattern
+																		ctaPattern,
 																	);
 
 																if (
@@ -2546,7 +2550,7 @@ export default function Home() {
 																	return ctaParts.map(
 																		(
 																			part,
-																			index
+																			index,
 																		) => {
 																			// 第一部分是主要內容，加粗
 																			if (
@@ -2579,7 +2583,7 @@ export default function Home() {
 																					}
 																				</span>
 																			);
-																		}
+																		},
 																	);
 																} else {
 																	// 如果沒有結構化選項和CTA，整個內容都加粗（純AI回應）
@@ -2746,7 +2750,7 @@ export default function Home() {
 															? (() => {
 																	const date =
 																		new Date(
-																			message.timestamp
+																			message.timestamp,
 																		);
 																	const hours =
 																		date
@@ -2754,7 +2758,7 @@ export default function Home() {
 																			.toString()
 																			.padStart(
 																				2,
-																				"0"
+																				"0",
 																			);
 																	const minutes =
 																		date
@@ -2762,7 +2766,7 @@ export default function Home() {
 																			.toString()
 																			.padStart(
 																				2,
-																				"0"
+																				"0",
 																			);
 																	const seconds =
 																		date
@@ -2770,7 +2774,7 @@ export default function Home() {
 																			.toString()
 																			.padStart(
 																				2,
-																				"0"
+																				"0",
 																			);
 																	return `${hours}:${minutes}:${seconds}`;
 																})()
@@ -2825,7 +2829,7 @@ export default function Home() {
 														}}
 														onAnimationStart={() =>
 															console.log(
-																`🎬 Progress bar started with ${loadingDuration}s duration`
+																`🎬 Progress bar started with ${loadingDuration}s duration`,
 															)
 														}
 													></div>

@@ -22,11 +22,14 @@ import {
 	User,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
+import { getProductDisplayPrice } from "@/lib/productPrice";
 
 export default function CheckoutPage() {
 	const { data: session } = useSession();
 	const locale = useLocale();
 	const router = useRouter();
+	const { region } = useRegionDetection();
 	const [cart, setCart] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [submitting, setSubmitting] = useState(false);
@@ -87,12 +90,13 @@ export default function CheckoutPage() {
 	const calculateSubtotal = () => {
 		if (!cart?.items) return 0;
 		return cart.items.reduce((total, item) => {
-			const price = item.product.price;
-			const discount = item.product.discount?.percentage || 0;
-			const finalPrice = price * (1 - discount / 100);
+			const { discountedPrice } = getProductDisplayPrice(item.product, region);
+			const finalPrice = discountedPrice ?? item.product.price * (1 - (item.product.discount?.percentage || 0) / 100);
 			return total + finalPrice * item.quantity;
 		}, 0);
 	};
+
+	const summarySymbol = cart?.items?.length ? getProductDisplayPrice(cart.items[0].product, region).symbol : "HK$";
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -124,6 +128,7 @@ export default function CheckoutPage() {
 				shippingInfo,
 				billingInfo: billingSameAsShipping ? shippingInfo : billingInfo,
 				locale,
+				region: region || "hongkong",
 			};
 
 			const res = await fetch("/api/shop/create-checkout-session", {
@@ -205,7 +210,7 @@ export default function CheckoutPage() {
 							: "快去添加一些幸運物品吧！"}
 					</p>
 					<Button
-						onClick={() => router.push(`/${locale}/shop`)}
+						onClick={() => router.push(`/${locale}/shop/all`)}
 						className="bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] hover:from-[#2A4A3E] hover:to-[#2A4A3E]"
 					>
 						{locale === "zh-CN" ? "开始购物" : "開始購物"}
@@ -632,15 +637,8 @@ export default function CheckoutPage() {
 								<div className="space-y-4 mb-6 max-h-72 overflow-y-auto pr-2 scrollbar-thin">
 									{cart.items.map((item) => {
 										const product = item.product;
-										const hasDiscount =
-											product.discount?.percentage > 0;
-										const finalPrice = hasDiscount
-											? product.price *
-												(1 -
-													product.discount
-														.percentage /
-														100)
-											: product.price;
+										const { discountedPrice, symbol } = getProductDisplayPrice(product, region);
+										const finalPrice = discountedPrice ?? product.price;
 
 										return (
 											<div
@@ -683,7 +681,7 @@ export default function CheckoutPage() {
 														: {item.quantity}
 													</p>
 													<p className="text-sm font-semibold text-[#1C312E]">
-														HK$
+														{symbol}
 														{(
 															finalPrice *
 															item.quantity
@@ -703,7 +701,7 @@ export default function CheckoutPage() {
 												: "小計"}
 										</span>
 										<span className="font-medium">
-											HK${calculateSubtotal().toFixed(0)}
+											{summarySymbol}{calculateSubtotal().toFixed(0)}
 										</span>
 									</div>
 									<div className="flex justify-between text-sm">
@@ -726,8 +724,7 @@ export default function CheckoutPage() {
 													: "總計"}
 											</span>
 											<span className="text-2xl bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] bg-clip-text text-transparent">
-												HK$
-												{calculateSubtotal().toFixed(0)}
+												{summarySymbol}{calculateSubtotal().toFixed(0)}
 											</span>
 										</div>
 									</div>

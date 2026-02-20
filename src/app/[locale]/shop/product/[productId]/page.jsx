@@ -97,7 +97,7 @@ export default function ProductDetailPage() {
 				}
 			} else {
 				toast.error(locale === "zh-CN" ? "商品不存在" : "商品不存在");
-				router.push(`/${locale}/shop`);
+				router.push(`/${locale}/shop/all`);
 			}
 		} catch (error) {
 			console.error("Failed to fetch product:", error);
@@ -463,7 +463,7 @@ export default function ProductDetailPage() {
 					</Link>
 					<ChevronRight className="w-4 h-4" />
 					<Link
-						href={`/${locale}/shop`}
+						href={`/${locale}/shop/all`}
 						className="transition-colors hover:text-gray-700"
 					>
 						{locale === "zh-CN" ? "商店" : "商店"}

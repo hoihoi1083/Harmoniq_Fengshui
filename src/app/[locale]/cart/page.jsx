@@ -22,6 +22,10 @@ import {
 	Mail,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
+import { getProductDisplayPrice } from "@/lib/productPrice";
+
+const GIFT_REPORT_LABELS = { wealth: "財運", love: "感情", career: "事業", health: "健康" };
 
 export default function CartPage() {
 	const { data: session } = useSession();
@@ -33,6 +37,7 @@ export default function CartPage() {
 	const [cartCount, setCartCount] = useState(0);
 	const [promoCode, setPromoCode] = useState("");
 	const [discountPercentage, setDiscountPercentage] = useState(0);
+	const { region } = useRegionDetection();
 
 	useEffect(() => {
 		if (session?.user) {
@@ -132,12 +137,13 @@ export default function CartPage() {
 	const calculateSubtotal = () => {
 		if (!cart?.items) return 0;
 		return cart.items.reduce((total, item) => {
-			const price = item.product.price;
-			const discount = item.product.discount?.percentage || 0;
-			const finalPrice = price * (1 - discount / 100);
+			const { discountedPrice } = getProductDisplayPrice(item.product, region);
+			const finalPrice = discountedPrice ?? item.product.price * (1 - (item.product.discount?.percentage || 0) / 100);
 			return total + finalPrice * item.quantity;
 		}, 0);
 	};
+
+	const cartSummarySymbol = cart?.items?.length ? getProductDisplayPrice(cart.items[0].product, region).symbol : "HK$";
 
 	const calculateDiscount = () => {
 		return calculateSubtotal() * (discountPercentage / 100);
@@ -228,7 +234,7 @@ export default function CartPage() {
 					</Link>
 					<ChevronRight className="w-4 h-4 text-gray-400" />
 					<Link
-						href={`/${locale}/shop`}
+						href={`/${locale}/shop/all`}
 						className="text-gray-600 hover:text-[#6B8E23]"
 					>
 						{locale === "zh-CN" ? "商店" : "商店"}
@@ -258,7 +264,7 @@ export default function CartPage() {
 								: "快去添加一些幸運物品吧！"}
 						</p>
 						<Button
-							onClick={() => router.push(`/${locale}/shop`)}
+							onClick={() => router.push(`/${locale}/shop/all`)}
 							className="bg-[#6B8E23] hover:bg-[#8B9F3A] text-white"
 						>
 							{locale === "zh-CN" ? "开始购物" : "開始購物"}
@@ -270,12 +276,10 @@ export default function CartPage() {
 						<div className="space-y-3 lg:col-span-2">
 							{cart.items.map((item) => {
 								const product = item.product;
+								const { price, discountedPrice, symbol } = getProductDisplayPrice(product, region);
 								const hasDiscount =
 									product.discount?.percentage > 0;
-								const discount =
-									product.discount?.percentage || 0;
-								const finalPrice =
-									product.price * (1 - discount / 100);
+								const finalPrice = discountedPrice ?? price;
 
 								return (
 									<div
@@ -317,6 +321,11 @@ export default function CartPage() {
 												{product.name[locale] ||
 													product.name.zh_TW}
 											</h3>
+											{item.giftReportType && (
+												<p className="mb-1 text-sm text-[#6B8E23]">
+													{locale === "zh-CN" ? "贈送報告" : "贈送報告"}: {GIFT_REPORT_LABELS[item.giftReportType] || item.giftReportType}
+												</p>
+											)}
 											<p className="mb-3 text-sm text-gray-500">
 												{product.description[
 													locale
@@ -378,19 +387,13 @@ export default function CartPage() {
 												<div className="text-right">
 													{hasDiscount && (
 														<div className="mb-1 text-xs text-gray-400 line-through">
-															HK$
-															{(
-																product.price *
-																item.quantity
-															).toFixed(0)}
+															{symbol}
+															{(price * item.quantity).toFixed(0)}
 														</div>
 													)}
 													<div className="text-lg font-bold text-[#2C2C2C]">
-														HK$
-														{(
-															finalPrice *
-															item.quantity
-														).toFixed(0)}
+														{symbol}
+														{(finalPrice * item.quantity).toFixed(0)}
 													</div>
 												</div>
 											</div>
@@ -428,7 +431,7 @@ export default function CartPage() {
 												: "小計"}
 										</span>
 										<span className="font-medium text-[#2C2C2C]">
-											HK${calculateSubtotal().toFixed(0)}
+											{cartSummarySymbol}{calculateSubtotal().toFixed(0)}
 										</span>
 									</div>
 									{discountPercentage > 0 && (
@@ -439,7 +442,7 @@ export default function CartPage() {
 													: `折扣 (-${discountPercentage}%)`}
 											</span>
 											<span className="font-medium text-red-500">
-												-HK$
+												-{cartSummarySymbol}
 												{calculateDiscount().toFixed(0)}
 											</span>
 										</div>
@@ -452,7 +455,7 @@ export default function CartPage() {
 													: "總計"}
 											</span>
 											<span className="text-[#2C2C2C]">
-												HK${calculateTotal().toFixed(0)}
+												{cartSummarySymbol}{calculateTotal().toFixed(0)}
 											</span>
 										</div>
 									</div>

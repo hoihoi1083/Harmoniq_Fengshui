@@ -10,7 +10,7 @@ import React, {
 import { useSearchParams, useParams, useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 import getWuxingData from "@/lib/nayin";
 import HealthFortuneAnalysis from "@/components/HealthFortuneAnalysis";
@@ -342,7 +342,7 @@ export default function FourFortuneAnalysis({
 	return (
 		<div className="min-h-screen bg-[#EFEFEF]">
 			{/* Navbar */}
-			<Navbar from="report" />
+			<ShopNavbar />
 
 			{/* Main Content */}
 			<div className="pt-4">

@@ -1,5 +1,5 @@
 "use client";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import {
 	useRef,
 	useState,
@@ -2566,7 +2566,7 @@ export default function ReportPage({
 
 	return (
 		<div className="min-h-screen bg-[#EFEFEF] ">
-			{!isPrinting && <Navbar from="report" />}
+			{!isPrinting && <ShopNavbar />}
 
 			{/* Historical Report Banner */}
 			{!isPrinting && showHistorical && (

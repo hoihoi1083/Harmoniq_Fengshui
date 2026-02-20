@@ -8,7 +8,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { get, post, patch } from "@/lib/ajax";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -962,7 +962,7 @@ export default function DemoPage() {
 		<div className="min-h-screen bg-white">
 			{/* Navbar */}
 			<div className="[&>nav]:!relative [&>nav]:!top-auto">
-				<Navbar />
+				<ShopNavbar />
 			</div>
 
 			{/* Breadcrumb and Title */}

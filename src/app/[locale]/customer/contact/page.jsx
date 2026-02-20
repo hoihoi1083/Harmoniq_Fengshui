@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import EnquiryForm from "./EnquiryForm";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 
 export default function () {
 	const t = useTranslations("home.contact");
@@ -16,11 +16,7 @@ export default function () {
 		>
 			{/* Navbar with white text */}
 			<div className="absolute top-0 left-0 right-0 z-50">
-				<Navbar
-					from="contact"
-					backgroundColor="transparent"
-					style={{ color: "white" }}
-				/>
+				<ShopNavbar />
 			</div>
 			<div className="flex flex-col h-full max-w-full min-h-screen lg:flex-row">
 				{/* Content Section */}

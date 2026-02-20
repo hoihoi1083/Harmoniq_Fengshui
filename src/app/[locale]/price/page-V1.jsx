@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Footer from "@/components/home/Footer";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import FAQ from "@/components/home/FAQ";
 import PricePromo from "../../../components/PricePromo";
 import { useTranslations, useLocale } from "next-intl";
@@ -995,7 +995,7 @@ export default function YourPage() {
 					fontFamily: '"Noto Serif TC", serif',
 				}}
 			>
-				<Navbar />
+				<ShopNavbar />
 
 				<section
 					className="self-stretch flex flex-col items-center justify-start mb-25 gap-16 sm:gap-24 lg:gap-[164px] max-w-full text-center text-2xl sm:text-3xl lg:text-[40px] text-[#073e31] font-[ABeeZee] px-4 sm:px-6 lg:px-0"

@@ -68,7 +68,7 @@ export default function CategoriesPage() {
 						Home
 					</Link>
 					<ChevronRight className="w-4 h-4" />
-					<Link href={`/${locale}/shop`} className="hover:text-[#8B9F3A]">
+					<Link href={`/${locale}/shop/all`} className="hover:text-[#8B9F3A]">
 						Shop
 					</Link>
 					<ChevronRight className="w-4 h-4" />

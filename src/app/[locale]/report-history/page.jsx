@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 
 const ReportHistoryPage = () => {
@@ -337,7 +337,7 @@ const ReportHistoryPage = () => {
 	if (loading && reports.length === 0) {
 		return (
 			<div className="min-h-screen bg-gray-50">
-				<Navbar />
+				<ShopNavbar />
 				<div className="flex items-center justify-center flex-1 py-8">
 					<div className="text-center">
 						<div className="w-12 h-12 mx-auto mb-4 border-b-2 border-blue-600 rounded-full animate-spin"></div>
@@ -351,7 +351,7 @@ const ReportHistoryPage = () => {
 
 	return (
 		<div className="min-h-screen" style={{ backgroundColor: "#EFEFEF" }}>
-			<Navbar />
+			<ShopNavbar />
 			<div className="py-20">
 				<div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 					{/* Header */}

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BirthdayModal from "@/components/BirthdayModal";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 
 export default function SmartChat2() {
 	const { data: session } = useSession();
@@ -33,7 +33,7 @@ export default function SmartChat2() {
 			const storedRegion = localStorage.getItem("userRegion");
 			console.log(
 				"📱 Retrieved from localStorage - userRegion:",
-				storedRegion
+				storedRegion,
 			);
 			if (storedRegion && ["china", "hongkong"].includes(storedRegion)) {
 				setUserRegion(storedRegion);
@@ -41,7 +41,7 @@ export default function SmartChat2() {
 			} else {
 				console.log(
 					"❌ No valid stored region found, using default:",
-					"hongkong"
+					"hongkong",
 				);
 			}
 		}
@@ -155,7 +155,7 @@ export default function SmartChat2() {
 				const paymentContext = JSON.parse(pendingPaymentData);
 				console.log(
 					"💳 Found pending payment after login:",
-					paymentContext
+					paymentContext,
 				);
 
 				// Clear the pending payment
@@ -200,11 +200,11 @@ export default function SmartChat2() {
 			"🔍 Before checking couple analysis - isCoupleAnalysis:",
 			isCoupleAnalysis,
 			"inputMessage:",
-			inputMessage.trim()
+			inputMessage.trim(),
 		);
 		if (isCoupleAnalysis && inputMessage.trim() === "1") {
 			console.log(
-				"🎯 Couple analysis option 1 selected - redirecting directly to couple payment"
+				"🎯 Couple analysis option 1 selected - redirecting directly to couple payment",
 			);
 
 			const userMessage = {
@@ -241,7 +241,7 @@ export default function SmartChat2() {
 
 			console.log(
 				"🔍 Final problem to use for couple payment:",
-				problemToUse
+				problemToUse,
 			);
 			console.log("📊 Couple payment debug info:", {
 				problemFromLastMessage,
@@ -258,7 +258,7 @@ export default function SmartChat2() {
 					hasAiAnalysis: !!msg.aiAnalysis,
 					specificProblemValue: msg.specificProblem,
 					contentPreview: msg.content?.substring(0, 50) + "...",
-				}))
+				})),
 			);
 
 			// 🔐 Check if user is logged in before payment
@@ -277,7 +277,7 @@ export default function SmartChat2() {
 
 				localStorage.setItem(
 					"pendingPayment",
-					JSON.stringify(paymentContext)
+					JSON.stringify(paymentContext),
 				);
 
 				// Show login prompt message
@@ -314,7 +314,7 @@ export default function SmartChat2() {
 					freshLocale,
 					"from URL (region:",
 					storedRegion,
-					"is for pricing only)"
+					"is for pricing only)",
 				);
 				console.log("🚀 Sending to payment-couple API:", {
 					locale: freshLocale,
@@ -351,12 +351,12 @@ export default function SmartChat2() {
 						}
 
 						const stripe = await import("@stripe/stripe-js").then(
-							(mod) => mod.loadStripe(stripePublicKey)
+							(mod) => mod.loadStripe(stripePublicKey),
 						);
 
 						if (stripe) {
 							console.log(
-								"🚀 Redirecting to Stripe checkout for couple payment"
+								"🚀 Redirecting to Stripe checkout for couple payment",
 							);
 							await stripe.redirectToCheckout({
 								sessionId: paymentData.sessionId,
@@ -366,12 +366,12 @@ export default function SmartChat2() {
 						}
 					} else {
 						throw new Error(
-							"No session ID received from couple payment"
+							"No session ID received from couple payment",
 						);
 					}
 				} else {
 					throw new Error(
-						`Payment API error: ${paymentResponse.status}`
+						`Payment API error: ${paymentResponse.status}`,
 					);
 				}
 			} catch (error) {
@@ -437,7 +437,7 @@ export default function SmartChat2() {
 				if (data.specificProblem) {
 					console.log(
 						"💾 Updating latestSpecificProblem from API response:",
-						data.specificProblem
+						data.specificProblem,
 					);
 					setLatestSpecificProblem(data.specificProblem);
 
@@ -445,7 +445,7 @@ export default function SmartChat2() {
 					if (!originalUserQuestion) {
 						console.log(
 							"📝 Setting originalUserQuestion:",
-							data.specificProblem
+							data.specificProblem,
 						);
 						setOriginalUserQuestion(data.specificProblem);
 					}
@@ -455,7 +455,7 @@ export default function SmartChat2() {
 				if (data.concern) {
 					console.log(
 						"💾 Updating concern from API response:",
-						data.concern
+						data.concern,
 					);
 					setConcern(data.concern);
 				}
@@ -476,13 +476,13 @@ export default function SmartChat2() {
 					data.needsBirthdayInfo,
 					data.shouldTriggerModal,
 					"isCoupleAnalysis:",
-					data.isCoupleAnalysis
+					data.isCoupleAnalysis,
 				);
 
 				// 🎯 Set couple analysis flag if couple birthdays detected
 				if (data.hasCouplesBirthdays || data.isCoupleAnalysis) {
 					console.log(
-						"🎯 Setting couple analysis to true due to couple birthdays detected"
+						"🎯 Setting couple analysis to true due to couple birthdays detected",
 					);
 					setIsCoupleAnalysis(true);
 				}
@@ -495,14 +495,14 @@ export default function SmartChat2() {
 					// 🔥 保存原始用戶問題 - 每次都更新最新的具體問題
 					console.log(
 						"🔔 檢查 API 回應中的 specificProblem:",
-						data.specificProblem
+						data.specificProblem,
 					);
 					let problemToUse = "";
 					if (data.specificProblem) {
 						setLatestSpecificProblem(data.specificProblem);
 						console.log(
 							"💾 更新最新具體問題:",
-							data.specificProblem
+							data.specificProblem,
 						);
 
 						// 只在第一次時設置原始問題
@@ -510,7 +510,7 @@ export default function SmartChat2() {
 							setOriginalUserQuestion(data.specificProblem);
 							console.log(
 								"📝 設置原始問題:",
-								data.specificProblem
+								data.specificProblem,
 							);
 						}
 						problemToUse = data.specificProblem;
@@ -521,7 +521,7 @@ export default function SmartChat2() {
 						"💳 直接觸發付款 - concern:",
 						data.concern,
 						"problem:",
-						problemToUse
+						problemToUse,
 					);
 
 					// 🔥 檢查付款類型，決定使用哪個 API
@@ -531,7 +531,7 @@ export default function SmartChat2() {
 						"concern:",
 						data.concern,
 						"problem:",
-						problemToUse
+						problemToUse,
 					);
 
 					// 決定使用哪個付款 API
@@ -550,7 +550,7 @@ export default function SmartChat2() {
 					}
 
 					console.log(
-						`💳 使用付款端點: ${paymentEndpoint} (comprehensive: ${useComprehensivePayment}, premium: ${usePremiumPayment})`
+						`💳 使用付款端點: ${paymentEndpoint} (comprehensive: ${useComprehensivePayment}, premium: ${usePremiumPayment})`,
 					);
 
 					// 直接觸發付款 API
@@ -560,7 +560,7 @@ export default function SmartChat2() {
 						// 🔐 Check if user is logged in before payment
 						if (!session) {
 							console.log(
-								"🔒 User not logged in, saving payment context"
+								"🔒 User not logged in, saving payment context",
 							);
 
 							// Determine payment type
@@ -582,7 +582,7 @@ export default function SmartChat2() {
 
 							localStorage.setItem(
 								"pendingPayment",
-								JSON.stringify(paymentContext)
+								JSON.stringify(paymentContext),
 							);
 
 							// Show login prompt message
@@ -630,7 +630,7 @@ export default function SmartChat2() {
 								"💰 Smart-chat2 comprehensive/premium payment - Using fresh locale:",
 								freshLocale,
 								"from stored region:",
-								storedRegion
+								storedRegion,
 							);
 
 							// 使用 Stripe Checkout Session APIs (payment4 或 payment2)
@@ -673,33 +673,33 @@ export default function SmartChat2() {
 
 							// Enhanced locale debugging
 							console.log(
-								"🔥🔥🔥 INDIVIDUAL PAYMENT LOCALE DEBUG 🔥🔥🔥"
+								"🔥🔥🔥 INDIVIDUAL PAYMENT LOCALE DEBUG 🔥🔥🔥",
 							);
 							console.log(
 								"💰 About to call fortune payment with locale:",
-								freshLocale
+								freshLocale,
 							);
 							console.log("🔍 All locale variables:");
 							console.log("   - userRegion (state):", userRegion);
 							console.log(
 								"   - currentLocale (state):",
-								currentLocale
+								currentLocale,
 							);
 							console.log(
 								"   - storedRegion (localStorage):",
-								storedRegion
+								storedRegion,
 							);
 							console.log(
 								"   - freshLocale (calculated):",
-								freshLocale
+								freshLocale,
 							);
 							console.log("   - pathname:", pathname);
 							console.log(
 								"   - regionToLocaleMap:",
-								regionToLocaleMap
+								regionToLocaleMap,
 							);
 							console.log(
-								"🔥🔥🔥 END INDIVIDUAL PAYMENT DEBUG 🔥🔥🔥"
+								"🔥🔥🔥 END INDIVIDUAL PAYMENT DEBUG 🔥🔥🔥",
 							);
 
 							// 使用 fortune category API 來支持不同 concern types
@@ -713,7 +713,7 @@ export default function SmartChat2() {
 
 							console.log(
 								"📤 INDIVIDUAL PAYMENT REQUEST PAYLOAD:",
-								requestPayload
+								requestPayload,
 							);
 
 							paymentResponse = await fetch(paymentEndpoint, {
@@ -729,7 +729,7 @@ export default function SmartChat2() {
 							const paymentData = await paymentResponse.json();
 							console.log(
 								`💳 ${useComprehensivePayment ? "Expert88 ($88)" : usePremiumPayment ? "Premium ($188)" : "Fortune ($38)"} Payment Response:`,
-								paymentData
+								paymentData,
 							);
 
 							if (useComprehensivePayment || usePremiumPayment) {
@@ -738,7 +738,7 @@ export default function SmartChat2() {
 									window.location.href = paymentData.data.url;
 								} else {
 									throw new Error(
-										`No checkout URL received from ${usePremiumPayment ? "Premium" : "Expert88"} payment`
+										`No checkout URL received from ${usePremiumPayment ? "Premium" : "Expert88"} payment`,
 									);
 								}
 							} else {
@@ -749,7 +749,7 @@ export default function SmartChat2() {
 									paymentData.data?.id;
 								console.log(
 									"Smart-chat2 extracted session ID:",
-									sessionId
+									sessionId,
 								);
 
 								if (sessionId) {
@@ -759,14 +759,14 @@ export default function SmartChat2() {
 											.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 									if (!stripePublicKey) {
 										throw new Error(
-											"Stripe public key not configured"
+											"Stripe public key not configured",
 										);
 									}
 
 									const stripe = await import(
 										"@stripe/stripe-js"
 									).then((mod) =>
-										mod.loadStripe(stripePublicKey)
+										mod.loadStripe(stripePublicKey),
 									);
 
 									if (stripe) {
@@ -775,16 +775,16 @@ export default function SmartChat2() {
 										});
 									} else {
 										throw new Error(
-											"Failed to load Stripe"
+											"Failed to load Stripe",
 										);
 									}
 								} else {
 									console.error(
 										"No session ID found in smart-chat2 response:",
-										paymentData
+										paymentData,
 									);
 									throw new Error(
-										"No session ID received from Fortune payment"
+										"No session ID received from Fortune payment",
 									);
 								}
 							}
@@ -795,7 +795,7 @@ export default function SmartChat2() {
 					} catch (paymentError) {
 						console.error(
 							`💳 ${useComprehensivePayment ? "Comprehensive ($88)" : usePremiumPayment ? "Premium ($188)" : "Fortune ($38)"} payment error:`,
-							paymentError
+							paymentError,
 						);
 						setIsLoading(false);
 						// Show error message to user
@@ -857,7 +857,7 @@ export default function SmartChat2() {
 		// For couple analysis, generate URL and redirect directly (payment already completed)
 		if (birthdayData.isCoupleAnalysis || isCoupleAnalysis) {
 			console.log(
-				"📊 Couple analysis detected, generating report URL..."
+				"📊 Couple analysis detected, generating report URL...",
 			);
 
 			// 優先使用最新的具體問題，然後是原始問題，最後是 concern
@@ -982,12 +982,12 @@ export default function SmartChat2() {
 					const paymentData = await paymentResponse.json();
 					console.log(
 						"💳 Resumed Couple Payment Response:",
-						paymentData
+						paymentData,
 					);
 
 					if (paymentData.sessionId) {
 						const stripe = await import("@stripe/stripe-js").then(
-							(mod) => mod.loadStripe(stripePublicKey)
+							(mod) => mod.loadStripe(stripePublicKey),
 						);
 
 						if (stripe) {
@@ -999,7 +999,7 @@ export default function SmartChat2() {
 					}
 				} else {
 					throw new Error(
-						`Payment API error: ${paymentResponse.status}`
+						`Payment API error: ${paymentResponse.status}`,
 					);
 				}
 			} else if (paymentContext.type === "comprehensive") {
@@ -1017,7 +1017,7 @@ export default function SmartChat2() {
 							locale: paymentContext.locale,
 							region: localStorage.getItem("userRegion"),
 						}),
-					}
+					},
 				);
 
 				if (paymentResponse.ok) {
@@ -1041,7 +1041,7 @@ export default function SmartChat2() {
 							locale: paymentContext.locale,
 							region: localStorage.getItem("userRegion"),
 						}),
-					}
+					},
 				);
 
 				if (paymentResponse.ok) {
@@ -1077,7 +1077,7 @@ export default function SmartChat2() {
 							locale: paymentContext.locale,
 							region: localStorage.getItem("userRegion"),
 						}),
-					}
+					},
 				);
 
 				if (paymentResponse.ok) {
@@ -1087,7 +1087,7 @@ export default function SmartChat2() {
 
 					if (sessionId) {
 						const stripe = await import("@stripe/stripe-js").then(
-							(mod) => mod.loadStripe(stripePublicKey)
+							(mod) => mod.loadStripe(stripePublicKey),
 						);
 
 						if (stripe) {
@@ -1123,7 +1123,7 @@ export default function SmartChat2() {
 				: `userId=${encodeURIComponent(userId)}`;
 
 			const response = await fetch(
-				`/api/conversation-history?${queryParam}`
+				`/api/conversation-history?${queryParam}`,
 			);
 
 			if (response.ok) {
@@ -1144,7 +1144,7 @@ export default function SmartChat2() {
 		try {
 			setIsLoading(true);
 			const response = await fetch(
-				`/api/load-conversation?conversationId=${encodeURIComponent(conversationId)}`
+				`/api/load-conversation?conversationId=${encodeURIComponent(conversationId)}`,
 			);
 
 			if (response.ok) {
@@ -1165,14 +1165,14 @@ export default function SmartChat2() {
 							aiAnalysis: msg.aiAnalysis || null,
 							systemType: msg.systemType || "smart-chat2",
 							id: msg.id || `loaded-${index}`,
-						})
+						}),
 					);
 
 					// 添加初始歡迎消息（如果還沒有）
 					const hasWelcomeMessage = formattedMessages.some(
 						(msg) =>
 							msg.role === "assistant" &&
-							msg.content.includes("歡迎來到智能風水顧問")
+							msg.content.includes("歡迎來到智能風水顧問"),
 					);
 
 					if (!hasWelcomeMessage) {
@@ -1181,7 +1181,7 @@ export default function SmartChat2() {
 							content:
 								"你好呀～我是小鈴！✨ 歡迎回到智能風水顧問 Smart-Chat2 (AI版)！\n\n繼續您之前的對話...",
 							timestamp: new Date(
-								data.metadata?.createdAt || Date.now()
+								data.metadata?.createdAt || Date.now(),
 							),
 							aiAnalysis: null,
 							systemType: "smart-chat2",
@@ -1209,19 +1209,19 @@ export default function SmartChat2() {
 				if (data.metadata) {
 					const metadata = data.metadata;
 					setSessionId(
-						metadata.sessionId || `smart-chat2-${Date.now()}`
+						metadata.sessionId || `smart-chat2-${Date.now()}`,
 					);
 					setConcern(metadata.primaryConcern || "");
 					setIsCoupleAnalysis(
 						metadata.userData?.relationshipType === "couple" ||
-							false
+							false,
 					);
 					setReportType("");
 				}
 
 				console.log(
 					"對話加載成功:",
-					data.metadata?.title || conversationId
+					data.metadata?.title || conversationId,
 				);
 			} else {
 				console.error("加載對話失敗:", response.statusText);
@@ -1302,7 +1302,7 @@ export default function SmartChat2() {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
 			{/* Navigation Bar */}
-			<Navbar backgroundColor="EFEFEF" />
+			<ShopNavbar />
 			<div className="relative flex h-screen mt-16">
 				{/* 移動端菜單按鈕 */}
 				<button
@@ -1371,7 +1371,7 @@ export default function SmartChat2() {
 										className="p-3 hover:bg-[#d0d0d0] rounded cursor-pointer transition-colors mb-1"
 										onClick={() =>
 											loadSpecificConversation(
-												conversation.conversationId
+												conversation.conversationId,
 											)
 										}
 									>
@@ -1381,7 +1381,7 @@ export default function SmartChat2() {
 										<div className="flex items-center justify-between mt-1 text-xs text-gray-600">
 											<span>
 												{formatConversationTime(
-													conversation.lastUpdated
+													conversation.lastUpdated,
 												)}
 											</span>
 											<span className="bg-[#d0d0d0] text-gray-800 px-2 py-0.5 rounded-full text-xs">
@@ -1602,7 +1602,7 @@ export default function SmartChat2() {
 												value={inputMessage}
 												onChange={(e) =>
 													setInputMessage(
-														e.target.value
+														e.target.value,
 													)
 												}
 												onKeyPress={handleKeyPress}
@@ -1829,7 +1829,7 @@ export default function SmartChat2() {
 															? (() => {
 																	const date =
 																		new Date(
-																			message.timestamp
+																			message.timestamp,
 																		);
 																	const hours =
 																		date
@@ -1837,7 +1837,7 @@ export default function SmartChat2() {
 																			.toString()
 																			.padStart(
 																				2,
-																				"0"
+																				"0",
 																			);
 																	const minutes =
 																		date
@@ -1845,7 +1845,7 @@ export default function SmartChat2() {
 																			.toString()
 																			.padStart(
 																				2,
-																				"0"
+																				"0",
 																			);
 																	const seconds =
 																		date
@@ -1853,7 +1853,7 @@ export default function SmartChat2() {
 																			.toString()
 																			.padStart(
 																				2,
-																				"0"
+																				"0",
 																			);
 																	return `${hours}:${minutes}:${seconds}`;
 																})()

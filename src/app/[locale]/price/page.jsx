@@ -3,7 +3,7 @@ import React, { useState, useRef, useLayoutEffect } from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import FooterV2 from "@/components/home/FooterV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -373,7 +373,7 @@ const PricePage = () => {
 		<main className="w-full bg-[rgba(243,243,243,1)]">
 			{/* Navbar - Non-sticky */}
 			<div className="[&>nav]:!relative [&>nav]:!top-auto">
-				<Navbar />
+				<ShopNavbar />
 			</div>
 
 			{/* Main Content Area with Background */}

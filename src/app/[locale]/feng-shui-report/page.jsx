@@ -30,7 +30,7 @@ import QuestionFocus from "@/components/QuestionFocus";
 import SavedReportDisplay from "@/components/SavedReportDisplay";
 import getWuxingData from "@/lib/nayin";
 import { LoadingProvider } from "@/utils/LoadingStateManagement";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 import ReportStatusBanner from "@/components/ReportStatusBanner";
 import { getConcernColor } from "@/utils/colorTheme";
@@ -965,7 +965,7 @@ export default function FengShuiReportPage() {
 
 	return (
 		<div className="min-h-screen bg-white">
-			<Navbar from="report" />
+			<ShopNavbar />
 			<LoadingProvider>
 				<div
 					ref={reportRef}

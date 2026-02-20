@@ -27,7 +27,7 @@ import getWuxingData from "@/lib/nayin";
 import { LoadingProvider } from "@/utils/LoadingStateManagement";
 import { CoupleAnalysisProvider } from "@/contexts/CoupleAnalysisContext";
 import { storeCoupleComponentData } from "@/utils/coupleComponentDataStore";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 
 // Couple-specific components
@@ -714,7 +714,7 @@ export default function CoupleReportPage({ params }) {
 				}
 			>
 				{/* Navbar */}
-				<Navbar from="report" backgroundColor="white" />
+				<ShopNavbar />
 
 				{/* Historical Report Banner */}
 				{showHistoricalBanner && (

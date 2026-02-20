@@ -12,7 +12,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import getRoomDirection from "../design/getRoomDirection";
 import { ROOM_TYPES, ROOM_TYPES_LABEL_TW } from "@/types/room";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 
 const ROOM_TYPE_MAPPING = {
@@ -871,7 +871,7 @@ export default function BazhaiReportPage() {
 						}
 					/>
 				</div> */}
-				<Navbar />
+				<ShopNavbar />
 				{/* 整體分析 */}
 				<div className="flex items-center justify-center w-full">
 					<OverallBazhaiAnalysis

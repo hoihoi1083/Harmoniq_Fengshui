@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 
 export default function LocaleLayout({ children, params }) {
@@ -9,7 +9,7 @@ export default function LocaleLayout({ children, params }) {
 
 	return (
 		<>
-			{!isContactPage && <Navbar />}
+			{!isContactPage && <ShopNavbar />}
 			{children}
 			{!isContactPage && <Footer />}
 		</>

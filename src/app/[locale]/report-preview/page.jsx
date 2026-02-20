@@ -5,7 +5,7 @@ import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import FooterV2 from "@/components/home/FooterV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -410,7 +410,7 @@ const ReportPreviewPage = () => {
 
 			{/* Navbar - Non-sticky */}
 			<div className="[&>nav]:!relative [&>nav]:!top-auto">
-				<Navbar />
+				<ShopNavbar />
 			</div>
 
 			{/* Main Content Area */}

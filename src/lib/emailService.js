@@ -2,9 +2,18 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function getCurrencySymbol(currency) {
+	if (!currency) return "HK$";
+	if (currency === "CNY") return "¥";
+	if (currency === "TWD") return "NT$";
+	if (currency === "USD") return "$";
+	return "HK$";
+}
+
 export async function sendOrderConfirmationEmail(order, locale = "zh-TW") {
 	try {
 		const isZhCN = locale === "zh-CN";
+		const symbol = getCurrencySymbol(order.currency);
 
 		const itemsHTML = order.items
 			.map(
@@ -17,7 +26,7 @@ export async function sendOrderConfirmationEmail(order, locale = "zh-TW") {
 					${item.quantity}
 				</td>
 				<td style="padding: 12px; border-bottom: 1px solid #e9ecef; text-align: right;">
-					${order.currency} $${(item.price * item.quantity).toFixed(2)}
+					${symbol}${(item.price * item.quantity).toFixed(0)}
 				</td>
 			</tr>
 		`
@@ -112,7 +121,7 @@ export async function sendOrderConfirmationEmail(order, locale = "zh-TW") {
 									${isZhCN ? "小计：" : "小計："}
 								</td>
 								<td style="padding: 8px 0; text-align: right; color: #495057;">
-									${order.currency} $${order.subtotal.toFixed(2)}
+									${symbol}${order.subtotal.toFixed(0)}
 								</td>
 							</tr>
 							<tr>
@@ -128,7 +137,7 @@ export async function sendOrderConfirmationEmail(order, locale = "zh-TW") {
 									${isZhCN ? "总计：" : "總計："}
 								</td>
 								<td style="padding: 12px 0 0 0; text-align: right; font-size: 20px; font-weight: 700; color: #1C312E;">
-									${order.currency} $${order.totalAmount.toFixed(2)}
+									${symbol}${order.totalAmount.toFixed(0)}
 								</td>
 							</tr>
 						</table>
@@ -289,6 +298,47 @@ export async function sendShippingNotificationEmail(
 		return { success: true, data: result };
 	} catch (error) {
 		console.error("❌ Failed to send shipping notification:", error);
+		return { success: false, error: error.message };
+	}
+}
+
+/**
+ * Send a short email to admin when a new shop order is paid (optional).
+ * Set ADMIN_ORDER_NOTIFY_EMAIL in env to enable.
+ */
+export async function sendAdminNewOrderNotification(order) {
+	const adminEmail = process.env.ADMIN_ORDER_NOTIFY_EMAIL;
+	if (!adminEmail || !process.env.RESEND_API_KEY) return { success: false, skipped: true };
+
+	const symbol = getCurrencySymbol(order.currency);
+	const itemsList = (order.items || [])
+		.map((i) => `- ${i.productName} x${i.quantity} ${symbol}${(i.price * i.quantity).toFixed(0)}`)
+		.join("\n");
+
+	const emailHTML = `
+		<!DOCTYPE html>
+		<html><body style="font-family: sans-serif; padding: 20px;">
+			<h2>🛒 新訂單 (New Shop Order)</h2>
+			<p><strong>訂單號 Order ID:</strong> ${order.orderId}</p>
+			<p><strong>客戶 Email:</strong> ${order.userEmail}</p>
+			<p><strong>總額 Total:</strong> ${symbol}${order.totalAmount?.toFixed(0) ?? ""}</p>
+			<p><strong>商品 Items:</strong></p>
+			<pre>${itemsList}</pre>
+			<p><a href="${process.env.NEXTAUTH_URL}/admin/orders">前往後台查看 Go to Admin Orders</a></p>
+		</body></html>
+	`;
+
+	try {
+		await resend.emails.send({
+			from: "HarmoniqFengShui <noreply@harmoniqfengshui.com>",
+			to: adminEmail,
+			subject: `[Harmoniq] 新訂單 ${order.orderId}`,
+			html: emailHTML,
+		});
+		console.log("✅ Admin new order notification sent");
+		return { success: true };
+	} catch (error) {
+		console.error("❌ Failed to send admin order notification:", error);
 		return { success: false, error: error.message };
 	}
 }

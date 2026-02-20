@@ -129,7 +129,7 @@ async function fulfillCheckout(session) {
 				const Order = (await import("@/models/Order")).default;
 				const Product = (await import("@/models/Product")).default;
 				const Cart = (await import("@/models/Cart")).default;
-				const { sendOrderConfirmationEmail } = await import("@/lib/emailService");
+				const { sendOrderConfirmationEmail, sendAdminNewOrderNotification } = await import("@/lib/emailService");
 
 				// Update order status
 				const order = await Order.findById(orderId);
@@ -166,13 +166,20 @@ async function fulfillCheckout(session) {
 					console.log("Cart cleared for user:", userId);
 				}
 
-				// Send order confirmation email
+				// Send order confirmation email to customer
 				try {
 					const locale = order.shippingAddress?.country === "中国" || order.shippingAddress?.country === "China" ? "zh-CN" : "zh-TW";
 					await sendOrderConfirmationEmail(order, locale);
 					console.log("📧 Order confirmation email sent");
 				} catch (emailError) {
 					console.error("Failed to send confirmation email:", emailError);
+				}
+
+				// Optional: notify admin of new order (set ADMIN_ORDER_NOTIFY_EMAIL in env)
+				try {
+					await sendAdminNewOrderNotification(order);
+				} catch (adminEmailError) {
+					console.error("Failed to send admin notification:", adminEmailError);
 				}
 
 				// Record fulfillment

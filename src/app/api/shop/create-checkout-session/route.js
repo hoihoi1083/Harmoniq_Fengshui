@@ -6,6 +6,7 @@ import dbConnect from "@/lib/mongoose";
 import Product from "@/models/Product";
 import Order from "@/models/Order";
 import Cart from "@/models/Cart";
+import { getStripeCurrencyForRegion, getPriceForRegion } from "@/lib/shopCheckout";
 
 export async function POST(request) {
 	try {
@@ -32,8 +33,11 @@ export async function POST(request) {
 		const headersList = await headers();
 		const origin = headersList.get("origin") || process.env.NEXTAUTH_URL;
 
-		const { items, shippingInfo, billingInfo, locale } =
+		const { items, shippingInfo, billingInfo, locale, region: requestRegion } =
 			await request.json();
+
+		const region = requestRegion === "china" || requestRegion === "taiwan" ? requestRegion : "hongkong";
+		const stripeCurrency = getStripeCurrencyForRegion(region);
 
 		if (!items || items.length === 0) {
 			return NextResponse.json(
@@ -85,9 +89,10 @@ export async function POST(request) {
 				);
 			}
 
-			// Calculate price with discount
+			// Price for selected region (CNY / HKD / TWD)
+			const unitPrice = getPriceForRegion(product, region);
 			const discount = product.discount?.percentage || 0;
-			const finalPrice = Math.round(product.price * (1 - discount / 100));
+			const finalPrice = Math.round(unitPrice * (1 - discount / 100));
 			subtotal += finalPrice * item.quantity;
 
 			// Filter valid image URLs for Stripe
@@ -118,9 +123,9 @@ export async function POST(request) {
 
 			lineItems.push({
 				price_data: {
-					currency: product.currency?.toLowerCase() || "hkd",
+					currency: stripeCurrency,
 					product_data: productData,
-					unit_amount: finalPrice * 100, // Stripe expects amount in cents
+					unit_amount: finalPrice * 100, // Stripe: amount in smallest unit (cents/fen)
 				},
 				quantity: item.quantity,
 			});
@@ -131,11 +136,13 @@ export async function POST(request) {
 				productName: product.name.zh_TW || product.name["zh-CN"],
 				productImage: product.images?.[0] || "",
 				quantity: item.quantity,
-				price: product.price,
+				price: unitPrice,
 				isDigital: product.isDigital,
 				giftReportType: item.giftReportType || undefined,
 			});
 		}
+
+		const orderCurrency = stripeCurrency.toUpperCase();
 
 		// Create pending order in database
 		const order = new Order({
@@ -146,7 +153,7 @@ export async function POST(request) {
 			subtotal,
 			shippingFee: 0,
 			totalAmount: subtotal,
-			currency: "HKD",
+			currency: orderCurrency,
 			status: "pending",
 			paymentStatus: "pending",
 			shippingAddress: {

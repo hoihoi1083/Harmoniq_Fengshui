@@ -1,4 +1,4 @@
-import Navbar from "@/components/Navbar";
+import ShopNavbar from "@/components/ShopNavbar";
 import Hero from "@/components/home/Hero";
 import Features from "@/components/home/Features";
 import Share from "@/components/home/Share";
@@ -21,7 +21,7 @@ import { get } from "@/lib/ajax";
 export default function Home() {
 	return (
 		<div className="min-h-screen bg-[#EFEFEF]">
-			<Navbar from="home" />
+			<ShopNavbar />
 			<main>
 				<section id="hero" style={{ overflow: "hidden" }}>
 					<Hero />
