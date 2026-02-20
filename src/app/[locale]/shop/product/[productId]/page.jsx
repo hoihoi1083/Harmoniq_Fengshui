@@ -452,7 +452,7 @@ export default function ProductDetailPage() {
 		<div className="min-h-screen bg-white">
 			<ShopNavbar cartCount={cartCount} onSearch={() => {}} />
 
-			<div className="px-4 py-8 pt-20 mx-auto max-w-7xl sm:px-6 lg:px-8">
+			<div className="px-4 py-8 pt-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
 				{/* Breadcrumb Navigation */}
 				<nav className="flex items-center gap-2 mb-8 text-sm text-gray-500">
 					<Link

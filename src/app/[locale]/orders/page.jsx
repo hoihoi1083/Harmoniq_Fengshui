@@ -49,6 +49,15 @@ export default function MyOrdersPage() {
 		}
 	};
 
+	function getCurrencySymbol(currency) {
+		if (!currency) return "HK$";
+		if (currency === "CNY") return "¥";
+		if (currency === "TWD") return "NT$";
+		if (currency === "HKD") return "HK$";
+		if (currency === "USD") return "$";
+		return `${currency} `;
+	}
+
 	const getStatusBadge = (status) => {
 		const statusConfig = {
 			pending: {
@@ -196,9 +205,7 @@ export default function MyOrdersPage() {
 									</div>
 									<div className="text-right">
 										<p className="text-2xl font-bold text-[#1C312E]">
-											{order.currency === "HKD" && "HK$"}
-											{order.currency === "CNY" && "¥"}
-											{order.currency === "USD" && "$"}
+											{getCurrencySymbol(order.currency)}
 											{order.totalAmount}
 										</p>
 										<p className="text-sm text-gray-500">

@@ -46,6 +46,15 @@ function AdminOrderDetailContent({ orderId, locale }) {
 	const [editingTracking, setEditingTracking] = useState(false);
 	const [trackingNumber, setTrackingNumber] = useState("");
 
+	function getCurrencySymbol(currency) {
+		if (!currency) return "HK$";
+		if (currency === "CNY") return "¥";
+		if (currency === "TWD") return "NT$";
+		if (currency === "HKD") return "HK$";
+		if (currency === "USD") return "$";
+		return `${currency} `;
+	}
+
 	// Fetch order details
 	useEffect(() => {
 		const fetchOrder = async () => {
@@ -491,18 +500,14 @@ function AdminOrderDetailContent({ orderId, locale }) {
 													</p>
 												)}
 												<p className="text-sm text-blue-600 font-medium mt-1">
-													{order.currency === "HKD"
-														? "HK$"
-														: "$"}
+													{getCurrencySymbol(order.currency)}
 													{item.price?.toFixed(2) ||
 														"0.00"}
 												</p>
 											</div>
 											<div className="text-right">
 												<p className="font-bold text-gray-800">
-													{order.currency === "HKD"
-														? "HK$"
-														: "$"}
+													{getCurrencySymbol(order.currency)}
 													{(
 														item.price *
 														item.quantity
@@ -518,9 +523,7 @@ function AdminOrderDetailContent({ orderId, locale }) {
 									<div className="flex justify-between text-gray-600">
 										<span>小計</span>
 										<span>
-											{order.currency === "HKD"
-												? "HK$"
-												: "$"}
+											{getCurrencySymbol(order.currency)}
 											{order.totalAmount?.toFixed(2)}
 										</span>
 									</div>
@@ -528,16 +531,14 @@ function AdminOrderDetailContent({ orderId, locale }) {
 										<span>運費</span>
 										<span>
 											{order.shippingFee > 0
-												? `${order.currency === "HKD" ? "HK$" : "$"}${order.shippingFee.toFixed(2)}`
+												? `${getCurrencySymbol(order.currency)}${order.shippingFee.toFixed(2)}`
 												: "免運費"}
 										</span>
 									</div>
 									<div className="flex justify-between text-xl font-bold text-blue-600 pt-2 border-t">
 										<span>總計</span>
 										<span>
-											{order.currency === "HKD"
-												? "HK$"
-												: "$"}
+											{getCurrencySymbol(order.currency)}
 											{order.totalAmount?.toFixed(2)}
 										</span>
 									</div>
@@ -608,7 +609,7 @@ function AdminOrderDetailContent({ orderId, locale }) {
 										幣種
 									</p>
 									<p className="font-medium">
-										{order.currency || "HKD"}
+										{order.currency || "HKD"} ({getCurrencySymbol(order.currency).trim()})
 									</p>
 								</div>
 							</div>
