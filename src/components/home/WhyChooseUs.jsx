@@ -1,44 +1,17 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 
 const WhyChooseUs = () => {
-	const locale = useLocale();
+	const t = useTranslations("home.whyChooseUs");
 
 	const features = [
-		{
-			id: 1,
-			icon: "/images/features/product-select.png",
-			title: "商品嚴選",
-			description: "所有商品均經過挑選與檢查，購買安心無壓力",
-		},
-		{
-			id: 2,
-			icon: "/images/features/gift-report.png",
-			title: "贈送八字命理報告",
-			description: "每一筆訂單，都附贈大師參與的專屬命理分析報告",
-		},
-		{
-			id: 3,
-			icon: "/images/features/master-custom.png",
-			title: "大師親自定制",
-			description:
-				"大師根據個人情況整理重點，請你清楚知道該做下一步需要思與調整的方向",
-		},
-		{
-			id: 4,
-			icon: "/images/features/life-style.png",
-			title: "報告生活化",
-			description: "重點放在實際生活中的影響與建議，一看就懂，一看就明",
-		},
-		{
-			id: 5,
-			icon: "/images/features/complete-experience.png",
-			title: "完整體驗",
-			description:
-				"購買時選自物的同時，也能獲得一份有依據有溫度的個人解開",
-		},
+		{ id: 1, icon: "/images/features/product-select.png", title: t("feature1.title"), description: t("feature1.description") },
+		{ id: 2, icon: "/images/features/gift-report.png", title: t("feature2.title"), description: t("feature2.description") },
+		{ id: 3, icon: "/images/features/master-custom.png", title: t("feature3.title"), description: t("feature3.description") },
+		{ id: 4, icon: "/images/features/life-style.png", title: t("feature4.title"), description: t("feature4.description") },
+		{ id: 5, icon: "/images/features/complete-experience.png", title: t("feature5.title"), description: t("feature5.description") },
 	];
 
 	return (
@@ -53,9 +26,7 @@ const WhyChooseUs = () => {
 					}}
 				>
 					<span className="text-lg font-bold text-white sm:text-xl md:text-2xl whitespace-nowrap">
-						{locale === "zh-CN"
-							? "為何選擇我們？"
-							: "為何選擇我們？"}
+						{t("title")}
 					</span>
 				</div>
 			</div>

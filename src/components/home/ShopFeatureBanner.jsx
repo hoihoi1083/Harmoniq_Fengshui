@@ -2,47 +2,35 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import useMobile from "../../app/hooks/useMobile";
 import { px } from "framer-motion";
 
 const ShopFeatureBanner = ({
 	imageSrc = "/images/hero/left-picture.png",
-	title = "師傅一對一專屬訂製",
-	title2 = "訂製報告",
-
-	bulletItems = [
-		"解開迷津，指引方向",
-		"直面人生困惑難題",
-		"深入剖析流年運勢",
-		"一對一專屬命理測算",
-	],
-	bulletItems2 = [
-		"獲取個性化命理報告",
-		"按照我们的專屬建議",
-		"迎接完美平衡的生活",
-	],
-
+	title: titleProp,
+	title2: title2Prop,
+	bulletItems: bulletItemsProp,
+	bulletItems2: bulletItems2Prop,
 	bulletImageSrc = "/images/hero/bullet.png",
 	buttonText,
 	buttonHref = "/demo",
 }) => {
-	const locale = useLocale();
+	const t = useTranslations("home.shopFeatureBanner");
 	const isMobile = useMobile();
 
-	const resolvedButtonText =
-		buttonText || (locale === "zh-CN" ? "进入聊天室" : "進入聊天室");
-
-	// Mobile: separate layout (vertical titles, circular images, wavy dark background)
-	const mobileDesc1 =
-		locale === "zh-CN"
-			? "一对一专属命理测算，深入剖析流年运势，直面人生困惑难题，解开迷津，指引方向"
-			: "一對一專屬命理測算，深入剖析流年運勢，直面人生困惑難題，解開迷津，指引方向";
-	const mobileDesc2 =
-		locale === "zh-CN"
-			? "获取个性化命理报告，按照我们的专属建议，迎接完美平衡的生活"
-			: "獲取個性化命理報告，按照我們的專屬建議，迎接完美平衡的生活";
-	const previewReportText = locale === "zh-CN" ? "预览报告" : "預覽報告";
+	const title = titleProp ?? t("title");
+	const title2 = title2Prop ?? t("title2");
+	const bulletItems =
+		bulletItemsProp ??
+		[t("bullet1"), t("bullet2"), t("bullet3"), t("bullet4")];
+	const bulletItems2 =
+		bulletItems2Prop ??
+		[t("bullet2_1"), t("bullet2_2"), t("bullet2_3")];
+	const resolvedButtonText = buttonText ?? t("buttonText");
+	const mobileDesc1 = t("mobileDesc1");
+	const mobileDesc2 = t("mobileDesc2");
+	const previewReportText = t("previewReportText");
 
 	if (isMobile) {
 		return (
@@ -271,7 +259,7 @@ const ShopFeatureBanner = ({
 										</div>
 										<Link href={buttonHref}>
 											<button className="px-10 py-3 text-sm font-semibold text-white transition-all border rounded-full shadow-md md:text-base hover:shadow-lg border-white/80">
-												購買報告
+												{t("buyReport")}
 											</button>
 										</Link>
 									</div>

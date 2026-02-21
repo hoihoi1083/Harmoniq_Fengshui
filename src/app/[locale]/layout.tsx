@@ -98,6 +98,11 @@ export default async function LocaleLayout({
 		notFound();
 	}
 	setRequestLocale(locale);
+	// Load messages for this URL locale so client components get the correct language
+	const messages =
+		locale === "zh-CN"
+			? (await import("@/../messages/zh-CN.json")).default
+			: (await import("@/../messages/zh-TW.json")).default;
 
 	return (
 		<>
@@ -124,7 +129,7 @@ export default async function LocaleLayout({
 				<MixpanelAuthTracker />
 				<UserProvider>
 					<ImageProvider>
-						<NextIntlClientProvider locale={locale}>
+						<NextIntlClientProvider locale={locale} messages={messages}>
 							{children}
 						</NextIntlClientProvider>
 					</ImageProvider>

@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 
 const ComparisonTables = () => {
-	const locale = useLocale();
+	const t = useTranslations("home.compare");
 
 	return (
 		<div className="w-full py-10 md:px-6 md:py-1">
@@ -20,7 +20,7 @@ const ComparisonTables = () => {
 						}}
 					>
 						<span className="text-lg font-bold text-white sm:text-xl md:text-2xl whitespace-nowrap">
-							{locale === "zh-CN" ? "風鈴Shop" : "風鈴Shop"}
+							{t("shopTitle")}
 						</span>
 					</div>
 				</div>
@@ -66,7 +66,7 @@ const ComparisonTables = () => {
 						}}
 					>
 						<span className="text-lg font-bold text-white sm:text-xl md:text-2xl whitespace-nowrap">
-							{locale === "zh-CN" ? "命理報告" : "命理報告"}
+							{t("reportTitle")}
 						</span>
 					</div>
 				</div>

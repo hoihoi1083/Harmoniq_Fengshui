@@ -62,32 +62,12 @@ const TestimonialSection = () => {
 		if (isDragging) handleMouseUp();
 	};
 
-	// Sample testimonial data
+	// Testimonial data from i18n (TW/CN)
 	const testimonials = [
-		{
-			id: 1,
-			quote: "一直容易疲勞，買了白水晶，贈送的報告建議超具體，照做一週，白天精神明顯變好，入睡也快了。這報告就像懂我的私人顧問，把複雜知識變成能直接用的行動指南，非常有用！",
-			name: "Donald C.",
-			avatar: "/images/testimonials/avatar-1.png",
-		},
-		{
-			id: 2,
-			quote: "以前對理財很迷茫。報告幫我分析出屬情感消費型，並給出5%啟動法設立自動儲蓄。現在對管理錢財有了清晰頭緒，感覺未來規劃踏實很多。",
-			name: "Emily R.",
-			avatar: "/images/testimonials/avatar-2.png",
-		},
-		{
-			id: 3,
-			quote: "這份分析神準！指出我和男朋友是問題解決型和情感傾聽型的溝通差異，一看就恍然大悟。提供的具體對話建議，讓我們馬上實踐，爭吵真的減少了。",
-			name: "Kelly F.",
-			avatar: "/images/testimonials/avatar-3.png",
-		},
-		{
-			id: 4,
-			quote: "事業運報告幫我定位在穩定突破期，點出優勢是資源整合，給出具體90天行動建議。我突然覺得職涯道路清晰了，這報告就像專業職場導師，對規劃幫助極大。",
-			name: "Charlie P.",
-			avatar: "/images/testimonials/avatar-4.png",
-		},
+		{ id: 1, quote: t("testimonial1.quote"), name: t("testimonial1.name"), avatar: "/images/testimonials/avatar-1.png" },
+		{ id: 2, quote: t("testimonial2.quote"), name: t("testimonial2.name"), avatar: "/images/testimonials/avatar-2.png" },
+		{ id: 3, quote: t("testimonial3.quote"), name: t("testimonial3.name"), avatar: "/images/testimonials/avatar-3.png" },
+		{ id: 4, quote: t("testimonial4.quote"), name: t("testimonial4.name"), avatar: "/images/testimonials/avatar-4.png" },
 	];
 
 	return (

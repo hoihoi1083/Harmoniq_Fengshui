@@ -60,14 +60,14 @@ export function getRegionalPriceId(locale, paymentType, region = null) {
 
 	if (!priceId) {
 		console.error(
-			`❌ No price ID found for currency: ${currency}, paymentType: ${paymentType}`
+			`❌ No price ID found for currency: ${currency}, paymentType: ${paymentType}`,
 		);
 		// Fallback to HKD if price not found
 		return priceIdMap.HKD[paymentType] || process.env.PRICE_ID2_HKD;
 	}
 
 	console.log(
-		`✅ Selected price ID: ${priceId} for ${currency} ${paymentType}`
+		`✅ Selected price ID: ${priceId} for ${currency} ${paymentType}`,
 	);
 	return priceId;
 }
@@ -209,14 +209,14 @@ export function getDisplayPrices(locale, region = null) {
 			career: { original: 88, discount: 38 },
 		},
 		TWD: {
-			fengshui: { original: 1540, discount: 740 }, // Approximate conversion
-			life: { original: 660, discount: 340 },
-			fortune: { original: 300, discount: 150 },
-			wealth: { original: 300, discount: 150 },
-			relationship: { original: 300, discount: 150 },
-			couple: { original: 680, discount: 340 },
-			health: { original: 300, discount: 150 },
-			career: { original: 300, discount: 150 },
+			fengshui: { original: 1568, discount: 668 }, // Approximate conversion
+			life: { original: 668, discount: 368 },
+			fortune: { original: 368, discount: 168 },
+			wealth: { original: 368, discount: 168 },
+			relationship: { original: 368, discount: 168 },
+			couple: { original: 668, discount: 368 },
+			health: { original: 368, discount: 168 },
+			career: { original: 368, discount: 168 },
 		},
 	};
 

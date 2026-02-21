@@ -25,7 +25,7 @@ export default function ServiceDemoTags() {
 	const getImagePath = (baseName) => {
 		if (region === "china") {
 			const nameWithoutExtension = baseName.replace(".png", "");
-			return `/images/demo/${nameWithoutExtension}-china.png`;
+			return `/images/demo/${nameWithoutExtension}.png`;
 		}
 		return `/images/demo/${baseName}`;
 	};

@@ -12,11 +12,12 @@ import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getCurrencySymbol } from "@/utils/regionalPricing";
+import { getCurrencySymbol, getDisplayPrices } from "@/utils/regionalPricing";
 import FooterV2 from "@/components/home/FooterV2";
 
 export default function DemoPage() {
 	const t = useTranslations("demoPage");
+	const tReport = useTranslations("reportPreview");
 	const locale = useLocale();
 	const searchParams = useSearchParams();
 	const { data: session } = useSession();
@@ -45,68 +46,61 @@ export default function DemoPage() {
 		smoothness: 1,
 	};
 
-	// Report type configuration with pricing and descriptions
+	// Report type configuration with pricing and descriptions (title/description from i18n)
 	const reportConfig = {
 		fengshui: {
-			title: "風水測算報告",
+			title: tReport("fengshui.title"),
 			price: 188,
 			originalPrice: 388,
-			description:
-				"運用八字與風水結合，分析住宅與辦公環境的磁場能量，提供針對性的改善建議，優化整體運勢。",
+			description: tReport("fengshui.description"),
 			endpoint: "/api/checkoutSessions/payment3",
 			concernType: "fengshui",
 		},
 		life: {
-			title: "命理測算報告",
+			title: tReport("life.title"),
 			price: 88,
 			originalPrice: 168,
-			description:
-				"深入分析個人八字命盤，解讀人生軌跡與發展方向，預示未來運勢，提供人生指引。",
+			description: tReport("life.description"),
 			endpoint: "/api/checkoutSessions/payment4",
 			concernType: "life",
 		},
 		relationship: {
-			title: "感情流年測算",
+			title: tReport("relationship.title"),
 			price: 38,
 			originalPrice: 68,
-			description:
-				"針對感情領域的專深分析，洞察感情運勢變化，提供感情建議與催旺方向。",
+			description: tReport("relationship.description"),
 			endpoint: "/api/checkoutSessions/payment-fortune-category",
 			concernType: "love",
 		},
 		couple: {
-			title: "合盤流年測算",
+			title: tReport("couple.title"),
 			price: 88,
 			originalPrice: 168,
-			description:
-				"兩人命盤配對分析，深度瞭解彼此性格差異與相處之道，增進感情和諧度。",
+			description: tReport("couple.description"),
 			endpoint: "/api/payment-couple",
 			concernType: "couple",
 		},
 		wealth: {
-			title: "財運流年測算",
+			title: tReport("wealth.title"),
 			price: 38,
 			originalPrice: 68,
-			description:
-				"分析財運走勢與偏財機會，預測收入變化，提供理財策略與催旺建議。",
+			description: tReport("wealth.description"),
 			endpoint: "/api/checkoutSessions/payment-fortune-category",
 			concernType: "financial",
 		},
 		health: {
-			title: "健康流年測算",
+			title: tReport("health.title"),
 			price: 38,
 			originalPrice: 68,
-			description:
-				"評估健康狀況與亞健康風險，提供調理建議與預防方向，守護身心健康。",
+			description: tReport("health.description"),
 			endpoint: "/api/checkoutSessions/payment-fortune-category",
 			concernType: "health",
 		},
 		career: {
-			title: "事業流年測算",
+			title: tReport("career.title"),
 			price: 88,
 			originalPrice: 168,
-			description:
-				"評估事業發展方向，預測機遇與挑戰，提供職業生涯規劃與催旺建議。",
+			description: tReport("career.description"),
 			endpoint: "/api/checkoutSessions/payment-fortune-category",
 			concernType: "career",
 		},
@@ -114,6 +108,10 @@ export default function DemoPage() {
 
 	// 🌍 Region detection for dynamic pricing
 	const [currentRegion, setCurrentRegion] = useState("hongkong");
+
+	// Regional display prices (CNY / HKD / TWD) for carousel and any price UI
+	const displayInfo = getDisplayPrices(locale, currentRegion);
+	const currencySymbol = displayInfo.symbol;
 
 	// Debug dialog state changes
 	useEffect(() => {
@@ -974,27 +972,25 @@ export default function DemoPage() {
 								href="/"
 								className="text-gray-900 hover:text-[#8B9F3A]"
 							>
-								{locale === "zh-CN" ? "首頁" : "首頁"}
+								{t("breadcrumbHome")}
 							</Link>
 							<span className="text-gray-400">{">"}</span>
 							<Link
 								href="/price"
 								className="text-gray-900 hover:text-[#8B9F3A]"
 							>
-								{locale === "zh-CN" ? "命理測算" : "命理測算"}
+								{t("breadcrumbPricing")}
 							</Link>
 							<span className="text-gray-400">{">"}</span>
 							<Link
 								href={`/report-preview?type=${activeTag}`}
 								className="text-gray-900 hover:text-[#8B9F3A]"
 							>
-								{locale === "zh-CN" ? "報告預覽" : "報告預覽"}
+								{t("breadcrumbReportPreview")}
 							</Link>
 							<span className="text-gray-400">{">"}</span>
 							<span className="text-gray-900">
-								{locale === "zh-CN"
-									? "詳細報告內容"
-									: "詳細報告內容"}
+								{t("breadcrumbDetail")}
 							</span>
 						</div>
 						<h1
@@ -1023,7 +1019,9 @@ export default function DemoPage() {
 						disabled={isProcessingPayment}
 						className="py-3 font-semibold text-white transition bg-black rounded-full px-30 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
 					>
-						{isProcessingPayment ? t("ui.processing") : "立即購買"}
+						{isProcessingPayment
+							? t("ui.processing")
+							: t("ui.buyNow")}
 					</button>
 				</div>
 			</div>
@@ -1230,7 +1228,7 @@ export default function DemoPage() {
 													>
 														{t(
 															"content.life.toggleButton1",
-														) || "年運分析"}
+														)}
 													</button>
 													<button
 														onClick={() =>
@@ -1258,7 +1256,7 @@ export default function DemoPage() {
 													>
 														{t(
 															"content.life.toggleButton2",
-														) || "命格詳解"}
+														)}
 													</button>
 												</div>
 
@@ -1276,12 +1274,10 @@ export default function DemoPage() {
 															"compatibility"
 																? t(
 																		"content.life.previewAlt1",
-																	) ||
-																	"年運分析報告"
+																	)
 																: t(
 																		"content.life.previewAlt2",
-																	) ||
-																	"命格詳解報告"
+																	)
 														}
 														className="h-auto max-w-[100%]"
 													/>
@@ -1458,12 +1454,11 @@ export default function DemoPage() {
 										// Skip the current report type
 										if (key === activeTag) return null;
 
-										// Calculate discount percentage
+										const cardPriceInfo = displayInfo.prices[key] || displayInfo.prices.fengshui;
+										const cardPrice = cardPriceInfo?.discount ?? config.price;
+										const cardOriginal = cardPriceInfo?.original ?? config.originalPrice;
 										const discount = Math.round(
-											((config.originalPrice -
-												config.price) /
-												config.originalPrice) *
-												100,
+											((cardOriginal - cardPrice) / cardOriginal) * 100,
 										);
 
 										// Get image path (using actual images from public/images/report-preview)
@@ -1499,20 +1494,17 @@ export default function DemoPage() {
 													/>
 												</div>
 												<div className="p-4">
-													<h3 className="font-semibold text-[#073E31] mb-2 text-sm line-clamp-2">
+													<h3 className="font-semibold text-[#073E31] mb-2 text-md sm:text-lg line-clamp-2">
 														{config.title}
 													</h3>
 													<div className="flex items-center gap-2">
-														<span className="text-[#8B9F3A] font-bold text-sm">
-															HK${config.price}
+														<span className="text-[#8B9F3A] font-bold text-md sm:text-lg">
+															{currencySymbol}{cardPrice}
 														</span>
-														<span className="text-xs text-gray-400 line-through">
-															HK$
-															{
-																config.originalPrice
-															}
+														<span className="text-sm sm:text-md text-gray-400 line-through">
+															{currencySymbol}{cardOriginal}
 														</span>
-														<span className="text-xs font-semibold text-red-500">
+														<span className="text-sm sm:text-md font-semibold text-red-500">
 															-{discount}%
 														</span>
 													</div>
@@ -1535,24 +1527,18 @@ export default function DemoPage() {
 							<div className="flex flex-col items-center justify-between gap-8 md:flex-row">
 								<div className="text-white">
 									<h2 className="text-2xl font-bold md:text-3xl">
-										{locale === "zh-CN"
-											? "随时了解"
-											: "隨時了解"}
+										{tReport("stayUpdated")}
 									</h2>
 									<h2 className="text-2xl font-bold md:text-3xl">
-										{locale === "zh-CN"
-											? "我们的最新优惠"
-											: "我們的最新優惠"}
+										{tReport("latestOffers")}
 									</h2>
 								</div>
 								<div className="flex flex-col gap-3 w-full md:w-auto md:min-w-[400px]">
 									<Input
 										type="email"
-										placeholder={
-											locale === "zh-CN"
-												? "输入您的电邮地址"
-												: "輸入您的電郵地址"
-										}
+										placeholder={tReport(
+											"emailPlaceholder",
+										)}
 										value={email}
 										onChange={(e) =>
 											setEmail(e.target.value)
@@ -1564,9 +1550,7 @@ export default function DemoPage() {
 										size="lg"
 										className="px-8 py-4 font-bold text-gray-800 bg-white rounded-full hover:bg-gray-100"
 									>
-										{locale === "zh-CN"
-											? "订阅我们"
-											: "訂閱我們"}
+										{tReport("subscribe")}
 									</Button>
 								</div>
 							</div>

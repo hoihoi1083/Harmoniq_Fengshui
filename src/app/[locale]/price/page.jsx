@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
 import Image from "next/image";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import ShopNavbar from "@/components/ShopNavbar";
 import FooterV2 from "@/components/home/FooterV2";
@@ -10,8 +10,15 @@ import { Button } from "@/components/ui/button";
 const PricePage = () => {
 	const locale = useLocale();
 	const router = useRouter();
+	const tFeatures = useTranslations("home.whyChooseUs");
+	const tPrice = useTranslations("pricePage");
 	const [email, setEmail] = useState("");
+	const [region, setRegion] = useState("hongkong");
 	const scrollRef = useRef(null);
+	useEffect(() => {
+		const stored = typeof window !== "undefined" ? localStorage.getItem("userRegion") : null;
+		if (stored && ["china", "hongkong", "taiwan"].includes(stored)) setRegion(stored);
+	}, []);
 	const hasDraggedRef = useRef(false);
 	const isJumpingRef = useRef(false);
 	const carouselPeekPx = 56;
@@ -38,55 +45,42 @@ const PricePage = () => {
 		{
 			id: 1,
 			icon: "/images/features/product-select.png",
-			title: locale === "zh-CN" ? "商品嚴選" : "商品嚴選",
-			description:
-				locale === "zh-CN"
-					? "所有商品均經過挑選與檢查，購買安心無壓力"
-					: "所有商品均經過挑選與檢查，購買安心無壓力",
+			title: tFeatures("feature1.title"),
+			description: tFeatures("feature1.description"),
 		},
 		{
 			id: 2,
 			icon: "/images/features/gift-report.png",
-			title: locale === "zh-CN" ? "贈送八字命理報告" : "贈送八字命理報告",
-			description:
-				locale === "zh-CN"
-					? "每一筆訂單，都附贈大師參與的專屬命理分析報告"
-					: "每一筆訂單，都附贈大師參與的專屬命理分析報告",
+			title: tFeatures("feature2.title"),
+			description: tFeatures("feature2.description"),
 		},
 		{
 			id: 3,
 			icon: "/images/features/master-custom.png",
-			title: locale === "zh-CN" ? "大師親自定制" : "大師親自定制",
-			description:
-				locale === "zh-CN"
-					? "大師根據個人情況整理重點，請你清楚知道該做下一步需要思與調整的方向"
-					: "大師根據個人情況整理重點，請你清楚知道該做下一步需要思與調整的方向",
+			title: tFeatures("feature3.title"),
+			description: tFeatures("feature3.description"),
 		},
 		{
 			id: 4,
 			icon: "/images/features/life-style.png",
-			title: locale === "zh-CN" ? "報告生活化" : "報告生活化",
-			description:
-				locale === "zh-CN"
-					? "重點放在實際生活中的影響與建議，一看就懂，一看就明"
-					: "重點放在實際生活中的影響與建議，一看就懂，一看就明",
+			title: tFeatures("feature4.title"),
+			description: tFeatures("feature4.description"),
 		},
 		{
 			id: 5,
 			icon: "/images/features/complete-experience.png",
-			title: locale === "zh-CN" ? "完整體驗" : "完整體驗",
-			description:
-				locale === "zh-CN"
-					? "購買時選自物的同時，也能獲得一份有依據有溫度的個人解開"
-					: "購買時選自物的同時，也能獲得一份有依據有溫度的個人解開",
+			title: tFeatures("feature5.title"),
+			description: tFeatures("feature5.description"),
 		},
 	];
 
+	// Image suffix by region: China → CNY, Hong Kong → HKD, Taiwan → TWD
+	const imageSuffix = region === "china" ? "CNY" : region === "taiwan" ? "TWD" : "HKD";
 	const pricingCards = [
 		{
 			id: 1,
 			column: "left",
-			image: "/images/price/fengshui.png",
+			image: `/images/price/fengshui-${imageSuffix}.png`,
 			title: locale === "zh-CN" ? "風水測算" : "風水測算",
 			price: "HKD$88",
 			originalPrice: "$188",
@@ -102,7 +96,7 @@ const PricePage = () => {
 		{
 			id: 2,
 			column: "right",
-			image: "/images/price/life.png",
+			image: `/images/price/life-${imageSuffix}.png`,
 			title: locale === "zh-CN" ? "命理測算" : "命理測算",
 			price: "HKD$88",
 			originalPrice: "$168",
@@ -118,7 +112,7 @@ const PricePage = () => {
 		{
 			id: 3,
 			column: "left",
-			image: "/images/price/relationship.png",
+			image: `/images/price/relationship-${imageSuffix}.png`,
 			title: locale === "zh-CN" ? "感情流年測算" : "感情流年測算",
 			price: "HKD$38",
 			originalPrice: "$68",
@@ -134,7 +128,7 @@ const PricePage = () => {
 		{
 			id: 4,
 			column: "right",
-			image: "/images/price/couple.png",
+			image: `/images/price/couple-${imageSuffix}.png`,
 			title: locale === "zh-CN" ? "合盤流年測算" : "合盤流年測算",
 			price: "HKD$88",
 			originalPrice: "$168",
@@ -150,7 +144,7 @@ const PricePage = () => {
 		{
 			id: 5,
 			column: "left",
-			image: "/images/price/wealth.png",
+			image: `/images/price/wealth-${imageSuffix}.png`,
 			title: locale === "zh-CN" ? "財運流年測算" : "財運流年測算",
 			price: "HKD$38",
 			originalPrice: "$68",
@@ -166,7 +160,7 @@ const PricePage = () => {
 		{
 			id: 6,
 			column: "right",
-			image: "/images/price/health.png",
+			image: `/images/price/health-${imageSuffix}.png`,
 			title: locale === "zh-CN" ? "健康流年測算" : "健康流年測算",
 			price: "HKD$38",
 			originalPrice: "$68",
@@ -182,7 +176,7 @@ const PricePage = () => {
 		{
 			id: 7,
 			column: "left",
-			image: "/images/price/career.png",
+			image: `/images/price/career-${imageSuffix}.png`,
 			title: locale === "zh-CN" ? "事業流年測算" : "事業流年測算",
 			price: "HKD$88",
 			originalPrice: "$168",
@@ -305,9 +299,9 @@ const PricePage = () => {
 	}, [carouselCards.length]);
 
 	const isLightCard = (imagePath) =>
-		imagePath?.includes("fengshui.png") ||
-		imagePath?.includes("couple.png") ||
-		imagePath?.includes("career.png");
+		imagePath?.includes("fengshui") ||
+		imagePath?.includes("couple") ||
+		imagePath?.includes("career");
 
 	const PricingCard = ({ card, noNavigate = false }) => {
 		const useBlackText = isLightCard(card.image);
@@ -335,7 +329,7 @@ const PricePage = () => {
 				/>
 
 				{/* Bottom Controls - responsive padding and sizes */}
-				<div className="absolute z-10 flex items-center justify-between bottom-3 left-2 right-2 sm:bottom-4 sm:left-3 sm:right-3 md:bottom-6 md:left-6 md:right-6">
+				{/* <div className="absolute z-10 flex items-center justify-between bottom-3 left-2 right-2 sm:bottom-4 sm:left-3 sm:right-3 md:bottom-6 md:left-6 md:right-6">
 					<div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
 						<button
 							type="button"
@@ -364,7 +358,7 @@ const PricePage = () => {
 							{locale === "zh-CN" ? "預覽報告" : "預覽報告"}
 						</span>
 					</div>
-				</div>
+				</div> */}
 			</div>
 		);
 	};
@@ -384,8 +378,8 @@ const PricePage = () => {
 					backgroundColor: "#f5f5f5",
 				}}
 			>
-				{/* Features Grid Section - max 2 rows on mobile (3+2 centered), 5 cols on desktop */}
-				<section className="relative w-full px-4 py-10 sm:py-12 md:py-16 lg:py-24">
+				{/* Features Grid Section - max 2 rows on mobile (3+2 centered), 5 cols on desktop. Use px-* to control container width on mobile (smaller px = wider content). */}
+				<section className="relative w-full px-0 py-10 sm:px-4 sm:py-12 md:py-16 lg:py-24">
 					<div className="container mx-auto max-w-full">
 						<div className="flex flex-wrap justify-center gap-3 lg:gap-6">
 							{features.map((feature) => (
@@ -405,12 +399,12 @@ const PricePage = () => {
 									</div>
 
 									{/* Title */}
-									<h3 className="mb-1.5 sm:mb-2 md:mb-3 text-xs sm:text-sm font-semibold text-[#073E31] md:text-base min-h-[2rem] flex items-center justify-center">
+									<h3 className="mb-0 sm:mb-2 md:mb-3 text-[10px] sm:text-sm font-semibold text-[#073E31] md:text-base min-h-[2rem] flex items-center justify-center">
 										{feature.title}
 									</h3>
 
 									{/* Description */}
-									<p className="text-[10px] sm:text-xs md:text-sm w-full max-w-[95%] text-[#073E31] leading-relaxed">
+									<p className="text-[6px] sm:text-xs md:text-sm w-full max-w-[95%] text-[#073E31] leading-relaxed">
 										{feature.description}
 									</p>
 								</div>
@@ -424,9 +418,7 @@ const PricePage = () => {
 					<div className="absolute inset-0" />
 					<div className="container relative px-4 sm:px-6 mx-auto max-w-full">
 						<h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-center text-black">
-							{locale === "zh-CN"
-								? "解鎖進階分析"
-								: "解鎖進階分析"}
+							{tPrice("title")}
 						</h1>
 					</div>
 				</section>
