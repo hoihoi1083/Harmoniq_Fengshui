@@ -1,10 +1,33 @@
 #!/bin/bash
-# Detect and kill crypto miners (Enhanced Security)
+# Detect and kill crypto miners, and remove miner files from disk (Enhanced Security)
 
-MINER_PROCESSES="xmrig|cpuminer|ccminer|ethminer|claymore|phoenixminer|t-rex|lolminer|nbminer|gminer|nicehash|stratum|cryptonight|monero"
+MINER_PROCESSES="xmrig|cpuminer|ccminer|ethminer|claymore|phoenixminer|t-rex|lolminer|nbminer|gminer|nicehash|stratum|cryptonight|monero|pulseadio"
 LOG_FILE="/home/ec2-user/miner-detection.log"
+# Project dir (same as deployment); use env or default
+PROJECT_DIR="${FENGSHUI_LAYOUT:-$HOME/fengshui-layout}"
 
-# Check for suspicious processes
+# --- 1. Remove known miner files/dirs from project (so they can't be restarted) ---
+if [ -d "$PROJECT_DIR" ]; then
+    cd "$PROJECT_DIR" || true
+    for name in xmrig-6.21.0 xmrig.tar.gz xmrig-auto.tar.gz xmrig linux_amd64 lrt scanner_linux mist bbs nul pulseadio .pulseadio; do
+        if [ -e "$name" ]; then
+            echo "[$(date)] Removing miner file/dir: $name" >> "$LOG_FILE"
+            rm -rf "$name" 2>/dev/null || true
+        fi
+    done
+    # Any path matching xmrig*
+    find . -maxdepth 2 -name 'xmrig*' -exec rm -rf {} \; 2>/dev/null || true
+fi
+
+# --- 1b. Remove known malware from home dir (e.g. .pulseadio typosquat) ---
+for name in .pulseadio pulseadio; do
+    if [ -e "$HOME/$name" ]; then
+        echo "[$(date)] Removing home-dir malware: $HOME/$name" >> "$LOG_FILE"
+        rm -rf "$HOME/$name" 2>/dev/null || true
+    fi
+done
+
+# --- 2. Check for suspicious processes ---
 FOUND=$(ps aux | grep -iE "$MINER_PROCESSES" | grep -v grep)
 
 if [ ! -z "$FOUND" ]; then

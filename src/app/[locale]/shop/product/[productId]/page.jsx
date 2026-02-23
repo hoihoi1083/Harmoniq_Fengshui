@@ -265,10 +265,16 @@ export default function ProductDetailPage() {
 					locale === "zh-CN" ? "已添加到购物车" : "已加入購物車",
 				);
 			} else {
-				throw new Error(data.error);
+				throw new Error(data.error || (locale === "zh-CN" ? "添加失败" : "加入失敗"));
 			}
 		} catch (error) {
-			toast.error(locale === "zh-CN" ? "添加失败" : "加入失敗");
+			const message =
+				typeof error?.message === "string"
+					? error.message
+					: locale === "zh-CN"
+						? "添加失败"
+						: "加入失敗";
+			toast.error(message);
 		} finally {
 			setIsAddingToCart(false);
 		}
@@ -746,20 +752,46 @@ export default function ProductDetailPage() {
 						</div>
 
 						{/* Add to Cart Button */}
-						<Button
-							size="lg"
-							className="w-full bg-[#6B8E23] hover:bg-[#5A7A1E] text-white h-14 text-base font-medium rounded-lg"
-							onClick={handleAddToCart}
-							disabled={
-								(!product?.isDigital && product?.stock === 0) ||
-								isAddingToCart
-							}
-						>
-							{isAddingToCart ? (
-								<div className="w-5 h-5 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin" />
-							) : null}
-							{locale === "zh-CN" ? "加到購物車" : "加到購物車"}
-						</Button>
+						{(() => {
+							const needsLogin = !session?.user;
+							const needsGiftReport =
+								Array.isArray(product?.giftReportTypes) &&
+								product.giftReportTypes.length > 0 &&
+								!selectedGiftReport;
+							const outOfStock =
+								!product?.isDigital && product?.stock === 0;
+							const isDisabled =
+								needsLogin ||
+								needsGiftReport ||
+								outOfStock ||
+								isAddingToCart;
+							const buttonText = isAddingToCart
+								? locale === "zh-CN"
+									? "加入中..."
+									: "加入中..."
+								: needsLogin
+									? locale === "zh-CN"
+										? "請先登入"
+										: "請先登入"
+									: needsGiftReport
+										? locale === "zh-CN"
+											? "請選擇贈送報告類型"
+											: "請選擇贈送報告類型"
+										: "加到購物車";
+							return (
+								<Button
+									size="lg"
+									className="w-full bg-[#6B8E23] hover:bg-[#5A7A1E] text-white h-14 text-base font-medium rounded-lg disabled:opacity-90"
+									onClick={handleAddToCart}
+									disabled={isDisabled}
+								>
+									{isAddingToCart ? (
+										<div className="w-5 h-5 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin" />
+									) : null}
+									{buttonText}
+								</Button>
+							);
+						})()}
 					</div>
 				</div>
 

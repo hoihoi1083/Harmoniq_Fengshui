@@ -319,7 +319,7 @@ export default function ShopPage() {
 						<div className="relative h-[400px] lg:h-[600px] flex items-center justify-center">
 							<div className="relative w-full h-full">
 								<Image
-									src="/images/shop-home/crystal.png"
+									src="/images/Shop-home/Crystal.png"
 									alt="Crystal Energy"
 									fill
 									className="object-contain drop-shadow-2xl"
@@ -866,7 +866,7 @@ export default function ShopPage() {
 										style={{ aspectRatio: "814 / 578" }}
 									>
 										<Image
-											src="/images/shop-home/earring.png"
+											src="/images/Shop-home/earring.png"
 											alt={
 												locale === "zh-CN"
 													? "耳饰"
@@ -896,7 +896,7 @@ export default function ShopPage() {
 										style={{ aspectRatio: "1368 / 578" }}
 									>
 										<Image
-											src="/images/shop-home/bracelet.png"
+											src="/images/Shop-home/bracelet.png"
 											alt={
 												locale === "zh-CN"
 													? "手串"
@@ -932,7 +932,7 @@ export default function ShopPage() {
 										style={{ aspectRatio: "1368 / 578" }}
 									>
 										<Image
-											src="/images/shop-home/fengshuiproduct.png"
+											src="/images/Shop-home/fengshuiproduct.png"
 											alt={
 												locale === "zh-CN"
 													? "风水摆件"
@@ -962,7 +962,7 @@ export default function ShopPage() {
 										style={{ aspectRatio: "814 / 578" }}
 									>
 										<Image
-											src="/images/shop-home/ring.png"
+											src="/images/Shop-home/ring.png"
 											alt={
 												locale === "zh-CN"
 													? "戒指"

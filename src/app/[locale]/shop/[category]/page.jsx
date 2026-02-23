@@ -611,7 +611,7 @@ function CategoryPageContent() {
 						style={{ aspectRatio: "1" }}
 					>
 						<Image
-							src="/images/shop-home/crystal.png"
+							src="/images/Shop-home/Crystal.png"
 							alt=""
 							fill
 							className="object-contain object-[bottom_right] drop-shadow-2xl"

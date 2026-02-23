@@ -9,6 +9,9 @@ set -e  # Exit on any error
 REMOTE_HOST="fs"
 REMOTE_PATH="/home/ec2-user/fengshui-layout"
 LOCAL_PROJECT_PATH="."
+# Set to 1 to build locally and upload .next/standalone (skips npm install + build on server).
+# Use --local-build if server build is OOM-killed (exit 137) or runs out of memory.
+BUILD_LOCAL=0
 
 # Colors for output
 RED='\033[0;31m'
@@ -57,6 +60,12 @@ check_prerequisites() {
     print_success "Prerequisites check completed"
 }
 
+# Unlock protected files on server so rsync can overwrite them (they get re-locked after deploy)
+unlock_remote_protected_files() {
+    print_status "Unlocking protected files on server for deploy..."
+    ssh $REMOTE_HOST "cd $REMOTE_PATH && sudo chattr -i package.json ecosystem.config.json next.config.js next.config.ts .env .env.production 2>/dev/null; true" || true
+}
+
 # Function to upload source code
 upload_source() {
     print_status "Uploading source code to server..."
@@ -81,11 +90,81 @@ upload_source() {
     fi
 }
 
+# Build locally and upload .next/standalone (use when npm install fails on server)
+local_build_and_upload_standalone() {
+    print_status "Building application locally..."
+    if ! npm run build; then
+        print_error "Local build failed. Fix errors above and re-run."
+        exit 1
+    fi
+    if [ ! -d ".next/standalone" ]; then
+        print_error "Standalone output not found after build"
+        exit 1
+    fi
+    print_status "Preparing standalone bundle (public + static)..."
+    cp -r public .next/standalone/ 2>/dev/null || true
+    mkdir -p .next/standalone/.next
+    cp -r .next/static .next/standalone/.next/
+    if [ -f ".env.production" ]; then
+        cp .env.production .next/standalone/.env
+    fi
+    print_status "Uploading standalone build to server..."
+    rsync -avz -e "ssh" \
+        --progress \
+        .next/standalone/ $REMOTE_HOST:$REMOTE_PATH/.next/standalone/
+    if [ $? -ne 0 ]; then
+        print_error "Failed to upload standalone build"
+        exit 1
+    fi
+    print_success "Standalone build uploaded"
+}
+
+# On server: only wire env and start PM2 (no npm install, no build). Requires .next/standalone already present.
+server_deploy_standalone_only() {
+    print_status "Configuring and starting app on server (standalone only)..."
+    ssh $REMOTE_HOST "bash -s" << 'EOF'
+        set -e
+        cd /home/ec2-user/fengshui-layout
+        if [ ! -d ".next/standalone" ]; then
+            echo "❌ .next/standalone not found. Use full deploy or run with --local-build after a local build upload."
+            exit 1
+        fi
+        # Ensure env in standalone
+        if [ -f ".env.production" ]; then
+            cp .env.production .next/standalone/.env
+        fi
+        mkdir -p logs
+        echo "🔓 Unlocking config for PM2..."
+        sudo chattr -i ecosystem.config.json 2>/dev/null || true
+        pm2 delete all 2>/dev/null || true
+        pm2 start ecosystem.config.json --update-env
+        pm2 save
+        echo "✅ PM2 started (standalone)"
+        pm2 list
+        # Re-lock critical files (same as full deploy) so malware can't overwrite config
+        echo "🔒 Re-locking protected files..."
+        sudo chattr +i package.json 2>/dev/null || true
+        sudo chattr +i ecosystem.config.json 2>/dev/null || true
+        sudo chattr +i next.config.js 2>/dev/null || true
+        sudo chattr +i next.config.ts 2>/dev/null || true
+        sudo chattr +i .env 2>/dev/null || true
+        sudo chattr +i .env.production 2>/dev/null || true
+        echo "✅ Deployment completed successfully!"
+EOF
+    if [ $? -eq 0 ]; then
+        print_success "Server started successfully"
+    else
+        print_error "Server deploy failed"
+        exit 1
+    fi
+}
+
 # Function to build and deploy on server
 server_build_and_deploy() {
     print_status "Building and deploying on server..."
     
-    ssh $REMOTE_HOST << 'EOF'
+    # Use bash -s so PIPESTATUS and streaming work; keeps SSH alive during long build
+    ssh $REMOTE_HOST "bash -s" << 'EOF'
         set -e
         
         echo "🚀 Starting server-side deployment..."
@@ -145,17 +224,54 @@ server_build_and_deploy() {
         echo "🧹 Cleaning PM2 logs..."
         pm2 flush || true
         
-        # Skip npm install - AWS blocks outbound package manager connections
-        # NOTE: If package.json changes, you'll need to manually install dependencies on server
-        echo "⚠️  Skipping npm install (AWS blocks it - using existing node_modules)"
+        # Show disk space right before npm (common cause of failure)
+        echo "💾 Disk before npm install:"
+        df -h / | grep -E 'Filesystem|nvme'
         
-        # Build the application
-        echo "🔨 Building application..."
-        npm run build
+        # Run npm install (outbound must work). If node_modules is broken, do a clean install.
+        echo "📦 Installing dependencies..."
+        NPM_LOG=$(mktemp)
+        if ! npm install --production 2>&1 | tee "$NPM_LOG"; then
+            echo "⚠️  npm install failed. Last 40 lines of output:"
+            tail -40 "$NPM_LOG"
+            echo "---"
+            echo "⚠️  Trying clean install (rm -rf node_modules && npm install)..."
+            rm -rf node_modules
+            if ! npm install --production 2>&1 | tee "$NPM_LOG"; then
+                echo "❌ Clean npm install also failed. Last 40 lines:"
+                tail -40 "$NPM_LOG"
+                rm -f "$NPM_LOG"
+                echo "❌ Check: disk space (df -h), network (curl -I https://registry.npmjs.org), and npm cache (npm cache verify)."
+                exit 1
+            fi
+        fi
+        rm -f "$NPM_LOG"
+        echo "✅ npm install succeeded"
         
-        # Check if build was successful; restore backup if build failed
+        # Build: stream output (keeps SSH alive) and save to log; use PIPESTATUS for real exit code
+        export NODE_OPTIONS="--max-old-space-size=2048"
+        echo "🔨 Building application (NODE_OPTIONS=$NODE_OPTIONS)..."
+        mkdir -p logs
+        BUILD_LOG="logs/build.log"
+        npm run build 2>&1 | tee "$BUILD_LOG"
+        BUILD_EXIT=${PIPESTATUS[0]}
+        if [ "$BUILD_EXIT" -ne 0 ]; then
+            echo "❌ Build exited with code $BUILD_EXIT (137=OOM killed). Full log:"
+            cat "$BUILD_LOG"
+            echo "--- dmesg (OOM/signals) ---"
+            dmesg 2>/dev/null | tail -20 || true
+            if [ -d ".next.backup" ]; then
+                echo "🔄 Restoring previous build..."
+                rm -rf .next
+                mv .next.backup .next
+            fi
+            exit 1
+        fi
         if [ ! -d ".next/standalone" ]; then
-            echo "❌ Build failed - standalone directory not found"
+            echo "❌ Build did not produce .next/standalone. Full log:"
+            cat "$BUILD_LOG"
+            echo "--- dmesg ---"
+            dmesg 2>/dev/null | tail -20 || true
             if [ -d ".next.backup" ]; then
                 echo "🔄 Restoring previous build..."
                 rm -rf .next
@@ -279,11 +395,14 @@ show_summary() {
 
 # Function to handle errors and cleanup
 cleanup() {
-    if [ $? -ne 0 ]; then
-        print_error "Deployment failed!"
-        print_status "Check the logs for more details:"
-        print_status "  ssh $REMOTE_HOST 'pm2 logs'"
-        exit 1
+    local exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        print_error "Deployment failed (exit $exit_code)."
+        print_status "To see what went wrong:"
+        print_status "  ssh $REMOTE_HOST 'cat ~/fengshui-layout/logs/build.log'   # server build log"
+        print_status "  ssh $REMOTE_HOST 'dmesg | tail -30'                        # OOM/kills"
+        print_status "  ssh $REMOTE_HOST 'pm2 logs'                                # app runtime"
+        exit $exit_code
     fi
 }
 
@@ -292,15 +411,34 @@ trap cleanup EXIT
 
 # Main deployment process
 main() {
+    # Parse --local-build before other logic
+    for arg in "$@"; do
+        if [ "$arg" = "--local-build" ]; then
+            BUILD_LOCAL=1
+            break
+        fi
+    done
+
     echo "🚀 Starting Complete Deployment Process"
+    if [ "$BUILD_LOCAL" = "1" ]; then
+        echo "📦 Mode: local build + upload standalone (no npm install on server)"
+    fi
     echo "======================================="
-    
+
     check_prerequisites
+    unlock_remote_protected_files
     upload_source
-    server_build_and_deploy
+
+    if [ "$BUILD_LOCAL" = "1" ]; then
+        local_build_and_upload_standalone
+        server_deploy_standalone_only
+    else
+        server_build_and_deploy
+    fi
+
     verify_deployment
     show_summary
-    
+
     print_success "🎉 Deployment completed successfully!"
 }
 
