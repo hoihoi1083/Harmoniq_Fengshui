@@ -145,7 +145,17 @@ server_build_and_deploy() {
         echo "🧹 Cleaning PM2 logs..."
         pm2 flush || true
         
-        # In# Restore backup if build failed
+        # Skip npm install - AWS blocks outbound package manager connections
+        # NOTE: If package.json changes, you'll need to manually install dependencies on server
+        echo "⚠️  Skipping npm install (AWS blocks it - using existing node_modules)"
+        
+        # Build the application
+        echo "🔨 Building application..."
+        npm run build
+        
+        # Check if build was successful; restore backup if build failed
+        if [ ! -d ".next/standalone" ]; then
+            echo "❌ Build failed - standalone directory not found"
             if [ -d ".next.backup" ]; then
                 echo "🔄 Restoring previous build..."
                 rm -rf .next
@@ -157,20 +167,6 @@ server_build_and_deploy() {
         # Remove backup on successful build
         echo "🗑️  Removing old build backup..."
         rm -rf .next.backup 2>/dev/null || true
-        
-        # Skip npm install - AWS blocks outbound package manager connections
-        # NOTE: If package.json changes, you'll need to manually install dependencies on server
-        echo "⚠️  Skipping npm install (AWS blocks it - using existing node_modules)"
-        
-        # Build the application
-        echo "🔨 Building application..."
-        npm run build
-        
-        # Check if build was successful
-        if [ ! -d ".next/standalone" ]; then
-            echo "❌ Build failed - standalone directory not found"
-            exit 1
-        fi
         
         # Copy public assets to standalone build
         echo "📁 Copying public assets..."

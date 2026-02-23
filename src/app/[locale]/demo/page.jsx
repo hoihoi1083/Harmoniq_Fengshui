@@ -686,9 +686,22 @@ export default function DemoPage() {
 		setCurrentCardType("couple");
 
 		try {
-			// Prepare request body
+			// Use stored region (same as report-preview & price V1) so TWD shows for Taiwan
+			const storedRegion =
+				typeof window !== "undefined"
+					? localStorage.getItem("userRegion")
+					: null;
+			const regionToLocaleMap = {
+				china: "zh-CN",
+				hongkong: "zh-TW",
+				taiwan: "zh-TW",
+			};
+			const freshLocale =
+				regionToLocaleMap[storedRegion] || locale || "zh-TW";
+
 			const requestBody = {
-				locale: locale, // Use current locale for couple analysis
+				locale: freshLocale,
+				region: storedRegion, // Required for NTD/TWD when region is taiwan
 			};
 
 			// Create checkout session for couple analysis
