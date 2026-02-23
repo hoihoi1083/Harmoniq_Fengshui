@@ -61,7 +61,7 @@ export default function LoginPage({ searchParams }) {
 				toast.error(t("loginFailedCheckCredentials"));
 			} else {
 				toast.success(t("loginSuccess"));
-				router.push("/"); // Redirect to chat page
+				router.push("/"); // Redirect to home
 			}
 		} catch (error) {
 			console.error("Login error:", error);

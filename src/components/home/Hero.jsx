@@ -11,6 +11,7 @@ import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
 
 export default function Hero() {
 	const t = useTranslations("home.hero");
+	const tServices = useTranslations("home.services");
 	const isMobile = useMobile();
 	const { scaleRatio, isMobileLayout } = useResponsiveScale();
 	const { region } = useRegionDetection();
@@ -229,28 +230,28 @@ export default function Hero() {
 	};
 	const steps = [
 		{
-			num: 1,
-			image: "/images/hero/hero-1-white.png",
-			title: "風鈴聊天室",
-			subtitle: "免費測評房間/命理",
+			num: "1",
+			title: tServices("steps.step1.title"),
+			subtitle: tServices("steps.step1.subtitle"),
+			image: "/images/hero/hero-1.png",
 		},
 		{
-			num: 2,
-			image: "/images/hero/hero-2-white.png",
-			title: "選擇報告",
-			subtitle: "挑選心儀測算模式",
+			num: "2",
+			title: tServices("steps.step2.title"),
+			subtitle: tServices("steps.step2.subtitle"),
+			image: "/images/hero/hero-2.png",
 		},
 		{
-			num: 3,
-			image: "/images/hero/hero-3-white.png",
-			title: "填寫信息",
-			subtitle: "輸入生辰八字",
+			num: "3",
+			title: tServices("steps.step3.title"),
+			subtitle: tServices("steps.step3.subtitle"),
+			image: "/images/hero/hero-3.png",
 		},
 		{
-			num: 4,
-			image: "/images/hero/hero-4-white.png",
-			title: "解鎖專屬定製報告",
-			subtitle: "收到詳細分析和建議",
+			num: "4",
+			title: tServices("steps.step4.title"),
+			subtitle: tServices("steps.step4.subtitle"),
+			image: "/images/hero/hero-4.png",
 		},
 	];
 
@@ -296,7 +297,7 @@ export default function Hero() {
 							{/* HarmoniQ Brand Name - right aligned */}
 							{/* Main Title */}
 							<h1
-								className="justify-center px-2 mb-8 text-[60px] sm:text-[90px] md:text-[100px] text-start"
+								className="justify-center px-2 mb-8 text-[50px] sm:text-[90px] md:text-[100px] text-start"
 								style={{
 									fontFamily: "Noto Serif TC, serif",
 									fontWeight: 800,

@@ -73,7 +73,7 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 								<Menu className="w-6 h-6" />
 							</button>
 							<Link
-								href={`/${locale}/home`}
+								href={`/${locale}`}
 								className="flex items-center pr-5 hover:opacity-80 transition-opacity shrink-0"
 							>
 								<Image
@@ -96,13 +96,13 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 						{/* Navigation Links - desktop only */}
 						<div className="hidden md:flex items-center gap-8">
 							<Link
-								href={`/${locale}/home`}
+								href={`/${locale}`}
 								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
 								首頁
 							</Link>
 							<Link
-								href={`/${locale}`}
+								href={`/${locale}/smart-chat2`}
 								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
 								風鈴資訊室
@@ -294,14 +294,14 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 						<div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
 							<div className="container mx-auto px-4 py-3 space-y-1">
 								<Link
-									href={`/${locale}/home`}
+									href={`/${locale}`}
 									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
 									onClick={() => setMobileMenuOpen(false)}
 								>
 									首頁
 								</Link>
 								<Link
-									href={`/${locale}`}
+									href={`/${locale}/smart-chat2`}
 									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
 									onClick={() => setMobileMenuOpen(false)}
 								>

@@ -27,7 +27,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 	const isLogined = status === "authenticated" && session?.user?.userId;
 	const isLoading = status === "loading";
 
-	const isHome = pathname === "/home";
+	const isHome = pathname === "/" || pathname === "/home";
 	const isContact = pathname === "/customer/contact";
 	const navTextColor = isContact
 		? "#fff"
@@ -43,12 +43,12 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 	};
 
 	const navigateToSection = (sectionId) => {
-		// If we're on the home page, just scroll
-		if (pathname === "/home") {
+		// If we're on the home page (root or /home), just scroll
+		if (pathname === "/" || pathname === "/home") {
 			scrollToSection(sectionId);
 		} else {
-			// If we're on another page, navigate to home page with hash
-			router.push(`/home#${sectionId}`);
+			// If we're on another page, navigate to home with hash
+			router.push(`/#${sectionId}`);
 		}
 	};
 
@@ -175,7 +175,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 						{!isNavbarMobile && (
 							<div className="flex items-center gap-10 ">
 								<Link
-									href="/home"
+									href="/"
 									className={`px-3 py-1 rounded-full transition-all font-noto-sans-hk duration-200 hover:opacity-80 ${
 										isHome ? "bg-[#A3B116]" : ""
 									}`}
@@ -186,13 +186,13 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 									{t("home")}
 								</Link>
 								<Link
-									href="/"
+									href="/smart-chat2"
 									className={`px-3 py-1 rounded-full transition-all font-noto-sans-hk duration-200 hover:opacity-80 ${
-										pathname === "/" ? "bg-[#A3B116]" : ""
+										pathname === "/smart-chat2" ? "bg-[#A3B116]" : ""
 									}`}
 									style={{
 										color:
-											pathname === "/"
+											pathname === "/smart-chat2"
 												? "#fff"
 												: navTextColor,
 									}}
@@ -239,7 +239,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 								<button
 									onClick={() => navigateToSection("faq")}
 									className={`px-3 py-1 rounded-full transition-all duration-200 font-noto-sans-hk cursor-pointer hover:opacity-80 ${
-										pathname === "/home" &&
+										(pathname === "/" || pathname === "/home") &&
 										typeof window !== "undefined" &&
 										window.location.hash === "#faq"
 											? "bg-[#A3B116]"
@@ -247,7 +247,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 									}`}
 									style={{
 										color:
-											pathname === "/home" &&
+											(pathname === "/" || pathname === "/home") &&
 											typeof window !== "undefined" &&
 											window.location.hash === "#faq"
 												? "#fff"
@@ -334,7 +334,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 				<div className="absolute top-16 left-0 right-0 bg-white/90 backdrop-blur-sm  border-b shadow-lg z-[80]">
 					<div className="px-4 py-2 space-y-2">
 						<Link
-							href="/home"
+							href="/"
 							className="block px-4 py-2 text-gray-800 transition-colors rounded hover:bg-gray-100"
 							onClick={() => setIsMobileMenuOpen(false)}
 							style={{ fontFamily: "Noto Serif TC, serif" }}
@@ -342,7 +342,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 							{t("home")}
 						</Link>
 						<Link
-							href="/"
+							href="/smart-chat2"
 							className="block px-4 py-2 text-gray-800 transition-colors rounded hover:bg-gray-100"
 							onClick={() => setIsMobileMenuOpen(false)}
 							style={{ fontFamily: "Noto Serif TC, serif" }}
