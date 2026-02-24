@@ -84,6 +84,20 @@ const OrderSchema = new mongoose.Schema({
 		default: "pending",
 	},
 	notes: String,
+	// One-time report input for gift report. One sex/birthday per order; one question per report type when multiple.
+	reportInput: {
+		sex: { type: String, enum: ["male", "female"] },
+		birthday: String,
+		question: String, // legacy: single question when only one report type
+		// When user buys multiple products with different reports: { wealth: "?", love: "?", career: "?", health: "?" }
+		questions: {
+			wealth: String,
+			love: String,
+			career: String,
+			health: String,
+		},
+		submittedAt: { type: Date, default: Date.now },
+	},
 	createdAt: {
 		type: Date,
 		default: Date.now,

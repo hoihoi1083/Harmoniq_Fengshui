@@ -16,6 +16,8 @@ import {
 	Mail,
 	Calendar,
 	Sparkles,
+	FileText,
+	Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -41,11 +43,18 @@ export default function OrderConfirmationPage() {
 	const params = useParams();
 	const [order, setOrder] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [reportForm, setReportForm] = useState({ sex: "male", birthday: "", questions: {} });
+	const [reportSubmitting, setReportSubmitting] = useState(false);
+	const [reportFormVisible, setReportFormVisible] = useState(false);
 
 	useEffect(() => {
-		if (session?.user && params.orderId) {
+		if (!params.orderId) return;
+		setOrder(null);
+		setReportFormVisible(false);
+		if (session?.user) {
+			setLoading(true);
 			fetchOrder();
-		} else if (!session?.user) {
+		} else {
 			setLoading(false);
 		}
 	}, [session, params.orderId]);
@@ -89,6 +98,65 @@ export default function OrderConfirmationPage() {
 			refunded: locale === "zh-CN" ? "已退款" : "已退款",
 		};
 		return statusMap[status] || status;
+	};
+
+	const hasGiftReport = order?.items?.some((i) => i.giftReportType);
+	const giftReportTypes = order?.items
+		? [...new Set(order.items.filter((i) => i.giftReportType).map((i) => i.giftReportType))]
+		: [];
+	const hasReportQuestion = order?.reportInput?.question ||
+		(order?.reportInput?.questions && Object.values(order.reportInput.questions || {}).some((q) => q));
+	const reportAlreadySubmitted = !!(order?.reportInput?.birthday && hasReportQuestion);
+
+	const handleSubmitReportInput = async (e) => {
+		e.preventDefault();
+		if (reportAlreadySubmitted || reportSubmitting) return;
+		if (!reportForm.birthday?.trim()) {
+			toast.error(locale === "zh-CN" ? "請填寫出生日期" : "請填寫出生日期");
+			return;
+		}
+		const questions = {};
+		for (const t of giftReportTypes) {
+			const q = (reportForm.questions || {})[t];
+			if (typeof q !== "string" || !q.trim()) {
+				toast.error(
+					locale === "zh-CN"
+						? `請填寫「${GIFT_REPORT_LABELS[t] || t}」報告的問題`
+						: `請填寫「${GIFT_REPORT_LABELS[t] || t}」報告的問題`
+				);
+				return;
+			}
+			questions[t] = q.trim();
+		}
+		setReportSubmitting(true);
+		try {
+			const res = await fetch(`/api/shop/orders/${params.orderId}/report-input`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					sex: reportForm.sex,
+					birthday: reportForm.birthday.trim(),
+					questions,
+				}),
+			});
+			const data = await res.json();
+			if (data.success) {
+				if (data.data?.reportInput) {
+					setOrder(data.data);
+				} else {
+					await fetchOrder();
+				}
+				setReportFormVisible(false);
+				toast.success(locale === "zh-CN" ? "報告資料已提交" : "報告資料已提交");
+			} else {
+				toast.error(data.error || (locale === "zh-CN" ? "提交失敗" : "提交失敗"));
+			}
+		} catch (err) {
+			console.error(err);
+			toast.error(locale === "zh-CN" ? "提交失敗" : "提交失敗");
+		} finally {
+			setReportSubmitting(false);
+		}
 	};
 
 	if (loading) {
@@ -284,6 +352,133 @@ export default function OrderConfirmationPage() {
 								)}
 							</div>
 						</div>
+
+						{/* Report input (one-time: sex, birthday, question) - only when order has gift report */}
+						{hasGiftReport && (
+							<div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-gray-100">
+								<div className="flex items-center gap-3 mb-6">
+									<div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#6B8E23] to-[#5A7A1E] flex items-center justify-center">
+										<FileText className="w-5 h-5 text-white" />
+									</div>
+									<h2 className="text-2xl font-bold text-[#1C312E]">
+										{locale === "zh-CN" ? "贈送報告資料" : "贈送報告資料"}
+									</h2>
+									{reportAlreadySubmitted && (
+										<span className="flex items-center gap-1.5 text-sm font-medium text-green-700 bg-green-50 px-3 py-1.5 rounded-full">
+											<Lock className="w-4 h-4" />
+											{locale === "zh-CN" ? "已填寫（僅可提交一次）" : "已填寫（僅可提交一次）"}
+										</span>
+									)}
+								</div>
+
+								{reportAlreadySubmitted ? (
+									<div className="space-y-3 bg-gray-50 p-6 rounded-2xl">
+										<p className="text-sm text-gray-600">
+											{locale === "zh-CN" ? "性別：" : "性別："}{" "}
+											{order.reportInput.sex === "female" ? (locale === "zh-CN" ? "女" : "女") : (locale === "zh-CN" ? "男" : "男")}
+										</p>
+										<p className="text-sm text-gray-600">
+											{locale === "zh-CN" ? "出生日期：" : "出生日期："} {order.reportInput.birthday}
+										</p>
+										{order.reportInput.questions && Object.keys(order.reportInput.questions).filter((t) => order.reportInput.questions[t]).length > 0 ? (
+											<div className="space-y-2 mt-3">
+												{["wealth", "love", "career", "health"].map(
+													(t) =>
+														order.reportInput.questions[t] && (
+															<p key={t} className="text-sm text-gray-600">
+																{locale === "zh-CN" ? "問題" : "問題"}（{GIFT_REPORT_LABELS[t] || t}）：{order.reportInput.questions[t]}
+															</p>
+														)
+												)}
+											</div>
+										) : (
+											<p className="text-sm text-gray-600">
+												{locale === "zh-CN" ? "問題：" : "問題："} {order.reportInput.question}
+											</p>
+										)}
+									</div>
+								) : (
+									<>
+										{!reportFormVisible ? (
+											<Button
+												type="button"
+												onClick={() => setReportFormVisible(true)}
+												className="bg-[#6B8E23] hover:bg-[#5A7A1E] text-white"
+											>
+												{locale === "zh-CN" ? "填寫報告資料（僅可提交一次）" : "填寫報告資料（僅可提交一次）"}
+											</Button>
+										) : (
+											<form onSubmit={handleSubmitReportInput} className="space-y-4 max-w-lg">
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														{locale === "zh-CN" ? "性別" : "性別"}
+													</label>
+													<select
+														value={reportForm.sex}
+														onChange={(e) => setReportForm({ ...reportForm, sex: e.target.value })}
+														className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 focus:ring-2 focus:ring-[#6B8E23] focus:border-[#6B8E23]"
+													>
+														<option value="male">{locale === "zh-CN" ? "男" : "男"}</option>
+														<option value="female">{locale === "zh-CN" ? "女" : "女"}</option>
+													</select>
+												</div>
+												<div>
+													<label className="block text-sm font-medium text-gray-700 mb-1">
+														{locale === "zh-CN" ? "出生日期" : "出生日期"}
+													</label>
+													<input
+														type="date"
+														value={reportForm.birthday}
+														onChange={(e) => setReportForm({ ...reportForm, birthday: e.target.value })}
+														className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 focus:ring-2 focus:ring-[#6B8E23] focus:border-[#6B8E23]"
+														required
+													/>
+												</div>
+												{giftReportTypes.map((reportType) => (
+													<div key={reportType}>
+														<label className="block text-sm font-medium text-gray-700 mb-1">
+															{locale === "zh-CN" ? "想問的問題" : "想問的問題"}（{GIFT_REPORT_LABELS[reportType] || reportType}）
+														</label>
+														<textarea
+															value={reportForm.questions?.[reportType] ?? ""}
+															onChange={(e) =>
+																setReportForm({
+																	...reportForm,
+																	questions: { ...(reportForm.questions || {}), [reportType]: e.target.value },
+																})
+															}
+															rows={2}
+															placeholder={locale === "zh-CN" ? "例如：我想了解此方面的運勢" : "例如：我想了解此方面的運勢"}
+															className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-gray-900 focus:ring-2 focus:ring-[#6B8E23] focus:border-[#6B8E23] resize-none"
+															required
+														/>
+													</div>
+												))}
+												<div className="flex gap-3">
+													<Button
+														type="submit"
+														disabled={reportSubmitting}
+														className="bg-[#6B8E23] hover:bg-[#5A7A1E] text-white"
+													>
+														{reportSubmitting
+															? (locale === "zh-CN" ? "提交中..." : "提交中...")
+															: (locale === "zh-CN" ? "提交" : "提交")}
+													</Button>
+													<Button
+														type="button"
+														variant="outline"
+														onClick={() => setReportFormVisible(false)}
+														disabled={reportSubmitting}
+													>
+														{locale === "zh-CN" ? "取消" : "取消"}
+													</Button>
+												</div>
+											</form>
+										)}
+									</>
+								)}
+							</div>
+						)}
 
 						{/* Shipping Information */}
 						<div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-gray-100">

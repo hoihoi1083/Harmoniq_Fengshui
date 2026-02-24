@@ -35,7 +35,9 @@ export async function GET(request, { params }) {
 
 		const { orderId } = await params;
 
-		const order = await Order.findById(orderId).populate("items.productId");
+		const order = await Order.findById(orderId)
+			.populate("items.productId")
+			.lean();
 
 		if (!order) {
 			return NextResponse.json(
@@ -46,7 +48,7 @@ export async function GET(request, { params }) {
 
 		return NextResponse.json({
 			success: true,
-			order: order,
+			order,
 		});
 	} catch (error) {
 		console.error("Error fetching order:", error);

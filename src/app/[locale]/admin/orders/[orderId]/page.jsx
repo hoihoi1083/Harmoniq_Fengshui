@@ -22,6 +22,7 @@ import {
 	Edit2,
 	Save,
 	X,
+	FileText,
 } from "lucide-react";
 import {
 	Select,
@@ -545,6 +546,71 @@ function AdminOrderDetailContent({ orderId, locale }) {
 								</div>
 							</div>
 						</Card>
+
+						{/* Customer report input (sex, birthday, questions) - for orders with gift report */}
+						{order.items?.some((i) => i.giftReportType) && (
+							<Card className="p-6 bg-white border-slate-200 shadow-lg">
+								<h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800">
+									<FileText className="w-5 h-5 text-green-600" />
+									客戶報告資料
+								</h2>
+								{(() => {
+									const hasQuestion = order.reportInput?.question ||
+										(order.reportInput?.questions && Object.values(order.reportInput.questions || {}).some((q) => q));
+									const isComplete = order.reportInput?.birthday && hasQuestion;
+									const hasAnyInput = order.reportInput?.sex || order.reportInput?.birthday || order.reportInput?.submittedAt;
+									if (!hasAnyInput) {
+										return <p className="text-slate-500 text-sm">客戶尚未填寫報告資料</p>;
+									}
+									return (
+										<div className="space-y-3 bg-slate-50 p-4 rounded-xl">
+											{!isComplete && (
+												<p className="text-amber-700 text-sm font-medium bg-amber-50 px-3 py-2 rounded-lg">
+													資料不完整（缺少出生日期或問題），請客戶至訂單頁重新填寫。
+												</p>
+											)}
+											<div>
+												<p className="text-sm text-slate-600">性別</p>
+												<p className="font-medium">
+													{order.reportInput.sex === "female" ? "女" : "男"}
+												</p>
+											</div>
+											<div>
+												<p className="text-sm text-slate-600">出生日期</p>
+												<p className="font-medium">{order.reportInput.birthday || "—"}</p>
+											</div>
+											{order.reportInput.questions &&
+											Object.keys(order.reportInput.questions).filter((t) => order.reportInput.questions[t]).length > 0 ? (
+												<div className="space-y-2 pt-2 border-t border-slate-200">
+													<p className="text-sm text-slate-600">問題（按報告類型）</p>
+													{["wealth", "love", "career", "health"].map(
+														(t) =>
+															order.reportInput.questions[t] && (
+																<div key={t} className="pl-2">
+																	<span className="text-sm font-medium text-green-700">
+																		{({ wealth: "財運", love: "感情", career: "事業", health: "健康" })[t]}：
+																	</span>
+																	<span className="text-slate-800">{order.reportInput.questions[t]}</span>
+																</div>
+															)
+													)}
+												</div>
+											) : (
+												<div>
+													<p className="text-sm text-slate-600">問題</p>
+													<p className="font-medium">{order.reportInput.question || "—"}</p>
+												</div>
+											)}
+											{order.reportInput.submittedAt && (
+												<p className="text-xs text-slate-500 pt-2">
+													提交時間：{new Date(order.reportInput.submittedAt).toLocaleString("zh-TW")}
+												</p>
+											)}
+										</div>
+									);
+								})()}
+							</Card>
+						)}
 
 						{/* Shipping Address */}
 						<Card className="p-6 bg-white border-slate-200 shadow-lg">
