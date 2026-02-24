@@ -19,7 +19,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const GIFT_REPORT_LABELS = { wealth: "財運", love: "感情", career: "事業", health: "健康" };
+const GIFT_REPORT_LABELS = {
+	wealth: "財運",
+	love: "感情",
+	career: "事業",
+	health: "健康",
+};
 
 function getOrderCurrencySymbol(currency) {
 	if (!currency) return "HK$";
@@ -140,7 +145,7 @@ export default function OrderConfirmationPage() {
 		<div className="min-h-screen bg-gradient-to-br from-[#EFEFEF] via-white to-[#EFEFEF]">
 			<ShopNavbar />
 
-			<div className="container mx-auto px-4 pt-24 pb-12 max-w-7xl">
+			<div className="container mx-auto px-4 pt-10 pb-12 max-w-7xl">
 				{/* Success Header */}
 				<div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-12 mb-10 text-center border border-gray-100 relative overflow-hidden">
 					<div className="absolute inset-0 bg-gradient-to-br from-green-50 to-transparent opacity-50" />
@@ -169,7 +174,7 @@ export default function OrderConfirmationPage() {
 										day: "numeric",
 										hour: "2-digit",
 										minute: "2-digit",
-									}
+									},
 								)}
 							</span>
 						</div>
@@ -238,7 +243,15 @@ export default function OrderConfirmationPage() {
 													)}
 													{item.giftReportType && (
 														<p className="text-sm text-[#6B8E23] mb-1">
-															{locale === "zh-CN" ? "贈送報告" : "贈送報告"}: {GIFT_REPORT_LABELS[item.giftReportType] || item.giftReportType}
+															{locale === "zh-CN"
+																? "贈送報告"
+																: "贈送報告"}
+															:{" "}
+															{GIFT_REPORT_LABELS[
+																item
+																	.giftReportType
+															] ||
+																item.giftReportType}
 														</p>
 													)}
 													<div className="flex justify-between items-center">
@@ -249,7 +262,9 @@ export default function OrderConfirmationPage() {
 															: {item.quantity}
 														</span>
 														<span className="text-lg font-bold text-[#1C312E]">
-															{getOrderCurrencySymbol(order.currency)}
+															{getOrderCurrencySymbol(
+																order.currency,
+															)}
 															{(
 																finalPrice *
 																item.quantity
@@ -290,7 +305,8 @@ export default function OrderConfirmationPage() {
 											: "收件人："}
 									</span>
 									<span className="text-gray-900">
-									{order.shippingAddress?.fullName || "N/A"}
+										{order.shippingAddress?.fullName ||
+											"N/A"}
 									</span>
 								</div>
 								<div className="flex items-start gap-3">
@@ -300,7 +316,7 @@ export default function OrderConfirmationPage() {
 											: "電話："}
 									</span>
 									<span className="text-gray-900">
-									{order.shippingAddress?.phone || "N/A"}
+										{order.shippingAddress?.phone || "N/A"}
 									</span>
 								</div>
 								<p>
@@ -309,7 +325,11 @@ export default function OrderConfirmationPage() {
 											? "邮箱："
 											: "郵箱："}
 									</span>
-									<span>{order.userEmail || order.userId || "N/A"}</span>
+									<span>
+										{order.userEmail ||
+											order.userId ||
+											"N/A"}
+									</span>
 								</p>
 								<p>
 									<span className="font-medium">
@@ -318,13 +338,13 @@ export default function OrderConfirmationPage() {
 											: "地址："}
 									</span>
 									<span>
-									{order.shippingAddress?.address || ""},{" "}
-									{order.shippingAddress?.city || ""}
-									{order.shippingAddress?.province &&
-										`, ${order.shippingAddress.province}`}
-									{order.shippingAddress?.postalCode &&
-										` ${order.shippingAddress.postalCode}`}
-									, {order.shippingAddress?.country || ""}
+										{order.shippingAddress?.address || ""},{" "}
+										{order.shippingAddress?.city || ""}
+										{order.shippingAddress?.province &&
+											`, ${order.shippingAddress.province}`}
+										{order.shippingAddress?.postalCode &&
+											` ${order.shippingAddress.postalCode}`}
+										, {order.shippingAddress?.country || ""}
 									</span>
 								</p>
 								{order.notes && (
@@ -377,7 +397,7 @@ export default function OrderConfirmationPage() {
 									</span>
 									<span className="font-bold text-orange-600 px-3 py-1 bg-white rounded-full shadow-sm">
 										{getPaymentStatusText(
-											order.paymentStatus
+											order.paymentStatus,
 										)}
 									</span>
 								</div>
@@ -395,7 +415,12 @@ export default function OrderConfirmationPage() {
 										{locale === "zh-CN" ? "小计" : "小計"}
 									</span>
 									<span className="font-medium">
-										{getOrderCurrencySymbol(order.currency)}{(order.subtotal || order.totalAmount || 0).toFixed(0)}
+										{getOrderCurrencySymbol(order.currency)}
+										{(
+											order.subtotal ||
+											order.totalAmount ||
+											0
+										).toFixed(0)}
 									</span>
 								</div>
 								<div className="flex justify-between text-sm">
@@ -418,7 +443,14 @@ export default function OrderConfirmationPage() {
 												: "總計"}
 										</span>
 										<span className="text-2xl bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] bg-clip-text text-transparent">
-												{getOrderCurrencySymbol(order.currency)}{(order.totalAmount || order.total || 0).toFixed(0)}
+											{getOrderCurrencySymbol(
+												order.currency,
+											)}
+											{(
+												order.totalAmount ||
+												order.total ||
+												0
+											).toFixed(0)}
 										</span>
 									</div>
 								</div>
@@ -429,7 +461,9 @@ export default function OrderConfirmationPage() {
 						<div className="space-y-4">
 							<Button
 								className="w-full bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] hover:from-[#2A4A3E] hover:to-[#2A4A3E] h-12 text-base rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
-								onClick={() => router.push(`/${locale}/shop/all`)}
+								onClick={() =>
+									router.push(`/${locale}/shop/all`)
+								}
 							>
 								<Sparkles className="w-4 h-4 mr-2" />
 								{locale === "zh-CN" ? "继续购物" : "繼續購物"}

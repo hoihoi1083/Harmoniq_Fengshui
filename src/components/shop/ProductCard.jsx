@@ -11,22 +11,56 @@ import { toast } from "sonner";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
 
-export default function ProductCard({ product, onAddToCart }) {
+export default function ProductCard({
+	product,
+	onAddToCart,
+	showGiftReport = true,
+}) {
 	const locale = useLocale();
-	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
+	const { region } = useRegionDetectionWithRedirect({
+		skipFirstRedirect: true,
+	});
 	const display = getProductDisplayPrice(product, region);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 	const [showZoom, setShowZoom] = useState(false);
 	const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+	const [selectedGiftReport, setSelectedGiftReport] = useState(null);
+	const [showGiftReportWarning, setShowGiftReportWarning] = useState(false);
 	const imageRef = useRef(null);
+
+	const GIFT_REPORT_LABELS = {
+		wealth: locale === "zh-CN" ? "財運" : "財運",
+		love: locale === "zh-CN" ? "感情" : "感情",
+		career: locale === "zh-CN" ? "事業" : "事業",
+		health: locale === "zh-CN" ? "健康" : "健康",
+	};
 
 	const handleAddToCart = async (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 
+		if (showGiftReport) {
+			const reportTypes = Array.isArray(product?.giftReportTypes)
+				? product.giftReportTypes
+				: [];
+			if (reportTypes.length > 0 && !selectedGiftReport) {
+				setShowGiftReportWarning(true);
+				toast.error(
+					locale === "zh-CN"
+						? "请选择一种赠送报告类型"
+						: "請選擇一種贈送報告類型",
+				);
+				return;
+			}
+			setShowGiftReportWarning(false);
+		}
+
 		setIsAddingToCart(true);
 		try {
-			await onAddToCart(product);
+			await onAddToCart(
+				product,
+				showGiftReport ? selectedGiftReport || undefined : undefined,
+			);
 			toast.success(
 				locale === "zh-CN" ? "已添加到购物车" : "已加入購物車",
 			);
@@ -211,6 +245,57 @@ export default function ProductCard({ product, onAddToCart }) {
 						{product.name[locale] || product.name.zh_TW}
 					</h3>
 
+					{/* Gift report type (choose one as gift) - same as product detail page */}
+					{showGiftReport &&
+						Array.isArray(product?.giftReportTypes) &&
+						product.giftReportTypes.length > 0 && (
+							<div className="space-y-1.5">
+								<span className="text-xs font-medium text-gray-600">
+									{locale === "zh-CN"
+										? "選擇贈送報告類型"
+										: "選擇贈送報告類型"}
+								</span>
+								<div className="flex flex-wrap gap-1.5">
+									{product.giftReportTypes.map((type) => (
+										<button
+											key={type}
+											type="button"
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												setSelectedGiftReport(
+													selectedGiftReport === type
+														? null
+														: type,
+												);
+												setShowGiftReportWarning(false);
+											}}
+											className={`px-2.5 py-1.5 border rounded-lg text-xs font-medium transition-all ${
+												selectedGiftReport === type
+													? "border-[#6B8E23] bg-[#6B8E23]/10 text-[#6B8E23]"
+													: "border-gray-200 hover:border-gray-300"
+											}`}
+										>
+											{GIFT_REPORT_LABELS[type] || type}
+										</button>
+									))}
+								</div>
+								{showGiftReportWarning && (
+									<p
+										role="alert"
+										className="text-xs text-amber-600 font-medium flex items-center gap-1"
+									>
+										<span className="inline-flex w-3.5 h-3.5 rounded-full bg-amber-500 text-white text-[10px] items-center justify-center flex-shrink-0">
+											!
+										</span>
+										{locale === "zh-CN"
+											? "請先選擇贈送報告類型"
+											: "請先選擇贈送報告類型"}
+									</p>
+								)}
+							</div>
+						)}
+
 					{/* Star Rating */}
 					{rating > 0 && (
 						<div className="flex items-center gap-2">
@@ -260,7 +345,7 @@ export default function ProductCard({ product, onAddToCart }) {
 					)}
 
 					{/* Tags */}
-					{product.tags && product.tags.length > 0 && (
+					{/* {product.tags && product.tags.length > 0 && (
 						<div className="flex flex-wrap gap-1.5">
 							{product.tags.map((tag, index) => (
 								<span
@@ -271,17 +356,18 @@ export default function ProductCard({ product, onAddToCart }) {
 								</span>
 							))}
 						</div>
-					)}
+					)} */}
 
 					{/* Price and Actions */}
 					<div className="flex items-center justify-between pt-3 border-t border-gray-100">
 						<div className="flex flex-col">
-							{hasDiscount && displayPrice !== discountedPrice && (
-								<span className="text-xs text-gray-400 line-through">
-									{symbol}
-									{displayPrice.toFixed(0)}
-								</span>
-							)}
+							{hasDiscount &&
+								displayPrice !== discountedPrice && (
+									<span className="text-xs text-gray-400 line-through">
+										{symbol}
+										{displayPrice.toFixed(0)}
+									</span>
+								)}
 							<span className="text-xl font-bold bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] bg-clip-text text-transparent">
 								{symbol}
 								{hasDiscount

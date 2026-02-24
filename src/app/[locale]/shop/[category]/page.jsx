@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
+import ProductCard from "@/components/shop/ProductCard";
 
 function CategoryPageContent() {
 	const { data: session } = useSession();
@@ -233,7 +234,7 @@ function CategoryPageContent() {
 		}
 	};
 
-	const handleAddToCart = async (product) => {
+	const handleAddToCart = async (product, giftReportType) => {
 		if (!session?.user) {
 			toast.error(locale === "zh-CN" ? "请先登录" : "請先登入");
 			return;
@@ -246,6 +247,11 @@ function CategoryPageContent() {
 				body: JSON.stringify({
 					productId: product._id,
 					quantity: 1,
+					...(Array.isArray(product?.giftReportTypes) &&
+					product.giftReportTypes.length > 0 &&
+					giftReportType
+						? { giftReportType }
+						: {}),
 				}),
 			});
 
@@ -1217,245 +1223,13 @@ function CategoryPageContent() {
 						) : (
 							<>
 								<div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-12">
-									{paginatedProducts.map((product) => {
-										// Handle product name - Product model uses zh_TW, zh_CN (underscore); locale may be zh-TW, zh-CN (hyphen)
-										let productName = "";
-										if (
-											typeof product.name === "object" &&
-											product.name !== null
-										) {
-											productName =
-												product.name[locale] ||
-												product.name["zh-TW"] ||
-												product.name["zh-CN"] ||
-												product.name.zh_TW ||
-												product.name.zh_CN ||
-												product.name["en"] ||
-												"";
-										} else {
-											productName = String(
-												product.name || "",
-											);
-										}
-
-										const hasDiscount =
-											product.discount &&
-											product.discount.percentage > 0 &&
-											(!product.discount.validUntil ||
-												new Date(
-													product.discount.validUntil,
-												) > new Date());
-										const display = getProductDisplayPrice(
-											product,
-											region,
-										);
-										const discountedPrice =
-											display.discountedPrice;
-										const displayPrice = display.price;
-										const symbol = display.symbol;
-										const rating =
-											product.rating?.average || 4.0;
-										const ratingCount =
-											product.rating?.count || 0;
-										const soldCount =
-											product.soldCount ||
-											product.sold ||
-											0;
-
-										return (
-											<Link
-												key={product.id || product._id}
-												href={`/${locale}/shop/product/${product._id || product.id}`}
-												className="group"
-											>
-												<div className=" rounded-2xl sm:rounded-3xl overflow-hidden  transition-all duration-500 flex flex-col h-full">
-													{/* Product Image with Badges */}
-													<div className="relative h-40 sm:h-56 md:h-64 lg:h-72 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0">
-														{product.images &&
-														product.images.length >
-															0 ? (
-															<Image
-																src={
-																	product
-																		.images[0]
-																}
-																alt={
-																	productName
-																}
-																fill
-																className="object-cover group-hover:scale-105 transition-transform duration-700"
-																sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
-															/>
-														) : (
-															<div className="flex items-center justify-center h-full">
-																<Sparkles className="w-20 h-20 text-gray-300" />
-															</div>
-														)}
-
-														{/* Discount Badge */}
-														{hasDiscount && (
-															<div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-500 text-white px-2 py-0.5 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold shadow-lg">
-																-
-																{
-																	product
-																		.discount
-																		.percentage
-																}
-																%
-															</div>
-														)}
-
-														{/* Element Badge */}
-														{product.elementType &&
-															product.elementType !==
-																"none" && (
-																<div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700 flex items-center gap-1">
-																	{product.elementType ===
-																		"wood" &&
-																		"🌳"}
-																	{product.elementType ===
-																		"fire" &&
-																		"🔥"}
-																	{product.elementType ===
-																		"earth" &&
-																		"🌍"}
-																	{product.elementType ===
-																		"metal" &&
-																		"⚙️"}
-																	{product.elementType ===
-																		"water" &&
-																		"💧"}
-																	{
-																		product.elementType
-																	}
-																</div>
-															)}
-													</div>
-
-													{/* Product Info */}
-													<div className="p-3 sm:p-4 md:p-5 space-y-1.5 sm:space-y-2 md:space-y-3 flex flex-col flex-grow">
-														{/* Category Tags */}
-														<div className="flex gap-1 sm:gap-2 flex-wrap min-h-[20px] sm:min-h-[28px]">
-															{product.tags &&
-																product.tags
-																	.slice(0, 6)
-																	.map(
-																		(
-																			tag,
-																			idx,
-																		) => (
-																			<span
-																				key={
-																					idx
-																				}
-																				className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full font-medium"
-																			>
-																				{
-																					tag
-																				}
-																			</span>
-																		),
-																	)}
-														</div>
-
-														{/* Product Name */}
-														<h3 className="font-bold text-gray-900 text-sm sm:text-base md:text-lg line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] md:h-14 group-hover:text-[#6B8E23] transition-colors">
-															{productName}
-														</h3>
-
-														{/* Rating & Sold Count */}
-														<div className="flex items-center justify-between gap-1">
-															<div className="flex items-center gap-0.5 sm:gap-1 min-w-0">
-																<div className="flex flex-shrink-0">
-																	{[
-																		...Array(
-																			5,
-																		),
-																	].map(
-																		(
-																			_,
-																			i,
-																		) => (
-																			<svg
-																				key={
-																					i
-																				}
-																				className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(rating) ? "text-yellow-400" : "text-gray-300"}`}
-																				fill="currentColor"
-																				viewBox="0 0 20 20"
-																			>
-																				<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-																			</svg>
-																		),
-																	)}
-																</div>
-																<span className="text-[10px] sm:text-xs text-gray-600 ml-0.5 sm:ml-1 truncate">
-																	{rating.toFixed(
-																		1,
-																	)}{" "}
-																	(
-																	{ratingCount >
-																	0
-																		? ratingCount
-																		: "100"}
-																	)
-																</span>
-															</div>
-															<span className="text-[10px] sm:text-xs text-gray-500 flex-shrink-0">
-																{locale ===
-																"zh-CN"
-																	? "已售"
-																	: "已售"}{" "}
-																{soldCount}
-															</span>
-														</div>
-
-														{/* Price & Action */}
-														<div className="flex items-center justify-between gap-2 pt-1.5 sm:pt-2 border-t border-gray-100 mt-auto">
-															<div className="flex flex-col min-w-0">
-																{hasDiscount &&
-																	displayPrice !==
-																		discountedPrice && (
-																		<span className="text-[10px] sm:text-xs text-gray-400 line-through">
-																			{
-																				symbol
-																			}
-																			{displayPrice.toFixed(
-																				0,
-																			)}
-																		</span>
-																	)}
-																<span className="text-base sm:text-lg md:text-2xl font-bold text-[#6B8E23]">
-																	{symbol}
-																	{hasDiscount
-																		? discountedPrice.toFixed(
-																				0,
-																			)
-																		: displayPrice.toFixed(
-																				0,
-																			)}
-																</span>
-															</div>
-															<Button
-																size="sm"
-																className="bg-[#6B8E23] hover:bg-[#5a7a1d] text-white rounded-full px-2.5 sm:px-4 h-8 sm:h-9 flex-shrink-0"
-																onClick={(
-																	e,
-																) => {
-																	e.preventDefault();
-																	handleAddToCart(
-																		product,
-																	);
-																}}
-															>
-																<ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-															</Button>
-														</div>
-													</div>
-												</div>
-											</Link>
-										);
-									})}
+									{paginatedProducts.map((product) => (
+										<ProductCard
+											key={product.id || product._id}
+											product={product}
+											onAddToCart={(p, giftReportType) => handleAddToCart(p, giftReportType)}
+										/>
+									))}
 								</div>
 
 								{/* Pagination - only show when more than 1 page */}
