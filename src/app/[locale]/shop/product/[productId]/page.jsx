@@ -54,6 +54,7 @@ export default function ProductDetailPage() {
 	const [email, setEmail] = useState("");
 	const [selectedGiftReport, setSelectedGiftReport] = useState(null);
 	const [showGiftReportWarning, setShowGiftReportWarning] = useState(false);
+	const [showLoginWarning, setShowLoginWarning] = useState(false);
 	const imageRef = useRef(null);
 	const relatedCarouselRef = useRef(null);
 	const [isDragging, setIsDragging] = useState(false);
@@ -82,6 +83,10 @@ export default function ProductDetailPage() {
 			fetchRelatedProducts();
 		}
 	}, [product]);
+
+	useEffect(() => {
+		if (session?.user) setShowLoginWarning(false);
+	}, [session?.user]);
 
 	const fetchProduct = async () => {
 		try {
@@ -222,9 +227,11 @@ export default function ProductDetailPage() {
 
 	const handleAddToCart = async () => {
 		if (!session?.user) {
+			setShowLoginWarning(true);
 			toast.error(locale === "zh-CN" ? "请先登录" : "請先登入");
 			return;
 		}
+		setShowLoginWarning(false);
 		const reportTypes = Array.isArray(product?.giftReportTypes)
 			? product.giftReportTypes
 			: [];
@@ -764,11 +771,8 @@ export default function ProductDetailPage() {
 								!selectedGiftReport;
 							const outOfStock =
 								!product?.isDigital && product?.stock === 0;
-							// Allow clicking when only gift report is missing, so we can show the warning label
-							const isDisabled =
-								needsLogin ||
-								outOfStock ||
-								isAddingToCart;
+							// Allow click when not logged in or gift report missing, so we can show the warning
+							const isDisabled = outOfStock || isAddingToCart;
 							const buttonText = isAddingToCart
 								? locale === "zh-CN"
 									? "加入中..."
@@ -795,6 +799,19 @@ export default function ProductDetailPage() {
 										) : null}
 										{buttonText}
 									</Button>
+									{showLoginWarning && needsLogin && (
+										<p
+											role="alert"
+											className="text-sm text-amber-600 font-medium flex items-center gap-1.5"
+										>
+											<span className="inline-flex w-4 h-4 rounded-full bg-amber-500 text-white text-xs items-center justify-center flex-shrink-0">
+												!
+											</span>
+											{locale === "zh-CN"
+												? "請先登入後再加入購物車"
+												: "請先登入後再加入購物車"}
+										</p>
+									)}
 									{showGiftReportWarning &&
 										Array.isArray(product?.giftReportTypes) &&
 										product.giftReportTypes.length > 0 && (

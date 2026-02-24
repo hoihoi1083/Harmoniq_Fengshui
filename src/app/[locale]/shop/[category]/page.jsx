@@ -691,32 +691,36 @@ function CategoryPageContent() {
 								</div>
 							</div>
 
-							<p className="text-base mb-10 sm:text-lg text-gray-600 leading-relaxed">
+							<p className="w-[95%] sm:w-full justify-center sm:justify-start  mx-auto text-base mb-10 sm:text-lg text-gray-600 leading-relaxed">
 								{locale === "zh-CN"
 									? "浏览我们品类丰富的开运佳品，所有物件均经匠心力作与能量加持，旨在助您调和命理格局，契合个人运势，激发专属您的正向能量。"
 									: "瀏覽我們品類豐富的開運佳品，所有物件均經匠心力作與能量加持，旨在助您調和命理格局，契合個人運勢，激發專屬您的正向能量。"}
 							</p>
 
 							{/* Promo banner - not a button */}
-							<div className="w-full py-3 px-4 sm:py-4 sm:px-5 mb-6 sm:mb-8 lg:mb-10 bg-[#99A800] text-white text-center text-sm sm:text-base md:text-lg font-bold">
+							<div className="w-[80%] sm:w-full justify-center sm:justify-start  mx-auto py-3 px-4 sm:py-4 sm:px-5 mb-6 sm:mb-8 lg:mb-10 bg-[#99A800] text-white text-center text-sm sm:text-base md:text-lg font-bold">
 								{locale === "zh-CN"
 									? "购买开运水晶 赠送专属水晶能量报告"
 									: "購買開運水晶 贈送專屬水晶能量報告"}
 							</div>
 
-							<Button
-								size="lg"
-								className="w-full sm:w-auto bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-8 py-4 sm:px-10 sm:py-5 lg:px-14 lg:py-6 text-base sm:text-lg rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-								onClick={() => {
-									document
-										.getElementById("products-section")
-										?.scrollIntoView({
-											behavior: "smooth",
-										});
-								}}
-							>
-								{locale === "zh-CN" ? "开始购物" : "開始購物"}
-							</Button>
+							<div className="flex justify-center sm:justify-start">
+								<Button
+									size="lg"
+									className="w-[80%] sm:w-full justify-center bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-4 sm:px-10 sm:py-5 lg:px-14 lg:py-6 text-base sm:text-lg rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+									onClick={() => {
+										document
+											.getElementById("products-section")
+											?.scrollIntoView({
+												behavior: "smooth",
+											});
+									}}
+								>
+									{locale === "zh-CN"
+										? "开始购物"
+										: "開始購物"}
+								</Button>
+							</div>
 						</div>
 
 						{/* Right side empty so background crystal shows through on desktop */}
@@ -1227,7 +1231,12 @@ function CategoryPageContent() {
 										<ProductCard
 											key={product.id || product._id}
 											product={product}
-											onAddToCart={(p, giftReportType) => handleAddToCart(p, giftReportType)}
+											onAddToCart={(p, giftReportType) =>
+												handleAddToCart(
+													p,
+													giftReportType,
+												)
+											}
 										/>
 									))}
 								</div>

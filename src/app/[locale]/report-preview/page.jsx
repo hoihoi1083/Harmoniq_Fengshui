@@ -30,7 +30,8 @@ const ReportPreviewPage = () => {
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 		const stored = localStorage.getItem("userRegion");
-		if (stored && ["china", "hongkong", "taiwan"].includes(stored)) setRegion(stored);
+		if (stored && ["china", "hongkong", "taiwan"].includes(stored))
+			setRegion(stored);
 	}, []);
 
 	// Carousel scroll state and refs
@@ -112,9 +113,11 @@ const ReportPreviewPage = () => {
 	// Regional pricing: show correct symbol and amounts for CNY / HKD / TWD
 	const displayInfo = getDisplayPrices(locale, region);
 	const currencySymbol = displayInfo.symbol;
-	const priceInfo = displayInfo.prices[reportType] || displayInfo.prices.fengshui;
+	const priceInfo =
+		displayInfo.prices[reportType] || displayInfo.prices.fengshui;
 	const currentPrice = priceInfo?.discount ?? currentReport.price;
-	const currentOriginalPrice = priceInfo?.original ?? currentReport.originalPrice;
+	const currentOriginalPrice =
+		priceInfo?.original ?? currentReport.originalPrice;
 
 	const handleNewsletterSubmit = () => {
 		// Function to be implemented
@@ -487,15 +490,20 @@ const ReportPreviewPage = () => {
 								<div className="space-y-1 sm:space-y-2">
 									<div className="flex flex-wrap items-center gap-2 sm:gap-3">
 										<span className="text-2xl sm:text-3xl font-bold text-[#073E31]">
-											{currencySymbol}{currentPrice}
+											{currencySymbol}
+											{currentPrice}
 										</span>
 										<span className="text-base sm:text-lg text-gray-400 line-through">
-											{currencySymbol}{currentOriginalPrice}
+											{currencySymbol}
+											{currentOriginalPrice}
 										</span>
 										<span className="px-3 py-1 text-sm font-bold text-red-500 rounded bg-red-50">
 											-
 											{Math.round(
-												((currentOriginalPrice - currentPrice) / currentOriginalPrice) * 100,
+												((currentOriginalPrice -
+													currentPrice) /
+													currentOriginalPrice) *
+													100,
 											)}
 											%
 										</span>
@@ -562,7 +570,7 @@ const ReportPreviewPage = () => {
 									<button
 										onClick={handlePayment}
 										disabled={isProcessingPayment}
-										className="w-full sm:w-auto px-4 py-3 text-sm sm:text-base font-semibold text-white transition bg-[#7E8A00] rounded-full hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+										className="w-full sm:w-auto px-10 py-3 text-sm sm:text-base font-semibold text-white transition bg-[#7E8A00] rounded-full hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										{isProcessingPayment
 											? t("processing")
@@ -735,11 +743,19 @@ const ReportPreviewPage = () => {
 										// Skip the current report type
 										if (key === reportType) return null;
 
-										const cardPriceInfo = displayInfo.prices[key] || displayInfo.prices.fengshui;
-										const cardPrice = cardPriceInfo?.discount ?? config.price;
-										const cardOriginal = cardPriceInfo?.original ?? config.originalPrice;
+										const cardPriceInfo =
+											displayInfo.prices[key] ||
+											displayInfo.prices.fengshui;
+										const cardPrice =
+											cardPriceInfo?.discount ??
+											config.price;
+										const cardOriginal =
+											cardPriceInfo?.original ??
+											config.originalPrice;
 										const discount = Math.round(
-											((cardOriginal - cardPrice) / cardOriginal) * 100,
+											((cardOriginal - cardPrice) /
+												cardOriginal) *
+												100,
 										);
 
 										// Get image path (using actual images from public/images/report-preview)
@@ -780,10 +796,12 @@ const ReportPreviewPage = () => {
 													</h3>
 													<div className="flex items-center gap-1.5 sm:gap-2">
 														<span className="text-[#8B9F3A] font-bold text-md sm:text-lg">
-															{currencySymbol}{cardPrice}
+															{currencySymbol}
+															{cardPrice}
 														</span>
 														<span className="text-sm sm:text-md text-gray-400 line-through">
-															{currencySymbol}{cardOriginal}
+															{currencySymbol}
+															{cardOriginal}
 														</span>
 														<span className="text-sm sm:text-md font-semibold text-red-500">
 															-{discount}%

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useLocale } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Heart, Sparkles, ZoomIn } from "lucide-react";
-import { useState, useRef } from "react";
+import { ShoppingCart, Heart, Sparkles } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
@@ -22,11 +22,17 @@ export default function ProductCard({
 	});
 	const display = getProductDisplayPrice(product, region);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
-	const [showZoom, setShowZoom] = useState(false);
-	const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+	const [hoveredCell, setHoveredCell] = useState(null); // 0-8 for 3x3 grid, null when not hovering
 	const [selectedGiftReport, setSelectedGiftReport] = useState(null);
 	const [showGiftReportWarning, setShowGiftReportWarning] = useState(false);
-	const imageRef = useRef(null);
+
+	const images = product?.images?.length ? product.images : [];
+	const activeImageIndex =
+		images.length === 0 ? 0 : (hoveredCell !== null ? hoveredCell % images.length : 0);
+	const displayImageSrc =
+		images.length > 0
+			? (activeImageIndex === 0 ? (product.thumbnailImage || images[0]) : images[activeImageIndex])
+			: null;
 
 	const GIFT_REPORT_LABELS = {
 		wealth: locale === "zh-CN" ? "財運" : "財運",
@@ -110,84 +116,36 @@ export default function ProductCard({
 		return elementNames[element] || "";
 	};
 
-	// Handle mouse movement for zoom
-	const handleMouseMove = (e) => {
-		if (!imageRef.current) return;
-
-		const rect = imageRef.current.getBoundingClientRect();
-		const x = ((e.clientX - rect.left) / rect.width) * 100;
-		const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-		setZoomPosition({ x, y });
-	};
-
-	const handleMouseEnter = () => {
-		setShowZoom(true);
-	};
-
-	const handleMouseLeave = () => {
-		setShowZoom(false);
-	};
-
 	return (
 		<Link href={`/${locale}/shop/product/${product._id}`}>
 			<div className="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-[#1C312E] hover:-translate-y-2">
-				{/* Product Image */}
+				{/* Product Image - 3x3 grid hover shows different image per cell */}
 				<div
-					ref={imageRef}
 					className="relative overflow-hidden aspect-square bg-gradient-to-br from-gray-50 to-gray-100"
-					onMouseMove={handleMouseMove}
-					onMouseEnter={handleMouseEnter}
-					onMouseLeave={handleMouseLeave}
+					onMouseLeave={() => setHoveredCell(null)}
 				>
-					{product.images && product.images.length > 0 ? (
+					{displayImageSrc ? (
 						<>
 							<Image
-								src={
-									product.thumbnailImage || product.images[0]
-								}
+								key={activeImageIndex}
+								src={displayImageSrc}
 								alt={product.name[locale] || product.name.zh_TW}
 								fill
-								className="object-cover transition-transform duration-700 group-hover:scale-110"
+								className="object-cover transition-opacity duration-200"
 								sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
 							/>
 
-							{/* Zoom Icon Indicator */}
-							<div className="absolute z-10 transition-opacity duration-300 opacity-0 top-3 right-3 group-hover:opacity-100">
-								<div className="p-2 rounded-full bg-black/50 backdrop-blur-sm">
-									<ZoomIn className="w-4 h-4 text-white" />
-								</div>
-							</div>
-
-							{/* Zoom Preview Popup */}
-							{showZoom && (
-								<div className="absolute inset-0 z-30 pointer-events-none">
+							{/* Invisible 3x3 grid: hover each square to show a different image */}
+							<div className="absolute inset-0 z-10 grid grid-cols-3 grid-rows-3">
+								{[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
 									<div
-										className="absolute right-0 top-0 w-[200%] h-[200%] border-4 border-white shadow-2xl rounded-lg overflow-hidden"
-										style={{
-											transform: "translate(50%, 0)",
-											maxWidth: "400px",
-											maxHeight: "400px",
-										}}
-									>
-										<Image
-											src={
-												product.thumbnailImage ||
-												product.images[0]
-											}
-											alt={`${product.name[locale] || product.name.zh_TW} - Zoomed`}
-											fill
-											className="object-cover"
-											style={{
-												transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-												transform: `scale(2)`,
-												objectPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
-											}}
-											sizes="400px"
-										/>
-									</div>
-								</div>
-							)}
+										key={index}
+										className="w-full h-full"
+										onMouseEnter={() => setHoveredCell(index)}
+										aria-hidden
+									/>
+								))}
+							</div>
 						</>
 					) : (
 						<div className="flex items-center justify-center h-full bg-gradient-to-br from-[#73897F]/10 to-[#73897F]/5">
