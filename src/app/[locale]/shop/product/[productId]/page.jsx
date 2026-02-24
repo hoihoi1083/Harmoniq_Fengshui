@@ -53,6 +53,7 @@ export default function ProductDetailPage() {
 	const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
 	const [email, setEmail] = useState("");
 	const [selectedGiftReport, setSelectedGiftReport] = useState(null);
+	const [showGiftReportWarning, setShowGiftReportWarning] = useState(false);
 	const imageRef = useRef(null);
 	const relatedCarouselRef = useRef(null);
 	const [isDragging, setIsDragging] = useState(false);
@@ -228,6 +229,7 @@ export default function ProductDetailPage() {
 			? product.giftReportTypes
 			: [];
 		if (reportTypes.length > 0 && !selectedGiftReport) {
+			setShowGiftReportWarning(true);
 			toast.error(
 				locale === "zh-CN"
 					? "请选择一种赠送报告类型"
@@ -235,6 +237,7 @@ export default function ProductDetailPage() {
 			);
 			return;
 		}
+		setShowGiftReportWarning(false);
 
 		setIsAddingToCart(true);
 		try {
@@ -695,14 +698,15 @@ export default function ProductDetailPage() {
 											<button
 												key={type}
 												type="button"
-												onClick={() =>
+												onClick={() => {
 													setSelectedGiftReport(
 														selectedGiftReport ===
 															type
 															? null
 															: type,
-													)
-												}
+													);
+													setShowGiftReportWarning(false);
+												}}
 												className={`px-4 py-2 border-2 rounded-lg text-sm font-medium transition-all ${
 													selectedGiftReport === type
 														? "border-[#6B8E23] bg-[#6B8E23]/10 text-[#6B8E23]"
@@ -760,9 +764,9 @@ export default function ProductDetailPage() {
 								!selectedGiftReport;
 							const outOfStock =
 								!product?.isDigital && product?.stock === 0;
+							// Allow clicking when only gift report is missing, so we can show the warning label
 							const isDisabled =
 								needsLogin ||
-								needsGiftReport ||
 								outOfStock ||
 								isAddingToCart;
 							const buttonText = isAddingToCart
@@ -779,17 +783,34 @@ export default function ProductDetailPage() {
 											: "請選擇贈送報告類型"
 										: "加到購物車";
 							return (
-								<Button
-									size="lg"
-									className="w-full bg-[#6B8E23] hover:bg-[#5A7A1E] text-white h-14 text-base font-medium rounded-lg disabled:opacity-90"
-									onClick={handleAddToCart}
-									disabled={isDisabled}
-								>
-									{isAddingToCart ? (
-										<div className="w-5 h-5 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin" />
-									) : null}
-									{buttonText}
-								</Button>
+								<div className="space-y-2">
+									<Button
+										size="lg"
+										className="w-full bg-[#6B8E23] hover:bg-[#5A7A1E] text-white h-14 text-base font-medium rounded-lg disabled:opacity-90"
+										onClick={handleAddToCart}
+										disabled={isDisabled}
+									>
+										{isAddingToCart ? (
+											<div className="w-5 h-5 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin" />
+										) : null}
+										{buttonText}
+									</Button>
+									{showGiftReportWarning &&
+										Array.isArray(product?.giftReportTypes) &&
+										product.giftReportTypes.length > 0 && (
+											<p
+												role="alert"
+												className="text-sm text-amber-600 font-medium flex items-center gap-1.5"
+											>
+												<span className="inline-flex w-4 h-4 rounded-full bg-amber-500 text-white text-xs items-center justify-center flex-shrink-0">
+													!
+												</span>
+												{locale === "zh-CN"
+													? "請先選擇贈送報告類型後再加入購物車"
+													: "請先選擇贈送報告類型後再加入購物車"}
+											</p>
+										)}
+								</div>
 							);
 						})()}
 					</div>

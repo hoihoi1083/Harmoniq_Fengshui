@@ -42,7 +42,7 @@ if [ -n "$suspicious" ]; then
 fi
 
 # Check for unauthorized cron jobs
-malicious_cron=$(crontab -l 2>/dev/null | grep -vE "^#|monitor-health|file-integrity|security-audit" | grep -E "cache|worker|miner" || echo "")
+malicious_cron=$(crontab -l 2>/dev/null | grep -vE "^#|monitor-health|file-integrity|security-audit|detect-miners" | grep -E "cache|worker|miner" || echo "")
 if [ -n "$malicious_cron" ]; then
     echo "[$timestamp] 🚨 MALICIOUS CRON DETECTED: $malicious_cron" >> "$LOG_FILE"
     send_alert "SECURITY ALERT: Malicious Cron Job" "Unauthorized cron job detected:\n\n$malicious_cron\n\nTimestamp: $timestamp" true

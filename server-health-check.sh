@@ -151,8 +151,8 @@ else
     [ "$SECURITY_AUDIT" -eq 0 ] && echo "      ❌ Security audit cron not found"
 fi
 
-# Check for malicious cron entries
-MALICIOUS_CRON=$(crontab -l 2>/dev/null | grep -vE '^#|monitor-health|file-integrity|security-audit' | grep -iE 'cache|worker|miner|\.gvfs|\.pd_|curl.*sh|wget.*sh|/tmp/|/var/tmp/' | head -5)
+# Check for malicious cron entries (exclude our own security scripts: monitor-health, file-integrity, security-audit, detect-miners)
+MALICIOUS_CRON=$(crontab -l 2>/dev/null | grep -vE '^#|monitor-health|file-integrity|security-audit|detect-miners' | grep -iE 'cache|worker|miner|\.gvfs|\.pd_|curl.*sh|wget.*sh|/tmp/|/var/tmp/' | head -5)
 if [ -n "$MALICIOUS_CRON" ]; then
     echo "   🚨 ALERT: Suspicious cron entries detected!"
     echo "$MALICIOUS_CRON" | sed 's/^/      /'

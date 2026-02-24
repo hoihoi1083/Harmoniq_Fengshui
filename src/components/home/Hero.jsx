@@ -502,7 +502,7 @@ export default function Hero() {
 							>
 								<div className="w-full ">
 									<h1
-										className="justify-center px-2 mb-2 text-[40px] sm:text-[40px] md:text-[50px] text-start"
+										className="justify-center px-2 mb-2 text-[30px] sm:text-[40px] md:text-[50px] text-start"
 										style={{
 											fontFamily:
 												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",

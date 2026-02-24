@@ -29,7 +29,9 @@ import { getProductDisplayPrice } from "@/lib/productPrice";
 export default function ShopPage() {
 	const { data: session } = useSession();
 	const locale = useLocale();
-	const { region } = useRegionDetectionWithRedirect({ skipFirstRedirect: true });
+	const { region } = useRegionDetectionWithRedirect({
+		skipFirstRedirect: true,
+	});
 	const [products, setProducts] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -401,8 +403,12 @@ export default function ShopPage() {
 												product.discount.validUntil,
 											) > new Date());
 
-									const display = getProductDisplayPrice(product, region);
-									const discountedPrice = display.discountedPrice;
+									const display = getProductDisplayPrice(
+										product,
+										region,
+									);
+									const discountedPrice =
+										display.discountedPrice;
 									const displayPrice = display.price;
 									const symbol = display.symbol;
 
@@ -515,13 +521,20 @@ export default function ShopPage() {
 															<span className="text-2xl font-bold text-[#6B8E23]">
 																{symbol}
 																{hasDiscount
-																	? discountedPrice.toFixed(0)
-																	: displayPrice.toFixed(0)}
+																	? discountedPrice.toFixed(
+																			0,
+																		)
+																	: displayPrice.toFixed(
+																			0,
+																		)}
 															</span>
 															{hasDiscount && (
 																<>
 																	<span className="text-sm text-gray-400 line-through">
-																		{symbol}{displayPrice.toFixed(0)}
+																		{symbol}
+																		{displayPrice.toFixed(
+																			0,
+																		)}
 																	</span>
 																	<span className="text-xs font-semibold text-red-500 bg-red-50 px-2 py-1 rounded">
 																		-
@@ -611,8 +624,12 @@ export default function ShopPage() {
 												product.discount.validUntil,
 											) > new Date());
 
-									const display = getProductDisplayPrice(product, region);
-									const discountedPrice = display.discountedPrice;
+									const display = getProductDisplayPrice(
+										product,
+										region,
+									);
+									const discountedPrice =
+										display.discountedPrice;
 									const displayPrice = display.price;
 									const symbol = display.symbol;
 
@@ -779,16 +796,25 @@ export default function ShopPage() {
 													{/* Price & Action */}
 													<div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-auto">
 														<div className="flex flex-col">
-															{hasDiscount && displayPrice !== discountedPrice && (
-																<span className="text-xs text-gray-400 line-through">
-																	{symbol}{displayPrice.toFixed(0)}
-																</span>
-															)}
+															{hasDiscount &&
+																displayPrice !==
+																	discountedPrice && (
+																	<span className="text-xs text-gray-400 line-through">
+																		{symbol}
+																		{displayPrice.toFixed(
+																			0,
+																		)}
+																	</span>
+																)}
 															<span className="text-2xl font-bold text-[#6B8E23]">
 																{symbol}
 																{hasDiscount
-																	? discountedPrice.toFixed(0)
-																	: displayPrice.toFixed(0)}
+																	? discountedPrice.toFixed(
+																			0,
+																		)
+																	: displayPrice.toFixed(
+																			0,
+																		)}
 															</span>
 														</div>
 														<button

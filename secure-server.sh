@@ -3,9 +3,11 @@
 
 echo "=== Securing Server Against Crypto Miners ==="
 
-# 1. Restrict /tmp execution (common miner location)
+# 1. Restrict /tmp and /dev/shm execution (common miner/malware locations)
 echo "1. Securing /tmp directory..."
 sudo mount -o remount,noexec,nosuid,nodev /tmp 2>/dev/null || echo "  /tmp already secured or requires fstab update"
+echo "   Securing /dev/shm (noexec to block malware from running there)..."
+sudo mount -o remount,noexec /dev/shm 2>/dev/null || echo "  /dev/shm remount skipped (may need fstab entry)"
 
 # 2. Set file permissions
 echo "2. Securing home directory permissions..."
@@ -49,3 +51,4 @@ echo "   • Mining pool ports blocked"
 echo "   • Process monitoring enabled"
 echo ""
 echo "📊 Monitor logs: tail -f /home/ec2-user/miner-detection.log"
+echo "📊 Check disk/RAM/CPU usage: cd ~/fengshui-layout && bash check-server-resources.sh"

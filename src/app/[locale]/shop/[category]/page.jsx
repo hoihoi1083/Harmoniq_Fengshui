@@ -600,7 +600,7 @@ function CategoryPageContent() {
 		<div className="min-h-screen bg-white">
 			<ShopNavbar cartCount={cartCount} />
 			{/* Hero Banner Section - responsive */}
-			<section className="relative bg-gradient-to-br from-[#F5F5F0] via-[#FAFAF8] to-white overflow-hidden pt-6 pb-24 sm:pt-8 sm:pb-28 md:pt-10 md:pb-12 lg:pt-12 lg:pb-16 lg:min-h-[70vh] flex flex-col">
+			<section className="relative bg-gradient-to-br from-[#F5F5F0] via-[#FAFAF8] to-white overflow-hidden pt-10 pb-24 sm:pt-8 sm:pb-28 md:pt-10 md:pb-12 lg:pt-12 lg:pb-16 lg:min-h-[70vh] flex flex-col">
 				{/* Crystal as background: always bottom-right, size scales with viewport */}
 				<div
 					className="absolute inset-0 z-0 pointer-events-none"
@@ -685,7 +685,7 @@ function CategoryPageContent() {
 								</div>
 							</div>
 
-							<p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+							<p className="text-base mb-10 sm:text-lg text-gray-600 leading-relaxed">
 								{locale === "zh-CN"
 									? "浏览我们品类丰富的开运佳品，所有物件均经匠心力作与能量加持，旨在助您调和命理格局，契合个人运势，激发专属您的正向能量。"
 									: "瀏覽我們品類豐富的開運佳品，所有物件均經匠心力作與能量加持，旨在助您調和命理格局，契合個人運勢，激發專屬您的正向能量。"}
@@ -1337,16 +1337,25 @@ function CategoryPageContent() {
 														{/* Category Tags */}
 														<div className="flex gap-1 sm:gap-2 flex-wrap min-h-[20px] sm:min-h-[28px]">
 															{product.tags &&
-																product.tags.slice(0, 6).map(
-																	(tag, idx) => (
-																		<span
-																			key={idx}
-																			className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full font-medium"
-																		>
-																			{tag}
-																		</span>
-																	),
-																)}
+																product.tags
+																	.slice(0, 6)
+																	.map(
+																		(
+																			tag,
+																			idx,
+																		) => (
+																			<span
+																				key={
+																					idx
+																				}
+																				className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full font-medium"
+																			>
+																				{
+																					tag
+																				}
+																			</span>
+																		),
+																	)}
 														</div>
 
 														{/* Product Name */}
@@ -1673,7 +1682,7 @@ function CategoryPageContent() {
 											onChange={(e) =>
 												setEmail(e.target.value)
 											}
-											className="h-11 sm:h-12 pl-11 pr-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base text-gray-800 bg-white rounded-full border-0 placeholder:text-gray-400 w-full"
+											className="h-11 sm:h-12 pl-11 pr-4 sm:px-12 py-3 sm:py-4 text-sm sm:text-base text-gray-800 bg-white rounded-full border-0 placeholder:text-gray-400 w-full"
 										/>
 									</div>
 									<Button

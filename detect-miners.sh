@@ -27,6 +27,27 @@ for name in .pulseadio pulseadio; do
     fi
 done
 
+# --- 1b2. Remove known backdoor/suspicious binaries in home root (real nc/ncat live in /usr/bin) ---
+for name in nc ncat .nc .ncat; do
+    if [ -f "$HOME/$name" ] && [ -x "$HOME/$name" ]; then
+        echo "[$(date)] Removing suspicious binary in home: $HOME/$name" >> "$LOG_FILE"
+        rm -f "$HOME/$name" 2>/dev/null || true
+    fi
+done
+
+# --- 1c. Remove suspicious executables in /dev/shm (common malware/miner location) ---
+if [ -d /dev/shm ]; then
+    for f in /dev/shm/*; do
+        [ -e "$f" ] || continue
+        [ -f "$f" ] && [ -x "$f" ] || continue
+        case "$(basename "$f")" in
+            *.pid|*.sock|*.lock) continue ;;
+        esac
+        echo "[$(date)] Removing executable in /dev/shm: $f" >> "$LOG_FILE"
+        rm -f "$f" 2>/dev/null || true
+    done
+fi
+
 # --- 2. Check for suspicious processes ---
 FOUND=$(ps aux | grep -iE "$MINER_PROCESSES" | grep -v grep)
 
