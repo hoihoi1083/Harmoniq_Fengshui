@@ -117,11 +117,11 @@ export default function ProductCard({
 	};
 
 	return (
-		<Link href={`/${locale}/shop/product/${product._id}`}>
-			<div className="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-[#1C312E] hover:-translate-y-2">
+		<Link href={`/${locale}/shop/product/${product._id}`} className="h-full flex">
+			<div className="group relative w-full h-full flex flex-col bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-[#1C312E] hover:-translate-y-2">
 				{/* Product Image - 3x3 grid hover shows different image per cell */}
 				<div
-					className="relative overflow-hidden aspect-square bg-gradient-to-br from-gray-50 to-gray-100"
+					className="relative overflow-hidden aspect-square flex-shrink-0 bg-gradient-to-br from-gray-50 to-gray-100"
 					onMouseLeave={() => setHoveredCell(null)}
 				>
 					{displayImageSrc ? (
@@ -183,8 +183,8 @@ export default function ProductCard({
 					)}
 				</div>
 
-				{/* Product Info */}
-				<div className="p-5 space-y-3">
+				{/* Product Info - flex-1 so price/actions sit at bottom for equal-height cards */}
+				<div className="flex-1 flex flex-col min-w-0 p-4 sm:p-5 space-y-3">
 					{/* Element Badge */}
 					{product.elementType && (
 						<div>
@@ -203,11 +203,11 @@ export default function ProductCard({
 						{product.name[locale] || product.name.zh_TW}
 					</h3>
 
-					{/* Gift report type (choose one as gift) - same as product detail page */}
+					{/* Gift report type - fixed min-height so rating starts at same vertical position on every card (1 or 2 rows of tags) */}
 					{showGiftReport &&
 						Array.isArray(product?.giftReportTypes) &&
 						product.giftReportTypes.length > 0 && (
-							<div className="space-y-1.5">
+							<div className="space-y-1.5 min-h-[5rem] sm:min-h-0">
 								<span className="text-xs font-medium text-gray-600">
 									{locale === "zh-CN"
 										? "選擇贈送報告類型"
@@ -316,8 +316,9 @@ export default function ProductCard({
 						</div>
 					)} */}
 
-					{/* Price and Actions */}
-					<div className="flex items-center justify-between pt-3 border-t border-gray-100">
+					{/* Price and Actions - on mobile stack so price has full width (no truncation) and buttons fit; equal-height: mt-auto */}
+					<div className="pt-3 mt-auto border-t border-gray-100 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-2 min-w-0">
+						{/* Price: own row on mobile so HK$949 always visible */}
 						<div className="flex flex-col">
 							{hasDiscount &&
 								displayPrice !== discountedPrice && (
@@ -326,7 +327,7 @@ export default function ProductCard({
 										{displayPrice.toFixed(0)}
 									</span>
 								)}
-							<span className="text-xl font-bold bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] bg-clip-text text-transparent">
+							<span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] bg-clip-text text-transparent">
 								{symbol}
 								{hasDiscount
 									? discountedPrice.toFixed(0)
@@ -334,11 +335,12 @@ export default function ProductCard({
 							</span>
 						</div>
 
-						<div className="flex gap-2">
+						{/* Buttons: row below price on mobile, same row on sm+ */}
+						<div className="flex gap-2 justify-end flex-shrink-0">
 							<Button
 								size="sm"
 								variant="ghost"
-								className="w-10 h-10 p-0 transition-colors rounded-full hover:bg-red-50 hover:text-red-500"
+								className="w-9 h-9 sm:w-10 sm:h-10 p-0 transition-colors rounded-full hover:bg-red-50 hover:text-red-500"
 								onClick={(e) => {
 									e.preventDefault();
 									e.stopPropagation();
@@ -353,7 +355,7 @@ export default function ProductCard({
 							</Button>
 							<Button
 								size="sm"
-								className="h-10 px-4 rounded-full bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] hover:from-[#2A4A3E] hover:to-[#2A4A3E] shadow-lg hover:shadow-xl transition-all"
+								className="h-9 w-9 sm:h-10 sm:px-4 sm:w-auto p-0 rounded-full bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] hover:from-[#2A4A3E] hover:to-[#2A4A3E] shadow-lg hover:shadow-xl transition-all"
 								onClick={handleAddToCart}
 								disabled={
 									(!product.isDigital &&
