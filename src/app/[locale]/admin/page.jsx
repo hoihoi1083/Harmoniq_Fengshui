@@ -13,6 +13,7 @@ import {
 	Clock,
 	CheckCircle,
 	BarChart3,
+	Heart,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -121,6 +122,15 @@ export default function AdminDashboard({ params }) {
 			icon: TrendingUp,
 			href: "/admin/print-report",
 			color: "from-rose-500 to-pink-600",
+		},
+		{
+			title: "姻緣合盤報告",
+			title_en: "Couple Print Report",
+			description: "生成雙人姻緣合盤專業格式報告",
+			description_en: "Generate couple compatibility print reports",
+			icon: Heart,
+			href: "/admin/couple-print-report",
+			color: "from-pink-500 to-rose-600",
 		},
 		{
 			title: "商店管理",

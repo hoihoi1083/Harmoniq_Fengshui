@@ -229,12 +229,6 @@ export default function Page7_Seasons({ data }) {
 					const seasonStyle = getSeasonStyle(cleanSeasonName);
 					const seasonChar = cleanSeasonName.charAt(0); // Get first character: 冬/春/夏/秋
 
-					console.log("🎨 Season debug:", {
-						name: season.name,
-						styleColor: seasonStyle.color,
-						seasonColor: season.color,
-					});
-
 					// Clean content by removing disclaimers and core reminders
 					const cleanContent = (season.content || "")
 						.replace(/四季財運核心提醒：[\s\S]*?(?=四季|$)/g, "")
@@ -245,6 +239,28 @@ export default function Page7_Seasons({ data }) {
 						.replace(/以上分析[\s\S]*?(?=--|$)/g, "")
 						.replace(/--\s*$/g, "")
 						.trim();
+					// Layout: make 1), 2), 3) points start on next row
+					const contentWithNewlines = cleanContent.replace(/\s+(\d+)([)）])/g, "\n$1$2");
+
+					// Further layout: split out 「建議：」 and numbered points into their own paragraphs
+					let mainText = contentWithNewlines;
+					let advicePoints = [];
+
+					const adviceMatch = contentWithNewlines.match(/建議：([\s\S]*)$/);
+					if (adviceMatch) {
+						const adviceStartIndex = adviceMatch.index ?? -1;
+						if (adviceStartIndex >= 0) {
+							mainText = contentWithNewlines.slice(0, adviceStartIndex).trim();
+							const adviceBody = adviceMatch[1].trim();
+							if (adviceBody) {
+								// Split where a new numbered point starts, keeping the "1）" prefix with the text
+								advicePoints = adviceBody
+									.split(/\s*(?=\d+[)）])/)
+									.map((p) => p.trim())
+									.filter(Boolean);
+							}
+						}
+					}
 
 					return (
 						<div
@@ -338,9 +354,26 @@ export default function Page7_Seasons({ data }) {
 								</div>
 								{/* Season Content */}
 								<div className="mb-2 prose-sm prose max-w-none">
-									<p className="text-xs leading-relaxed text-black whitespace-pre-wrap">
-										{cleanContent}
-									</p>
+									{mainText && (
+										<p className="text-xs leading-relaxed text-black whitespace-pre-wrap">
+											{mainText}
+										</p>
+									)}
+									{advicePoints.length > 0 && (
+										<div className="mt-1 space-y-0.5">
+											<p className="text-xs font-semibold text-black">
+												<strong>建議：</strong>
+											</p>
+											{advicePoints.map((pt, idx) => (
+												<p
+													key={idx}
+													className="text-xs leading-relaxed text-black"
+												>
+													{pt}
+												</p>
+											))}
+										</div>
+									)}
 								</div>
 
 								{/* 具體建議 Section */}
