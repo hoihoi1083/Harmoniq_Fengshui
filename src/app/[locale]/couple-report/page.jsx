@@ -745,7 +745,7 @@ export default function CoupleReportPage({ params }) {
 				)}
 
 				{/* Navigation Row */}
-				<div className="w-full mt-16 bg-gradient-to-r from-[#C74772] to-[#D09900] py-4 sm:py-6">
+				<div className="w-full  bg-gradient-to-r from-[#C74772] to-[#D09900] py-4 sm:py-6">
 					<div className="max-w-6xl px-3 mx-auto sm:px-4">
 						<div className="flex items-center justify-center gap-3 sm:justify-between md:justify-center lg:justify-center xl:justify-center sm:gap-6">
 							{/* 姻緣合盤流年分析報告 Tab */}

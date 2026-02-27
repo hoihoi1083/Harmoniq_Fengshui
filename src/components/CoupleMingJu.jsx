@@ -1514,6 +1514,12 @@ function renderStructuredContent(concern, tab, content) {
 	}
 }
 
+// Strip markdown ** for display
+function stripMarkdownBold(text) {
+	if (!text || typeof text !== "string") return text;
+	return text.replace(/\*\*/g, "");
+}
+
 // Function to format the left tab (日月互動) content with special layout
 function formatLeftTabContent(content) {
 	if (!content) return null;
@@ -1521,73 +1527,114 @@ function formatLeftTabContent(content) {
 	// Parse the content to extract different sections
 	const lines = content.split("\n").filter((line) => line.trim());
 
+	// Normalize line for matching (AI may return **五行調和方案：** or 長期配對策略（針對2026丙午年）：)
+	const normalizedLine = (line) => stripMarkdownBold(line);
+	const lineIncludes = (line, str) => normalizedLine(line).includes(str);
+
 	// Find the title line that contains 【...合盤分析】
-	const titleLineIndex = lines.findIndex((line) =>
-		line.includes("合盤分析】")
-	);
-	if (titleLineIndex === -1)
-		return (
-			<div
-				className="whitespace-pre-line"
-				style={{ fontSize: "clamp(10px, 3.5vw, 16px)" }}
-			>
-				{content}
-			</div>
-		);
+	let titleLineIndex = lines.findIndex((line) => line.includes("合盤分析】"));
 
-	const titleLine = lines[titleLineIndex];
-
-	// Extract element pairing from title (e.g., "辛金配戊土" from "【辛金配戊土合盤分析】")
-	const titleMatch = titleLine.match(/【(.+?)合盤分析】/);
-	const elementPairing = titleMatch ? titleMatch[1] : "";
-
-	// Find the pattern description (like "土生金之正印格局")
+	let elementPairing = "";
 	let patternDescription = "";
-	let mainContentStart = titleLineIndex + 1;
-
-	// Look for the pattern in the main content
-	const fullContent = lines.slice(titleLineIndex + 1).join(" ");
-	const patternMatch = fullContent.match(/([^，。]+?格局)/);
-	if (patternMatch) {
-		patternDescription = patternMatch[1];
-	}
-
-	// Find the main description paragraph
 	let mainDescription = "";
-	const mainDescIndex = lines.findIndex(
-		(line, index) =>
-			index > titleLineIndex &&
-			line.includes("賦予") &&
-			line.includes("全局")
-	);
-	if (mainDescIndex !== -1) {
-		mainDescription = lines[mainDescIndex];
+	let contentStartIndex = 0;
+
+	if (titleLineIndex !== -1) {
+		const titleLine = lines[titleLineIndex];
+		const titleMatch = titleLine.match(/【(.+?)合盤分析】/);
+		elementPairing = titleMatch ? titleMatch[1] : "";
+		contentStartIndex = titleLineIndex + 1;
+
+		const fullContent = lines.slice(contentStartIndex).join(" ");
+		const patternMatch = fullContent.match(/([^，。]+?格局)/);
+		if (patternMatch) patternDescription = patternMatch[1];
+
+		const mainDescIndex = lines.findIndex(
+			(line, index) =>
+				index > titleLineIndex &&
+				line.includes("賦予") &&
+				line.includes("全局")
+		);
+		if (mainDescIndex !== -1) mainDescription = lines[mainDescIndex];
+	} else {
+		// Alternate format: first line = 戊土配戊土, second = 比肩成林之格局, no 【】
+		if (lines.length > 0) {
+			elementPairing = lines[0].trim();
+			if (lines.length > 1 && lines[1].includes("格局")) {
+				patternDescription = lines[1].trim();
+			}
+			contentStartIndex = patternDescription ? 2 : 1;
+		}
+		const mainDescIndex = lines.findIndex(
+			(line, index) =>
+				index >= contentStartIndex &&
+				line.includes("賦予") &&
+				line.includes("全局")
+		);
+		if (mainDescIndex !== -1) mainDescription = lines[mainDescIndex];
 	}
 
-	// Find sections
+	// Find sections (match with or without ** and with optional suffix e.g. （針對2026丙午年）)
 	const findSectionContent = (startText) => {
-		const startIndex = lines.findIndex((line) => line.includes(startText));
+		const startIndex = lines.findIndex((line) => lineIncludes(line, startText));
 		if (startIndex === -1) return [];
 
-		const content = [];
+		const sectionLines = [];
 		for (let i = startIndex; i < lines.length; i++) {
 			const line = lines[i];
-			// Stop if we hit another section header
+			const norm = normalizedLine(line);
 			if (
 				i > startIndex &&
-				(line.includes("方案：") ||
-					line.includes("策略：") ||
-					line.includes("此局"))
+				(norm.includes("方案：") ||
+					norm.includes("策略：") ||
+					norm.includes("此局") ||
+					norm.includes("深度分析說明"))
 			) {
 				break;
 			}
-			content.push(line);
+			sectionLines.push(line);
 		}
-		return content;
+		return sectionLines;
 	};
 
-	const wuxingSection = findSectionContent("五行調和方案：");
-	const strategySection = findSectionContent("長期配對策略：");
+	const wuxingSection = findSectionContent("五行調和方案");
+	let strategySection = findSectionContent("長期配對策略");
+	// Web: drop any line that is the repeated intro paragraph (賦予+全局) from strategy section
+	strategySection = strategySection.filter(
+		(line) =>
+			!line.trim().includes("賦予") || !line.trim().includes("全局")
+	);
+
+	const isInSection = (line) =>
+		wuxingSection.includes(line) || strategySection.includes(line);
+	let remainingLines = lines.filter(
+		(line) =>
+			!line.includes("合盤分析】") &&
+			!lineIncludes(line, "五行調和方案") &&
+			!lineIncludes(line, "長期配對策略") &&
+			!isInSection(line) &&
+			line !== mainDescription
+	);
+	// Exclude duplicate main description (same paragraph appearing again) — web only
+	const mainDescTrimmed = (mainDescription || "").trim();
+	const isDuplicateIntroParagraph = (line) => {
+		const t = line.trim();
+		if (!t) return false;
+		if (t === mainDescTrimmed) return true;
+		// Any line that is the intro paragraph (賦予 + 全局), with or without 具體長期配對策略如下
+		if (t.includes("賦予") && t.includes("全局")) return true;
+		return false;
+	};
+	remainingLines = remainingLines.filter(
+		(line) => !isDuplicateIntroParagraph(line)
+	);
+	// Exclude "深度分析說明雙方命理互動關係和注意事項" and everything after it
+	const depthAnalysisIndex = remainingLines.findIndex((line) =>
+		lineIncludes(line, "深度分析說明")
+	);
+	if (depthAnalysisIndex !== -1) {
+		remainingLines = remainingLines.slice(0, depthAnalysisIndex);
+	}
 
 	return (
 		<div className="space-y-6">
@@ -1624,7 +1671,7 @@ function formatLeftTabContent(content) {
 					className="leading-relaxed text-black"
 					style={{ fontSize: "clamp(14px, 3.5vw, 16px)" }}
 				>
-					{mainDescription}
+					{stripMarkdownBold(mainDescription)}
 				</div>
 			)}
 
@@ -1634,7 +1681,7 @@ function formatLeftTabContent(content) {
 					<div className="text-black">
 						{wuxingSection.map((line, index) => (
 							<div key={index} className="mb-1">
-								{line}
+								{stripMarkdownBold(line)}
 							</div>
 						))}
 					</div>
@@ -1647,42 +1694,24 @@ function formatLeftTabContent(content) {
 					<div className="text-black">
 						{strategySection.map((line, index) => (
 							<div key={index} className="mb-1">
-								{line}
+								{stripMarkdownBold(line)}
 							</div>
 						))}
 					</div>
 				</div>
 			)}
 
-			{/* Remaining content */}
-			{lines.filter(
-				(line) =>
-					!line.includes("合盤分析】") &&
-					!line.includes("五行調和方案：") &&
-					!line.includes("長期配對策略：") &&
-					!wuxingSection.includes(line) &&
-					!strategySection.includes(line) &&
-					line !== mainDescription
-			).length > 0 && (
+			{/* Remaining content (depth analysis block excluded) */}
+			{remainingLines.length > 0 && (
 				<div
 					className="leading-relaxed text-black"
 					style={{ fontSize: "clamp(14px, 3.5vw, 16px)" }}
 				>
-					{lines
-						.filter(
-							(line) =>
-								!line.includes("合盤分析】") &&
-								!line.includes("五行調和方案：") &&
-								!line.includes("長期配對策略：") &&
-								!wuxingSection.includes(line) &&
-								!strategySection.includes(line) &&
-								line !== mainDescription
-						)
-						.map((line, index) => (
-							<div key={index} className="mb-2">
-								{line}
-							</div>
-						))}
+					{remainingLines.map((line, index) => (
+						<div key={index} className="mb-2">
+							{stripMarkdownBold(line)}
+						</div>
+					))}
 				</div>
 			)}
 		</div>

@@ -171,7 +171,14 @@ function stripNumberedLabel(text) {
 // Lines we never show (prompt/format leftovers)
 function isFormattingOnlyLine(line) {
 	const t = (line || "").trim();
-	return t === "【標題格式】" || t === "【标题格式】" || t === "內容結構：" || t === "內容結構" || t === "内容结构：" || t === "内容结构";
+	return (
+		t === "【標題格式】" ||
+		t === "【标题格式】" ||
+		t === "內容結構：" ||
+		t === "內容結構" ||
+		t === "内容结构：" ||
+		t === "内容结构"
+	);
 }
 
 function formatLeftContent(content) {
@@ -273,7 +280,10 @@ function formatLeftContent(content) {
 					<div className="text-black">
 						{wuxingSection
 							.map((line) => stripNumberedLabel(line))
-							.filter((line) => line.trim() && !isFormattingOnlyLine(line))
+							.filter(
+								(line) =>
+									line.trim() && !isFormattingOnlyLine(line),
+							)
 							.map((line, i) => (
 								<div
 									key={i}
@@ -290,7 +300,10 @@ function formatLeftContent(content) {
 					<div className="text-black">
 						{strategySection
 							.map((line) => stripNumberedLabel(line))
-							.filter((line) => line.trim() && !isFormattingOnlyLine(line))
+							.filter(
+								(line) =>
+									line.trim() && !isFormattingOnlyLine(line),
+							)
 							.map((line, i) => (
 								<div
 									key={i}
@@ -303,7 +316,8 @@ function formatLeftContent(content) {
 					</div>
 				)}
 				{/* 最後段落 - without "4. 最後段落：" */}
-				{restLines.filter((l) => !isFormattingOnlyLine(l)).length > 0 && (
+				{restLines.filter((l) => !isFormattingOnlyLine(l)).length >
+					0 && (
 					<div
 						className="leading-relaxed text-black mt-2"
 						style={{ fontSize: "11px" }}

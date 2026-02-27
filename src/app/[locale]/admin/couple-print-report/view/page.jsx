@@ -6,12 +6,12 @@ import { useLocale } from "next-intl";
 import getWuxingData from "@/lib/nayin";
 import CouplePrintCoverPage from "./components/CouplePrintCoverPage";
 import CouplePrintPage1 from "./components/CouplePrintPage1";
-import CouplePrintTextPage from "./components/CouplePrintTextPage";
+import CouplePrintProblemSolution from "./components/CouplePrintProblemSolution";
 import CouplePrintMingJuLeftMiddle from "./components/CouplePrintMingJuLeftMiddle";
 import CouplePrintMingJuRight from "./components/CouplePrintMingJuRight";
 import CouplePrintSeason from "./components/CouplePrintSeason";
 import CouplePrintCoreSuggestion from "./components/CouplePrintCoreSuggestion";
-import Page10_Summary from "@/app/[locale]/admin/print-report/view/components/Page10_Summary";
+import CouplePrintSummary from "./components/CouplePrintSummary";
 import { parseCoupleCoreSuggestionContent } from "@/lib/coupleCoreSuggestionParse";
 import { getConcernColor } from "@/utils/colorTheme";
 
@@ -159,6 +159,7 @@ function CouplePrintReportView() {
 	const [coreSuggestionParsedData, setCoreSuggestionParsedData] = useState(null);
 	const [overallSummaryData, setOverallSummaryData] = useState(null);
 	const [problemSolutionData, setProblemSolutionData] = useState(null);
+	const [problemSubsections, setProblemSubsections] = useState(null); // chartDiagnosis, emergencyFengShui, restartChemistry for 感情降溫類
 	const [wuxing1, setWuxing1] = useState(null);
 	const [wuxing2, setWuxing2] = useState(null);
 	const [page1AnnualResult, setPage1AnnualResult] = useState(null);
@@ -389,6 +390,39 @@ function CouplePrintReportView() {
 						male: problemRes.male,
 						raw: problemRes.rawResponse || "",
 					});
+					// 感情降溫類: fetch same subsection content as web (盤面診斷、風水急救、重啟默契)
+					const isEmotionCooling = (function categorize(q) {
+						if (!q || typeof q !== "string") return false;
+						const p = q.trim().toLowerCase();
+						if (/冷戰|降溫|疏遠|冷淡|感情淡|不理我/.test(p)) return true;
+						if (/異地|長距離|工作|家庭|父母|環境|壓力/.test(p)) return false;
+						if (/朋友/.test(p) && !/男朋友|女朋友/.test(p)) return false;
+						if (/說錯話|話術|溝通|誤會|爭吵|口角|吵架|禁忌/.test(p)) return false;
+						return true; // default 感情降溫類
+					})(question);
+					if (isEmotionCooling && question) {
+						const analysisData = { female: problemRes.female, male: problemRes.male };
+						const payloadChart = { femaleUser, maleUser, requestType: "chart_diagnosis", isSimplified };
+						const payloadFengShui = { femaleUser: { ...femaleUser, birthDate: femaleUser.birthDateTime }, maleUser: { ...maleUser, birthDate: maleUser.birthDateTime }, femaleBazi: problemRes.female?.bazi, maleBazi: problemRes.male?.bazi, femalePillars: problemRes.female?.pillars, malePillars: problemRes.male?.pillars, requestType: "emergency_feng_shui", isSimplified };
+						const payloadChemistry = { femaleUser: { ...femaleUser, birthDate: femaleUser.birthDateTime }, maleUser: { ...maleUser, birthDate: maleUser.birthDateTime }, femaleBazi: problemRes.female?.bazi, maleBazi: problemRes.male?.bazi, femalePillars: problemRes.female?.pillars, malePillars: problemRes.male?.pillars, requestType: "restart_chemistry", isSimplified };
+						try {
+							const [chartRes, fengRes, chemRes] = await Promise.all([
+								fetch("/api/chart-diagnosis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadChart) }).then((r) => r.ok ? r.json() : null),
+								fetch("/api/emergency-feng-shui", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadFengShui) }).then((r) => r.ok ? r.json() : null),
+								fetch("/api/restart-chemistry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadChemistry) }).then((r) => r.ok ? r.json() : null),
+							]);
+							setProblemSubsections({
+								chartDiagnosis: chartRes?.female ? chartRes : null,
+								emergencyFengShui: fengRes?.recommendations ? fengRes : null,
+								restartChemistry: chemRes?.iceBreakers ? chemRes : null,
+							});
+						} catch (e) {
+							console.warn("Problem subsections fetch failed:", e);
+							setProblemSubsections(null);
+						}
+					} else {
+						setProblemSubsections(null);
+					}
 				}
 
 				// Fetch individual analysis for both users (same as CoupleAnnualAnalysis IndividualAnalysisSection)
@@ -542,7 +576,7 @@ function CouplePrintReportView() {
 			)}
 
 			{overallSummaryData && (
-				<Page10_Summary
+				<CouplePrintSummary
 					data={{
 						summary: overallSummaryData,
 						concern,
@@ -552,14 +586,7 @@ function CouplePrintReportView() {
 			)}
 
 			{problemSolutionData && (
-				<CouplePrintTextPage
-					title="專屬問題解決方案"
-					content={
-						problemSolutionData.raw ||
-						`問題：${problemSolutionData.question}\n\n女方：${problemSolutionData.female?.description || ""}\n\n男方：${problemSolutionData.male?.description || ""}`
-					}
-					pageClass="print-report-couple-problem"
-				/>
+				<CouplePrintProblemSolution data={problemSolutionData} subsections={problemSubsections} />
 			)}
 
 			<style jsx global>{`
