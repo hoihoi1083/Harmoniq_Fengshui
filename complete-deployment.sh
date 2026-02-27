@@ -411,9 +411,9 @@ trap cleanup EXIT
 
 # Main deployment process
 main() {
-    # Parse --local-build before other logic
+    # Parse --local-build (use this if server build is OOM-killed / exit 137)
     for arg in "$@"; do
-        if [ "$arg" = "--local-build" ]; then
+        if [ "$arg" = "--local-build" ] || [ "$arg" = "-local-build" ]; then
             BUILD_LOCAL=1
             break
         fi
@@ -421,7 +421,9 @@ main() {
 
     echo "🚀 Starting Complete Deployment Process"
     if [ "$BUILD_LOCAL" = "1" ]; then
-        echo "📦 Mode: local build + upload standalone (no npm install on server)"
+        echo "📦 Mode: local build + upload standalone (no npm install/build on server — avoids OOM)"
+    else
+        echo "📦 Mode: full deploy (build on server). If build fails with exit 137 (OOM), run: $0 --local-build"
     fi
     echo "======================================="
 

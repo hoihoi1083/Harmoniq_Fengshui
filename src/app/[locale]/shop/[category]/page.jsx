@@ -698,7 +698,7 @@ function CategoryPageContent() {
 							</p>
 
 							{/* Promo banner - not a button */}
-							<div className="w-[80%] sm:w-full justify-center sm:justify-start  mx-auto py-3 px-4 sm:py-4 sm:px-5 mb-6 sm:mb-8 lg:mb-10 bg-[#99A800] text-white text-center text-sm sm:text-base md:text-lg font-bold">
+							<div className="w-[90%] sm:w-full justify-center sm:justify-start  mx-auto py-3 px-4 sm:py-4 sm:px-5 mb-6 sm:mb-8 lg:mb-10 bg-[#99A800] text-white text-center text-sm sm:text-base md:text-lg font-bold">
 								{locale === "zh-CN"
 									? "购买开运水晶 赠送专属水晶能量报告"
 									: "購買開運水晶 贈送專屬水晶能量報告"}
@@ -707,7 +707,7 @@ function CategoryPageContent() {
 							<div className="flex justify-center sm:justify-start">
 								<Button
 									size="lg"
-									className="w-[80%] sm:w-full justify-center bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-4 sm:px-10 sm:py-5 lg:px-14 lg:py-6 text-base sm:text-lg rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+									className="w-[90%] sm:w-full justify-center bg-[#2C2C2C] hover:bg-[#1C1C1C] text-white px-10 py-4 sm:px-10 sm:py-5 lg:px-14 lg:py-6 text-base sm:text-lg rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
 									onClick={() => {
 										document
 											.getElementById("products-section")
