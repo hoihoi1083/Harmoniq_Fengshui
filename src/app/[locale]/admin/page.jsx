@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useLocale } from "next-intl";
 import { Card } from "@/components/ui/card";
 import {
 	Package,
@@ -14,11 +15,13 @@ import {
 	CheckCircle,
 	BarChart3,
 	Heart,
+	FileText,
 } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboard({ params }) {
 	const router = useRouter();
+	const locale = useLocale();
 	const { data: session, status } = useSession();
 	const [stats, setStats] = useState({
 		todayOrders: 0,
@@ -122,6 +125,15 @@ export default function AdminDashboard({ params }) {
 			icon: TrendingUp,
 			href: "/admin/print-report",
 			color: "from-rose-500 to-pink-600",
+		},
+		{
+			title: "命理報告列印",
+			title_en: "Life Print Report",
+			description: "生成命理測算報告列印版（八字、流年、開運建議）",
+			description_en: "Generate life report print version (Bazi, fortune, suggestions)",
+			icon: FileText,
+			href: "/admin/life-print-report",
+			color: "from-emerald-500 to-teal-600",
 		},
 		{
 			title: "姻緣合盤報告",
@@ -270,7 +282,7 @@ export default function AdminDashboard({ params }) {
 					</h2>
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
 						{mainActions.map((action, index) => (
-							<Link key={index} href={action.href}>
+							<Link key={index} href={`/${locale}${action.href}`}>
 								<Card
 									className={`p-6 h-full hover:scale-[1.03] transition-all duration-300 cursor-pointer border-0 bg-gradient-to-br ${action.color} text-white shadow-lg hover:shadow-xl`}
 								>

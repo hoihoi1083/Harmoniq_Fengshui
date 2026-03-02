@@ -97,6 +97,15 @@ export default async function middleware(request) {
 		if (referer.includes("/auth/login")) {
 			return response;
 		}
+		// Allow /report when sessionId is present (post-payment flow: birthday-entry -> report)
+		const sessionId = request.nextUrl.searchParams.get("sessionId");
+		if (
+			request.nextUrl.pathname.includes("/report") &&
+			sessionId &&
+			sessionId.startsWith("cs_")
+		) {
+			return response;
+		}
 		//允许目标页面是首页、隐私条款等页面
 		if (
 			!request.nextUrl.pathname.includes("/design") &&

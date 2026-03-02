@@ -117,9 +117,9 @@ export default function BirthdayEntryPage({ params }) {
 				? `${formData.birthDate}T${formData.birthTime}`
 				: `${formData.birthDate}T12:00`; // Default to noon if no time provided
 
-			// Redirect to report page with birth info
+			// Redirect to report page with birth info (sessionId allows access without login in middleware)
 			router.push(
-				`/report?birthDateTime=${encodeURIComponent(birthDateTime)}&gender=${formData.gender}&sessionId=${sessionId}`
+				`/report?birthDateTime=${encodeURIComponent(birthDateTime)}&gender=${formData.gender}&sessionId=${encodeURIComponent(sessionId || "")}`
 			);
 		} catch (err) {
 			setError(t("submitError"));

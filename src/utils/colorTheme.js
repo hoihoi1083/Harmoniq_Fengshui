@@ -11,6 +11,7 @@ export const getThemeColors = (concern) => {
 		健康: "#389D7D",
 		事業: "#3263C4",
 		事业: "#3263C4", // Simplified Chinese variant for career
+		命理: "#A3B116", // Life report (命理報告)
 	};
 
 	// Default fallback color

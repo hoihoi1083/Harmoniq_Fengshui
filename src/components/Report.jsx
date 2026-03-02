@@ -112,7 +112,7 @@ export default function ReportPage({
 	const clearContentForNewSession = useCallback((sessionId) => {
 		console.log(
 			"🧹 Clearing all cached content for new payment session:",
-			sessionId
+			sessionId,
 		);
 
 		// Clear comprehensive advice
@@ -164,28 +164,28 @@ export default function ReportPage({
 		(index) => (el) => {
 			nianzhuRefs.current[index] = el;
 		},
-		[]
+		[],
 	);
 
 	const setYuezhuRef = useCallback(
 		(index) => (el) => {
 			yuezhuRefs.current[index] = el;
 		},
-		[]
+		[],
 	);
 
 	const setRizhuRef = useCallback(
 		(index) => (el) => {
 			rizhuRefs.current[index] = el;
 		},
-		[]
+		[],
 	);
 
 	const setShizhuRef = useCallback(
 		(index) => (el) => {
 			shizhuRefs.current[index] = el;
 		},
-		[]
+		[],
 	);
 
 	// AI Analysis state for wuxing patterns
@@ -266,14 +266,14 @@ export default function ReportPage({
 
 	const { loading, reportDocData, assistantData } = useReportDoc(
 		locale,
-		userInfo
+		userInfo,
 	);
 
 	// Analyze Wuxing strength patterns (Logic-based)
 	const analyzeWuxingStrength = (elementCounts) => {
 		const total = Object.values(elementCounts).reduce(
 			(sum, count) => sum + count,
-			0
+			0,
 		);
 		const strongElements = [];
 		const weakElements = [];
@@ -300,7 +300,7 @@ export default function ReportPage({
 			// No particularly strong elements, find the strongest
 			const maxCount = Math.max(...Object.values(elementCounts));
 			const dominant = Object.entries(elementCounts).find(
-				([_, count]) => count === maxCount
+				([_, count]) => count === maxCount,
 			)?.[0];
 			strengthDesc = dominant ? `${dominant}為主` : "五行平衡";
 		}
@@ -595,11 +595,11 @@ export default function ReportPage({
 							JSON.stringify({
 								data: result.analysis,
 								timestamp: Date.now(),
-							})
+							}),
 						);
 					} catch (cacheError) {
 						console.log(
-							"Cache write error, continuing without cache"
+							"Cache write error, continuing without cache",
 						);
 					}
 				} else {
@@ -619,7 +619,7 @@ export default function ReportPage({
 	const generateLifeStageAnalysis = async (
 		pillarType,
 		pillarData,
-		userInfo
+		userInfo,
 	) => {
 		// Create cache key specific to pillar and user
 		const cacheKey = `lifeStageAnalysis_${userInfo.birthDateTime}_${userInfo.gender}_${pillarType}_${userInfo.sessionId || "default"}`;
@@ -632,7 +632,7 @@ export default function ReportPage({
 				const oneHour = 3600000; // 1 hour in milliseconds
 				if (Date.now() - timestamp < oneHour) {
 					console.log(
-						`✅ Using cached life stage analysis for ${pillarType}`
+						`✅ Using cached life stage analysis for ${pillarType}`,
 					);
 					return data;
 				}
@@ -643,7 +643,7 @@ export default function ReportPage({
 
 		try {
 			console.log(
-				`🔥 Generating fresh life stage analysis for ${pillarType}`
+				`🔥 Generating fresh life stage analysis for ${pillarType}`,
 			);
 			const stageMapping = {
 				年柱: "童年",
@@ -681,7 +681,7 @@ export default function ReportPage({
 						JSON.stringify({
 							data: result.analysis,
 							timestamp: Date.now(),
-						})
+						}),
 					);
 				} catch (cacheError) {
 					console.log("Cache write error, continuing without cache");
@@ -692,7 +692,7 @@ export default function ReportPage({
 		} catch (error) {
 			console.error(
 				`Life stage analysis error for ${pillarType}:`,
-				error
+				error,
 			);
 		}
 
@@ -748,7 +748,7 @@ export default function ReportPage({
 				const oneHour = 3600000; // 1 hour in milliseconds
 				if (Date.now() - timestamp < oneHour) {
 					console.log(
-						`✅ Using cached interpersonal advice for ${pillar}`
+						`✅ Using cached interpersonal advice for ${pillar}`,
 					);
 					return data;
 				}
@@ -759,7 +759,7 @@ export default function ReportPage({
 
 		try {
 			console.log(
-				`🔥 Generating fresh interpersonal advice for ${pillar}`
+				`🔥 Generating fresh interpersonal advice for ${pillar}`,
 			);
 			const response = await fetch("/api/interpersonal-advice", {
 				method: "POST",
@@ -782,7 +782,7 @@ export default function ReportPage({
 						JSON.stringify({
 							data: result.analysis,
 							timestamp: Date.now(),
-						})
+						}),
 					);
 				} catch (cacheError) {
 					console.log("Cache write error, continuing without cache");
@@ -850,7 +850,7 @@ export default function ReportPage({
 						JSON.stringify({
 							data: result.analysis,
 							timestamp: Date.now(),
-						})
+						}),
 					);
 				} catch (cacheError) {
 					console.log("Cache write error, continuing without cache");
@@ -880,7 +880,7 @@ export default function ReportPage({
 	// Helper function to generate comprehensive interpersonal advice
 	const generateComprehensiveInterpersonalAdvice = async (
 		userInfo,
-		wuxingData
+		wuxingData,
 	) => {
 		try {
 			const response = await fetch("/api/comprehensive-interpersonal", {
@@ -979,7 +979,7 @@ export default function ReportPage({
 						JSON.stringify({
 							data: result.analysis,
 							timestamp: Date.now(),
-						})
+						}),
 					);
 				} catch (cacheError) {
 					console.log("Cache write error, continuing without cache");
@@ -1056,7 +1056,7 @@ export default function ReportPage({
 
 		const wuxingData = getWuxingData(
 			userInfo.birthDateTime,
-			userInfo.gender
+			userInfo.gender,
 		);
 		const elementCounts = {};
 		const missingElements = [];
@@ -1103,7 +1103,7 @@ export default function ReportPage({
 		if (!userInfo || !userInfo.birthDateTime) {
 			console.warn(
 				"calculateComprehensiveElementDistribution: Missing userInfo or birthDateTime",
-				userInfo
+				userInfo,
 			);
 			return null;
 		}
@@ -1112,7 +1112,7 @@ export default function ReportPage({
 			// Get wuxing data from nayin library
 			const wuxingData = getWuxingData(
 				new Date(userInfo.birthDateTime),
-				userInfo.gender
+				userInfo.gender,
 			);
 
 			// Element counts combining stems, branches, and hidden stems
@@ -1212,7 +1212,7 @@ export default function ReportPage({
 		} catch (error) {
 			console.error(
 				"Error calculating comprehensive element distribution:",
-				error
+				error,
 			);
 			return null;
 		}
@@ -1249,7 +1249,7 @@ export default function ReportPage({
 				voice.lang.includes("zh") ||
 				voice.lang.includes("cmn") ||
 				voice.lang.includes("zh-CN") ||
-				voice.lang.includes("zh-TW")
+				voice.lang.includes("zh-TW"),
 		);
 
 		if (chineseVoice) {
@@ -1487,7 +1487,7 @@ export default function ReportPage({
 		if (sectionRefs.current.length === 0 || anchorList.length === 0) return;
 
 		const offsets = sectionRefs.current.map((ref) =>
-			ref ? ref.getBoundingClientRect().top : Infinity
+			ref ? ref.getBoundingClientRect().top : Infinity,
 		);
 		const index = offsets.findIndex((offset) => offset > 80); // 80为Navbar高度
 		const newActiveIndex =
@@ -1540,7 +1540,7 @@ export default function ReportPage({
 
 			if (isFromCurrentSession) {
 				console.log(
-					"✅ Content from current session - loading cached data"
+					"✅ Content from current session - loading cached data",
 				);
 
 				// Initialize comprehensive interpersonal advice
@@ -1549,10 +1549,10 @@ export default function ReportPage({
 					!comprehensiveInterpersonalAdvice
 				) {
 					console.log(
-						"✅ Loading existing comprehensive interpersonal advice"
+						"✅ Loading existing comprehensive interpersonal advice",
 					);
 					setComprehensiveInterpersonalAdvice(
-						reportDocData.comprehensiveInterpersonalAdvice
+						reportDocData.comprehensiveInterpersonalAdvice,
 					);
 				}
 
@@ -1562,15 +1562,15 @@ export default function ReportPage({
 					!comprehensiveLifeAdvice
 				) {
 					console.log(
-						"✅ Loading existing comprehensive life advice"
+						"✅ Loading existing comprehensive life advice",
 					);
 					setComprehensiveLifeAdvice(
-						reportDocData.comprehensiveLifeAdvice
+						reportDocData.comprehensiveLifeAdvice,
 					);
 				}
 			} else {
 				console.log(
-					"🆕 Content from different session - will generate fresh content"
+					"🆕 Content from different session - will generate fresh content",
 				);
 				// Clear existing content to force fresh generation for new payment
 				if (comprehensiveInterpersonalAdvice) {
@@ -1630,7 +1630,7 @@ export default function ReportPage({
 			if (showHistorical && propSessionId) {
 				console.log(
 					"📜 Loading historical report data for sessionId:",
-					propSessionId
+					propSessionId,
 				);
 				try {
 					const { success, data } =
@@ -1651,12 +1651,12 @@ export default function ReportPage({
 							}
 							if (data.basicReportData.liuNianData) {
 								setLiuNianData(
-									data.basicReportData.liuNianData
+									data.basicReportData.liuNianData,
 								);
 							}
 							if (data.basicReportData.jiajuProData) {
 								setJiajuProData(
-									data.basicReportData.jiajuProData
+									data.basicReportData.jiajuProData,
 								);
 							}
 						}
@@ -1675,16 +1675,16 @@ export default function ReportPage({
 									wealth: !!fortuneData.wealthFortuneData,
 									relationship:
 										!!fortuneData.relationshipFortuneData,
-								}
+								},
 							);
 							console.log(
 								"📜 DEBUG - Full fourFortuneAI structure:",
-								Object.keys(fortuneData)
+								Object.keys(fortuneData),
 							);
 							if (fortuneData.healthFortuneData) {
 								console.log(
 									"📜 DEBUG - healthFortuneData keys:",
-									Object.keys(fortuneData.healthFortuneData)
+									Object.keys(fortuneData.healthFortuneData),
 								);
 							}
 						}
@@ -1699,22 +1699,22 @@ export default function ReportPage({
 									wealth: !!fortuneData.wealthFortuneData,
 									relationship:
 										!!fortuneData.relationshipFortuneData,
-								}
+								},
 							);
 						}
 
 						if (fortuneData) {
 							console.log(
 								"📜 Setting fourFortuneData with:",
-								fortuneData
+								fortuneData,
 							);
 							console.log(
 								"📜 fortuneData keys:",
-								Object.keys(fortuneData)
+								Object.keys(fortuneData),
 							);
 							console.log(
 								"📜 fortuneData.healthFortuneData exists:",
-								!!fortuneData.healthFortuneData
+								!!fortuneData.healthFortuneData,
 							);
 							setFourFortuneData(fortuneData);
 						}
@@ -1728,32 +1728,32 @@ export default function ReportPage({
 							) {
 								setComprehensiveLifeAdvice(
 									data.aiGeneratedContent.comprehensiveAI
-										.lifeAdvice
+										.lifeAdvice,
 								);
 							}
 
 							// Load wuxing analysis
 							if (data.aiGeneratedContent.wuxingAnalysis) {
 								setAiAnalysis(
-									data.aiGeneratedContent.wuxingAnalysis
+									data.aiGeneratedContent.wuxingAnalysis,
 								);
 							}
 
 							// Load life stage analysis
 							if (data.aiGeneratedContent.lifeStageAnalysis) {
 								setLifeStageAnalysis(
-									data.aiGeneratedContent.lifeStageAnalysis
+									data.aiGeneratedContent.lifeStageAnalysis,
 								);
 							}
 						}
 
 						console.log(
-							"🎯 Historical report data loaded successfully"
+							"🎯 Historical report data loaded successfully",
 						);
 					} else {
 						console.warn(
 							"⚠️ No historical data found for sessionId:",
-							propSessionId
+							propSessionId,
 						);
 					}
 				} catch (error) {
@@ -1775,7 +1775,7 @@ export default function ReportPage({
 			});
 			console.log("🔧 Setting userInfo from URL parameters");
 			console.log(
-				"🚨 FORCING URL-ONLY MODE - Ignoring any logged-in user data"
+				"🚨 FORCING URL-ONLY MODE - Ignoring any logged-in user data",
 			);
 
 			// FORCE URL-only mode - completely ignore session data
@@ -1839,7 +1839,7 @@ export default function ReportPage({
 			// Check if we have any data worth saving
 			const hasBasicData = mingLiData || liuNianData || jiajuProData;
 			const hasFourFortuneData = Object.values(fourFortuneData).some(
-				(data) => data !== null
+				(data) => data !== null,
 			);
 			const hasAIContent =
 				comprehensiveLifeAdvice ||
@@ -1861,7 +1861,7 @@ export default function ReportPage({
 
 			if (hasBasicData && hasFourFortuneData) {
 				const allFortunesComplete = Object.values(
-					fourFortuneData
+					fourFortuneData,
 				).every((data) => data !== null);
 				reportStatus = allFortunesComplete ? "complete" : "partial";
 			} else if (hasBasicData || hasFourFortuneData) {
@@ -1916,7 +1916,7 @@ export default function ReportPage({
 			try {
 				console.log(
 					"🔧 Preparing to save to reportData collection with userId:",
-					session?.user?.userId
+					session?.user?.userId,
 				);
 				const alternativeReportData = {
 					sessionId: currentSessionId,
@@ -1945,27 +1945,27 @@ export default function ReportPage({
 				};
 
 				const alternativeResult = await saveReportData(
-					alternativeReportData
+					alternativeReportData,
 				);
 				if (alternativeResult.success) {
 					console.log(
-						"✅ Report data saved successfully to reportData collection!"
+						"✅ Report data saved successfully to reportData collection!",
 					);
 					console.log(
 						"🎯 Data saved with userId:",
-						session?.user?.userId
+						session?.user?.userId,
 					);
 					console.log("📋 Session ID:", currentSessionId);
 				} else {
 					console.error(
 						"❌ Failed to save to reportData collection:",
-						alternativeResult.error
+						alternativeResult.error,
 					);
 				}
 			} catch (error) {
 				console.error(
 					"❌ Error saving to alternative collection:",
-					error
+					error,
 				);
 			}
 
@@ -2044,7 +2044,7 @@ export default function ReportPage({
 			// ✅ NEW: Skip AI generation when showing historical data
 			if (showHistorical) {
 				console.log(
-					"📜 Skipping wuxing analysis - showing historical data"
+					"📜 Skipping wuxing analysis - showing historical data",
 				);
 				return;
 			}
@@ -2056,14 +2056,14 @@ export default function ReportPage({
 				if (wuxingAnalysis?.wuxingData) {
 					const result = await analyzeComplexPatterns(
 						wuxingAnalysis.wuxingData,
-						userInfo
+						userInfo,
 					);
 					console.log("🔍 AI Analysis Result:", result);
 					console.log("📋 LifeAdvice in result:", result?.lifeAdvice);
 					console.log("🤖 AI Success:", !!result?.aiGenerated);
 					console.log(
 						"🎯 Content Type:",
-						result?.contentType || "unknown"
+						result?.contentType || "unknown",
 					);
 					setAiAnalysis(result);
 				}
@@ -2086,7 +2086,7 @@ export default function ReportPage({
 			// ✅ NEW: Skip AI generation when showing historical data
 			if (showHistorical) {
 				console.log(
-					"📜 Skipping element flow analysis - showing historical data"
+					"📜 Skipping element flow analysis - showing historical data",
 				);
 				return;
 			}
@@ -2108,7 +2108,7 @@ export default function ReportPage({
 			// ✅ NEW: Skip AI generation when showing historical data
 			if (showHistorical) {
 				console.log(
-					"📜 Skipping AI generation - showing historical data"
+					"📜 Skipping AI generation - showing historical data",
 				);
 				return;
 			}
@@ -2124,7 +2124,7 @@ export default function ReportPage({
 			// Prevent duplicate AI generation during development hot reloads
 			if (aiGenerationStarted) {
 				console.log(
-					"⚠️ AI generation already started, skipping duplicate..."
+					"⚠️ AI generation already started, skipping duplicate...",
 				);
 				return;
 			}
@@ -2134,7 +2134,7 @@ export default function ReportPage({
 				const sessionKey = `ai_generation_${userInfo.sessionId}`;
 				if (window[sessionKey]) {
 					console.log(
-						"🚨 EMERGENCY: URL session already generating, aborting!"
+						"🚨 EMERGENCY: URL session already generating, aborting!",
 					);
 					return;
 				}
@@ -2145,7 +2145,7 @@ export default function ReportPage({
 			console.log(
 				"🎯 Generation for:",
 				userInfo?.birthDateTime,
-				userInfo?.sessionId
+				userInfo?.sessionId,
 			);
 			setAiGenerationStarted(true);
 			const pillars = ["年柱", "月柱", "日柱", "時柱"];
@@ -2172,7 +2172,7 @@ export default function ReportPage({
 					const lifeStagePromise = generateLifeStageAnalysis(
 						pillar,
 						pillarDataMap[pillar],
-						userInfo
+						userInfo,
 					)
 						.then((analysis) => {
 							setLifeStageAnalysis((prev) => ({
@@ -2184,7 +2184,7 @@ export default function ReportPage({
 						.catch((error) => {
 							console.error(
 								`Error generating ${pillar} analysis:`,
-								error
+								error,
 							);
 							return {
 								type: "lifeStage",
@@ -2215,7 +2215,7 @@ export default function ReportPage({
 
 					const interpersonalPromise = generateInterpersonalAdvice(
 						pillar,
-						userInfo
+						userInfo,
 					)
 						.then((advice) => {
 							setInterpersonalAdvice((prev) => ({
@@ -2231,7 +2231,7 @@ export default function ReportPage({
 						.catch((error) => {
 							console.error(
 								`Error generating interpersonal advice for ${pillar}:`,
-								error
+								error,
 							);
 							return {
 								type: "interpersonal",
@@ -2262,7 +2262,7 @@ export default function ReportPage({
 
 					const lifeAdvicePromise = generateLifeAdvice(
 						pillar,
-						userInfo
+						userInfo,
 					)
 						.then((advice) => {
 							setLifeAdviceAnalysis((prev) => ({
@@ -2278,7 +2278,7 @@ export default function ReportPage({
 						.catch((error) => {
 							console.error(
 								`Error generating life advice for ${pillar}:`,
-								error
+								error,
 							);
 							return {
 								type: "lifeAdvice",
@@ -2301,16 +2301,16 @@ export default function ReportPage({
 			// Wait for all pillar analyses to complete (in parallel)
 			if (allPromises.length > 0) {
 				console.log(
-					`🚀 Starting ${allPromises.length} parallel AI generations...`
+					`🚀 Starting ${allPromises.length} parallel AI generations...`,
 				);
 				try {
 					const results = await Promise.allSettled(allPromises);
 					const successful = results.filter(
-						(r) => r.status === "fulfilled" && r.value.success
+						(r) => r.status === "fulfilled" && r.value.success,
 					).length;
 					const failed = results.length - successful;
 					console.log(
-						`✅ Parallel generation complete: ${successful} successful, ${failed} failed`
+						`✅ Parallel generation complete: ${successful} successful, ${failed} failed`,
 					);
 				} catch (error) {
 					console.error("Error in parallel generation:", error);
@@ -2320,7 +2320,7 @@ export default function ReportPage({
 			// Generate comprehensive sections
 			const wuxingData = getWuxingData(
 				userInfo.birthDateTime,
-				userInfo.gender
+				userInfo.gender,
 			);
 
 			const currentSessionId =
@@ -2335,13 +2335,13 @@ export default function ReportPage({
 				setIsLoadingComprehensiveInterpersonal(true);
 				console.log(
 					"🔥 Generating FRESH interpersonal advice for session:",
-					currentSessionId
+					currentSessionId,
 				);
 				try {
 					const advice =
 						await generateComprehensiveInterpersonalAdvice(
 							userInfo,
-							wuxingData
+							wuxingData,
 						);
 					// Add session tracking to ensure uniqueness per payment
 					const adviceWithSession = {
@@ -2353,7 +2353,7 @@ export default function ReportPage({
 				} catch (error) {
 					console.error(
 						"Error generating comprehensive interpersonal advice:",
-						error
+						error,
 					);
 				} finally {
 					setIsLoadingComprehensiveInterpersonal(false);
@@ -2365,12 +2365,12 @@ export default function ReportPage({
 				setIsLoadingComprehensiveLifeAdvice(true);
 				console.log(
 					"🔥 Generating FRESH life advice for session:",
-					currentSessionId
+					currentSessionId,
 				);
 				try {
 					const advice = await generateComprehensiveLifeAdvice(
 						userInfo,
-						wuxingData
+						wuxingData,
 					);
 					// Add session tracking to ensure uniqueness per payment
 					const adviceWithSession = {
@@ -2382,7 +2382,7 @@ export default function ReportPage({
 				} catch (error) {
 					console.error(
 						"Error generating comprehensive life advice:",
-						error
+						error,
 					);
 				} finally {
 					setIsLoadingComprehensiveLifeAdvice(false);
@@ -2459,7 +2459,7 @@ export default function ReportPage({
 						>
 							{convertByRegion(
 								"小鈴正在為您準備專屬命理分析報告",
-								region
+								region,
 							)}
 						</div>
 						<div
@@ -2472,7 +2472,7 @@ export default function ReportPage({
 						>
 							{convertByRegion(
 								"請稍候，正在深度解析您的八字命盤",
-								region
+								region,
 							)}
 						</div>
 					</div>
@@ -2588,7 +2588,7 @@ export default function ReportPage({
 
 			{/* Navigation Row */}
 			{!isPrinting && (
-				<div className="w-full mt-16 bg-gradient-to-r from-[#A3B116] to-[#3D5C2D] py-4 sm:py-6">
+				<div className="w-full  bg-gradient-to-r from-[#A3B116] to-[#3D5C2D] py-4 sm:py-6">
 					<div className="max-w-6xl px-3 mx-auto sm:px-4">
 						<div className="flex items-center justify-center gap-3 sm:justify-between md:justify-center lg:justify-center xl:justify-center sm:gap-6">
 							{/* 命理分析報告 Tab */}
@@ -2834,7 +2834,7 @@ export default function ReportPage({
 														>
 															{convertByRegion(
 																"五行齊全",
-																region
+																region,
 															)}
 														</span>
 														<span
@@ -2850,7 +2850,7 @@ export default function ReportPage({
 															-
 															{convertByRegion(
 																"沒有嚴重缺失某一元素",
-																region
+																region,
 															)}
 														</span>
 													</div>
@@ -2859,7 +2859,7 @@ export default function ReportPage({
 														{missingElements.map(
 															(
 																element,
-																index
+																index,
 															) => (
 																<span
 																	key={
@@ -2899,7 +2899,7 @@ export default function ReportPage({
 																		</span>
 																	)}
 																</span>
-															)
+															),
 														)}
 														<span
 															style={{
@@ -2913,7 +2913,7 @@ export default function ReportPage({
 														>
 															{convertByRegion(
 																"缺失",
-																region
+																region,
 															)}
 														</span>
 													</div>
@@ -3024,7 +3024,7 @@ export default function ReportPage({
 											>
 												{convertByRegion(
 													"年柱",
-													region
+													region,
 												)}
 												-
 												<span className="text-[#A3B116]">
@@ -3046,7 +3046,7 @@ export default function ReportPage({
 											>
 												{convertByRegion(
 													"月柱",
-													region
+													region,
 												)}
 												-
 												<span className="text-[#A3B116]">
@@ -3068,7 +3068,7 @@ export default function ReportPage({
 											>
 												{convertByRegion(
 													"日柱",
-													region
+													region,
 												)}
 												-
 												<span className="text-[#A3B116]">
@@ -3090,7 +3090,7 @@ export default function ReportPage({
 											>
 												{convertByRegion(
 													"時柱",
-													region
+													region,
 												)}
 												-
 												<span className="text-[#A3B116]">
@@ -3191,31 +3191,31 @@ export default function ReportPage({
 												) {
 													return convertByRegion(
 														"根據五行分析，需要進一步確認用神配置以達到最佳平衡效果。",
-														region
+														region,
 													);
 												}
 
 												const strategyDesc = {
 													補缺: convertByRegion(
 														"補足所缺",
-														region
+														region,
 													),
 													扶弱: convertByRegion(
 														"扶助偏弱",
-														region
+														region,
 													),
 													抑強: convertByRegion(
 														"抑制過強",
-														region
+														region,
 													),
 													瀉強: convertByRegion(
 														"化解過旺",
-														region
+														region,
 													),
 												};
 												return convertByRegion(
 													`根據您的五行配置分析，建議以「${primaryGod}」為首選用神，「${auxiliaryGod}」為輔助用神。透過${strategyDesc[strategy] || convertByRegion("平衡調和", region)}的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力。`,
-													region
+													region,
 												);
 											})()}
 										</p>
@@ -3330,20 +3330,20 @@ export default function ReportPage({
 										{/* Tag buttons */}
 										<div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:gap-3 sm:mb-4 lg:justify-start interactive-tabs">
 											{Object.entries(
-												reportDocData.nianzhuData
+												reportDocData.nianzhuData,
 											)
 												.slice(0, 2)
 												.map(([key, value], index) => {
 													const isLastButton =
 														index ===
 														Object.entries(
-															reportDocData.nianzhuData
+															reportDocData.nianzhuData,
 														).length -
 															1;
 
 													// Extract element from key - handle new format like 天干金, 地支木, 综合金木
 													const getElementFromKey = (
-														key
+														key,
 													) => {
 														// Check if key contains any of the wuxing elements
 														const elements = [
@@ -3356,7 +3356,7 @@ export default function ReportPage({
 														for (const element of elements) {
 															if (
 																key.includes(
-																	element
+																	element,
 																)
 															) {
 																return element;
@@ -3512,20 +3512,20 @@ export default function ReportPage({
 																for (const element of elements) {
 																	if (
 																		key.includes(
-																			element
+																			element,
 																		)
 																	) {
 																		return element;
 																	}
 																}
 																return key.slice(
-																	-1
+																	-1,
 																); // Fallback
 															};
 
 														const elementKey =
 															getElementFromKey(
-																key
+																key,
 															);
 														// Map of available element images
 														const availableImages =
@@ -3538,7 +3538,7 @@ export default function ReportPage({
 															];
 														if (
 															availableImages.includes(
-																elementKey
+																elementKey,
 															)
 														) {
 															return `/images/report/${elementKey}.png`;
@@ -3552,7 +3552,7 @@ export default function ReportPage({
 												/>
 											</div>
 										</div>
-									)
+									),
 								)}
 
 								{/* AI Life Stage Analysis Section for 年柱 */}
@@ -3580,7 +3580,7 @@ export default function ReportPage({
 											<p className="text-sm sm:text-lg text-[#5A5A5A]">
 												{convertByRegion(
 													"正在分析您的童年生活特征...",
-													region
+													region,
 												)}
 											</p>
 										</div>
@@ -3600,7 +3600,7 @@ export default function ReportPage({
 														lifeStageAnalysis[
 															"年柱"
 														].title || "",
-														region
+														region,
 													)}
 												</h4>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
@@ -3619,7 +3619,7 @@ export default function ReportPage({
 															lifeStageAnalysis[
 																"年柱"
 															].content || "",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -3639,7 +3639,7 @@ export default function ReportPage({
 															lifeStageAnalysis[
 																"年柱"
 															].example || "",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -3661,7 +3661,7 @@ export default function ReportPage({
 																lifeStageAnalysis[
 																	"年柱"
 																].wisdom || "",
-																region
+																region,
 															)}
 														</p>
 													</div>
@@ -3711,20 +3711,20 @@ export default function ReportPage({
 										{/* Tag buttons */}
 										<div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:gap-3 sm:mb-4 lg:justify-start interactive-tabs">
 											{Object.entries(
-												reportDocData.yuezhuData
+												reportDocData.yuezhuData,
 											)
 												.slice(0, 2)
 												.map(([key, value], index) => {
 													const isLastButton =
 														index ===
 														Object.entries(
-															reportDocData.yuezhuData
+															reportDocData.yuezhuData,
 														).length -
 															1;
 
 													// Extract element from key - handle new format like 天干金, 地支木, 综合金木
 													const getElementFromKey = (
-														key
+														key,
 													) => {
 														// Check if key contains any of the wuxing elements
 														const elements = [
@@ -3737,7 +3737,7 @@ export default function ReportPage({
 														for (const element of elements) {
 															if (
 																key.includes(
-																	element
+																	element,
 																)
 															) {
 																return element;
@@ -3892,20 +3892,20 @@ export default function ReportPage({
 																for (const element of elements) {
 																	if (
 																		key.includes(
-																			element
+																			element,
 																		)
 																	) {
 																		return element;
 																	}
 																}
 																return key.slice(
-																	-1
+																	-1,
 																); // Fallback
 															};
 
 														const elementKey =
 															getElementFromKey(
-																key
+																key,
 															);
 														// Map of available element images
 														const availableImages =
@@ -3918,7 +3918,7 @@ export default function ReportPage({
 															];
 														if (
 															availableImages.includes(
-																elementKey
+																elementKey,
 															)
 														) {
 															return `/images/report/${elementKey}.png`;
@@ -3932,7 +3932,7 @@ export default function ReportPage({
 												/>
 											</div>
 										</div>
-									)
+									),
 								)}
 
 								{/* AI Life Stage Analysis Section for 月柱 */}
@@ -3960,7 +3960,7 @@ export default function ReportPage({
 											<p className="text-sm sm:text-lg text-[#5A5A5A]">
 												{convertByRegion(
 													"正在分析您的青年时期特征...",
-													region
+													region,
 												)}
 											</p>
 										</div>
@@ -3980,7 +3980,7 @@ export default function ReportPage({
 														lifeStageAnalysis[
 															"月柱"
 														].title || "",
-														region
+														region,
 													)}
 												</h4>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
@@ -3999,7 +3999,7 @@ export default function ReportPage({
 															lifeStageAnalysis[
 																"月柱"
 															].content || "",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -4018,14 +4018,14 @@ export default function ReportPage({
 														<strong>
 															{convertByRegion(
 																"例子：",
-																region
+																region,
 															)}
 														</strong>{" "}
 														{convertByRegion(
 															lifeStageAnalysis[
 																"月柱"
 															].example || "",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -4046,14 +4046,14 @@ export default function ReportPage({
 															<strong>
 																{convertByRegion(
 																	"智慧洞察：",
-																	region
+																	region,
 																)}
 															</strong>
 															{convertByRegion(
 																lifeStageAnalysis[
 																	"月柱"
 																].wisdom || "",
-																region
+																region,
 															)}
 														</p>
 													</div>
@@ -4103,20 +4103,20 @@ export default function ReportPage({
 										{/* Tag buttons */}
 										<div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:gap-3 sm:mb-4 lg:justify-start interactive-tabs">
 											{Object.entries(
-												reportDocData.rizhuData
+												reportDocData.rizhuData,
 											)
 												.slice(0, 2)
 												.map(([key, value], index) => {
 													const isLastButton =
 														index ===
 														Object.entries(
-															reportDocData.rizhuData
+															reportDocData.rizhuData,
 														).length -
 															1;
 
 													// Extract element from key - handle new format like 天干金, 地支木, 综合金木
 													const getElementFromKey = (
-														key
+														key,
 													) => {
 														// Check if key contains any of the wuxing elements
 														const elements = [
@@ -4129,7 +4129,7 @@ export default function ReportPage({
 														for (const element of elements) {
 															if (
 																key.includes(
-																	element
+																	element,
 																)
 															) {
 																return element;
@@ -4285,20 +4285,20 @@ export default function ReportPage({
 																for (const element of elements) {
 																	if (
 																		key.includes(
-																			element
+																			element,
 																		)
 																	) {
 																		return element;
 																	}
 																}
 																return key.slice(
-																	-1
+																	-1,
 																); // Fallback
 															};
 
 														const elementKey =
 															getElementFromKey(
-																key
+																key,
 															);
 														// Map of available element images
 														const availableImages =
@@ -4311,7 +4311,7 @@ export default function ReportPage({
 															];
 														if (
 															availableImages.includes(
-																elementKey
+																elementKey,
 															)
 														) {
 															return `/images/report/${elementKey}.png`;
@@ -4325,7 +4325,7 @@ export default function ReportPage({
 												/>
 											</div>
 										</div>
-									)
+									),
 								)}
 								{/* AI Life Stage Analysis Section for 日柱 */}
 								<div className="p-3 sm:p-6 lg:p-8">
@@ -4352,7 +4352,7 @@ export default function ReportPage({
 											<p className="text-sm sm:text-lg text-[#5A5A5A]">
 												{convertByRegion(
 													"正在分析您的成年时期特征...",
-													region
+													region,
 												)}
 											</p>
 										</div>
@@ -4372,7 +4372,7 @@ export default function ReportPage({
 														lifeStageAnalysis[
 															"日柱"
 														].title || "",
-														region
+														region,
 													)}
 												</h4>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
@@ -4391,7 +4391,7 @@ export default function ReportPage({
 															lifeStageAnalysis[
 																"日柱"
 															].content || "",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -4411,7 +4411,7 @@ export default function ReportPage({
 															lifeStageAnalysis[
 																"日柱"
 															].example || "",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -4433,7 +4433,7 @@ export default function ReportPage({
 																lifeStageAnalysis[
 																	"日柱"
 																].wisdom || "",
-																region
+																region,
 															)}
 														</p>
 													</div>
@@ -4483,20 +4483,20 @@ export default function ReportPage({
 										{/* Tag buttons */}
 										<div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:gap-3 sm:mb-4 lg:justify-start interactive-tabs">
 											{Object.entries(
-												reportDocData.shizhuData
+												reportDocData.shizhuData,
 											)
 												.slice(0, 2)
 												.map(([key, value], index) => {
 													const isLastButton =
 														index ===
 														Object.entries(
-															reportDocData.shizhuData
+															reportDocData.shizhuData,
 														).length -
 															1;
 
 													// Extract element from key - handle new format like 天干金, 地支木, 综合金木
 													const getElementFromKey = (
-														key
+														key,
 													) => {
 														// Check if key contains any of the wuxing elements
 														const elements = [
@@ -4509,7 +4509,7 @@ export default function ReportPage({
 														for (const element of elements) {
 															if (
 																key.includes(
-																	element
+																	element,
 																)
 															) {
 																return element;
@@ -4664,20 +4664,20 @@ export default function ReportPage({
 																for (const element of elements) {
 																	if (
 																		key.includes(
-																			element
+																			element,
 																		)
 																	) {
 																		return element;
 																	}
 																}
 																return key.slice(
-																	-1
+																	-1,
 																); // Fallback
 															};
 
 														const elementKey =
 															getElementFromKey(
-																key
+																key,
 															);
 														// Map of available element images
 														const availableImages =
@@ -4690,7 +4690,7 @@ export default function ReportPage({
 															];
 														if (
 															availableImages.includes(
-																elementKey
+																elementKey,
 															)
 														) {
 															return `/images/report/${elementKey}.png`;
@@ -4704,7 +4704,7 @@ export default function ReportPage({
 												/>
 											</div>
 										</div>
-									)
+									),
 								)}
 
 								{/* AI Life Stage Analysis Section for 時柱 */}
@@ -4732,7 +4732,7 @@ export default function ReportPage({
 											<p className="text-sm sm:text-lg text-[#5A5A5A]">
 												{convertByRegion(
 													"正在分析您的老年时期特征...",
-													region
+													region,
 												)}
 											</p>
 										</div>
@@ -4752,7 +4752,7 @@ export default function ReportPage({
 														lifeStageAnalysis[
 															"時柱"
 														].title || "",
-														region
+														region,
 													)}
 												</h4>
 												<div className="p-2 mb-3 sm:p-4 sm:mb-4">
@@ -4771,7 +4771,7 @@ export default function ReportPage({
 															lifeStageAnalysis[
 																"時柱"
 															].content || "",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -4791,7 +4791,7 @@ export default function ReportPage({
 															lifeStageAnalysis[
 																"時柱"
 															].example || "",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -4813,7 +4813,7 @@ export default function ReportPage({
 																lifeStageAnalysis[
 																	"時柱"
 																].wisdom || "",
-																region
+																region,
 															)}
 														</p>
 													</div>
@@ -4964,7 +4964,7 @@ export default function ReportPage({
 									>
 										{convertByRegion(
 											"五行分佈深度解析",
-											region
+											region,
 										)}
 									</h2>
 								</div>
@@ -4974,7 +4974,7 @@ export default function ReportPage({
 									{(() => {
 										const distribution =
 											calculateComprehensiveElementDistribution(
-												userInfo
+												userInfo,
 											);
 
 										if (!distribution) {
@@ -4982,7 +4982,7 @@ export default function ReportPage({
 												<div className="py-6 text-center text-gray-500 sm:py-8">
 													{convertByRegion(
 														"無法載入五行分析數據",
-														region
+														region,
 													)}
 												</div>
 											);
@@ -5068,7 +5068,7 @@ export default function ReportPage({
 																		>
 																			{convertByRegion(
 																				"分數(包括藏干):",
-																				region
+																				region,
 																			)}
 																		</span>
 																		<span
@@ -5079,7 +5079,7 @@ export default function ReportPage({
 																			}}
 																		>
 																			{Math.round(
-																				count
+																				count,
 																			)}
 																		</span>
 																	</div>
@@ -5093,7 +5093,7 @@ export default function ReportPage({
 																		>
 																			{convertByRegion(
 																				"強度:",
-																				region
+																				region,
 																			)}
 																		</span>
 																		<span
@@ -5118,7 +5118,7 @@ export default function ReportPage({
 																		>
 																			{convertByRegion(
 																				"特性:",
-																				region
+																				region,
 																			)}
 																		</span>
 																		<p
@@ -5132,9 +5132,9 @@ export default function ReportPage({
 																			{convertByRegion(
 																				getElementTrait(
 																					element,
-																					star
+																					star,
 																				),
-																				region
+																				region,
 																			)}
 																		</p>
 																	</div>
@@ -5148,7 +5148,7 @@ export default function ReportPage({
 																		>
 																			{convertByRegion(
 																				"對命主的影響:",
-																				region
+																				region,
 																			)}
 																		</span>
 																		<p
@@ -5163,9 +5163,9 @@ export default function ReportPage({
 																			{convertByRegion(
 																				getElementInfluence(
 																					element,
-																					star
+																					star,
 																				),
-																				region
+																				region,
 																			)}
 																		</p>
 																	</div>
@@ -5199,7 +5199,7 @@ export default function ReportPage({
 																	>
 																		{convertByRegion(
 																			"五行",
-																			region
+																			region,
 																		)}
 																	</div>
 																	<div
@@ -5213,11 +5213,11 @@ export default function ReportPage({
 																	>
 																		{convertByRegion(
 																			"數值",
-																			region
+																			region,
 																		)}
 																		{convertByRegion(
 																			"(包括藏干)",
-																			region
+																			region,
 																		)}
 																	</div>
 																	<div
@@ -5231,7 +5231,7 @@ export default function ReportPage({
 																	>
 																		{convertByRegion(
 																			"強度",
-																			region
+																			region,
 																		)}
 																	</div>
 																	<div
@@ -5245,7 +5245,7 @@ export default function ReportPage({
 																	>
 																		{convertByRegion(
 																			"特性",
-																			region
+																			region,
 																		)}
 																	</div>
 																	<div
@@ -5259,7 +5259,7 @@ export default function ReportPage({
 																	>
 																		{convertByRegion(
 																			"對命主的影響",
-																			region
+																			region,
 																		)}
 																	</div>
 																</div>
@@ -5278,7 +5278,7 @@ export default function ReportPage({
 																		] || "";
 																	const star =
 																		getStar(
-																			strength
+																			strength,
 																		);
 
 																	return (
@@ -5338,7 +5338,7 @@ export default function ReportPage({
 																					}}
 																				>
 																					{Math.round(
-																						count
+																						count,
 																					)}
 																				</div>
 
@@ -5367,9 +5367,9 @@ export default function ReportPage({
 																					{convertByRegion(
 																						getElementTrait(
 																							element,
-																							star
+																							star,
 																						),
-																						region
+																						region,
 																					)}
 																				</div>
 
@@ -5386,15 +5386,15 @@ export default function ReportPage({
 																					{convertByRegion(
 																						getElementInfluence(
 																							element,
-																							star
+																							star,
 																						),
-																						region
+																						region,
 																					)}
 																				</div>
 																			</div>
 																		</div>
 																	);
-																}
+																},
 															)}
 														</div>
 													</div>
@@ -5415,7 +5415,7 @@ export default function ReportPage({
 									>
 										{convertByRegion(
 											"五行流通阻礙點",
-											region
+											region,
 										)}
 									</h3>
 
@@ -5452,7 +5452,7 @@ export default function ReportPage({
 												>
 													{convertByRegion(
 														"正在進行五行流通深度分析...",
-														region
+														region,
 													)}
 												</p>
 											</div>
@@ -5479,7 +5479,7 @@ export default function ReportPage({
 														>
 															{convertByRegion(
 																obstacle.title,
-																region
+																region,
 															)}
 														</div>
 														<p
@@ -5495,7 +5495,7 @@ export default function ReportPage({
 														>
 															{convertByRegion(
 																obstacle.description,
-																region
+																region,
 															)}
 														</p>
 														<div className="mb-2">
@@ -5510,7 +5510,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	"生活影響...",
-																	region
+																	region,
 																)}
 															</span>
 														</div>
@@ -5527,11 +5527,11 @@ export default function ReportPage({
 														>
 															{convertByRegion(
 																obstacle.lifeImpact,
-																region
+																region,
 															)}
 														</p>
 													</div>
-												)
+												),
 											)}
 
 										{/* Fallback when no AI data */}
@@ -5549,7 +5549,7 @@ export default function ReportPage({
 													>
 														{convertByRegion(
 															"正在為您準備個人化的五行流通分析...",
-															region
+															region,
 														)}
 													</p>
 												</div>
@@ -5572,7 +5572,7 @@ export default function ReportPage({
 									>
 										{convertByRegion(
 											"十神格局與內在關聯",
-											region
+											region,
 										)}
 									</h2>
 								</div>
@@ -5830,7 +5830,7 @@ export default function ReportPage({
 															key={godName}
 															onClick={() =>
 																setActiveTenGodsTab(
-																	godName
+																	godName,
 																)
 															}
 															className="flex-shrink-0 font-extrabold transition-colors"
@@ -5860,7 +5860,7 @@ export default function ReportPage({
 														>
 															{godName}
 														</button>
-													)
+													),
 												)}
 											</div>
 
@@ -6070,7 +6070,7 @@ export default function ReportPage({
 																			-{" "}
 																			{convertByRegion(
 																				data.meaning,
-																				region
+																				region,
 																			)}
 																		</span>
 																	</div>
@@ -6087,7 +6087,7 @@ export default function ReportPage({
 																>
 																	{convertByRegion(
 																		data.expression,
-																		region
+																		region,
 																	)}
 																</h3>
 															</div>
@@ -6105,13 +6105,13 @@ export default function ReportPage({
 																>
 																	{convertByRegion(
 																		"實際表現",
-																		region
+																		region,
 																	)}
 																</h4>
 																{data.realManifestation.map(
 																	(
 																		item,
-																		index
+																		index,
 																	) => (
 																		<p
 																			key={
@@ -6129,10 +6129,10 @@ export default function ReportPage({
 																		>
 																			{convertByRegion(
 																				item,
-																				region
+																				region,
 																			)}
 																		</p>
-																	)
+																	),
 																)}
 															</div>
 
@@ -6152,13 +6152,13 @@ export default function ReportPage({
 																		data
 																			.warnings
 																			.title,
-																		region
+																		region,
 																	)}
 																</p>
 																{data.warnings.items.map(
 																	(
 																		item,
-																		index
+																		index,
 																	) => (
 																		<p
 																			key={
@@ -6177,10 +6177,10 @@ export default function ReportPage({
 																			▶{" "}
 																			{convertByRegion(
 																				item,
-																				region
+																				region,
 																			)}
 																		</p>
-																	)
+																	),
 																)}
 															</div>
 
@@ -6199,7 +6199,7 @@ export default function ReportPage({
 																		data
 																			.coreConflicts
 																			.title,
-																		region
+																		region,
 																	)}
 																</h3>
 
@@ -6207,7 +6207,7 @@ export default function ReportPage({
 																	{data.coreConflicts.conflicts.map(
 																		(
 																			conflict,
-																			index
+																			index,
 																		) => (
 																			<div
 																				key={
@@ -6228,7 +6228,7 @@ export default function ReportPage({
 																				>
 																					{convertByRegion(
 																						conflict.title,
-																						region
+																						region,
 																					)}
 																				</div>
 
@@ -6246,7 +6246,7 @@ export default function ReportPage({
 																					>
 																						{convertByRegion(
 																							conflict.description,
-																							region
+																							region,
 																						)}
 																					</p>
 																				</div>
@@ -6278,7 +6278,7 @@ export default function ReportPage({
 																						>
 																							{convertByRegion(
 																								conflict.psychologicalRoots,
-																								region
+																								region,
 																							)}
 																						</p>
 																					</div>
@@ -6311,7 +6311,7 @@ export default function ReportPage({
 																						>
 																							{convertByRegion(
 																								conflict.developmentalStages,
-																								region
+																								region,
 																							)}
 																						</p>
 																					</div>
@@ -6344,17 +6344,17 @@ export default function ReportPage({
 																					>
 																						{convertByRegion(
 																							conflict.example,
-																							region
+																							region,
 																						)}
 																					</p>
 																				</div>
 																			</div>
-																		)
+																		),
 																	)}
 																</div>
 															</div>
 														</div>
-													)
+													),
 											)}
 										</>
 									);
@@ -6403,7 +6403,7 @@ export default function ReportPage({
 											>
 												{convertByRegion(
 													"正在測算個人化建議...",
-													region
+													region,
 												)}
 											</p>
 											<p
@@ -6415,7 +6415,7 @@ export default function ReportPage({
 											>
 												{convertByRegion(
 													"小鈴正在根據您的八字命理分析，為您量身定制專屬的化解提示",
-													region
+													region,
 												)}
 											</p>
 										</div>
@@ -6434,7 +6434,7 @@ export default function ReportPage({
 											>
 												{convertByRegion(
 													"透過這些策略，你可以在生活和工作中更好地平衡才華與壓力，發揮自己的潛力，迎接機會的來臨。",
-													region
+													region,
 												)}
 											</p>
 										</>
@@ -6461,7 +6461,7 @@ export default function ReportPage({
 													>
 														{convertByRegion(
 															tip.title,
-															region
+															region,
 														)}
 													</h3>
 													<p
@@ -6476,7 +6476,7 @@ export default function ReportPage({
 													>
 														{convertByRegion(
 															tip.content,
-															region
+															region,
 														)}
 													</p>
 													{tip.example && (
@@ -6492,7 +6492,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	"例如：",
-																	region
+																	region,
 																)}
 															</p>
 															<p
@@ -6506,13 +6506,13 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	tip.example,
-																	region
+																	region,
 																)}
 															</p>
 														</div>
 													)}
 												</div>
-											)
+											),
 										)}
 									</div>
 								)}
@@ -6532,7 +6532,7 @@ export default function ReportPage({
 										<span>
 											{convertByRegion(
 												"綜合調理與人生建議",
-												region
+												region,
 											)}
 										</span>
 									</h3>
@@ -6561,7 +6561,7 @@ export default function ReportPage({
 												<span className="text-lg sm:text-xl text-[#8B4513] text-center">
 													{convertByRegion(
 														"小鈴正在測算綜合人生建議...",
-														region
+														region,
 													)}
 												</span>
 											</div>
@@ -6601,7 +6601,7 @@ export default function ReportPage({
 															<button
 																onClick={() =>
 																	setActiveComprehensiveTab(
-																		tab.key
+																		tab.key,
 																	)
 																}
 																className="flex items-center justify-center w-16 h-16 transition-all duration-300 rounded-full shadow-lg sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32"
@@ -6628,7 +6628,7 @@ export default function ReportPage({
 																					: "none",
 																			}}
 																			onError={(
-																				e
+																				e,
 																			) => {
 																				e.target.style.display =
 																					"none";
@@ -6673,7 +6673,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	tab.key,
-																	region
+																	region,
 																)}
 															</span>
 														</div>
@@ -6695,7 +6695,7 @@ export default function ReportPage({
 												>
 													{convertByRegion(
 														activeComprehensiveTab,
-														region
+														region,
 													)}
 												</h4>
 											</div>
@@ -6715,7 +6715,7 @@ export default function ReportPage({
 																key={subTab}
 																onClick={() =>
 																	setActiveWuxingTab(
-																		subTab
+																		subTab,
 																	)
 																}
 																className={`flex-1 max-w-[120px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
@@ -6735,7 +6735,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	subTab,
-																	region
+																	region,
 																)}
 															</button>
 														))}
@@ -6755,7 +6755,7 @@ export default function ReportPage({
 																>
 																	{convertByRegion(
 																		"補益建議",
-																		region
+																		region,
 																	)}
 																</h4>
 																<div
@@ -6773,13 +6773,13 @@ export default function ReportPage({
 																			comprehensiveLifeAdvice
 																				.wuxingHarmony
 																				.summary
-																				.supplement
+																				.supplement,
 																		) ? (
 																			<ul className="space-y-2">
 																				{comprehensiveLifeAdvice.wuxingHarmony.summary.supplement.map(
 																					(
 																						item,
-																						index
+																						index,
 																					) => (
 																						<li
 																							key={
@@ -6793,11 +6793,11 @@ export default function ReportPage({
 																							<span>
 																								{convertByRegion(
 																									item,
-																									region
+																									region,
 																								)}
 																							</span>
 																						</li>
-																					)
+																					),
 																				)}
 																			</ul>
 																		) : (
@@ -6807,7 +6807,7 @@ export default function ReportPage({
 																						.wuxingHarmony
 																						.summary
 																						.supplement,
-																					region
+																					region,
 																				)}
 																			</p>
 																		)
@@ -6815,7 +6815,7 @@ export default function ReportPage({
 																		<p className="italic text-gray-500">
 																			{convertByRegion(
 																				"暫無補益建議",
-																				region
+																				region,
 																			)}
 																		</p>
 																	)}
@@ -6835,7 +6835,7 @@ export default function ReportPage({
 																>
 																	{convertByRegion(
 																		"强化方法",
-																		region
+																		region,
 																	)}
 																</h4>
 																<div
@@ -6853,13 +6853,13 @@ export default function ReportPage({
 																			comprehensiveLifeAdvice
 																				.wuxingHarmony
 																				.summary
-																				.strengthen
+																				.strengthen,
 																		) ? (
 																			<ul className="space-y-3">
 																				{comprehensiveLifeAdvice.wuxingHarmony.summary.strengthen.map(
 																					(
 																						item,
-																						index
+																						index,
 																					) => (
 																						<li
 																							key={
@@ -6873,11 +6873,11 @@ export default function ReportPage({
 																							<span>
 																								{convertByRegion(
 																									item,
-																									region
+																									region,
 																								)}
 																							</span>
 																						</li>
-																					)
+																					),
 																				)}
 																			</ul>
 																		) : (
@@ -6887,7 +6887,7 @@ export default function ReportPage({
 																						.wuxingHarmony
 																						.summary
 																						.strengthen,
-																					region
+																					region,
 																				)}
 																			</p>
 																		)
@@ -6895,7 +6895,7 @@ export default function ReportPage({
 																		<p className="italic text-gray-500">
 																			{convertByRegion(
 																				"暫無强化建議",
-																				region
+																				region,
 																			)}
 																		</p>
 																	)}
@@ -6915,7 +6915,7 @@ export default function ReportPage({
 																>
 																	{convertByRegion(
 																		"避免事項",
-																		region
+																		region,
 																	)}
 																</h4>
 																<div
@@ -6933,13 +6933,13 @@ export default function ReportPage({
 																			comprehensiveLifeAdvice
 																				.wuxingHarmony
 																				.summary
-																				.avoid
+																				.avoid,
 																		) ? (
 																			<ul className="space-y-3">
 																				{comprehensiveLifeAdvice.wuxingHarmony.summary.avoid.map(
 																					(
 																						item,
-																						index
+																						index,
 																					) => (
 																						<li
 																							key={
@@ -6953,11 +6953,11 @@ export default function ReportPage({
 																							<span>
 																								{convertByRegion(
 																									item,
-																									region
+																									region,
 																								)}
 																							</span>
 																						</li>
-																					)
+																					),
 																				)}
 																			</ul>
 																		) : (
@@ -6967,7 +6967,7 @@ export default function ReportPage({
 																						.wuxingHarmony
 																						.summary
 																						.avoid,
-																					region
+																					region,
 																				)}
 																			</p>
 																		)
@@ -6975,7 +6975,7 @@ export default function ReportPage({
 																		<p className="italic text-gray-500">
 																			{convertByRegion(
 																				"暫無避免事項",
-																				region
+																				region,
 																			)}
 																		</p>
 																	)}
@@ -6998,7 +6998,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	"詳細說明",
-																	region
+																	region,
 																)}
 															</h5>
 															<p
@@ -7012,7 +7012,7 @@ export default function ReportPage({
 																	comprehensiveLifeAdvice
 																		.wuxingHarmony
 																		.detailed,
-																	region
+																	region,
 																)}
 															</p>
 														</div>
@@ -7033,7 +7033,7 @@ export default function ReportPage({
 																key={subTab}
 																onClick={() =>
 																	setActiveHealthTab(
-																		subTab
+																		subTab,
 																	)
 																}
 																className={`flex-1 max-w-[140px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
@@ -7053,7 +7053,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	subTab,
-																	region
+																	region,
 																)}
 															</button>
 														))}
@@ -7073,7 +7073,7 @@ export default function ReportPage({
 																>
 																	{convertByRegion(
 																		"運動建議",
-																		region
+																		region,
 																	)}
 																</h4>
 																<div
@@ -7089,13 +7089,13 @@ export default function ReportPage({
 																		Array.isArray(
 																			comprehensiveLifeAdvice
 																				.healthWellness
-																				.exercise
+																				.exercise,
 																		) ? (
 																			<ul className="space-y-3">
 																				{comprehensiveLifeAdvice.healthWellness.exercise.map(
 																					(
 																						item,
-																						index
+																						index,
 																					) => (
 																						<li
 																							key={
@@ -7109,11 +7109,11 @@ export default function ReportPage({
 																							<span>
 																								{convertByRegion(
 																									item,
-																									region
+																									region,
 																								)}
 																							</span>
 																						</li>
-																					)
+																					),
 																				)}
 																			</ul>
 																		) : (
@@ -7122,7 +7122,7 @@ export default function ReportPage({
 																					comprehensiveLifeAdvice
 																						.healthWellness
 																						.exercise,
-																					region
+																					region,
 																				)}
 																			</p>
 																		)
@@ -7130,7 +7130,7 @@ export default function ReportPage({
 																		<p className="italic text-gray-500">
 																			{convertByRegion(
 																				"暫無運動建議",
-																				region
+																				region,
 																			)}
 																		</p>
 																	)}
@@ -7150,7 +7150,7 @@ export default function ReportPage({
 																>
 																	{convertByRegion(
 																		"情緒調節",
-																		region
+																		region,
 																	)}
 																</h4>
 																<div
@@ -7168,14 +7168,14 @@ export default function ReportPage({
 																				comprehensiveLifeAdvice
 																					.healthWellness
 																					.emotion,
-																				region
+																				region,
 																			)}
 																		</p>
 																	) : (
 																		<p className="italic text-gray-500">
 																			{convertByRegion(
 																				"暫無情緒調節建議",
-																				region
+																				region,
 																			)}
 																		</p>
 																	)}
@@ -7198,7 +7198,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	"詳細說明",
-																	region
+																	region,
 																)}
 															</h5>
 															<p
@@ -7212,7 +7212,7 @@ export default function ReportPage({
 																	comprehensiveLifeAdvice
 																		.healthWellness
 																		.detailed,
-																	region
+																	region,
 																)}
 															</p>
 														</div>
@@ -7234,7 +7234,7 @@ export default function ReportPage({
 																key={subTab}
 																onClick={() =>
 																	setActiveCareerTab(
-																		subTab
+																		subTab,
 																	)
 																}
 																className={`flex-1 max-w-[100px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
@@ -7254,7 +7254,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	subTab,
-																	region
+																	region,
 																)}
 															</button>
 														))}
@@ -7277,7 +7277,7 @@ export default function ReportPage({
 																	>
 																		{convertByRegion(
 																			"近期事業方向",
-																			region
+																			region,
 																		)}
 																	</h4>
 																	<div
@@ -7296,7 +7296,7 @@ export default function ReportPage({
 																					comprehensiveLifeAdvice
 																						.careerDirection
 																						.nearTerm,
-																					region
+																					region,
 																				)}
 																			</p>
 																		) : (
@@ -7309,7 +7309,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"年齡範圍：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7317,7 +7317,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.nearTerm
 																								.ageRange,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7329,7 +7329,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"格局：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7337,7 +7337,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.nearTerm
 																								.pattern,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7349,7 +7349,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"推薦行業：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7357,16 +7357,16 @@ export default function ReportPage({
 																								comprehensiveLifeAdvice
 																									.careerDirection
 																									.nearTerm
-																									.industries
+																									.industries,
 																							)
 																								? comprehensiveLifeAdvice.careerDirection.nearTerm.industries.join(
-																										"、"
+																										"、",
 																									)
 																								: comprehensiveLifeAdvice
 																										.careerDirection
 																										.nearTerm
 																										.industries,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7378,7 +7378,7 @@ export default function ReportPage({
 																						<strong className="text-[#B4003C]">
 																							{convertByRegion(
 																								"風險預警：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7386,7 +7386,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.nearTerm
 																								.risk,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7411,7 +7411,7 @@ export default function ReportPage({
 																	>
 																		{convertByRegion(
 																			"中期事業方向",
-																			region
+																			region,
 																		)}
 																	</h4>
 																	<div
@@ -7430,7 +7430,7 @@ export default function ReportPage({
 																					comprehensiveLifeAdvice
 																						.careerDirection
 																						.midTerm,
-																					region
+																					region,
 																				)}
 																			</p>
 																		) : (
@@ -7443,7 +7443,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"年齡範圍：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7451,7 +7451,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.midTerm
 																								.ageRange,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7463,7 +7463,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"轉化：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7471,7 +7471,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.midTerm
 																								.transformation,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7483,7 +7483,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"策略：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7491,7 +7491,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.midTerm
 																								.strategy,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7503,7 +7503,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"決策：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7511,7 +7511,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.midTerm
 																								.decision,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7536,7 +7536,7 @@ export default function ReportPage({
 																	>
 																		{convertByRegion(
 																			"遠期事業方向",
-																			region
+																			region,
 																		)}
 																	</h4>
 																	<div
@@ -7555,7 +7555,7 @@ export default function ReportPage({
 																					comprehensiveLifeAdvice
 																						.careerDirection
 																						.longTerm,
-																					region
+																					region,
 																				)}
 																			</p>
 																		) : (
@@ -7568,7 +7568,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"年齡範圍：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7576,7 +7576,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.longTerm
 																								.ageRange,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7588,7 +7588,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"運勢：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7596,7 +7596,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.longTerm
 																								.fortune,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7608,7 +7608,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"知識：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7616,7 +7616,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.longTerm
 																								.knowledge,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7628,7 +7628,7 @@ export default function ReportPage({
 																						<strong className="text-[#007BFF]">
 																							{convertByRegion(
 																								"養生：",
-																								region
+																								region,
 																							)}
 																						</strong>
 																						{convertByRegion(
@@ -7636,7 +7636,7 @@ export default function ReportPage({
 																								.careerDirection
 																								.longTerm
 																								.wellness,
-																							region
+																							region,
 																						)}
 																					</p>
 																				)}
@@ -7661,7 +7661,7 @@ export default function ReportPage({
 															>
 																{convertByRegion(
 																	"詳細說明",
-																	region
+																	region,
 																)}
 															</h5>
 															<p
@@ -7675,7 +7675,7 @@ export default function ReportPage({
 																	comprehensiveLifeAdvice
 																		.careerDirection
 																		.detailed,
-																	region
+																	region,
 																)}
 															</p>
 														</div>
@@ -7781,7 +7781,7 @@ export default function ReportPage({
 														<button
 															onClick={() =>
 																setActiveInterpersonalTab(
-																	tab.key
+																	tab.key,
 																)
 															}
 															className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full transition-all duration-300 flex items-center justify-center font-bold text-white ${
@@ -7854,7 +7854,7 @@ export default function ReportPage({
 																key={subTab}
 																onClick={() =>
 																	setActivePersonalTab(
-																		subTab
+																		subTab,
 																	)
 																}
 																className={`flex-1 max-w-[120px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
@@ -8040,7 +8040,7 @@ export default function ReportPage({
 																key={subTab}
 																onClick={() =>
 																	setActiveWorkplaceTab(
-																		subTab
+																		subTab,
 																	)
 																}
 																className={`flex-1 max-w-[120px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
@@ -8226,7 +8226,7 @@ export default function ReportPage({
 																key={subTab}
 																onClick={() =>
 																	setActiveSocialTab(
-																		subTab
+																		subTab,
 																	)
 																}
 																className={`flex-1 max-w-[120px] py-2 rounded-full font-bold transition-all duration-300 sm:flex-none sm:max-w-none sm:py-3 ${
