@@ -6,6 +6,26 @@
  */
 const COUPLE_COLOR = "#B4003C";
 const ACCENT = "#C74772";
+/** Line height for vertical title 日月互動 (spacing between 日/月 and 互/動). e.g. 1, 1.2, 1.5 */
+const VERTICAL_TITLE_LINE_HEIGHT = 1.2;
+/** Dark red for numbered section titles (01 甲己合土 style) */
+const NUMBER_TITLE_COLOR = "#8B2942";
+
+/** Parse bullet text "**引水調候**：內容..." into { title, content }. Strips ** from content. */
+function parseBulletTitleContent(text) {
+	if (!text || typeof text !== "string")
+		return { title: "", content: text || "" };
+	const match = text.match(/^\s*\*\*(.+?)\*\*[：:]\s*(.*)/s);
+	if (match) return { title: match[1].trim(), content: match[2].trim() };
+	const colonIdx =
+		text.indexOf("：") >= 0 ? text.indexOf("：") : text.indexOf(":");
+	if (colonIdx > 0)
+		return {
+			title: text.slice(0, colonIdx).replace(/\*\*/g, "").trim(),
+			content: text.slice(colonIdx + 1).trim(),
+		};
+	return { title: "", content: text.replace(/\*\*/g, "").trim() };
+}
 
 function parseJsonContent(content) {
 	if (!content || typeof content !== "string") return null;
@@ -181,160 +201,507 @@ function isFormattingOnlyLine(line) {
 	);
 }
 
+const SECTION_BAR_BG = "#";
+const VERTICAL_TITLE_COLOR = "#666666";
+
+function parseLeftContentSections(content) {
+	if (!content || typeof content !== "string")
+		return {
+			elementPairing: "",
+			mainDescription: "",
+			wuxingBullets: [],
+			strategyBullets: [],
+			summaryParagraph: "",
+		};
+	const lines = content
+		.split("\n")
+		.map((l) => l.trim())
+		.filter(Boolean);
+
+	let elementPairing = "";
+	const titleLineIndex = lines.findIndex((l) => l.includes("合盤分析】"));
+	if (titleLineIndex >= 0) {
+		const m = lines[titleLineIndex].match(/【(.+?)合盤分析】/);
+		if (m) elementPairing = m[1].trim();
+	}
+	if (!elementPairing && lines.length > 0) {
+		const pairLine = lines.find(
+			(l) => l.includes("配") && l.length <= 12 && l.length >= 4,
+		);
+		if (pairLine) elementPairing = pairLine;
+	}
+
+	let mainDescription = "";
+	const descIdx = lines.findIndex(
+		(l, i) =>
+			(i > titleLineIndex || titleLineIndex < 0) &&
+			l.includes("賦予") &&
+			l.includes("全局"),
+	);
+	if (descIdx >= 0) mainDescription = stripNumberedLabel(lines[descIdx]);
+
+	const wuxingStart = lines.findIndex((l) => l.includes("五行調和方案"));
+	const strategyStart = lines.findIndex((l) => l.includes("長期配對策略"));
+	const lastStart = lines.findIndex((l) => l.includes("最後段落"));
+
+	const extractBullets = (startIdx, endIdx) => {
+		if (startIdx < 0) return [];
+		const end = endIdx > startIdx ? endIdx : lines.length;
+		const block = lines.slice(startIdx + 1, end).join("\n");
+		return block
+			.split(/\n/)
+			.map((s) => s.trim())
+			.filter(
+				(s) =>
+					s.startsWith("- ") ||
+					s.startsWith("－") ||
+					s.startsWith("• "),
+			)
+			.map((s) => s.replace(/^[-－•]\s*/, "").trim())
+			.filter(Boolean);
+	};
+
+	let wuxingBullets = extractBullets(
+		wuxingStart,
+		strategyStart >= 0
+			? strategyStart
+			: lastStart >= 0
+				? lastStart
+				: lines.length,
+	);
+	let strategyBullets = extractBullets(
+		strategyStart,
+		lastStart >= 0 ? lastStart : lines.length,
+	);
+
+	// If API returned all 6 under 五行 only, or duplicated in both: first 3 = 五行調和方案, last 3 = 長期配對策略
+	if (wuxingBullets.length >= 6 && strategyBullets.length <= 3) {
+		const firstThree = wuxingBullets.slice(0, 3);
+		const lastThree = wuxingBullets.slice(3, 6);
+		wuxingBullets = firstThree;
+		if (strategyBullets.length === 0) strategyBullets = lastThree;
+	} else if (
+		wuxingBullets.length === 6 &&
+		strategyBullets.length === 6 &&
+		JSON.stringify(wuxingBullets) === JSON.stringify(strategyBullets)
+	) {
+		wuxingBullets = wuxingBullets.slice(0, 3);
+		strategyBullets = strategyBullets.slice(3, 6);
+	}
+
+	let summaryParagraph = "";
+	if (lastStart >= 0) {
+		const lastLine = lines[lastStart];
+		const afterColon = lastLine.replace(/^[^：:]*[：:]\s*/, "").trim();
+		const rest = lines
+			.slice(lastStart + 1)
+			.map((l) => stripNumberedLabel(l))
+			.filter((l) => !isFormattingOnlyLine(l))
+			.join(" ")
+			.trim();
+		summaryParagraph = [afterColon, rest].filter(Boolean).join(" ");
+	}
+
+	return {
+		elementPairing,
+		mainDescription,
+		wuxingBullets,
+		strategyBullets,
+		summaryParagraph,
+	};
+}
+
 function formatLeftContent(content) {
 	if (!content) return null;
-	const lines = content.split("\n").filter((l) => l.trim());
-	const titleLineIndex = lines.findIndex((l) => l.includes("合盤分析】"));
-	if (titleLineIndex === -1) {
+
+	const {
+		elementPairing,
+		mainDescription,
+		wuxingBullets,
+		strategyBullets,
+		summaryParagraph,
+	} = parseLeftContentSections(content);
+
+	const hasStructured =
+		elementPairing ||
+		mainDescription ||
+		wuxingBullets.length > 0 ||
+		strategyBullets.length > 0 ||
+		summaryParagraph;
+	if (!hasStructured)
 		return (
-			<div
-				className="whitespace-pre-line text-black leading-relaxed"
-				style={{ fontSize: "13px", lineHeight: 1.7 }}
-			>
+			<div className="whitespace-pre-line text-black leading-relaxed">
 				{content}
 			</div>
 		);
-	}
-	const titleLine = lines[titleLineIndex];
-	const titleMatch = titleLine.match(/【(.+?)合盤分析】/);
-	const elementPairing = titleMatch ? titleMatch[1] : "";
-	const fullContent = lines.slice(titleLineIndex + 1).join(" ");
-	const patternMatch = fullContent.match(/([^，。]+?格局)/);
-	const patternDescription = patternMatch ? patternMatch[1] : "";
-	const mainDescIndex = lines.findIndex(
-		(l, i) =>
-			i > titleLineIndex && l.includes("賦予") && l.includes("全局"),
-	);
-	const mainDescriptionRaw = mainDescIndex !== -1 ? lines[mainDescIndex] : "";
-	const mainDescription = stripNumberedLabel(mainDescriptionRaw);
-	const findSection = (startText) => {
-		const start = lines.findIndex((l) => l.includes(startText));
-		if (start === -1) return [];
-		const out = [];
-		for (let i = start; i < lines.length; i++) {
-			const line = lines[i];
-			if (
-				i > start &&
-				(line.includes("方案：") ||
-					line.includes("策略：") ||
-					line.includes("此局"))
-			)
-				break;
-			out.push(line);
-		}
-		return out;
-	};
-	const wuxingSection = findSection("五行調和方案：");
-	const strategySection = findSection("長期配對策略：");
-	const restLines = lines.filter(
-		(l) =>
-			!l.includes("合盤分析】") &&
-			!l.includes("五行調和方案：") &&
-			!l.includes("長期配對策略：") &&
-			!wuxingSection.includes(l) &&
-			!strategySection.includes(l) &&
-			l !== mainDescriptionRaw &&
-			!isFormattingOnlyLine(l),
-	);
 
 	return (
 		<div
-			className="space-y-2"
-			style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+			style={{
+				fontFamily:
+					"Noto Serif TC, Noto Sans HK, system-ui, sans-serif",
+			}}
 		>
-			{/* Title and Pattern - same as web formatLeftTabContent */}
-			<div className="flex items-center justify-start gap-6">
-				<h1
-					className="text-[#C74772]"
-					style={{
-						fontFamily: "Noto Serif TC, serif",
-						fontSize: "15px",
-						fontWeight: 400,
-						lineHeight: 1,
-						WebkitTextStroke: "1px #B4003C",
-					}}
-				>
-					{elementPairing}
-				</h1>
-				{patternDescription && (
+			<div
+				style={{
+					display: "flex",
+					alignItems: "flex-start",
+					gap: "20px",
+					marginBottom: "16px",
+				}}
+			>
+				<div style={{ display: "flex" }}>
+					{/* First Column: 日 月 — lineHeight controls spacing between chars */}
 					<div
-						className="bg-[#C74772] text-white  rounded-full"
-						style={{ fontSize: "10px", fontWeight: 500 }}
+						style={{
+							writingMode: "vertical-rl",
+							lineHeight: VERTICAL_TITLE_LINE_HEIGHT,
+						}}
 					>
-						{patternDescription}
+						<span
+							style={{
+								fontSize: "60px",
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+								fontWeight: "bold",
+								letterSpacing: "0",
+								color: "#A47584",
+							}}
+						>
+							日
+						</span>
+						<span
+							style={{
+								fontSize: "60px",
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+								fontWeight: "bold",
+								letterSpacing: "0",
+								color: "#A47584",
+							}}
+						>
+							月
+						</span>
 					</div>
-				)}
+					{/* Second Column: 互 動 */}
+					<div
+						className="border-r-1"
+						style={{
+							writingMode: "vertical-rl",
+							lineHeight: VERTICAL_TITLE_LINE_HEIGHT,
+						}}
+					>
+						<span
+							style={{
+								fontSize: "60px",
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+								fontWeight: "bold",
+								letterSpacing: "0",
+							}}
+						>
+							互
+						</span>
+						<span
+							style={{
+								fontSize: "60px",
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+								fontWeight: "bold",
+								letterSpacing: "0",
+							}}
+						>
+							動
+						</span>
+					</div>
+				</div>
+				<div style={{ flex: 1 }}>
+					{elementPairing && (
+						<div
+							style={{
+								display: "inline-block",
+								backgroundColor: SECTION_BAR_BG,
+								color: "#fff",
+								fontSize: "15px",
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+								fontWeight: 800,
+								padding: "5px 40px",
+								marginBottom: "16px",
+							}}
+						>
+							{elementPairing}
+						</div>
+					)}
+					{mainDescription && (
+						<p
+							style={{
+								fontSize: "13px",
+								lineHeight: 1.5,
+								color: "#333",
+								textAlign: "justify",
+								margin: 0,
+							}}
+						>
+							{mainDescription}
+						</p>
+					)}
+				</div>
 			</div>
-			{/* Main Description */}
-			{mainDescription && (
-				<div
-					className="leading-relaxed text-black"
-					style={{ fontSize: "11px" }}
-				>
-					{mainDescription}
+
+			{wuxingBullets.length > 0 && (
+				<div style={{ marginBottom: "20px" }}>
+					<div
+						style={{
+							width: "25%",
+							backgroundColor: SECTION_BAR_BG,
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							color: "#fff",
+							fontSize: "17px",
+							fontWeight: 900,
+							padding: "6px",
+							marginBottom: "5px",
+							textAlign: "center",
+						}}
+					>
+						五行調和方案
+					</div>
+					<div
+						style={{
+							display: "grid",
+							gridTemplateColumns: "1fr 1fr",
+							gap: "10px 28px",
+							fontSize: "11px",
+							lineHeight: 1.65,
+							color: "#333",
+						}}
+					>
+						{wuxingBullets.map((text, idx) => {
+							const { title, content } =
+								parseBulletTitleContent(text);
+							return (
+								<div
+									key={idx}
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										gap: "6px",
+									}}
+								>
+									<div
+										style={{
+											display: "flex",
+											alignItems: "baseline",
+											gap: "6px",
+										}}
+									>
+										<span
+											style={{
+												fontSize: "20px",
+												fontWeight: 700,
+												color: NUMBER_TITLE_COLOR,
+												fontFamily:
+													"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											}}
+										>
+											{String(idx + 1).padStart(2, "0")}
+										</span>
+										{title && (
+											<span
+												style={{
+													fontSize: "20px",
+													fontWeight: 700,
+													color: NUMBER_TITLE_COLOR,
+													fontFamily:
+														"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+												}}
+											>
+												{title}
+											</span>
+										)}
+									</div>
+									<div
+										style={{
+											width: "40%",
+											height: "1px",
+											backgroundColor: "#333",
+											minWidth: "60px",
+										}}
+									/>
+									<div
+										style={{
+											color: "#444",
+											fontWeight: 400,
+											fontSize: "13px",
+										}}
+									>
+										· {content}
+									</div>
+								</div>
+							);
+						})}
+					</div>
 				</div>
 			)}
-			<div className="bg-[#EFEFEF] p-2  rounded-lg">
-				{/* 五行調和方案 - same as web, without "2. 五行調和方案：" */}
-				{wuxingSection.length > 0 && (
-					<div className="text-black">
-						{wuxingSection
-							.map((line) => stripNumberedLabel(line))
-							.filter(
-								(line) =>
-									line.trim() && !isFormattingOnlyLine(line),
-							)
-							.map((line, i) => (
-								<div
-									key={i}
-									className="mb-0"
-									style={{ fontSize: "11px" }}
-								>
-									{line}
-								</div>
-							))}
-					</div>
-				)}
-				{/* 長期配對策略 - same as web, without "3. 長期配對策略：" */}
-				{strategySection.length > 0 && (
-					<div className="text-black">
-						{strategySection
-							.map((line) => stripNumberedLabel(line))
-							.filter(
-								(line) =>
-									line.trim() && !isFormattingOnlyLine(line),
-							)
-							.map((line, i) => (
-								<div
-									key={i}
-									className="mb-0"
-									style={{ fontSize: "11px" }}
-								>
-									{line}
-								</div>
-							))}
-					</div>
-				)}
-				{/* 最後段落 - without "4. 最後段落：" */}
-				{restLines.filter((l) => !isFormattingOnlyLine(l)).length >
-					0 && (
+
+			{strategyBullets.length > 0 && (
+				<div style={{ marginBottom: "20px" }}>
 					<div
-						className="leading-relaxed text-black mt-2"
-						style={{ fontSize: "11px" }}
+						style={{
+							width: "25%",
+							backgroundColor: SECTION_BAR_BG,
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							color: "#fff",
+							fontSize: "17px",
+							fontWeight: 900,
+							padding: "6px",
+							marginBottom: "5px",
+							textAlign: "center",
+						}}
 					>
-						{restLines
-							.filter((l) => !isFormattingOnlyLine(l))
-							.map((line, i) => (
-								<p key={i} className="mb-1">
-									{stripNumberedLabel(line)}
-								</p>
-							))}
+						長期配對策略
 					</div>
-				)}
-			</div>
+					<div
+						style={{
+							display: "grid",
+							gridTemplateColumns: "1fr 1fr",
+							gap: "10px 28px",
+							fontSize: "11px",
+							lineHeight: 1.65,
+							color: "#333",
+						}}
+					>
+						{strategyBullets.map((text, idx) => {
+							const { title, content } =
+								parseBulletTitleContent(text);
+							return (
+								<div
+									key={idx}
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										gap: "6px",
+									}}
+								>
+									<div
+										style={{
+											display: "flex",
+											alignItems: "baseline",
+											gap: "6px",
+										}}
+									>
+										<span
+											style={{
+												fontSize: "20px",
+												fontWeight: 700,
+												color: NUMBER_TITLE_COLOR,
+												fontFamily:
+													"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											}}
+										>
+											{String(idx + 1).padStart(2, "0")}
+										</span>
+										{title && (
+											<span
+												style={{
+													fontSize: "20px",
+													fontWeight: 700,
+													color: NUMBER_TITLE_COLOR,
+													fontFamily:
+														"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+												}}
+											>
+												{title}
+											</span>
+										)}
+									</div>
+									<div
+										style={{
+											width: "40%",
+											height: "1px",
+											backgroundColor: "#333",
+											minWidth: "60px",
+										}}
+									/>
+									<div
+										style={{
+											color: "#444",
+											fontWeight: 400,
+											fontSize: "13px",
+										}}
+									>
+										· {content}
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+			)}
+
+			{summaryParagraph && (
+				<div
+					style={{
+						marginTop: "24px",
+						borderRadius: "16px",
+						border: "1px solid",
+						padding: "24px 22px",
+						display: "flex",
+						gap: "12px",
+						alignItems: "flex-start",
+					}}
+				>
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+							gap: "12px",
+						}}
+					>
+						<span
+							style={{
+								writingMode: "vertical-rl",
+								textOrientation: "upright",
+								fontSize: "50px",
+								fontWeight: 700,
+								lineHeight: 1,
+								color: "#A47584",
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							}}
+						>
+							總結
+						</span>
+					</div>
+					<div style={{ flex: 1, minWidth: 0 }}>
+						<p
+							style={{
+								fontSize: "13px",
+								lineHeight: 1.8,
+								color: "#333",
+								textAlign: "justify",
+								margin: 0,
+							}}
+						>
+							{summaryParagraph}
+						</p>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
+
+const pageStyle = {
+	width: "210mm",
+	minHeight: "297mm",
+	padding: "14mm 18mm",
+	boxSizing: "border-box",
+	overflow: "hidden",
+};
 
 export default function CouplePrintMingJuLeftMiddle({
 	leftContent,
@@ -347,49 +714,27 @@ export default function CouplePrintMingJuLeftMiddle({
 	if (!hasLeft && !hasMiddle) return null;
 
 	return (
-		<div
-			className="mx-auto bg-white page-break"
-			style={{
-				width: "210mm",
-				minHeight: "297mm",
-				padding: "14mm 18mm",
-				boxSizing: "border-box",
-				overflow: "hidden",
-			}}
-		>
-			{/* Card container */}
-			<div
-				style={{
-					width: "100%",
-
-					boxSizing: "border-box",
-				}}
-			>
-				{/* Topic headings only (no tabs) */}
-				{hasLeft && (
-					<>
-						<h3
-							className="font-bold text-[#B4003C] mb-1"
+		<>
+			{/* Page 1: Left — 日月互動 */}
+			{hasLeft && (
+				<div className="mx-auto bg-white page-break" style={pageStyle}>
+					<div style={{ width: "100%", boxSizing: "border-box" }}>
+						<div
 							style={{
-								fontSize: "16px",
-								fontFamily: "Noto Sans HK, sans-serif",
+								backgroundColor: "white",
+								color: "black",
 							}}
 						>
-							日月互動
-						</h3>
-						<div
-							className="mb-2"
-							style={{ backgroundColor: "white", color: "black" }}
-						>
-							<div className="py-2">
-								{formatLeftContent(leftContent)}
-							</div>
+							{formatLeftContent(leftContent)}
 						</div>
-					</>
-				)}
+					</div>
+				</div>
+			)}
 
-				{hasMiddle && (
-					<>
+			{/* Page 2: Middle — 夫妻宮寅未暗合 */}
+			{hasMiddle && (
+				<div className="mx-auto bg-white page-break" style={pageStyle}>
+					<div style={{ width: "100%", boxSizing: "border-box" }}>
 						<h3
 							className="font-bold text-[#B4003C] mb-1"
 							style={{
@@ -418,9 +763,9 @@ export default function CouplePrintMingJuLeftMiddle({
 								</div>
 							)}
 						</div>
-					</>
-				)}
-			</div>
-		</div>
+					</div>
+				</div>
+			)}
+		</>
 	);
 }

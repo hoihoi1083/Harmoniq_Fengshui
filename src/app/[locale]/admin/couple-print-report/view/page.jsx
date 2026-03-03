@@ -18,10 +18,12 @@ import { getConcernColor } from "@/utils/colorTheme";
 const COUPLE_COLOR = "#D94075";
 
 // Web-style left-tab prompt so API returns 【日干合盤分析】+ 五行調和方案 + 長期配對策略 (same as CoupleMingJu)
-function getLeftMingJuPrompt(question, currentYear, isSimplified) {
+// dayMaster1/dayMaster2 e.g. 己土、丁火 — use so 日月互動 matches page 1 (土命/火命)
+function getLeftMingJuPrompt(question, currentYear, isSimplified, dayMaster1, dayMaster2) {
+	const dayPair = dayMaster1 && dayMaster2 ? (isSimplified ? `【日主】男方：${dayMaster1}，女方：${dayMaster2}。标题和第一段必须使用此配對，例如【${dayMaster1}${dayMaster2}合盘分析】及「${dayMaster1}配${dayMaster2}」。` : `【日主】男方：${dayMaster1}，女方：${dayMaster2}。標題和第一段必須使用此配對，例如【${dayMaster1}${dayMaster2}合盤分析】及「${dayMaster1}配${dayMaster2}」。`) : "";
 	const base = isSimplified
-		? `夫妻合盘分析：关注领域：感情，具体问题：${question}，分析年份：${currentYear}。【重要指示】你是专业的八字合盘命理大师，必须提供具体、准确、有说服力的夫妻合盘分析。避免模糊用词，要给出明确的判断和建议。请使用简体中文回应。`
-		: `夫妻合盤分析：關注領域：感情，具體問題：${question}，分析年份：${currentYear}。【重要指示】你是專業的八字合盤命理大師，必須提供具體、準確、有說服力的夫妻合盤分析。避免模糊用詞，要給出明確的判斷和建議。請使用繁體中文回應。`;
+		? `夫妻合盘分析：关注领域：感情，具体问题：${question}，分析年份：${currentYear}。${dayPair}【重要指示】你是专业的八字合盘命理大师，必须提供具体、准确、有说服力的夫妻合盘分析。避免模糊用词，要给出明确的判断和建议。请使用简体中文回应。`
+		: `夫妻合盤分析：關注領域：感情，具體問題：${question}，分析年份：${currentYear}。${dayPair}【重要指示】你是專業的八字合盤命理大師，必須提供具體、準確、有說服力的夫妻合盤分析。避免模糊用詞，要給出明確的判斷和建議。請使用繁體中文回應。`;
 	const format = isSimplified
 		? `
 
@@ -237,7 +239,13 @@ function CouplePrintReportView() {
 							problem: question,
 							currentYear,
 							analysisType: "left",
-							prompt: getLeftMingJuPrompt(question, currentYear, isSimplified),
+							prompt: getLeftMingJuPrompt(
+								question,
+								currentYear,
+								isSimplified,
+								wuxing1?.dayStem && wuxing1?.dayStemWuxing ? wuxing1.dayStem + wuxing1.dayStemWuxing : null,
+								wuxing2?.dayStem && wuxing2?.dayStemWuxing ? wuxing2.dayStem + wuxing2.dayStemWuxing : null,
+							),
 							isSimplified,
 						}),
 					}).then((r) => r.json()),
