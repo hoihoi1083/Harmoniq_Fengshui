@@ -35,7 +35,6 @@ export default function CouplePrintCoverPage({
 }) {
 	const now = new Date();
 	const year = now.getFullYear();
-	const nextYear = year + 1;
 
 	// Female = left pink box, Male = right blue box. 壬水/丁火 = dayStem + dayStemWuxing
 	const femaleWuxing = gender1 === "female" ? wuxing1 : wuxing2;
@@ -65,17 +64,56 @@ export default function CouplePrintCoverPage({
 
 	const compat = compatibility || { score: 78, level: "良緣" };
 	const balance = elementInteraction?.balance || "五行相生，關係和諧平衡";
-	const nextYearStrategy =
-		annualStrategy && annualStrategy[nextYear]
-			? annualStrategy[nextYear]
+	// Use current year (e.g. 2026), not next year, for the recommendation
+	const currentYearStrategy =
+		annualStrategy && annualStrategy[year]
+			? annualStrategy[year]
 			: null;
-	const yearLabel = `${nextYear}丙午年`;
-	const fullYearlyText =
-		nextYearStrategy?.description || nextYearStrategy?.monthlyFocus || "";
+	const yearLabel = `${year}年`;
+	const rawDescription =
+		currentYearStrategy?.description || currentYearStrategy?.monthlyFocus || "";
+	// Prefer showing the full "整體趨勢" paragraph; API structure is:
+	// [ "1. YYYY年感情運勢分析" ] 整體趨勢：...。 [ - YYYY年N月（農曆...）：... ] [ 重點月份 / 具體建議 ... ]
+	const trendLabel = "整體趨勢：";
+	const trendStart = rawDescription.indexOf(trendLabel);
+	const trendOnly =
+		trendStart >= 0
+			? (() => {
+					const afterLabel = rawDescription.slice(trendStart + trendLabel.length);
+					// End at next section: " - 2026年N月" style, or "重點月份", "具體建議", etc.
+					// Match " - 2026年8月" style bullets, not "2026丙午年" in the first sentence
+					const bulletMatch = /\s-\s*\d{4}年\d?月/.exec(afterLabel);
+					const candidates = [
+						bulletMatch?.index,
+						afterLabel.indexOf("重點月份"),
+						afterLabel.indexOf("具體建議"),
+						afterLabel.indexOf("具體的"),
+						afterLabel.indexOf("需要注意"),
+					].filter((i) => typeof i === "number" && i >= 0);
+					const end =
+						candidates.length > 0 ? Math.min(...candidates) : afterLabel.length;
+					return (trendLabel + afterLabel.slice(0, end)).trim();
+				})()
+			: null;
+	const fullYearlyText = trendOnly !== null ? trendOnly : rawDescription;
+	const maxLen = 220;
 	const yearlyText =
-		fullYearlyText.length > 220
-			? fullYearlyText.slice(0, 220).trim() + "…"
-			: fullYearlyText;
+		fullYearlyText.length <= maxLen
+			? fullYearlyText
+			: (() => {
+					const slice = fullYearlyText.slice(0, maxLen + 1);
+					const lastSentenceEnd = Math.max(
+						slice.lastIndexOf("。"),
+						slice.lastIndexOf("！"),
+						slice.lastIndexOf("？"),
+						slice.lastIndexOf("；"),
+					);
+					const cut =
+						lastSentenceEnd >= 0 && lastSentenceEnd > maxLen * 0.5
+							? lastSentenceEnd + 1
+							: maxLen;
+					return fullYearlyText.slice(0, cut).trim() + "…";
+				})();
 	const showCompatibilityBlock =
 		compatibility != null && compat?.score != null;
 	const femaleElColor = ELEMENT_COLOR[femaleEl] || "#374151";
