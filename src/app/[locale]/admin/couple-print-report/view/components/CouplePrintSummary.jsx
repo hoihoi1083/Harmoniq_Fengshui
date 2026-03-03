@@ -26,12 +26,15 @@ export default function CouplePrintSummary({ data }) {
 			className="page-break relative bg-white h-[297mm] overflow-hidden flex flex-col"
 			style={{ padding: "15mm 20mm" }}
 		>
-			{/* Date - Top Right */}
+			{/* Date - Top Right (same as CouplePrintSeason) */}
 			<div
 				style={{
-					fontSize: "20px",
-					color: "#666",
 					fontFamily: "Noto Serif TC, serif",
+					fontStyle: "extrabold",
+					fontWeight: 400,
+					fontSize: "20px",
+					lineHeight: "14px",
+					color: "#424242",
 					textAlign: "right",
 				}}
 			>
@@ -162,24 +165,14 @@ export default function CouplePrintSummary({ data }) {
 				</p>
 			</div>
 
-			{/* Footer */}
+			{/* Footer — same as CouplePrintSeason */}
 			<div
 				style={{
 					position: "absolute",
 					bottom: "15mm",
 					left: "20mm",
-					right: "20mm",
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "space-between",
 				}}
 			>
-				<p
-					className="text-sm text-gray-500"
-					style={{ fontFamily: "Noto Serif TC, serif" }}
-				>
-					💑 願你們的感情在 {currentYear} 年更加美滿幸福
-				</p>
 				<Image
 					src="/images/report/bottom.png"
 					alt=""

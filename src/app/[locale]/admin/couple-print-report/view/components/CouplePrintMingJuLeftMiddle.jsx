@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 /**
  * Print page: 命局分析（一）— left (日月互動) + middle (夫妻宮寅未暗合) combined.
  * Topics as section headings (words only, no tabs). Content same format as web.
@@ -913,6 +915,18 @@ const pageStyle = {
 	padding: "14mm 18mm",
 	boxSizing: "border-box",
 	overflow: "hidden",
+	position: "relative",
+};
+
+/** Top date + footer — same as CouplePrintSeason (Page7_Seasons) */
+const dateStyle = {
+	fontFamily: "Noto Serif TC, serif",
+	fontStyle: "extrabold",
+	fontWeight: 400,
+	fontSize: "20px",
+	lineHeight: "14px",
+	color: "#424242",
+	textAlign: "right",
 };
 
 export default function CouplePrintMingJuLeftMiddle({
@@ -934,6 +948,18 @@ export default function CouplePrintMingJuLeftMiddle({
 			{/* Page 1: Left — 日月互動 */}
 			{hasLeft && (
 				<div className="mx-auto bg-white page-break" style={pageStyle}>
+					<div
+						style={{
+							position: "absolute",
+							right: "18mm",
+							top: "8mm",
+							...dateStyle,
+						}}
+					>
+						{new Date()
+							.toLocaleDateString("zh-TW")
+							.replace(/\//g, "/")}
+					</div>
 					<div style={{ width: "100%", boxSizing: "border-box" }}>
 						<div
 							style={{
@@ -944,13 +970,35 @@ export default function CouplePrintMingJuLeftMiddle({
 							{formatLeftContent(leftContent)}
 						</div>
 					</div>
+					<div
+						style={{
+							position: "absolute",
+							bottom: "15mm",
+							left: "20mm",
+						}}
+					>
+						<Image
+							src="/images/report/bottom.png"
+							alt=""
+							width={30}
+							height={10}
+							style={{ objectFit: "contain" }}
+						/>
+					</div>
 				</div>
 			)}
 
 			{/* Page 2: Middle — 夫妻宮寅未暗合 */}
 			{hasMiddle && (
 				<div className="mx-auto bg-white page-break" style={pageStyle}>
-					<div style={{ width: "100%", boxSizing: "border-box" }}>
+					<div
+						style={{
+							display: "flex",
+							alignItems: "flex-start",
+							justifyContent: "space-between",
+							marginBottom: "12px",
+						}}
+					>
 						<h3
 							className="font-bold text-[#A47584] mb-1"
 							style={{
@@ -963,6 +1011,13 @@ export default function CouplePrintMingJuLeftMiddle({
 						>
 							夫妻宮寅未暗合
 						</h3>
+						<div style={dateStyle}>
+							{new Date()
+								.toLocaleDateString("zh-TW")
+								.replace(/\//g, "/")}
+						</div>
+					</div>
+					<div style={{ width: "100%", boxSizing: "border-box" }}>
 						<div
 							style={{
 								fontFamily:
@@ -982,6 +1037,21 @@ export default function CouplePrintMingJuLeftMiddle({
 								</div>
 							)}
 						</div>
+					</div>
+					<div
+						style={{
+							position: "absolute",
+							bottom: "15mm",
+							left: "20mm",
+						}}
+					>
+						<Image
+							src="/images/report/bottom.png"
+							alt=""
+							width={30}
+							height={10}
+							style={{ objectFit: "contain" }}
+						/>
 					</div>
 				</div>
 			)}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ELEMENT_DESC as ELEMENT_DESC_MAP } from "../utils/individualAnalysisPrint";
 import CouplePrintIndividualSection from "./CouplePrintIndividualSection";
 
@@ -138,12 +139,33 @@ export default function CouplePrintPage1({
 						right: 0,
 						top: 0,
 						fontFamily: "Noto Serif TC, serif",
-						fontSize: "16px",
+						fontStyle: "extrabold",
+						fontWeight: 400,
+						fontSize: "20px",
+						lineHeight: "14px",
 						color: "#424242",
+						textAlign: "right",
 					}}
 				>
 					{dateStr}
 				</div>
+			</div>
+
+			{/* Footer — same as CouplePrintSeason */}
+			<div
+				style={{
+					position: "absolute",
+					bottom: "15mm",
+					left: "20mm",
+				}}
+			>
+				<Image
+					src="/images/report/bottom.png"
+					alt=""
+					width={30}
+					height={10}
+					style={{ objectFit: "contain" }}
+				/>
 			</div>
 
 			{/* 男方 / 女方: fortune-print style blocks (gray container, 姓名/生辰, 4-pillar Bazi, quote paragraph) */}

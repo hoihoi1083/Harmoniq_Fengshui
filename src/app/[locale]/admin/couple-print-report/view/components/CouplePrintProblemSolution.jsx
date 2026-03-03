@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 /**
  * Print: 專屬問題解決方案 — same content & layout as web when 問題類型：感情降溫類.
  * With subsections: 盤面診斷 (女方/男方 + 關鍵合盤徵象), 風水急救 (72小時內行動方案), 重啟默契 (破冰儀式建議).
@@ -73,22 +75,45 @@ export default function CouplePrintProblemSolution({ data, subsections }) {
 		padding: "12mm 18mm",
 		boxSizing: "border-box",
 		backgroundColor: "#fff",
+		position: "relative",
 	};
 
 	return (
 		<div className="mx-auto bg-white page-break" style={pageStyle}>
-			<h2
+			<div
 				style={{
-					fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-					fontWeight: 900,
-					fontSize: "24px",
-					letterSpacing: "0.15em",
-					color: COUPLE_COLOR,
+					display: "flex",
+					alignItems: "flex-start",
+					justifyContent: "space-between",
 					marginBottom: "10px",
 				}}
 			>
-				專屬問題解決方案
-			</h2>
+				<h2
+					style={{
+						fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontWeight: 900,
+						fontSize: "24px",
+						letterSpacing: "0.15em",
+						color: COUPLE_COLOR,
+						margin: 0,
+					}}
+				>
+					專屬問題解決方案
+				</h2>
+				<div
+					style={{
+						fontFamily: "Noto Serif TC, serif",
+						fontStyle: "extrabold",
+						fontWeight: 400,
+						fontSize: "20px",
+						lineHeight: "14px",
+						color: "#424242",
+						textAlign: "right",
+					}}
+				>
+					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+				</div>
+			</div>
 
 			{question && (
 				<div
@@ -236,6 +261,23 @@ export default function CouplePrintProblemSolution({ data, subsections }) {
 					)}
 				</>
 			)}
+
+			{/* Footer — same as CouplePrintSeason */}
+			<div
+				style={{
+					position: "absolute",
+					bottom: "15mm",
+					left: "20mm",
+				}}
+			>
+				<Image
+					src="/images/report/bottom.png"
+					alt=""
+					width={30}
+					height={10}
+					style={{ objectFit: "contain" }}
+				/>
+			</div>
 		</div>
 	);
 }

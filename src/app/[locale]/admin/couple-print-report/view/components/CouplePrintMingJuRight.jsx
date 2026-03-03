@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 /**
  * Print page: 命局分析（二）— 五行氣機修補.
  * Three sections: 01 調侯核心 (two subtopics), 02 日常調和 (建議1-3 + 時機1-2), 03 長期策略 (two columns).
@@ -393,20 +395,45 @@ export default function CouplePrintMingJuRight({ rightContent }) {
 				padding: PAGE_PADDING,
 				boxSizing: "border-box",
 				overflow: "hidden",
+				position: "relative",
 			}}
 		>
-			<h3
-				className="font-bold text-[#A47584] mb-1"
+			<div
 				style={{
-					fontSize: "35px",
-					letterSpacing: "0.20em",
-					fontFamily:
-						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-					fontWeight: 700,
+					display: "flex",
+					alignItems: "flex-start",
+					justifyContent: "space-between",
+					marginBottom: "12px",
 				}}
 			>
-				五行氣機修補
-			</h3>
+				<h3
+					className="font-bold text-[#A47584] mb-1"
+					style={{
+						fontSize: "35px",
+						letterSpacing: "0.20em",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontWeight: 700,
+					}}
+				>
+					五行氣機修補
+				</h3>
+				<div
+					style={{
+						fontFamily: "Noto Serif TC, serif",
+						fontStyle: "extrabold",
+						fontWeight: 400,
+						fontSize: "20px",
+						lineHeight: "14px",
+						color: "#424242",
+						textAlign: "right",
+					}}
+				>
+					{new Date()
+						.toLocaleDateString("zh-TW")
+						.replace(/\//g, "/")}
+				</div>
+			</div>
 
 			{hasStructured ? (
 				<div
@@ -605,6 +632,23 @@ export default function CouplePrintMingJuRight({ rightContent }) {
 						: String(rightContent)}
 				</div>
 			)}
+
+			{/* Footer — same as CouplePrintSeason */}
+			<div
+				style={{
+					position: "absolute",
+					bottom: "15mm",
+					left: "20mm",
+				}}
+			>
+				<Image
+					src="/images/report/bottom.png"
+					alt=""
+					width={30}
+					height={10}
+					style={{ objectFit: "contain" }}
+				/>
+			</div>
 		</div>
 	);
 }

@@ -607,6 +607,10 @@ function CouplePrintReportView() {
 				<CouplePrintCoreSuggestion data={coreSuggestionParsedData} />
 			)}
 
+			{problemSolutionData && (
+				<CouplePrintProblemSolution data={problemSolutionData} subsections={problemSubsections} />
+			)}
+
 			{overallSummaryData && (
 				<CouplePrintSummary
 					data={{
@@ -615,10 +619,6 @@ function CouplePrintReportView() {
 						color,
 					}}
 				/>
-			)}
-
-			{problemSolutionData && (
-				<CouplePrintProblemSolution data={problemSolutionData} subsections={problemSubsections} />
 			)}
 
 			<style jsx global>{`

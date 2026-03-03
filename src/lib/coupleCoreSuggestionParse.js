@@ -196,19 +196,44 @@ function extractActionAdvice(content, gender) {
 }
 
 function extractAccessories(content, gender) {
+	// Use section boundaries so we don't truncate at "女方" or "共同" inside the 開運物 text
+	const endMarkers = "女方提升建議|共同能量|場合色彩|每週儀式|\\*\\*女方|\\*\\*共同|\\*\\*\\s|\\n\\s*\\n(?=\\s*(?:女方|共同))";
 	const patterns = [
-		`\\*\\*${gender}提升建議[：]*\\*\\*[\\s\\S]*?開運物[：]*([\\s\\S]*?)(?=\\*\\*女方|\\*\\*共同|\\*\\*|$)`,
-		`${gender}提升建議[\\s\\S]*?開運物[：]*([\\s\\S]*?)(?=${gender === "男方" ? "女方" : "共同"}|$)`,
+		`\\*\\*${gender}提升建議[：:]*\\*\\*[\\s\\S]*?開運物[：:]*([\\s\\S]*?)(?=${endMarkers}|$)`,
+		`${gender}提升建議[\\s\\S]*?開運物[：:]*([\\s\\S]*?)(?=${endMarkers}|$)`,
 	];
 	for (const pattern of patterns) {
 		const regex = new RegExp(pattern, "i");
 		const match = content.match(regex);
 		if (match && match[1]) {
-			const accessoryText = cleanContent(match[1].trim().replace(/^\s*：\s*/, ""));
+			const accessoryText = cleanContent(match[1].trim().replace(/^\s*[：:]\s*/, ""));
+			if (!accessoryText || accessoryText.length < 2) continue;
 			const accessories = accessoryText
-				.split(/[、，,]/)
+				.split(/[、，,；;]/)
 				.map((item) => cleanContent(item.trim()))
-				.filter((item) => item.length > 0 && !item.includes("女方") && !item.includes("共同") && !item.includes("建議"));
+				.filter((item) => item.length > 0 && !/^女方提升建議|^共同能量/.test(item) && !item.includes("建議）"));
+			return accessories.length > 0 ? accessories : [accessoryText];
+		}
+	}
+	// Fallback: isolate gender block then look for 開運物[：:]\s*... (use section boundaries, not bare 女方/共同)
+	let block = content;
+	if (gender === "男方") {
+		const idx = content.search(/女方提升建議|共同能量|場合色彩/);
+		if (idx >= 0) block = content.slice(0, idx);
+	} else {
+		const start = content.search(/女方提升建議/);
+		if (start >= 0) block = content.slice(start);
+		const idx = block.search(/共同能量|場合色彩|每週儀式/);
+		if (idx >= 0) block = block.slice(0, idx);
+	}
+	const fallback = block.match(/開運物[：:]\s*([\s\S]*?)(?=\n\s*\n\s*(?:女方提升|共同能量|場合|每週)|女方提升建議|共同能量|場合色彩|$)/);
+	if (fallback && fallback[1]) {
+		const accessoryText = cleanContent(fallback[1].trim());
+		if (accessoryText.length > 1) {
+			const accessories = accessoryText
+				.split(/[、，,；;\n]/)
+				.map((item) => cleanContent(item.trim()))
+				.filter((item) => item.length > 0 && !item.includes("女方提升") && !item.includes("共同能量"));
 			return accessories.length > 0 ? accessories : [accessoryText];
 		}
 	}
@@ -249,14 +274,16 @@ function extractSituationTable(content) {
 			const situationMatch = tableContent.match(situationPattern);
 			if (situationMatch && situationMatch[1]) {
 				const situationText = cleanContent(situationMatch[1].trim());
-				const maleMatch = situationText.match(/[-–]*\s*男方[：]*([^\n]*)/);
-				const femaleMatch = situationText.match(/[-–]*\s*女方[：]*([^\n]*)/);
-				const energyMatch = situationText.match(/[-–]*\s*能量作用[：]*([^\n]*)/);
+				const maleMatch = situationText.match(/[-–]*\s*男方(?:主色)?[：:]*([^\n]*)/);
+				const femaleMatch = situationText.match(/[-–]*\s*女方(?:主色)?[：:]*([^\n]*)/);
+				const energyMatch = situationText.match(/[-–]*\s*能量作用[：:]*([^\n]*)/);
+				const strategyMatch = situationText.match(/[-–]*\s*溝通策略[：:]*([^\n]*)/);
 				if (maleMatch && femaleMatch) {
+					const strategy = energyMatch?.[1]?.trim() || strategyMatch?.[1]?.trim();
 					situations.push({
 						title: situationName,
 						colors: { male: [cleanContent(maleMatch[1].trim())], female: [cleanContent(femaleMatch[1].trim())] },
-						energyFunction: energyMatch ? cleanContent(energyMatch[1].trim()) : "五行調和",
+						energyFunction: strategy ? cleanContent(strategy) : "五行調和",
 					});
 				}
 			}
@@ -331,7 +358,7 @@ function parseRelationshipTaboosContent(content) {
 				continue;
 			}
 			if (currentSection) {
-				if (["女方忌用", "男方忌用", "春季", "夏季", "戊月", "約會避開", "同房禁忌"].includes(line)) {
+				if (["女方忌用", "男方忌用", "春季", "夏季", "戊月", "戌月", "約會避開", "同房禁忌"].includes(line)) {
 					if (currentSubsection && collectingContent.trim()) {
 						currentSubsection.content = collectingContent.trim();
 						collectingContent = "";
