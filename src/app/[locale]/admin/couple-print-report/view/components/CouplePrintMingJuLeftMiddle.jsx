@@ -27,151 +27,356 @@ function parseBulletTitleContent(text) {
 	return { title: "", content: text.replace(/\*\*/g, "").trim() };
 }
 
+/** Extract the first complete {...} object by counting braces (handles } inside strings). */
+function extractJsonObject(str) {
+	const start = str.indexOf("{");
+	if (start < 0) return null;
+	let depth = 0;
+	let inString = false;
+	let escape = false;
+	let quote = null;
+	for (let i = start; i < str.length; i++) {
+		const c = str[i];
+		if (escape) {
+			escape = false;
+			continue;
+		}
+		if (c === "\\" && inString) {
+			escape = true;
+			continue;
+		}
+		if (!inString) {
+			if (c === '"' || c === "'") {
+				inString = true;
+				quote = c;
+				continue;
+			}
+			if (c === "{") depth++;
+			else if (c === "}") {
+				depth--;
+				if (depth === 0) return str.slice(start, i + 1);
+			}
+			continue;
+		}
+		if (c === quote) inString = false;
+	}
+	return null;
+}
+
 function parseJsonContent(content) {
-	if (!content || typeof content !== "string") return null;
-	let clean = content.trim();
+	if (content == null) return null;
+	// Already parsed object (e.g. from API)
+	if (typeof content === "object" && !Array.isArray(content)) return content;
+	if (typeof content !== "string") return null;
+
+	let clean = content
+		.trim()
+		.replace(/\uFEFF/g, "")
+		.replace(/\r\n/g, "\n");
+	// Strip markdown code fence
 	if (clean.startsWith("```json"))
 		clean = clean.replace(/^```json\s*/, "").replace(/\s*```$/, "");
 	else if (clean.startsWith("```"))
 		clean = clean.replace(/^```\s*/, "").replace(/\s*```$/, "");
-	const match = clean.match(/\{[\s\S]*\}/);
-	if (match) clean = match[0];
+	// Strip leading title line e.g. "夫妻宮寅未暗合" so we start at {
+	const firstBrace = clean.indexOf("{");
+	if (firstBrace > 0) clean = clean.slice(firstBrace);
+	const jsonStr = extractJsonObject(clean);
+	if (!jsonStr) return null;
+	// Fix common invalid JSON: trailing commas before ] or }
+	const toParse = jsonStr.replace(/,(\s*[}\]])/g, "$1");
 	try {
-		return JSON.parse(clean);
+		return JSON.parse(toParse);
 	} catch {
 		return null;
 	}
 }
 
+const MIDDLE_ACCENT = "#A47584";
+const MIDDLE_BODY_SIZE = "12px";
+const MIDDLE_TITLE_NUM_SIZE = "25px";
+const MIDDLE_TITLE_TEXT_SIZE = "18px";
+
+/** Map simplified Chinese JSON keys to traditional for display */
+const MIDDLE_SECTION_DISPLAY_NAMES = {
+	合盘核心: "合盤核心",
+	夫妻互动关键: "夫妻互動關鍵",
+};
+
 function renderStructuredSections(data) {
 	if (!data || typeof data !== "object") return null;
+
+	const entries = Object.entries(data);
+	const sectionNum = (i) => String(i + 1).padStart(2, "0");
+	const sectionDisplayName = (key) =>
+		MIDDLE_SECTION_DISPLAY_NAMES[key] || key;
+
+	const SectionHeader = ({ num, title }) => (
+		<div
+			style={{
+				display: "flex",
+				alignItems: "baseline",
+				gap: "8px",
+				marginBottom: "px",
+			}}
+		>
+			<span
+				style={{
+					fontSize: MIDDLE_TITLE_NUM_SIZE,
+					fontWeight: 700,
+					color: "red",
+					fontFamily:
+						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+				}}
+			>
+				{num}
+			</span>
+			<span
+				style={{
+					fontSize: MIDDLE_TITLE_TEXT_SIZE,
+					fontWeight: 700,
+					color: "black",
+					fontFamily:
+						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+				}}
+			>
+				{title}
+			</span>
+		</div>
+	);
+
+	const SubBlock = ({ label, children }) => (
+		<div style={{ marginBottom: "5px" }}>
+			<div
+				style={{
+					backgroundColor: MIDDLE_ACCENT,
+					color: "#fff",
+					fontSize: "15px",
+					fontWeight: 700,
+					padding: "8px 10px",
+					marginBottom: "8px",
+					textAlign: "center",
+					fontFamily: "Noto Sans HK, sans-serif",
+				}}
+			>
+				{label}
+			</div>
+			<p
+				style={{
+					fontSize: MIDDLE_BODY_SIZE,
+					lineHeight: 1.7,
+					color: "#333",
+					margin: 0,
+				}}
+			>
+				{children}
+			</p>
+		</div>
+	);
+
 	return (
-		<div className="space-y-2" style={{ marginTop: "12px" }}>
-			{Object.entries(data).map(([section, sectionData], index) => (
-				<div key={index}>
-					<h3
-						className="font-bold text-[#B4003C] mb-1"
-						style={{
-							fontSize: "13px",
-							fontFamily: "Noto Sans HK, sans-serif",
-						}}
-					>
-						{section}
-					</h3>
+		<div style={{ marginTop: "5px" }}>
+			{entries.map(([section, sectionData], index) => (
+				<div key={index} style={{ marginBottom: "5px" }}>
+					<SectionHeader
+						num={sectionNum(index)}
+						title={sectionDisplayName(section)}
+					/>
+
+					{/* 合盤核心: 主要内容 + 状态列表 + 结论 box */}
 					{sectionData.主要内容 && (
-						<div className="mb-1">
-							<p
-								className="leading-relaxed text-gray-800"
-								style={{ fontSize: "11px" }}
-							>
-								{sectionData.主要内容}
-							</p>
-						</div>
+						<p
+							style={{
+								fontSize: MIDDLE_BODY_SIZE,
+								lineHeight: 1.7,
+								color: "#333",
+								marginBottom: "10px",
+							}}
+						>
+							{sectionData.主要内容}
+						</p>
 					)}
 					{sectionData.主要分析 && (
-						<div className="mb-1">
-							<p
-								className="leading-relaxed text-gray-800"
-								style={{ fontSize: "11px" }}
+						<p
+							style={{
+								fontSize: MIDDLE_BODY_SIZE,
+								lineHeight: 1.7,
+								color: "#333",
+								marginBottom: "5px",
+							}}
+						>
+							{sectionData.主要分析}
+						</p>
+					)}
+					{sectionData.状态列表 &&
+						sectionData.状态列表.length > 0 && (
+							<ul
+								style={{
+									margin: "0 0 12px 0",
+									paddingLeft: "20px",
+									fontSize: MIDDLE_BODY_SIZE,
+									lineHeight: 1.7,
+									color: "#333",
+								}}
 							>
-								{sectionData.主要分析}
-							</p>
-						</div>
-					)}
-					{sectionData.状态列表 && (
-						<ul className=" mb-2 pl-4">
-							{sectionData.状态列表.map((item, idx) => (
-								<li key={idx} className="flex items-start">
-									<span
-										className="text-[#C74772] mr-2"
-										style={{ fontSize: "11px" }}
+								{sectionData.状态列表.map((item, idx) => (
+									<li
+										key={idx}
+										style={{ marginBottom: "4px" }}
 									>
-										•
-									</span>
-									<span
-										className="text-gray-700"
-										style={{ fontSize: "11px" }}
-									>
-										{item}
-									</span>
-								</li>
-							))}
-						</ul>
-					)}
-					{sectionData.关键问题 && (
-						<div className="mb-1">
-							<h4
-								className="font-semibold text-gray-800 mb-1"
-								style={{ fontSize: "13px" }}
-							>
-								關鍵問題：
-							</h4>
-							{Object.entries(sectionData.关键问题).map(
-								([key, problem], idx) => (
-									<div key={idx} className="mb-1 ml-3">
-										<p
-											className="font-medium text-[#4B6EB2]"
-											style={{ fontSize: "11px" }}
-										>
-											{problem.名称}
-										</p>
-										<p
-											className="text-gray-600"
-											style={{ fontSize: "11px" }}
-										>
-											{problem.解释}
-										</p>
-									</div>
-								),
-							)}
-						</div>
-					)}
-					{sectionData.互动列表 && (
-						<div className="mb-1">
-							<h4
-								className="font-semibold text-gray-800 mb-1"
-								style={{ fontSize: "13px" }}
-							>
-								互動分析：
-							</h4>
-							{sectionData.互动列表.map((item, idx) => (
-								<div key={idx} className="mb-1 ml-4">
-									<p
-										className="font-medium text-[#4B6EB2]"
-										style={{ fontSize: "11px" }}
-									>
-										{item.方面}
-									</p>
-									<p
-										className="text-gray-600"
-										style={{ fontSize: "11px" }}
-									>
-										{item.特點}
-									</p>
-								</div>
-							))}
-						</div>
-					)}
+										· {item}
+									</li>
+								))}
+							</ul>
+						)}
 					{sectionData.结论 && (
-						<div className=" bg-white rounded border-l-4 border-[#B4003C]">
+						<div
+							style={{
+								border: "1px solid",
+								borderRadius: "8px",
+								padding: "12px 14px",
+								marginTop: "8px",
+							}}
+						>
 							<p
-								className="font-medium text-gray-800"
-								style={{ fontSize: "11px" }}
+								style={{
+									fontSize: MIDDLE_BODY_SIZE,
+									fontWeight: 700,
+									lineHeight: 1.7,
+									color: "#333",
+									margin: 0,
+								}}
 							>
 								{sectionData.结论}
 							</p>
 						</div>
 					)}
-					{sectionData.格局核心 && (
-						<div className=" bg-white rounded border-l-4 border-[#B4003C]">
-							<p
-								className="font-medium text-gray-800"
-								style={{ fontSize: "11px" }}
+
+					{/* 关键问题: two-column layout */}
+					{sectionData.关键问题 &&
+						Object.keys(sectionData.关键问题).length > 0 && (
+							<div
+								style={{
+									display: "grid",
+									gridTemplateColumns: "1fr 1fr",
+									gap: "20px 24px",
+									marginTop: "12px",
+								}}
 							>
-								核心：{sectionData.格局核心}
-							</p>
-						</div>
-					)}
+								{Object.entries(sectionData.关键问题).map(
+									([key, problem]) => (
+										<SubBlock
+											key={key}
+											label={problem.名称}
+										>
+											{problem.解释}
+										</SubBlock>
+									),
+								)}
+							</div>
+						)}
+
+					{/* 互动列表: two-column for first two, then full-width 格局核心 */}
+					{sectionData.互动列表 &&
+						sectionData.互动列表.length > 0 && (
+							<>
+								<div
+									style={{
+										display: "grid",
+										gridTemplateColumns: "1fr 1fr",
+										gap: "20px 24px",
+										marginTop: "12px",
+									}}
+								>
+									{sectionData.互动列表
+										.slice(0, 2)
+										.map((item, idx) => (
+											<SubBlock
+												key={idx}
+												label={item.方面}
+											>
+												{item.特點 ?? item.特点}
+											</SubBlock>
+										))}
+								</div>
+								{sectionData.互动列表.length > 2 &&
+									sectionData.互动列表
+										.slice(2)
+										.map((item, idx) => (
+											<SubBlock
+												key={idx}
+												label={item.方面}
+											>
+												{item.特點 ?? item.特点}
+											</SubBlock>
+										))}
+								{/* {sectionData.格局核心 && (
+									<div style={{ marginTop: "12px" }}>
+										<div
+											style={{
+												backgroundColor: MIDDLE_ACCENT,
+												color: "#fff",
+												fontSize: "13px",
+												fontWeight: 700,
+												padding: "8px 12px",
+												marginBottom: "8px",
+												textAlign: "center",
+												fontFamily:
+													"Noto Sans HK, sans-serif",
+												width: "100%",
+												boxSizing: "border-box",
+											}}
+										>
+											格局核心
+										</div>
+										<p
+											style={{
+												fontSize: MIDDLE_BODY_SIZE,
+												lineHeight: 1.7,
+												color: "#333",
+												margin: 0,
+											}}
+										>
+											{sectionData.格局核心}
+										</p>
+									</div>
+								)} */}
+							</>
+						)}
+
+					{/* 格局核心 only (no 互动列表) */}
+					{sectionData.格局核心 &&
+						(!sectionData.互动列表 ||
+							sectionData.互动列表.length === 0) && (
+							<div style={{ marginTop: "12px" }}>
+								<div
+									style={{
+										backgroundColor: MIDDLE_ACCENT,
+										color: "#fff",
+										fontSize: "13px",
+										fontWeight: 700,
+										padding: "8px 12px",
+										marginBottom: "8px",
+										textAlign: "center",
+										fontFamily: "Noto Sans HK, sans-serif",
+										width: "100%",
+										boxSizing: "border-box",
+									}}
+								>
+									格局核心
+								</div>
+								<p
+									style={{
+										fontSize: MIDDLE_BODY_SIZE,
+										lineHeight: 1.7,
+										color: "#333",
+										margin: 0,
+									}}
+								>
+									{sectionData.格局核心}
+								</p>
+							</div>
+						)}
 				</div>
 			))}
 		</div>
@@ -201,7 +406,8 @@ function isFormattingOnlyLine(line) {
 	);
 }
 
-const SECTION_BAR_BG = "#";
+/** Dark beige for section title bars (五行調和方案, 長期配對策略) — was "#" (invalid). */
+const SECTION_BAR_BG = "#A47584";
 const VERTICAL_TITLE_COLOR = "#666666";
 
 function parseLeftContentSections(content) {
@@ -240,9 +446,15 @@ function parseLeftContentSections(content) {
 	);
 	if (descIdx >= 0) mainDescription = stripNumberedLabel(lines[descIdx]);
 
-	const wuxingStart = lines.findIndex((l) => l.includes("五行調和方案"));
-	const strategyStart = lines.findIndex((l) => l.includes("長期配對策略"));
-	const lastStart = lines.findIndex((l) => l.includes("最後段落"));
+	const wuxingStart = lines.findIndex(
+		(l) => l.includes("五行調和方案") || l.includes("五行调和方案"),
+	);
+	const strategyStart = lines.findIndex(
+		(l) => l.includes("長期配對策略") || l.includes("长期配对策略"),
+	);
+	const lastStart = lines.findIndex(
+		(l) => l.includes("最後段落") || l.includes("最后段落"),
+	);
 
 	const extractBullets = (startIdx, endIdx) => {
 		if (startIdx < 0) return [];
@@ -707,8 +919,12 @@ export default function CouplePrintMingJuLeftMiddle({
 	leftContent,
 	middleContent,
 }) {
-	const hasLeft = leftContent && leftContent.trim();
-	const hasMiddle = middleContent && middleContent.trim();
+	const hasLeft =
+		leftContent != null &&
+		(typeof leftContent !== "string" || leftContent.trim() !== "");
+	const hasMiddle =
+		middleContent != null &&
+		(typeof middleContent !== "string" || middleContent.trim() !== "");
 	const middleData = hasMiddle ? parseJsonContent(middleContent) : null;
 
 	if (!hasLeft && !hasMiddle) return null;
@@ -736,10 +952,13 @@ export default function CouplePrintMingJuLeftMiddle({
 				<div className="mx-auto bg-white page-break" style={pageStyle}>
 					<div style={{ width: "100%", boxSizing: "border-box" }}>
 						<h3
-							className="font-bold text-[#B4003C] mb-1"
+							className="font-bold text-[#A47584] mb-1"
 							style={{
-								fontSize: "15px",
-								fontFamily: "Noto Sans HK, sans-serif",
+								fontSize: "35px",
+								letterSpacing: "0.20em",
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+								fontWeight: 700,
 							}}
 						>
 							夫妻宮寅未暗合

@@ -67,10 +67,17 @@ function getLeftMingJuPrompt(question, currentYear, isSimplified, dayMaster1, da
 }
 
 // Web-style middle-tab prompt (JSON) for 感情 - same as CoupleMingJu createCoupleAIPrompt middle
-function getMiddleMingJuPrompt(question, currentYear, isSimplified) {
+// dayMaster1/dayMaster2 e.g. 己土、丁火 — so 合盤核心 日主 matches Page 1
+function getMiddleMingJuPrompt(question, currentYear, isSimplified, dayMaster1, dayMaster2) {
+	const dayHint =
+		dayMaster1 && dayMaster2
+			? isSimplified
+				? `【日主】男方：${dayMaster1}，女方：${dayMaster2}。分析中必须使用此日主，合盘核心的「主要内容」开头请写「男方为${dayMaster1}命，女方为${dayMaster2}命」。`
+				: `【日主】男方：${dayMaster1}，女方：${dayMaster2}。分析中必須使用此日主，合盤核心的「主要内容」開頭請寫「男方為${dayMaster1}命，女方為${dayMaster2}命」。`
+			: "";
 	const base = isSimplified
-		? `夫妻合盘分析：关注领域：感情，具体问题：${question}，分析年份：${currentYear}。必须使用简体中文回应。`
-		: `夫妻合盤分析：關注領域：感情，具體問題：${question}，分析年份：${currentYear}。必須使用繁體中文回應。`;
+		? `夫妻合盘分析：关注领域：感情，具体问题：${question}，分析年份：${currentYear}。${dayHint}必须使用简体中文回应。`
+		: `夫妻合盤分析：關注領域：感情，具體問題：${question}，分析年份：${currentYear}。${dayHint}必須使用繁體中文回應。`;
 	const jsonFormat = isSimplified
 		? `
 
@@ -261,7 +268,13 @@ function CouplePrintReportView() {
 							problem: question,
 							currentYear,
 							analysisType: "middle",
-							prompt: getMiddleMingJuPrompt(question, currentYear, isSimplified),
+							prompt: getMiddleMingJuPrompt(
+								question,
+								currentYear,
+								isSimplified,
+								wuxing1?.dayStem && wuxing1?.dayStemWuxing ? wuxing1.dayStem + wuxing1.dayStemWuxing : null,
+								wuxing2?.dayStem && wuxing2?.dayStemWuxing ? wuxing2.dayStem + wuxing2.dayStemWuxing : null,
+							),
 							isSimplified,
 						}),
 					}).then((r) => r.json()),
@@ -279,7 +292,7 @@ function CouplePrintReportView() {
 							analysisType: "right",
 							prompt: isSimplified
 								? `夫妻合盤分析，關注領域：感情，具體問題：${question}，分析年份：${currentYear}。請提供感情調候策略的具體建議，必須按照以下JSON格式。只返回純JSON，不要markdown。{"调候核心":{"五行调节":"明確指出雙方需要的具體五行調節方案","调候重点":"具體說明調候的重點時機和方法"},"实用建议":{"日常调和":["建議1","建議2","建議3"],"时机把握":["時機1","時機2"]},"长期策略":{"感情发展":"具體的長期感情發展策略","关键节点":"感情發展的關鍵節點和注意事項"}}`
-								: `夫妻合盤分析，關注領域：感情，具體問題：${question}，分析年份：${currentYear}。請提供感情調候策略的具體建議，必須按照以下JSON格式。只返回純JSON，不要markdown。{"调候核心":{"五行调节":"明確指出雙方需要的具體五行調節方案","调候重点":"具體說明調候的重點時機和方法"},"实用建议":{"日常调和":["建議1","建議2","建議3"],"时机把握":["時機1","時機2"]},"长期策略":{"感情发展":"具體的長期感情發展策略","关键节点":"感情發展的關鍵節點和注意事項"}}`,
+								: `請全程使用繁體中文撰寫所有內容（JSON 內文字也須為繁體）。夫妻合盤分析，關注領域：感情，具體問題：${question}，分析年份：${currentYear}。請提供感情調候策略的具體建議，必須按照以下 JSON 格式。只返回純 JSON，不要 markdown。{"调候核心":{"五行调节":"明確指出雙方需要的具體五行調節方案","调候重点":"具體說明調候的重點時機和方法"},"实用建议":{"日常调和":["建議1","建議2","建議3"],"时机把握":["時機1","時機2"]},"长期策略":{"感情发展":"具體的長期感情發展策略","关键节点":"感情發展的關鍵節點和注意事項"}}`,
 							isSimplified,
 						}),
 					}).then((r) => r.json()),
