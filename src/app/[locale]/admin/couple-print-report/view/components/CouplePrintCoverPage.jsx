@@ -1,14 +1,85 @@
 "use client";
 
+import Image from "next/image";
+
 /**
  * Couple print report cover page - A4, same layout as fortune CoverPage
  * Title: 姻緣合盤報告
+ * Bottom: compatibility circle + element boxes + interaction bar + yearly recommendation (same as attached design)
  */
 const COUPLE_COLOR = "#D94075";
+const SCORE_COLOR = "#b45309";
+const CIRCLE_GRADIENT_START = "#D94075";
+const CIRCLE_GRADIENT_END = "#9333ea";
+const BAR_GRADIENT_START = "#CC91A7";
+const BAR_GRADIENT_END = "#95A789";
+const ELEMENT_COLOR = {
+	金: "#B2A062",
+	木: "#567156",
+	水: "#3b82f6",
+	火: "#B4003C",
+	土: "#D09900",
+};
 
-export default function CouplePrintCoverPage({ productName }) {
+export default function CouplePrintCoverPage({
+	productName,
+	compatibility,
+	user1Analysis,
+	user2Analysis,
+	elementInteraction,
+	wuxing1,
+	wuxing2,
+	gender1,
+	gender2,
+	annualStrategy,
+}) {
 	const now = new Date();
 	const year = now.getFullYear();
+	const nextYear = year + 1;
+
+	// Female = left pink box, Male = right blue box. 壬水/丁火 = dayStem + dayStemWuxing
+	const femaleWuxing = gender1 === "female" ? wuxing1 : wuxing2;
+	const maleWuxing = gender1 === "male" ? wuxing1 : wuxing2;
+	const femaleElementDisplay =
+		femaleWuxing?.dayStem && femaleWuxing?.dayStemWuxing
+			? femaleWuxing.dayStem + femaleWuxing.dayStemWuxing
+			: (user1Analysis?.dominantElement ||
+					user2Analysis?.dominantElement ||
+					"水") + "命";
+	const maleElementDisplay =
+		maleWuxing?.dayStem && maleWuxing?.dayStemWuxing
+			? maleWuxing.dayStem + maleWuxing.dayStemWuxing
+			: (user2Analysis?.dominantElement ||
+					user1Analysis?.dominantElement ||
+					"火") + "命";
+	const femaleEl =
+		femaleWuxing?.dayStemWuxing ||
+		user1Analysis?.dominantElement ||
+		user2Analysis?.dominantElement ||
+		"水";
+	const maleEl =
+		maleWuxing?.dayStemWuxing ||
+		user2Analysis?.dominantElement ||
+		user1Analysis?.dominantElement ||
+		"火";
+
+	const compat = compatibility || { score: 78, level: "良緣" };
+	const balance = elementInteraction?.balance || "五行相生，關係和諧平衡";
+	const nextYearStrategy =
+		annualStrategy && annualStrategy[nextYear]
+			? annualStrategy[nextYear]
+			: null;
+	const yearLabel = `${nextYear}丙午年`;
+	const fullYearlyText =
+		nextYearStrategy?.description || nextYearStrategy?.monthlyFocus || "";
+	const yearlyText =
+		fullYearlyText.length > 220
+			? fullYearlyText.slice(0, 220).trim() + "…"
+			: fullYearlyText;
+	const showCompatibilityBlock =
+		compatibility != null && compat?.score != null;
+	const femaleElColor = ELEMENT_COLOR[femaleEl] || "#374151";
+	const maleElColor = ELEMENT_COLOR[maleEl] || "#374151";
 
 	return (
 		<div
@@ -27,12 +98,12 @@ export default function CouplePrintCoverPage({ productName }) {
 					top: "35mm",
 					left: "35mm",
 					width: "135mm",
-					height: "210mm",
+					height: "150mm",
 					backgroundColor: "#EDEDED",
 					zIndex: 0,
 				}}
 			/>
-			<div
+			{/* <div
 				style={{
 					position: "absolute",
 					top: "6mm",
@@ -91,12 +162,20 @@ export default function CouplePrintCoverPage({ productName }) {
 				}}
 			>
 				告
-			</div>
+			</div> */}
 
-			<div style={{ position: "absolute", top: "30mm", left: "25mm", zIndex: 2 }}>
+			<div
+				style={{
+					position: "absolute",
+					top: "30mm",
+					left: "25mm",
+					zIndex: 2,
+				}}
+			>
 				<div
 					style={{
-						fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "25px",
 						fontWeight: 700,
 						letterSpacing: "1.8em",
@@ -108,7 +187,8 @@ export default function CouplePrintCoverPage({ productName }) {
 				</div>
 				<div
 					style={{
-						fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "130px",
 						fontWeight: 900,
 						color: COUPLE_COLOR,
@@ -123,11 +203,19 @@ export default function CouplePrintCoverPage({ productName }) {
 				</div>
 			</div>
 
-			<div style={{ position: "absolute", bottom: "40mm", left: "35mm", zIndex: 2 }}>
+			<div
+				style={{
+					position: "absolute",
+					bottom: "102mm",
+					left: "35mm",
+					zIndex: 2,
+				}}
+			>
 				<div style={{ marginBottom: "12px" }}>
 					<span
 						style={{
-							fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 							fontSize: "25px",
 							fontWeight: 700,
 							color: "#000000",
@@ -140,7 +228,8 @@ export default function CouplePrintCoverPage({ productName }) {
 				</div>
 				<div
 					style={{
-						fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "16px",
 						fontWeight: 400,
 						color: "#000000",
@@ -167,7 +256,7 @@ export default function CouplePrintCoverPage({ productName }) {
 					position: "absolute",
 					top: "35mm",
 					right: "5mm",
-					bottom: "35mm",
+					bottom: "120mm",
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
@@ -185,7 +274,8 @@ export default function CouplePrintCoverPage({ productName }) {
 				/>
 				<div
 					style={{
-						fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontSize: "90px",
 						fontWeight: 900,
 						color: "#000000",
@@ -197,6 +287,250 @@ export default function CouplePrintCoverPage({ productName }) {
 					{year}
 				</div>
 			</div>
+
+			{/* Compatibility section at bottom (same as attached picture) */}
+			{showCompatibilityBlock && (
+				<div
+					style={{
+						position: "absolute",
+						bottom: "18mm",
+						left: "35mm",
+						right: "30mm",
+						zIndex: 2,
+						padding: "10px 14px",
+						border: "1px solid #e5e0d8",
+						borderRadius: "16px",
+						boxSizing: "border-box",
+					}}
+				>
+					<div
+						style={{
+							display: "flex",
+							alignItems: "flex-start",
+							gap: "12px",
+						}}
+					>
+						{/* Left: circular score */}
+						<div
+							className="flex-shrink-0"
+							style={{
+								width: "190px",
+								height: "190px",
+								position: "relative",
+							}}
+						>
+							<svg
+								className="w-full h-full"
+								style={{ transform: "rotate(-90deg)" }}
+								viewBox="0 0 100 100"
+							>
+								<circle
+									cx="50"
+									cy="50"
+									r="40"
+									fill="none"
+									stroke="#e5e0d8"
+									strokeWidth="10"
+								/>
+								<circle
+									cx="50"
+									cy="50"
+									r="40"
+									fill="none"
+									stroke="url(#coverCompatCircleGrad)"
+									strokeWidth="10"
+									strokeLinecap="round"
+									strokeDasharray={`${(compat.score * 251.2) / 100} 251.2`}
+								/>
+								<defs>
+									<linearGradient
+										id="coverCompatCircleGrad"
+										x1="0%"
+										y1="0%"
+										x2="100%"
+										y2="0%"
+									>
+										<stop
+											offset="0%"
+											stopColor={CIRCLE_GRADIENT_START}
+										/>
+										<stop
+											offset="100%"
+											stopColor={CIRCLE_GRADIENT_END}
+										/>
+									</linearGradient>
+								</defs>
+							</svg>
+							<div
+								style={{
+									position: "absolute",
+									inset: 0,
+									display: "flex",
+									flexDirection: "column",
+									alignItems: "center",
+									justifyContent: "center",
+									pointerEvents: "none",
+								}}
+							>
+								<span
+									style={{
+										fontSize: "40px",
+										fontWeight: 700,
+										color: SCORE_COLOR,
+										lineHeight: 1,
+									}}
+								>
+									{compat.score}
+								</span>
+								<span
+									style={{
+										fontSize: "20px",
+										color: SCORE_COLOR,
+										marginTop: "2px",
+									}}
+								>
+									{compat.level}
+								</span>
+							</div>
+						</div>
+						{/* Right: two element boxes + gradient bar + yearly text */}
+						<div style={{ flex: 1, minWidth: 0 }}>
+							<div
+								style={{
+									display: "flex",
+									gap: "8px",
+									marginBottom: "8px",
+								}}
+							>
+								{/* Female box: no border, bg #DFDFDF, element word color by element */}
+								<div
+									style={{
+										flex: 1,
+										display: "flex",
+										alignItems: "center",
+										gap: "13px",
+										padding: "6px 10px",
+										backgroundColor: "#DFDFDF",
+										borderRadius: "10px",
+									}}
+								>
+									<Image
+										src="/images/report-print/female.png"
+										alt=""
+										width={24}
+										height={24}
+										style={{ objectFit: "contain" }}
+									/>
+									<Image
+										src={`/images/elements/${femaleEl}.png`}
+										alt=""
+										width={18}
+										height={18}
+										style={{ objectFit: "contain" }}
+									/>
+									<span
+										style={{
+											fontSize: "13px",
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontWeight: 700,
+											color: femaleElColor,
+										}}
+									>
+										{femaleElementDisplay}
+									</span>
+								</div>
+								{/* Male box: no border, bg #DFDFDF, element word color by element */}
+								<div
+									style={{
+										flex: 1,
+										display: "flex",
+										alignItems: "center",
+										gap: "13px",
+										padding: "6px 10px",
+										backgroundColor: "#DFDFDF",
+										borderRadius: "10px",
+									}}
+								>
+									<Image
+										src="/images/report-print/male.png"
+										alt=""
+										width={24}
+										height={24}
+										style={{ objectFit: "contain" }}
+									/>
+									<Image
+										src={`/images/elements/${maleEl}.png`}
+										alt=""
+										width={18}
+										height={18}
+										style={{ objectFit: "contain" }}
+									/>
+									<span
+										style={{
+											fontSize: "13px",
+											fontFamily:
+												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+											fontWeight: 700,
+											color: maleElColor,
+										}}
+									>
+										{maleElementDisplay}
+									</span>
+								</div>
+							</div>
+							{/* Gradient bar: #CC91A7 → #95A789 */}
+							<div
+								style={{
+									background: `linear-gradient(90deg, ${BAR_GRADIENT_START}, ${BAR_GRADIENT_END})`,
+									borderRadius: "8px",
+									padding: "6px 10px",
+									textAlign: "center",
+									marginBottom: "8px",
+								}}
+							>
+								<span
+									style={{
+										fontSize: "15px",
+										color: "#fff",
+										fontFamily:
+											"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+
+										fontWeight: 900,
+									}}
+								>
+									{balance}
+								</span>
+							</div>
+							{/* Year + recommendation paragraph */}
+							{yearlyText && (
+								<>
+									<div
+										style={{
+											fontSize: "15px",
+											fontWeight: 700,
+											color: SCORE_COLOR,
+											marginBottom: "4px",
+										}}
+									>
+										{yearLabel}
+									</div>
+									<p
+										style={{
+											fontSize: "11px",
+											lineHeight: 1.55,
+											color: "#374151",
+											margin: 0,
+										}}
+									>
+										{yearlyText}
+									</p>
+								</>
+							)}
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

@@ -541,7 +541,18 @@ function CouplePrintReportView() {
 				</button>
 			</div>
 
-			<CouplePrintCoverPage productName={productName} />
+			<CouplePrintCoverPage
+				productName={productName}
+				compatibility={page1AnnualResult?.compatibility}
+				user1Analysis={page1AnnualResult?.user1Analysis}
+				user2Analysis={page1AnnualResult?.user2Analysis}
+				elementInteraction={page1AnnualResult?.elementInteraction}
+				wuxing1={wuxing1}
+				wuxing2={wuxing2}
+				gender1={gender1}
+				gender2={gender2}
+				annualStrategy={page1AnnualResult?.annualStrategy}
+			/>
 
 			<CouplePrintPage1
 				name1={name1}
