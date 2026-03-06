@@ -1,5 +1,7 @@
 "use client";
 
+import LifePrintPageDateFooter from "./LifePrintPageDateFooter";
+
 /**
  * Page 3: 年柱 + 月柱 (四柱排盤解析) — design matches reference: title + 天干/地支 labels (element colors), two columns, 總結 box.
  * Page 4: 日柱 + 時柱 (same layout)
@@ -13,6 +15,7 @@ const PAGE_STYLE = {
 	padding: "15mm 18mm",
 	boxSizing: "border-box",
 	backgroundColor: "#fff",
+	position: "relative",
 };
 
 const WUXING_PILLAR_COLORS = {
@@ -327,6 +330,7 @@ export default function LifePrintPillars34({ reportDocData, wuxingData }) {
 		<>
 			{/* Page 3: 年柱 + 月柱 — 四柱排盤解析 */}
 			<div className="bg-white page-break" style={PAGE_STYLE}>
+				<LifePrintPageDateFooter />
 				<div
 					style={{
 						display: "flex",
@@ -360,6 +364,7 @@ export default function LifePrintPillars34({ reportDocData, wuxingData }) {
 			</div>
 			{/* Page 4: 日柱 + 時柱 */}
 			<div className="bg-white page-break" style={PAGE_STYLE}>
+				<LifePrintPageDateFooter />
 				<div
 					style={{
 						display: "flex",

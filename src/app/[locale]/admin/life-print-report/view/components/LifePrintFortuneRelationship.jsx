@@ -1,10 +1,14 @@
 "use client";
 
+import LifePrintPageDateFooter from "./LifePrintPageDateFooter";
+
 /**
- * Page: 感情運勢 — one full A4 page
+ * Relationship Fortune — 2 pages, design aligned with career (title bar, vertical section, table, numbered sub-headings)
+ * Page 1: 感情運勢分析, summary bar + quote, 正緣特徵三重認證 (01/02/03 two-column)
+ * Page 2: 三大情劫週期 (table), 婚姻法則 (01/02/03), 子女緣
  */
-const COLOR = "#E52E5C";
-const TITLE = "感情運勢";
+const RELATIONSHIP_RED = "#C41E3A";
+const TEXT_DARK = "#2d2d2d";
 const PAGE_STYLE = {
 	width: "210mm",
 	minHeight: "297mm",
@@ -12,97 +16,565 @@ const PAGE_STYLE = {
 	padding: "15mm 18mm",
 	boxSizing: "border-box",
 	backgroundColor: "#fff",
+	position: "relative",
 };
 
 function isErrorResponse(analysis) {
 	if (!analysis || typeof analysis !== "object") return true;
-	if (analysis.response && !analysis.summary && !analysis.systems) return true;
+	if (analysis.response && !analysis.summary && !analysis.authenticity)
+		return true;
 	return false;
 }
 
-export default function LifePrintFortuneRelationship({ data }) {
+function stripBold(s) {
+	if (s == null) return s;
+	return typeof s === "string" ? s.replace(/\*\*/g, "") : s;
+}
+
+/** Full-width title bar: red background, white text */
+function TitleBar({ children }) {
+	return (
+		<div
+			style={{
+				width: "40%",
+				backgroundColor: RELATIONSHIP_RED,
+				color: "#fff",
+				fontFamily:
+					"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+				fontWeight: 700,
+				fontSize: "17px",
+				textAlign: "center",
+				padding: "5px 12px",
+				marginBottom: "12px",
+				margin: "20px 0 20px 0",
+				WebkitPrintColorAdjust: "exact",
+				printColorAdjust: "exact",
+			}}
+		>
+			{children}
+		</div>
+	);
+}
+
+/** Section title (red) + optional description; optional two-column for children */
+function SectionVertical({ title, description, twoColumns, children }) {
+	return (
+		<div style={{ marginBottom: "18px" }}>
+			<div
+				style={{
+					display: "flex",
+					alignItems: "stretch",
+					marginBottom: description ? "10px" : "12px",
+					gap: 0,
+				}}
+			>
+				<span
+					style={{
+						fontFamily:
+							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						fontWeight: 700,
+						fontSize: "30px",
+						color: RELATIONSHIP_RED,
+						letterSpacing: "0.1em",
+						lineHeight: 1.4,
+						flexShrink: 0,
+					}}
+				>
+					{title}
+				</span>
+				{description && (
+					<>
+						<div
+							style={{
+								width: "1px",
+								minHeight: "1.2em",
+								backgroundColor: TEXT_DARK,
+								margin: "0 14px",
+								flexShrink: 0,
+							}}
+						/>
+						<p
+							style={{
+								fontSize: "13px",
+								lineHeight: 1.7,
+								color: TEXT_DARK,
+								margin: 0,
+								fontFamily: "Noto Sans HK, sans-serif",
+								flex: 1,
+							}}
+						>
+							{description}
+						</p>
+					</>
+				)}
+			</div>
+			{twoColumns ? (
+				<div
+					style={{
+						display: "grid",
+						gridTemplateColumns: "1fr 1fr",
+						gap: "0 24px",
+						alignItems: "start",
+					}}
+				>
+					{children}
+				</div>
+			) : (
+				children
+			)}
+		</div>
+	);
+}
+
+/** Numbered sub-heading: red number + dark title */
+function NumberedSubHeading({ num, title }) {
+	return (
+		<div
+			style={{
+				display: "flex",
+				alignItems: "baseline",
+				gap: "6px",
+				marginTop: "12px",
+				marginBottom: "6px",
+			}}
+		>
+			<span
+				style={{
+					fontFamily: "Noto Serif TC, serif",
+					fontWeight: 700,
+					fontSize: "22px",
+					color: RELATIONSHIP_RED,
+				}}
+			>
+				{num}
+			</span>
+			<span
+				style={{
+					fontFamily: "Noto Serif TC, serif",
+					fontWeight: 700,
+					fontSize: "18px",
+					color: TEXT_DARK,
+				}}
+			>
+				{title}
+			</span>
+		</div>
+	);
+}
+
+const bodyText = {
+	fontSize: "13px",
+	lineHeight: 1.7,
+	color: TEXT_DARK,
+	fontFamily: "Noto Sans HK, sans-serif",
+};
+
+// Order for 正緣: 基本屬性, 年齡差距, 相識契機 (profession, ageGap, meetingChance)
+const AUTH_KEYS = [
+	{ key: "profession", title: "基本屬性" },
+	{ key: "ageGap", title: "年齡差距" },
+	{ key: "meetingChance", title: "相識契機" },
+];
+
+// Build table rows from romanticCycles (preserve order: 25歲前, 35歲危機, 45歲波動 or first three entries)
+function getCycleRows(romanticCycles) {
+	if (!romanticCycles || typeof romanticCycles !== "object")
+		return [];
+	return Object.entries(romanticCycles)
+		.slice(0, 6)
+		.map(([k, v]) => ({
+			period: v?.period || k,
+			fortune: v?.fortune || "",
+			keyAction: v?.solution || "",
+			riskWarning: [v?.dangerousYear, v?.crisis].filter(Boolean).join(" "),
+		}));
+}
+
+export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 	const analysis = data?.analysis || data;
 	if (!analysis || isErrorResponse(analysis)) return null;
 
-	const parts = [];
-	if (analysis.summary?.description) {
-		parts.push(<p key="sum-desc" style={{ margin: "4px 0 10px", fontSize: "12px", lineHeight: 1.7 }}>{analysis.summary.description}</p>);
-	}
-	if (analysis.authenticity && typeof analysis.authenticity === "object") {
-		parts.push(<div key="auth-head" style={{ marginTop: "12px", fontWeight: 700, fontSize: "12px" }}>正緣特徵三重認證</div>);
-		["profession", "ageGap", "meetingChance"].forEach((k) => {
-			const val = analysis.authenticity[k];
-			if (!val?.description) return;
-			const title = val.title || k;
-			parts.push(
-				<div key={`auth-${k}`} style={{ marginTop: "8px", padding: "8px", background: "#f5f5f5", borderRadius: "6px" }}>
-					<strong style={{ fontSize: "12px" }}>{title}</strong>
-					<p style={{ margin: "4px 0", fontSize: "11px", lineHeight: 1.6 }}>{val.description}</p>
-					{val.warning && <p style={{ margin: "2px 0", fontSize: "10px", color: "#555" }}>注意：{val.warning}</p>}
-				</div>
-			);
-		});
-	}
-	if (analysis.romanticCycles && typeof analysis.romanticCycles === "object") {
-		parts.push(<div key="cycles-head" style={{ marginTop: "12px", fontWeight: 700, fontSize: "12px" }}>三大情劫週期</div>);
-		Object.entries(analysis.romanticCycles).forEach(([key, cycle]) => {
-			if (!cycle) return;
-			parts.push(
-				<div key={`cycle-${key}`} style={{ marginTop: "8px", padding: "8px", background: "#fafafa", borderRadius: "6px" }}>
-					<strong style={{ fontSize: "12px" }}>{cycle.period || key}</strong>
-					{cycle.fortune && <span style={{ fontSize: "11px", color: "#555", marginLeft: "6px" }}>{cycle.fortune}</span>}
-					{cycle.dangerousYear && <p style={{ margin: "4px 0 2px", fontSize: "11px" }}>危險流年：{cycle.dangerousYear}</p>}
-					{cycle.crisis && <p style={{ margin: "2px 0", fontSize: "11px", lineHeight: 1.6 }}>危機：{cycle.crisis}</p>}
-					{cycle.solution && <p style={{ margin: "2px 0", fontSize: "11px", lineHeight: 1.6 }}>化解：{cycle.solution}</p>}
-				</div>
-			);
-		});
-	}
-	if (analysis.sections && typeof analysis.sections === "object") {
-		Object.entries(analysis.sections).forEach(([key, val]) => {
-			if (!val?.content) return;
-			const c = val.content;
-			const text = c.description || (typeof c === "string" ? c : "");
-			parts.push(
-				<div key={key} style={{ marginTop: "12px", padding: "8px", background: "#f5f5f5", borderRadius: "6px" }}>
-					<strong style={{ fontSize: "12px" }}>{val.title || key}</strong>
-					<p style={{ margin: "4px 0", fontSize: "11px", lineHeight: 1.6 }}>{text}</p>
-				</div>
-			);
-		});
-	}
-	if (analysis.talents && typeof analysis.talents === "object") {
-		Object.entries(analysis.talents).forEach(([key, val]) => {
-			const content = val?.content;
-			if (!content) return;
-			if (Array.isArray(content)) {
-				content.forEach((x, i) => {
-					parts.push(<p key={`${key}-${i}`} style={{ margin: "4px 0", fontSize: "11px", lineHeight: 1.6 }}><strong>{x.name || val.title}：</strong>{x.description}</p>);
-				});
-			} else {
-				parts.push(<div key={key} style={{ marginTop: "8px", fontSize: "11px", lineHeight: 1.6 }}><strong>{val.title || key}</strong>：{content.description || ""}</div>);
-			}
-		});
-	}
-	if (analysis.marriageRules) {
-		const m = analysis.marriageRules;
-		parts.push(<div key="marriage-head" style={{ marginTop: "12px", fontWeight: 700, fontSize: "12px" }}>婚姻法則</div>);
-		if (m.bestYear?.description) parts.push(<div key="bestYear" style={{ marginTop: "8px", padding: "8px", background: "#fafafa", borderRadius: "6px" }}><strong>最佳婚年</strong>：{m.bestYear.year} — {m.bestYear.description}</div>);
-		if (m.taboos?.financial?.description) parts.push(<p key="tabooF" style={{ margin: "6px 0", fontSize: "11px", lineHeight: 1.6 }}><strong>{m.taboos.financial.title}</strong>：{m.taboos.financial.description}</p>);
-		if (m.taboos?.frequency?.description) parts.push(<p key="tabooFr" style={{ margin: "4px 0", fontSize: "11px", lineHeight: 1.6 }}><strong>{m.taboos.frequency.title}</strong>：{m.taboos.frequency.description}</p>);
-		if (m.childrenFate?.description) parts.push(<div key="child" style={{ marginTop: "8px", padding: "6px", background: "#fafafa" }}><strong>子女緣</strong>{m.childrenFate.timing && `（${m.childrenFate.timing}）`}：{m.childrenFate.description}</div>);
-	}
+	const summary = analysis.summary || {};
+	const authenticity = analysis.authenticity || {};
+	const romanticCycles = analysis.romanticCycles || {};
+	const marriageRules = analysis.marriageRules || {};
 
-	const summaryTitle = analysis.summary?.title;
-	if (!summaryTitle && parts.length === 0) return null;
+	const summaryTitle = summary.title || "感情運勢";
+	const summaryDesc = summary.description;
+
+	const cycleRows = getCycleRows(romanticCycles);
+	const bestYear = marriageRules.bestYear;
+	const taboos = marriageRules.taboos || {};
+	const childrenFate = marriageRules.childrenFate;
+
+	// Page 1: title, summary bar + quote, 正緣特徵三重認證 (two-column)
+	const hasAuth = AUTH_KEYS.some(({ key }) => authenticity[key]?.description);
+	const hasPage1 = summaryDesc || hasAuth;
+
+	const page1 = hasPage1 ? (
+		<div
+			key="relation-p1"
+			className="bg-white page-break"
+			style={PAGE_STYLE}
+		>
+			<LifePrintPageDateFooter />
+			{pageNumber != null && (
+				<div
+					style={{
+						position: "absolute",
+						top: "15mm",
+						right: "18mm",
+						fontSize: "11px",
+						color: TEXT_DARK,
+						fontFamily: '"Noto Sans HK", sans-serif',
+					}}
+				>
+					{pageNumber}
+				</div>
+			)}
+			<h2
+				style={{
+					fontFamily:
+						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+					fontWeight: 700,
+					fontSize: "28px",
+					color: RELATIONSHIP_RED,
+					marginBottom: "8px",
+					letterSpacing: "0.2em",
+				}}
+			>
+				感情運勢分析
+			</h2>
+			{summaryTitle && (
+				<TitleBar>{stripBold(summaryTitle)}</TitleBar>
+			)}
+			{summaryDesc && (
+				<p
+					style={{
+						...bodyText,
+						margin: "0 0 20px 0",
+						paddingLeft: "20px",
+						position: "relative",
+						fontFamily: "Noto Serif TC, serif",
+					}}
+				>
+					<span
+						style={{
+							position: "absolute",
+							left: "0",
+							fontSize: "36px",
+							lineHeight: 1,
+							color: TEXT_DARK,
+							fontFamily: "Noto Serif TC, serif",
+						}}
+						aria-hidden
+					>
+						"
+					</span>
+					{stripBold(summaryDesc)}
+				</p>
+			)}
+
+			{/* 正緣特徵三重認證 */}
+			{hasAuth && (
+				<SectionVertical
+					title="正緣特徵三重認證"
+					twoColumns
+				>
+					{AUTH_KEYS.map(({ key, title }, i) => {
+						const item = authenticity[key];
+						if (!item?.description) return null;
+						return (
+							<div key={key} style={{ marginBottom: "14px" }}>
+								<NumberedSubHeading
+									num={String(i + 1).padStart(2, "0")}
+									title={stripBold(item.title) || title}
+								/>
+								<p
+									style={{
+										...bodyText,
+										margin: "0 0 6px 0",
+									}}
+								>
+									{stripBold(item.description)}
+								</p>
+								{item.warning && (
+									<p
+										style={{
+											...bodyText,
+											margin: 0,
+											fontWeight: 600,
+										}}
+									>
+										注意：{stripBold(item.warning)}
+									</p>
+								)}
+							</div>
+						);
+					})}
+				</SectionVertical>
+			)}
+		</div>
+	) : null;
+
+	// Page 2: 三大情劫週期 table, 婚姻法則, 子女緣
+	const hasPage2 =
+		cycleRows.length > 0 ||
+		bestYear ||
+		taboos.financial ||
+		taboos.frequency ||
+		childrenFate;
+
+	const page2 = hasPage2 ? (
+		<div
+			key="relation-p2"
+			className="bg-white page-break"
+			style={PAGE_STYLE}
+		>
+			<LifePrintPageDateFooter />
+			{pageNumber != null && (
+				<div
+					style={{
+						position: "absolute",
+						top: "15mm",
+						right: "18mm",
+						fontSize: "11px",
+						color: TEXT_DARK,
+						fontFamily: '"Noto Sans HK", sans-serif',
+					}}
+				>
+					{typeof pageNumber === "string" && pageNumber.includes("/")
+						? pageNumber.replace(/^\d+/, (m) =>
+								String(parseInt(m, 10) + 1),
+							)
+						: pageNumber}
+				</div>
+			)}
+
+			{/* 三大情劫週期 — table */}
+			{cycleRows.length > 0 && (
+				<div style={{ marginBottom: "20px" }}>
+					<h2
+						style={{
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							fontWeight: 700,
+							fontSize: "28px",
+							color: RELATIONSHIP_RED,
+							marginBottom: "12px",
+							letterSpacing: "0.2em",
+						}}
+					>
+						三大情劫週期
+					</h2>
+					<table
+						style={{
+							width: "100%",
+							borderCollapse: "collapse",
+							fontSize: "13px",
+							fontFamily: "Noto Sans HK, sans-serif",
+						}}
+					>
+						<thead>
+							<tr>
+								<th
+									style={{
+										border: "1px solid #ccc",
+										padding: "8px 10px",
+										textAlign: "left",
+										backgroundColor: "#f5f5f5",
+										fontWeight: 700,
+										color: TEXT_DARK,
+									}}
+								>
+									時期
+								</th>
+								<th
+									style={{
+										border: "1px solid #ccc",
+										padding: "8px 10px",
+										textAlign: "left",
+										backgroundColor: "#f5f5f5",
+										fontWeight: 700,
+										color: TEXT_DARK,
+									}}
+								>
+									大運
+								</th>
+								<th
+									style={{
+										border: "1px solid #ccc",
+										padding: "8px 10px",
+										textAlign: "left",
+										backgroundColor: "#f5f5f5",
+										fontWeight: 700,
+										color: TEXT_DARK,
+									}}
+								>
+									關鍵動作
+								</th>
+								<th
+									style={{
+										border: "1px solid #ccc",
+										padding: "8px 10px",
+										textAlign: "left",
+										backgroundColor: "#f5f5f5",
+										fontWeight: 700,
+										color: TEXT_DARK,
+									}}
+								>
+									風險預警
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{cycleRows.map((row, i) => (
+								<tr key={i}>
+									<td
+										style={{
+											border: "1px solid #ddd",
+											padding: "8px 10px",
+											verticalAlign: "top",
+											color: TEXT_DARK,
+										}}
+									>
+										{stripBold(row.period)}
+									</td>
+									<td
+										style={{
+											border: "1px solid #ddd",
+											padding: "8px 10px",
+											verticalAlign: "top",
+											color: TEXT_DARK,
+										}}
+									>
+										{stripBold(row.fortune)}
+									</td>
+									<td
+										style={{
+											border: "1px solid #ddd",
+											padding: "8px 10px",
+											verticalAlign: "top",
+											lineHeight: 1.6,
+											color: TEXT_DARK,
+										}}
+									>
+										{stripBold(row.keyAction)}
+									</td>
+									<td
+										style={{
+											border: "1px solid #ddd",
+											padding: "8px 10px",
+											verticalAlign: "top",
+											lineHeight: 1.6,
+											color: TEXT_DARK,
+										}}
+									>
+										{stripBold(row.riskWarning)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			)}
+
+			{/* 婚姻法則 */}
+			{(bestYear || taboos.financial || taboos.frequency) && (
+				<SectionVertical title="婚姻法則">
+					{bestYear?.description && (
+						<div style={{ marginBottom: "12px" }}>
+							<NumberedSubHeading
+								num="01"
+								title={bestYear.title || "最佳婚年"}
+							/>
+							<p style={{ ...bodyText, margin: 0 }}>
+								{bestYear.year && (
+									<>
+										{stripBold(bestYear.year)} —{" "}
+									</>
+								)}
+								{stripBold(bestYear.description)}
+							</p>
+						</div>
+					)}
+					{taboos.financial?.description && (
+						<div style={{ marginBottom: "12px" }}>
+							<NumberedSubHeading
+								num="02"
+								title={stripBold(taboos.financial.title) || "禁止財務共有"}
+							/>
+							<p style={{ ...bodyText, margin: 0 }}>
+								{stripBold(taboos.financial.description)}
+							</p>
+						</div>
+					)}
+					{taboos.frequency?.description && (
+						<div>
+							<NumberedSubHeading
+								num="03"
+								title={stripBold(taboos.frequency.title) || "緩解水火相激"}
+							/>
+							<p style={{ ...bodyText, margin: 0 }}>
+								{stripBold(taboos.frequency.description)}
+							</p>
+						</div>
+					)}
+				</SectionVertical>
+			)}
+
+			{/* 子女緣 */}
+			{childrenFate && (
+				<div style={{ marginBottom: "18px" }}>
+					<div
+						style={{
+							display: "flex",
+							alignItems: "stretch",
+							marginBottom: "12px",
+							gap: 0,
+						}}
+					>
+						<div
+							style={{
+								width: "4px",
+								minHeight: "1.2em",
+								backgroundColor: RELATIONSHIP_RED,
+								marginRight: "12px",
+								flexShrink: 0,
+							}}
+						/>
+						<span
+							style={{
+								fontFamily:
+									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+								fontWeight: 700,
+								fontSize: "30px",
+								color: RELATIONSHIP_RED,
+								lineHeight: 1.4,
+							}}
+						>
+							{childrenFate.title || "子女緣"}
+						</span>
+					</div>
+					<p style={{ ...bodyText, margin: 0 }}>
+						{childrenFate.timing && (
+							<>
+								（{stripBold(childrenFate.timing)}）：
+							</>
+						)}{" "}
+						{stripBold(childrenFate.description)}
+					</p>
+				</div>
+			)}
+		</div>
+	) : null;
+
+	if (!hasPage1 && !hasPage2) return null;
 
 	return (
-		<div className="bg-white page-break" style={PAGE_STYLE}>
-			<h2 style={{ fontFamily: "Noto Serif TC, serif", fontWeight: 800, fontSize: "20px", color: COLOR, marginBottom: "8px", borderBottom: `3px solid ${COLOR}`, paddingBottom: "6px" }}>
-				{TITLE}
-			</h2>
-			{summaryTitle && <p style={{ fontWeight: 700, fontSize: "14px", color: "#333", marginBottom: "10px" }}>{summaryTitle}</p>}
-			<div style={{ fontFamily: "Noto Sans HK, sans-serif", color: "#333" }}>{parts}</div>
-		</div>
+		<>
+			{page1}
+			{page2}
+		</>
 	);
 }

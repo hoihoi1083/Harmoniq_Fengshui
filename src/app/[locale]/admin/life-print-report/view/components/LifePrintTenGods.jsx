@@ -1,5 +1,7 @@
 "use client";
 
+import LifePrintPageDateFooter from "./LifePrintPageDateFooter";
+
 /**
  * Pages 6–7: 十神格局與內在關聯
  * Page 6: 正印、財星、官殺 (two-column layout)
@@ -14,6 +16,7 @@ const PAGE_STYLE = {
 	maxWidth: "210mm",
 	padding: "15mm 18mm",
 	boxSizing: "border-box",
+	position: "relative",
 };
 const GOD_ORDER_PAGE1 = ["正印", "財星", "官殺"];
 const GOD_ORDER_PAGE2 = ["劫比", "食傷"];
@@ -275,6 +278,7 @@ function TenGodsPage({ godNames, tenGodsAnalysis, wuxingData, pageNum }) {
 
 	return (
 		<div className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			<div
 				style={{
 					display: "flex",

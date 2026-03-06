@@ -42,8 +42,8 @@ export async function POST(request) {
 							content: prompt,
 						},
 					],
-					max_tokens: 2048,
-					temperature: 0.7,
+					max_tokens: 3500,
+					temperature: 0.5,
 				}),
 			}
 		);
@@ -103,15 +103,10 @@ export async function POST(request) {
 					cleanedContent += '"';
 				}
 
-				// Additional cleaning steps
+				// Additional cleaning: trailing commas only (avoid appending "}" which can corrupt JSON)
 				cleanedContent = cleanedContent
-					// Fix incomplete arrays
 					.replace(/,\s*$/, "")
-					.replace(/,(\s*[}\]])/g, "$1")
-					// Fix trailing commas in objects/arrays
-					.replace(/,(\s*[}\]])/g, "$1")
-					// Ensure proper object/array closure
-					.replace(/([^}\]]\s*)$/, "$1}");
+					.replace(/,(\s*[}\]])/g, "$1");
 
 				console.log("🔧 Applied cleaning, trying parse again");
 				analysis = JSON.parse(cleanedContent);

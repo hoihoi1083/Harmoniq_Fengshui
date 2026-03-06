@@ -1,5 +1,7 @@
 "use client";
 
+import LifePrintPageDateFooter from "./LifePrintPageDateFooter";
+
 /**
  * Career Fortune — 2 pages, design aligned with health (title bar, vertical section titles, teal numbered sub-headings)
  * Page 1: 事業運勢分析, summary bar + quote + description, 天賦特質解碼 (01/02/03)
@@ -230,6 +232,7 @@ export default function LifePrintFortuneCareer({ data, pageNumber }) {
 	// Page 1
 	const page1 = (
 		<div key="career-p1" className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			{pageNumber != null && (
 				<div
 					style={{
@@ -351,6 +354,7 @@ export default function LifePrintFortuneCareer({ data, pageNumber }) {
 
 	const page2 = hasPage2 ? (
 		<div key="career-p2" className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			{pageNumber != null && (
 				<div
 					style={{

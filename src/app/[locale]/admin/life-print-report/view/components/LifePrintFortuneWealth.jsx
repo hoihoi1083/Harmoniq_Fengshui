@@ -1,5 +1,7 @@
 "use client";
 
+import LifePrintPageDateFooter from "./LifePrintPageDateFooter";
+
 /**
  * Wealth Fortune — 2 pages, design aligned with health/career (title bar, vertical section titles, numbered sub-headings)
  * Page 1: 財運運勢分析, summary bar + quote, 奠基期 + 爆發期 (two-column sub-sections)
@@ -235,6 +237,7 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 
 	const page1 = hasPage1 ? (
 		<div key="wealth-p1" className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			{pageNumber != null && (
 				<div
 					style={{
@@ -497,6 +500,7 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 
 	const page2 = hasPage2 ? (
 		<div key="wealth-p2" className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			{pageNumber != null && (
 				<div
 					style={{

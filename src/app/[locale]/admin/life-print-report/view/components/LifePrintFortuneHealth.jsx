@@ -1,5 +1,7 @@
 "use client";
 
+import LifePrintPageDateFooter from "./LifePrintPageDateFooter";
+
 /**
  * Health Fortune — 2 pages
  * Page 1: full-width blue-green title bars, two-column numbered sub-sections, no hr under 01/02/03
@@ -225,6 +227,7 @@ export default function LifePrintFortuneHealth({ data, pageNumber }) {
 	// Page 1: exact match to image — main title + thin line, full-width blue-green bars, two-column sub-sections, no hr under 01/02/03
 	const page1 = (
 		<div key="health-p1" className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			{pageNumber != null && (
 				<div
 					style={{
@@ -406,6 +409,7 @@ export default function LifePrintFortuneHealth({ data, pageNumber }) {
 
 	const page2 = hasPage2 ? (
 		<div key="health-p2" className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			{pageNumber != null && (
 				<div
 					style={{

@@ -1,5 +1,7 @@
 "use client";
 
+import LifePrintPageDateFooter from "./LifePrintPageDateFooter";
+
 /**
  * Page 8: 核心矛盾 - 才華vs壓力 (above) + 化解提示
  * Design matches reference: olive accent, left-wider two-column, grey dividers.
@@ -164,6 +166,7 @@ export default function LifePrintResolveTips({
 
 	return (
 		<div className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			{pageNumber != null && (
 				<div
 					style={{

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import LifePrintPageDateFooter from "./LifePrintPageDateFooter";
 
 /**
  * Page 5: 五行分佈 深度解析 + 五行疏通阻礙點
@@ -16,6 +17,7 @@ const PAGE_STYLE = {
 	padding: "15mm 18mm",
 	boxSizing: "border-box",
 	backgroundColor: "#fff",
+	position: "relative",
 };
 
 /** Map strength string (★–★★★★★) to 0–5 for trait/influence lookup. Same logic as Report.jsx / PersonalReportDisplay.jsx */
@@ -121,6 +123,7 @@ export default function LifePrintPage5({
 
 	return (
 		<div className="bg-white page-break" style={PAGE_STYLE}>
+			<LifePrintPageDateFooter />
 			{/* Page title row with page number */}
 			<div
 				style={{

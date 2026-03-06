@@ -13,7 +13,7 @@ export async function POST(request) {
 				success: true,
 				analysis: generateMockRelationshipAnalysis(
 					userInfo,
-					wuxingData
+					wuxingData,
 				),
 				isAIGenerated: false,
 			});
@@ -42,10 +42,10 @@ export async function POST(request) {
 								content: prompt,
 							},
 						],
-						temperature: 0.7,
-						max_tokens: 2500,
+						temperature: 0.5,
+						max_tokens: 3500,
 					}),
-				}
+				},
 			);
 
 			if (!response.ok) {
@@ -53,7 +53,7 @@ export async function POST(request) {
 				console.error(
 					"❌ DeepSeek API Error:",
 					response.status,
-					errorData
+					errorData,
 				);
 				throw new Error(`DeepSeek API error: ${response.status}`);
 			}
@@ -65,20 +65,41 @@ export async function POST(request) {
 				throw new Error("No content in AI response");
 			}
 
-			// Try to parse JSON from AI response
+			// Parse JSON with robust cleaning (same as wealth/health) to avoid always falling back
 			let parsedAnalysis;
 			try {
-				// Extract JSON from code blocks if present
-				const jsonMatch =
-					aiContent.match(/```json\n([\s\S]*?)\n```/) ||
-					aiContent.match(/```\n([\s\S]*?)\n```/);
-				const jsonString = jsonMatch ? jsonMatch[1] : aiContent;
-				parsedAnalysis = JSON.parse(jsonString);
+				let cleanContent = aiContent
+					.replace(/```json\n?/g, "")
+					.replace(/```\n?/g, "")
+					.trim();
+				parsedAnalysis = JSON.parse(cleanContent);
 			} catch (parseError) {
 				console.warn(
-					"⚠️ Failed to parse AI JSON response, using mock data"
+					"⚠️ Relationship first parse failed:",
+					parseError.message,
 				);
-				throw new Error("Invalid JSON from AI");
+				try {
+					let cleanedContent = aiContent
+						.replace(/```json\n?/g, "")
+						.replace(/```\n?/g, "")
+						.trim();
+					const quoteCount = (cleanedContent.match(/"/g) || []).length;
+					if (quoteCount % 2 !== 0) cleanedContent += '"';
+					cleanedContent = cleanedContent
+						.replace(/,\s*$/, "")
+						.replace(/,(\s*[}\]])/g, "$1");
+					parsedAnalysis = JSON.parse(cleanedContent);
+				} catch (secondErr) {
+					console.warn(
+						"⚠️ Relationship parse failed after cleaning, using mock:",
+						secondErr.message,
+					);
+					console.warn(
+						"📄 Relationship raw (first 400 chars):",
+						aiContent.substring(0, 400),
+					);
+					throw new Error("Invalid JSON from AI");
+				}
 			}
 
 			// Validate required structure
@@ -89,7 +110,7 @@ export async function POST(request) {
 				!parsedAnalysis.marriageRules
 			) {
 				console.warn(
-					"⚠️ AI response missing required fields, using mock data"
+					"⚠️ AI response missing required fields, using mock data",
 				);
 				throw new Error("Invalid response structure");
 			}
@@ -103,13 +124,13 @@ export async function POST(request) {
 		} catch (apiError) {
 			console.warn(
 				"🔄 AI API failed, falling back to mock data:",
-				apiError.message
+				apiError.message,
 			);
 			return NextResponse.json({
 				success: true,
 				analysis: generateMockRelationshipAnalysis(
 					userInfo,
-					wuxingData
+					wuxingData,
 				),
 				isAIGenerated: false,
 				error: apiError.message,
@@ -122,7 +143,7 @@ export async function POST(request) {
 				success: false,
 				error: error.message,
 			},
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
