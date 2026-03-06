@@ -444,6 +444,7 @@ function LifePrintReportViewInner() {
 				{/* Pages 6–7: 十神格局與內在關聯 */}
 				<LifePrintTenGods
 					tenGodsAnalysis={wuxingAnalysisResult?.tenGodsAnalysis}
+					wuxingData={fullAnalysis?.wuxingData}
 				/>
 
 				{/* Page 8: 化解提示 */}
