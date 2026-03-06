@@ -22,6 +22,21 @@ const WUXING_PILLAR_COLORS = {
 	火: "#B4003C",
 	土: "#D09900",
 };
+const ELEMENTS = ["金", "木", "水", "火", "土"];
+
+function getElementFromLabel(label) {
+	if (!label || typeof label !== "string") return null;
+	const s = label.trim();
+	// Last char is usually the element (天干己土 → 土, 地支卯木 → 木)
+	const last = s.slice(-1);
+	if (ELEMENTS.includes(last)) return last;
+	// Fallback: find last occurrence of any element in the label
+	for (let i = s.length - 1; i >= 0; i--) {
+		const c = s[i];
+		if (ELEMENTS.includes(c)) return c;
+	}
+	return null;
+}
 
 function getPillarContentObject(pillarData) {
 	if (!pillarData) return null;
@@ -41,7 +56,13 @@ function parsePillarContent(content, labelOverride) {
 		keys.find((k) => k.includes("综合") || k.includes("綜合")) ||
 		keys.find((k) => k.includes("結") || k.includes("结")) ||
 		// Fallback: any other key (third paragraph) that is not 天干* or 地支*
-		keys.find((k) => k !== tianganKey && k !== dizhiKey && typeof content[k] === "string" && content[k].length > 20);
+		keys.find(
+			(k) =>
+				k !== tianganKey &&
+				k !== dizhiKey &&
+				typeof content[k] === "string" &&
+				content[k].length > 20,
+		);
 	if (!tianganKey || !dizhiKey) return null;
 	const stemElement = tianganKey.slice(-1);
 	const branchElement = dizhiKey.slice(-1);
@@ -53,7 +74,10 @@ function parsePillarContent(content, labelOverride) {
 		branchColor: WUXING_PILLAR_COLORS[branchElement] || "#5A5A5A",
 		stemText: content[tianganKey],
 		branchText: content[dizhiKey],
-		summaryText: typeof summaryText === "string" ? summaryText : String(summaryText || ""),
+		summaryText:
+			typeof summaryText === "string"
+				? summaryText
+				: String(summaryText || ""),
 	};
 }
 
@@ -64,18 +88,28 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 	const {
 		tianganLabel,
 		dizhiLabel,
-		stemColor,
-		branchColor,
+		stemColor: parsedStemColor,
+		branchColor: parsedBranchColor,
 		stemText,
 		branchText,
 		summaryText,
 	} = parsed;
 
+	// Element color from label text so pill background matches 天干XX / 地支XX
+	const stemEl = getElementFromLabel(tianganLabel);
+	const branchEl = getElementFromLabel(dizhiLabel);
+	const stemColor =
+		(stemEl && WUXING_PILLAR_COLORS[stemEl]) ||
+		parsedStemColor ||
+		"#5A5A5A";
+	const branchColor =
+		(branchEl && WUXING_PILLAR_COLORS[branchEl]) ||
+		parsedBranchColor ||
+		"#5A5A5A";
+
 	// Fix mistaken "年柱" in summary: content/DB often has 年柱 for every pillar; show correct 月柱/日柱/時柱
 	const displaySummaryText =
-		title === "年柱"
-			? summaryText
-			: summaryText.replace("年柱", title);
+		title === "年柱" ? summaryText : summaryText.replace("年柱", title);
 
 	const labelStyle = (bgColor) => ({
 		display: "inline-block",
@@ -85,7 +119,10 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 		fontWeight: 900,
 		fontSize: "14px",
 		color: "#fff",
+		background: bgColor,
 		backgroundColor: bgColor,
+		WebkitPrintColorAdjust: "exact",
+		printColorAdjust: "exact",
 		textShadow: "0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
 		marginLeft: "10px",
 	});
@@ -105,9 +142,11 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 					style={{
 						fontFamily: "Noto Serif TC, serif",
 						fontWeight: 900,
-						fontSize: "28px",
-						color: "#2d2d2d",
-						textShadow: "0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
+						fontSize: "35px",
+						color: "#969E7E",
+						marginRight: "20px",
+						textShadow:
+							"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
 					}}
 				>
 					{title}
@@ -128,10 +167,11 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 				<div>
 					<div
 						style={{
-							fontFamily: "Noto Serif TC, serif",
-							fontWeight: 900,
-							fontSize: "16px",
-							color: "#2d2d2d",
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							fontWeight: 700,
+							fontSize: "25px",
+							color: stemColor,
 							marginBottom: "8px",
 						}}
 					>
@@ -140,23 +180,26 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 					<p
 						style={{
 							fontFamily: "Noto Sans TC, sans-serif",
-							fontSize: "12px",
+							fontSize: "13px",
 							lineHeight: 1.8,
 							color: "#424242",
 							margin: 0,
 							textAlign: "justify",
 						}}
 					>
-						{typeof stemText === "string" ? stemText : String(stemText || "")}
+						{typeof stemText === "string"
+							? stemText
+							: String(stemText || "")}
 					</p>
 				</div>
 				<div>
 					<div
 						style={{
-							fontFamily: "Noto Serif TC, serif",
-							fontWeight: 900,
-							fontSize: "16px",
-							color: "#2d2d2d",
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+							fontWeight: 700,
+							fontSize: "25px",
+							color: branchColor,
 							marginBottom: "8px",
 						}}
 					>
@@ -165,14 +208,16 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 					<p
 						style={{
 							fontFamily: "Noto Sans TC, sans-serif",
-							fontSize: "12px",
+							fontSize: "13px",
 							lineHeight: 1.8,
 							color: "#424242",
 							margin: 0,
 							textAlign: "justify",
 						}}
 					>
-						{typeof branchText === "string" ? branchText : String(branchText || "")}
+						{typeof branchText === "string"
+							? branchText
+							: String(branchText || "")}
 					</p>
 				</div>
 			</div>
@@ -184,18 +229,22 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 						display: "flex",
 						alignItems: "stretch",
 						gap: "12px",
+						borderRadius: "8px",
+						padding: "14px 16px",
+						border: "1px solid",
 					}}
 				>
 					<div
 						style={{
 							fontFamily: "Noto Serif TC, serif",
 							fontWeight: 900,
-							fontSize: "22px",
-							color: "#2d2d2d",
+							fontSize: "35px",
+							color: "#969E7E",
 							writingMode: "vertical-rl",
 							textOrientation: "mixed",
 							letterSpacing: "0.2em",
-							textShadow: "0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
+							textShadow:
+								"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
 							flexShrink: 0,
 						}}
 					>
@@ -204,15 +253,12 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 					<div
 						style={{
 							flex: 1,
-							backgroundColor: "#f0f0f0",
-							borderRadius: "8px",
-							padding: "14px 16px",
 						}}
 					>
 						<p
 							style={{
 								fontFamily: "Noto Sans TC, sans-serif",
-								fontSize: "12px",
+								fontSize: "13px",
 								lineHeight: 1.8,
 								color: "#424242",
 								margin: 0,
@@ -294,22 +340,12 @@ export default function LifePrintPillars34({ reportDocData, wuxingData }) {
 							fontFamily: "Noto Serif TC, serif",
 							fontWeight: 900,
 							fontSize: "24px",
-							color: "#2d2d2d",
+							color: "#969E7E",
 							margin: 0,
 						}}
 					>
 						四柱排盤解析
 					</h2>
-					<span
-						style={{
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "14px",
-							color: "#424242",
-							fontWeight: 500,
-						}}
-					>
-						3
-					</span>
 				</div>
 				<PillarBlockStyled
 					title="年柱"
@@ -337,22 +373,12 @@ export default function LifePrintPillars34({ reportDocData, wuxingData }) {
 							fontFamily: "Noto Serif TC, serif",
 							fontWeight: 900,
 							fontSize: "24px",
-							color: "#2d2d2d",
+							color: "#969E7E",
 							margin: 0,
 						}}
 					>
-						四柱排盤解析（續）
+						四柱排盤解析
 					</h2>
-					<span
-						style={{
-							fontFamily: "Noto Serif TC, serif",
-							fontSize: "14px",
-							color: "#424242",
-							fontWeight: 500,
-						}}
-					>
-						4
-					</span>
 				</div>
 				<PillarBlockStyled
 					title="日柱"
