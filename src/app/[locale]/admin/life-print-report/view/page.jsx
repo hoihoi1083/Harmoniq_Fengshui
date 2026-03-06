@@ -447,9 +447,10 @@ function LifePrintReportViewInner() {
 					wuxingData={fullAnalysis?.wuxingData}
 				/>
 
-				{/* Page 8: 化解提示 */}
+				{/* Page 8: 核心矛盾 + 化解提示 */}
 				<LifePrintResolveTips
 					lifeAdvice={wuxingAnalysisResult?.lifeAdvice}
+					tenGodsAnalysis={wuxingAnalysisResult?.tenGodsAnalysis}
 				/>
 
 				{/* Pages 9–10: 健康+事業, 財運+感情 */}
