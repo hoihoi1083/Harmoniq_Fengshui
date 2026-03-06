@@ -169,6 +169,8 @@ function validateAndStructureCareerResponse(response, userInfo, wuxingData) {
 		talents: {
 			天賦特質解碼: {
 				title: "天賦特質解碼",
+				description:
+					response.talents?.["天賦特質解碼"]?.description || null,
 				content: response.talents?.["天賦特質解碼"]?.content || [
 					{
 						name: `${wuxingData.yearStem}${wuxingData.yearBranch}傷官`,
@@ -241,6 +243,7 @@ function generateMockResponse(userInfo, wuxingData) {
 		talents: {
 			天賦特質解碼: {
 				title: "天賦特質解碼",
+				description: null,
 				content: [
 					{
 						name: `${wuxingData.yearStem}${wuxingData.yearBranch}傷官`,
