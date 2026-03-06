@@ -1,6 +1,6 @@
 "use client";
 
-// Couple print summary: "我們的2026" + same content as web CoupleOverallSummary (keyPhrase, themes, quote, yearOverview)
+// Couple print summary: "我們的2026" — content from AI via /api/couple-overall-summary (keyPhrase, coreThemes, shareableQuote, yearOverview)
 
 import Image from "next/image";
 

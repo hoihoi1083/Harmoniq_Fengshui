@@ -75,6 +75,20 @@ function parseJsonContent(content) {
 		.trim()
 		.replace(/\uFEFF/g, "")
 		.replace(/\r\n/g, "\n");
+
+	// Double-encoded: backend sometimes sends JSON stringified twice
+	if (clean.startsWith("{")) {
+		try {
+			const first = JSON.parse(clean);
+			if (typeof first === "string" && first.trim().startsWith("{")) {
+				return JSON.parse(first);
+			}
+			return first;
+		} catch {
+			// fall through to extractJsonObject path
+		}
+	}
+
 	// Strip markdown code fence
 	if (clean.startsWith("```json"))
 		clean = clean.replace(/^```json\s*/, "").replace(/\s*```$/, "");
@@ -104,6 +118,38 @@ const MIDDLE_SECTION_DISPLAY_NAMES = {
 	合盘核心: "合盤核心",
 	夫妻互动关键: "夫妻互動關鍵",
 };
+
+/** Normalize section data: API may return traditional (主要內容, 狀態列表) or simplified (主要内容, 状态列表) */
+function normalizeSectionData(sectionData) {
+	if (!sectionData || typeof sectionData !== "object") return {};
+	return {
+		主要内容: sectionData.主要内容 ?? sectionData.主要內容,
+		主要分析: sectionData.主要分析 ?? sectionData.主要分析,
+		状态列表: sectionData.状态列表 ?? sectionData.狀態列表,
+		结论: sectionData.结论 ?? sectionData.結論,
+		关键问题: sectionData.关键问题 ?? sectionData.關鍵問題,
+		互动列表: sectionData.互动列表 ?? sectionData.互動列表,
+		格局核心: sectionData.格局核心 ?? sectionData.格局核心,
+	};
+}
+
+/** Normalize problem entry: 名称/名稱, 解释/解釋 */
+function normalizeProblem(problem) {
+	if (!problem || typeof problem !== "object") return {};
+	return {
+		名称: problem.名称 ?? problem.名稱,
+		解释: problem.解释 ?? problem.解釋,
+	};
+}
+
+/** Normalize 互动列表 item: 方面, 特點/特点 */
+function normalizeInteractionItem(item) {
+	if (!item || typeof item !== "object") return {};
+	return {
+		方面: item.方面,
+		特点: item.特点 ?? item.特點,
+	};
+}
 
 function renderStructuredSections(data) {
 	if (!data || typeof data !== "object") return null;
@@ -178,7 +224,9 @@ function renderStructuredSections(data) {
 
 	return (
 		<div style={{ marginTop: "5px" }}>
-			{entries.map(([section, sectionData], index) => (
+			{entries.map(([section, sectionData], index) => {
+				const norm = normalizeSectionData(sectionData);
+				return (
 				<div key={index} style={{ marginBottom: "5px" }}>
 					<SectionHeader
 						num={sectionNum(index)}
@@ -186,7 +234,7 @@ function renderStructuredSections(data) {
 					/>
 
 					{/* 合盤核心: 主要内容 + 状态列表 + 结论 box */}
-					{sectionData.主要内容 && (
+					{norm.主要内容 && (
 						<p
 							style={{
 								fontSize: MIDDLE_BODY_SIZE,
@@ -195,10 +243,10 @@ function renderStructuredSections(data) {
 								marginBottom: "10px",
 							}}
 						>
-							{sectionData.主要内容}
+							{norm.主要内容}
 						</p>
 					)}
-					{sectionData.主要分析 && (
+					{norm.主要分析 && (
 						<p
 							style={{
 								fontSize: MIDDLE_BODY_SIZE,
@@ -207,11 +255,12 @@ function renderStructuredSections(data) {
 								marginBottom: "5px",
 							}}
 						>
-							{sectionData.主要分析}
+							{norm.主要分析}
 						</p>
 					)}
-					{sectionData.状态列表 &&
-						sectionData.状态列表.length > 0 && (
+					{norm.状态列表 &&
+						Array.isArray(norm.状态列表) &&
+						norm.状态列表.length > 0 && (
 							<ul
 								style={{
 									margin: "0 0 12px 0",
@@ -221,7 +270,7 @@ function renderStructuredSections(data) {
 									color: "#333",
 								}}
 							>
-								{sectionData.状态列表.map((item, idx) => (
+								{norm.状态列表.map((item, idx) => (
 									<li
 										key={idx}
 										style={{ marginBottom: "4px" }}
@@ -231,7 +280,7 @@ function renderStructuredSections(data) {
 								))}
 							</ul>
 						)}
-					{sectionData.结论 && (
+					{norm.结论 && (
 						<div
 							style={{
 								border: "1px solid",
@@ -249,14 +298,15 @@ function renderStructuredSections(data) {
 									margin: 0,
 								}}
 							>
-								{sectionData.结论}
+								{norm.结论}
 							</p>
 						</div>
 					)}
 
 					{/* 关键问题: two-column layout */}
-					{sectionData.关键问题 &&
-						Object.keys(sectionData.关键问题).length > 0 && (
+					{norm.关键问题 &&
+						typeof norm.关键问题 === "object" &&
+						Object.keys(norm.关键问题).length > 0 && (
 							<div
 								style={{
 									display: "grid",
@@ -265,22 +315,26 @@ function renderStructuredSections(data) {
 									marginTop: "12px",
 								}}
 							>
-								{Object.entries(sectionData.关键问题).map(
-									([key, problem]) => (
-										<SubBlock
-											key={key}
-											label={problem.名称}
-										>
-											{problem.解释}
-										</SubBlock>
-									),
+								{Object.entries(norm.关键问题).map(
+									([key, problem]) => {
+										const p = normalizeProblem(problem);
+										return (
+											<SubBlock
+												key={key}
+												label={p.名称}
+											>
+												{p.解释}
+											</SubBlock>
+										);
+									},
 								)}
 							</div>
 						)}
 
 					{/* 互动列表: two-column for first two, then full-width 格局核心 */}
-					{sectionData.互动列表 &&
-						sectionData.互动列表.length > 0 && (
+					{norm.互动列表 &&
+						Array.isArray(norm.互动列表) &&
+						norm.互动列表.length > 0 && (
 							<>
 								<div
 									style={{
@@ -290,28 +344,34 @@ function renderStructuredSections(data) {
 										marginTop: "12px",
 									}}
 								>
-									{sectionData.互动列表
+									{norm.互动列表
 										.slice(0, 2)
-										.map((item, idx) => (
-											<SubBlock
-												key={idx}
-												label={item.方面}
-											>
-												{item.特點 ?? item.特点}
-											</SubBlock>
-										))}
+										.map((item, idx) => {
+											const it = normalizeInteractionItem(item);
+											return (
+												<SubBlock
+													key={idx}
+													label={it.方面}
+												>
+													{it.特点}
+												</SubBlock>
+											);
+										})}
 								</div>
-								{sectionData.互动列表.length > 2 &&
-									sectionData.互动列表
+								{norm.互动列表.length > 2 &&
+									norm.互动列表
 										.slice(2)
-										.map((item, idx) => (
-											<SubBlock
-												key={idx}
-												label={item.方面}
-											>
-												{item.特點 ?? item.特点}
-											</SubBlock>
-										))}
+										.map((item, idx) => {
+											const it = normalizeInteractionItem(item);
+											return (
+												<SubBlock
+													key={idx}
+													label={it.方面}
+												>
+													{it.特点}
+												</SubBlock>
+											);
+										})}
 								{/* {sectionData.格局核心 && (
 									<div style={{ marginTop: "12px" }}>
 										<div
@@ -347,9 +407,10 @@ function renderStructuredSections(data) {
 						)}
 
 					{/* 格局核心 only (no 互动列表) */}
-					{sectionData.格局核心 &&
-						(!sectionData.互动列表 ||
-							sectionData.互动列表.length === 0) && (
+					{(norm.格局核心 ?? sectionData.格局核心) &&
+						(!norm.互动列表 ||
+							!Array.isArray(norm.互动列表) ||
+							norm.互动列表.length === 0) && (
 							<div style={{ marginTop: "12px" }}>
 								<div
 									style={{
@@ -375,12 +436,13 @@ function renderStructuredSections(data) {
 										margin: 0,
 									}}
 								>
-									{sectionData.格局核心}
+									{norm.格局核心 ?? sectionData.格局核心}
 								</p>
 							</div>
 						)}
 				</div>
-			))}
+				);
+			})}
 		</div>
 	);
 }
@@ -759,6 +821,7 @@ function formatLeftContent(content) {
 				</div>
 			)}
 
+			{/* 長期配對策略: each item = one optional title (from **Title**：) + one content block; no nested subtopics */}
 			{strategyBullets.length > 0 && (
 				<div style={{ marginBottom: "20px" }}>
 					<div
