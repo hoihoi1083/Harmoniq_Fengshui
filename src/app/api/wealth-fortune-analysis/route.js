@@ -66,20 +66,40 @@ export async function POST(request) {
 				throw new Error("No content in AI response");
 			}
 
-			// Try to parse JSON from AI response
+			// Parse JSON with same robust cleaning as health/career (fixes truncation, unterminated strings)
 			let parsedAnalysis;
 			try {
-				// Extract JSON from code blocks if present
-				const jsonMatch =
-					aiContent.match(/```json\n([\s\S]*?)\n```/) ||
-					aiContent.match(/```\n([\s\S]*?)\n```/);
-				const jsonString = jsonMatch ? jsonMatch[1] : aiContent;
-				parsedAnalysis = JSON.parse(jsonString);
+				let cleanContent = aiContent
+					.replace(/```json\n?/g, "")
+					.replace(/```\n?/g, "")
+					.trim();
+				parsedAnalysis = JSON.parse(cleanContent);
+				console.log("✅ Successfully generated AI wealth analysis");
 			} catch (parseError) {
-				console.warn(
-					"⚠️ Failed to parse AI JSON response, using mock data"
-				);
-				throw new Error("Invalid JSON from AI");
+				console.warn("⚠️ Wealth first parse failed:", parseError.message);
+				try {
+					let cleanedContent = aiContent
+						.replace(/```json\n?/g, "")
+						.replace(/```\n?/g, "")
+						.trim();
+					const quoteCount = (cleanedContent.match(/"/g) || []).length;
+					if (quoteCount % 2 !== 0) cleanedContent += '"';
+					cleanedContent = cleanedContent
+						.replace(/,\s*$/, "")
+						.replace(/,(\s*[}\]])/g, "$1");
+					parsedAnalysis = JSON.parse(cleanedContent);
+					console.log("✅ Wealth JSON parsed after cleaning");
+				} catch (secondErr) {
+					console.warn(
+						"⚠️ Wealth parse failed after cleaning, using mock:",
+						secondErr.message
+					);
+					console.warn(
+						"📄 Wealth raw (first 400 chars):",
+						aiContent.substring(0, 400)
+					);
+					throw new Error("Invalid JSON from AI");
+				}
 			}
 
 			// Validate required structure
@@ -94,7 +114,6 @@ export async function POST(request) {
 				throw new Error("Invalid response structure");
 			}
 
-			console.log("✅ Successfully generated AI wealth analysis");
 			return NextResponse.json({
 				success: true,
 				analysis: parsedAnalysis,

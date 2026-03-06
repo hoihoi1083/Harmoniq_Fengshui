@@ -242,15 +242,8 @@ function LifePrintReportViewInner() {
 					wuxingData,
 				);
 
-				const [
-					pillarRes,
-					flowRes,
-					wuxingRes,
-					healthRes,
-					careerRes,
-					wealthRes,
-					relationshipRes,
-				] = await Promise.all([
+				// Run pillar, flow, wuxing in parallel (no DeepSeek concurrency with fortunes)
+				const [pillarRes, flowRes, wuxingRes] = await Promise.all([
 					fetch("/api/report-pillar-data", {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
@@ -270,34 +263,40 @@ function LifePrintReportViewInner() {
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({ userInfo }),
 					}).then((r) => r.json()),
-					fetch("/api/health-fortune-analysis", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							userInfo,
-							wuxingData,
-							prompt: healthPrompt,
-						}),
-					}).then((r) => r.json()),
-					fetch("/api/career-fortune-analysis", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							userInfo,
-							wuxingData,
-							prompt: careerPrompt,
-						}),
-					}).then((r) => r.json()),
-					fetch("/api/wealth-fortune-analysis", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							userInfo,
-							wuxingData,
-							prompt: wealthPrompt,
-						}),
-					}).then((r) => r.json()),
-					fetch("/api/relationship-fortune-analysis", {
+				]);
+
+				// Run the four fortune APIs sequentially to avoid DeepSeek rate limits
+				// (parallel calls often caused only some to get AI content, others fallback)
+				const healthRes = await fetch("/api/health-fortune-analysis", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						userInfo,
+						wuxingData,
+						prompt: healthPrompt,
+					}),
+				}).then((r) => r.json());
+				const careerRes = await fetch("/api/career-fortune-analysis", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						userInfo,
+						wuxingData,
+						prompt: careerPrompt,
+					}),
+				}).then((r) => r.json());
+				const wealthRes = await fetch("/api/wealth-fortune-analysis", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						userInfo,
+						wuxingData,
+						prompt: wealthPrompt,
+					}),
+				}).then((r) => r.json());
+				const relationshipRes = await fetch(
+					"/api/relationship-fortune-analysis",
+					{
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({
@@ -305,8 +304,8 @@ function LifePrintReportViewInner() {
 							wuxingData,
 							prompt: relationshipPrompt,
 						}),
-					}).then((r) => r.json()),
-				]);
+					}
+				).then((r) => r.json());
 
 				if (pillarRes && !pillarRes.error) setReportDocData(pillarRes);
 				if (flowRes?.flowObstacles) setElementFlowAnalysis(flowRes);
@@ -330,16 +329,16 @@ function LifePrintReportViewInner() {
 						res.analysis.romanticCycles);
 				setFourFortuneData({
 					health: valid(healthRes)
-						? { analysis: healthRes.analysis }
+						? { analysis: healthRes.analysis, isAIGenerated: healthRes.isAIGenerated }
 						: null,
 					career: valid(careerRes)
-						? { analysis: careerRes.analysis }
+						? { analysis: careerRes.analysis, isAIGenerated: careerRes.isAIGenerated }
 						: null,
 					wealth: valid(wealthRes)
-						? { analysis: wealthRes.analysis }
+						? { analysis: wealthRes.analysis, isAIGenerated: wealthRes.isAIGenerated }
 						: null,
 					relationship: valid(relationshipRes)
-						? { analysis: relationshipRes.analysis }
+						? { analysis: relationshipRes.analysis, isAIGenerated: relationshipRes.isAIGenerated }
 						: null,
 				});
 			} catch (err) {

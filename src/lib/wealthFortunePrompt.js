@@ -49,15 +49,15 @@ export function generateWealthFortunePrompt(userInfo, wuxingData) {
       "fortune": "對應大運",
       "content": {
         "phase1": {
-          "name": "第一階段大運名稱",
-          "description": "該大運期間財運特點分析",
-          "keyYear": "關鍵年份及其重要事件預測",
-          "trapYear": "需要特別注意的危險年份及風險提醒"
+          "name": "第一階段大運名稱（含年份區間）",
+          "description": "該大運期間財運特點分析（2-3句話）",
+          "keyYear": "關鍵年份及其重要事件預測（可2-3句話說明）",
+          "trapYear": "需要特別注意的危險年份及風險提醒（可2-3句話說明）"
         },
         "phase2": {
           "name": "第二階段大運名稱", 
-          "description": "該大運期間財運特點分析",
-          "warning": "重要警示年份及注意事項"
+          "description": "該大運期間財運特點分析（2-3句話）",
+          "warning": "重要警示年份及注意事項（可2-3句話說明）"
         }
       }
     },
@@ -66,10 +66,10 @@ export function generateWealthFortunePrompt(userInfo, wuxingData) {
       "ageRange": "具體年齡範圍",
       "fortune": "對應大運",
       "content": {
-        "description": "財運爆發期的核心特徵",
-        "keyYear": "最佳投資年份及具體收益預測",
-        "industries": "最適合的核心投資領域",
-        "peakYear": "財富峰值年份及投資建議"
+        "description": "財運爆發期的核心特徵（2-3句話）",
+        "keyYear": "最佳投資年份及具體收益預測（可2-3句話說明）",
+        "industries": "最適合的核心投資領域（可簡述原因或2-3句話）",
+        "peakYear": "財富峰值年份及投資建議（可2-3句話說明）"
       }
     },
     "守成期": {
@@ -77,9 +77,9 @@ export function generateWealthFortunePrompt(userInfo, wuxingData) {
       "ageRange": "具體年齡範圍",
       "fortune": "對應大運",
       "content": {
-        "description": "守成期財運管理特點",
-        "keyYear": "重要理財決策年份",
-        "avoidIndustries": "需要避免的投資領域"
+        "description": "守成期財運管理特點（2-3句話）",
+        "keyYear": "重要理財決策年份（可2-3句話說明）",
+        "avoidIndustries": "需要避免的投資領域（可簡述原因或2-3句話）"
       }
     }
   },
@@ -117,6 +117,7 @@ export function generateWealthFortunePrompt(userInfo, wuxingData) {
 3. 提供具體的投資建議和風險提醒
 4. 給出實用的風水催財方位指導
 5. 所有預測都要有具體的八字理論依據
+6. 各階段底下的每個要點（如關鍵年份、致命陷阱、核心領域等）請盡量以 2–3 句話說明，使內容完整可讀。
 
 請確保分析內容專業、準確，符合傳統八字命理學理論。`;
 
