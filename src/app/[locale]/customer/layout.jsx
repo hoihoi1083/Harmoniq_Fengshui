@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
+import FooterV2 from "@/components/home/FooterV2";
 
 export default function LocaleLayout({ children, params }) {
 	const pathname = usePathname();
@@ -11,7 +12,7 @@ export default function LocaleLayout({ children, params }) {
 		<>
 			{!isContactPage && <ShopNavbar />}
 			{children}
-			{!isContactPage && <Footer />}
+			{!isContactPage && <FooterV2 />}
 		</>
 	);
 }

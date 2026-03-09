@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { Link } from "@/i18n/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "next-intl";
@@ -27,32 +28,24 @@ const FooterV2 = () => {
 							quality={100}
 						/>
 						<nav className="flex flex-col gap-2 md:flex-row md:items-center md:gap-6 lg:gap-8 text-sm text-white/90">
-							<a
-								href={`/${locale}/about`}
+							<Link
+								href="/customer/contact"
 								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
 								{locale === "zh-CN" ? "关于我们" : "關於我們"}
-							</a>
-							<a
-								href={`/${locale}/privacy`}
+							</Link>
+							<Link
+								href="/customer/privacy"
 								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
 								{locale === "zh-CN" ? "隐私政策" : "隱私政策"}
-							</a>
-							<a
-								href={`/${locale}/terms`}
+							</Link>
+							<Link
+								href="/customer/terms"
 								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
 								{locale === "zh-CN" ? "用户条款" : "用戶條款"}
-							</a>
-							<a
-								href={`/${locale}/refunds`}
-								className="hover:text-[#8B9F3A] transition-colors py-0.5"
-							>
-								{locale === "zh-CN"
-									? "退换货政策"
-									: "退換貨政策"}
-							</a>
+							</Link>
 						</nav>
 					</div>
 					<div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
@@ -112,7 +105,7 @@ const FooterV2 = () => {
 						</div>
 						<p className="text-white/90 text-sm sm:text-base">
 							{locale === "zh-CN" ? "电邮" : "電郵"}:
-							info@gmail.com
+							support@harmoniqfengshui.com
 						</p>
 					</div>
 					<div className="w-full max-w-full lg:max-w-[560px] rounded-xl sm:rounded-[20px] bg-[#2A2E36] p-4 sm:p-6">
@@ -183,7 +176,7 @@ const FooterV2 = () => {
 							</div>
 
 							{/* PayPal */}
-							<div className="bg-white rounded px-2 py-1.5 sm:px-3 sm:py-2 flex items-center justify-center min-w-[50px] h-[32px] sm:min-w-[60px] sm:h-[40px]">
+							{/* <div className="bg-white rounded px-2 py-1.5 sm:px-3 sm:py-2 flex items-center justify-center min-w-[50px] h-[32px] sm:min-w-[60px] sm:h-[40px]">
 								<svg
 									viewBox="0 0 48 32"
 									className="w-auto h-5 sm:h-6"
@@ -198,7 +191,7 @@ const FooterV2 = () => {
 										fill="#009CDE"
 									/>
 								</svg>
-							</div>
+							</div> */}
 
 							{/* Apple Pay */}
 							<div className="bg-white rounded px-2 py-1.5 sm:px-3 sm:py-2 flex items-center justify-center min-w-[50px] h-[32px] sm:min-w-[60px] sm:h-[40px]">

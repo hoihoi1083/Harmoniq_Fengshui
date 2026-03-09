@@ -64,10 +64,30 @@ const TestimonialSection = () => {
 
 	// Testimonial data from i18n (TW/CN)
 	const testimonials = [
-		{ id: 1, quote: t("testimonial1.quote"), name: t("testimonial1.name"), avatar: "/images/testimonials/avatar-1.png" },
-		{ id: 2, quote: t("testimonial2.quote"), name: t("testimonial2.name"), avatar: "/images/testimonials/avatar-2.png" },
-		{ id: 3, quote: t("testimonial3.quote"), name: t("testimonial3.name"), avatar: "/images/testimonials/avatar-3.png" },
-		{ id: 4, quote: t("testimonial4.quote"), name: t("testimonial4.name"), avatar: "/images/testimonials/avatar-4.png" },
+		{
+			id: 1,
+			quote: t("testimonial1.quote"),
+			name: t("testimonial1.name"),
+			avatar: "/images/testimonials/avatar-1.png",
+		},
+		{
+			id: 2,
+			quote: t("testimonial2.quote"),
+			name: t("testimonial2.name"),
+			avatar: "/images/testimonials/avatar-2.png",
+		},
+		{
+			id: 3,
+			quote: t("testimonial3.quote"),
+			name: t("testimonial3.name"),
+			avatar: "/images/testimonials/avatar-3.png",
+		},
+		{
+			id: 4,
+			quote: t("testimonial4.quote"),
+			name: t("testimonial4.name"),
+			avatar: "/images/testimonials/avatar-4.png",
+		},
 	];
 
 	return (
@@ -152,7 +172,7 @@ const TestimonialSection = () => {
 			</div>
 
 			{/* Learn More Button */}
-			<div className="flex justify-end">
+			{/* <div className="flex justify-end">
 				<button
 					className="bg-black hover:bg-[#1C1C1C] text-white px-6 md:px-18 py-3 md:py-3 rounded-[10px] text-sm md:text-base font-semibold shadow-md hover:shadow-lg transition-all"
 					onClick={() => {
@@ -162,7 +182,7 @@ const TestimonialSection = () => {
 				>
 					{t("learnMore")}
 				</button>
-			</div>
+			</div> */}
 			<WhyChooseUs />
 			<ComparisonTables />
 		</section>

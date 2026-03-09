@@ -1,10 +1,18 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 const ComparisonTables = () => {
 	const t = useTranslations("home.compare");
+	const locale = useLocale();
+	const isZhCN = locale === "zh-CN";
+	const shopComparisonSrc = isZhCN
+		? "/images/comparison/shop-comparison-china.png"
+		: "/images/comparison/shop-comparison.png";
+	const reportComparisonSrc = isZhCN
+		? "/images/comparison/report-comparison-china.png"
+		: "/images/comparison/report-comparison.png";
 
 	return (
 		<div className="w-full py-10 md:px-6 md:py-1">
@@ -44,7 +52,7 @@ const ComparisonTables = () => {
 						style={{ aspectRatio: "3195/1500" }}
 					>
 						<Image
-							src="/images/comparison/shop-comparison.png"
+							src={shopComparisonSrc}
 							alt=""
 							fill
 							className="object-contain"
@@ -90,7 +98,7 @@ const ComparisonTables = () => {
 						style={{ aspectRatio: "3195/1260" }}
 					>
 						<Image
-							src="/images/comparison/report-comparison.png"
+							src={reportComparisonSrc}
 							alt=""
 							fill
 							className="object-contain"
