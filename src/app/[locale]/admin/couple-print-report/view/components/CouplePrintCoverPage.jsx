@@ -9,10 +9,10 @@ import Image from "next/image";
  */
 const COUPLE_COLOR = "#D94075";
 const SCORE_COLOR = "#b45309";
-const CIRCLE_GRADIENT_START = "#D94075";
-const CIRCLE_GRADIENT_END = "#9333ea";
+const CIRCLE_GRADIENT_START = "#D289A1";
+const CIRCLE_GRADIENT_END = "#ABBDC7";
 const BAR_GRADIENT_START = "#CC91A7";
-const BAR_GRADIENT_END = "#95A789";
+const BAR_GRADIENT_END = "#95A7B9";
 const ELEMENT_COLOR = {
 	金: "#B2A062",
 	木: "#567156",
@@ -517,7 +517,7 @@ export default function CouplePrintCoverPage({
 									</span>
 								</div>
 							</div>
-							{/* Gradient bar: #CC91A7 → #95A789 */}
+							{/* Gradient bar: #CC91A7 → #95A7B9 */}
 							<div
 								style={{
 									background: `linear-gradient(90deg, ${BAR_GRADIENT_START}, ${BAR_GRADIENT_END})`,

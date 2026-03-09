@@ -429,9 +429,7 @@ export default function CouplePrintMingJuRight({ rightContent }) {
 						textAlign: "right",
 					}}
 				>
-					{new Date()
-						.toLocaleDateString("zh-TW")
-						.replace(/\//g, "/")}
+					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
 				</div>
 			</div>
 
@@ -530,8 +528,6 @@ export default function CouplePrintMingJuRight({ rightContent }) {
 												<div
 													key={i}
 													style={{
-														backgroundColor:
-															TIMING_BOX_BG,
 														border: TIMING_BOX_BORDER,
 														borderRadius: "8px",
 														padding: "10px 8px",

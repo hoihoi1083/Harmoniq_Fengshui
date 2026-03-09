@@ -33,18 +33,18 @@ export async function POST(request) {
 					body: JSON.stringify({
 						model: "deepseek-chat",
 						messages: [
-							{
-								role: "system",
-								content:
-									"你是一位專業的八字命理師，專精財運分析。請基於用戶的八字信息，提供準確、詳細的財運發展分析。",
+						{
+							role: "system",
+							content:
+								"你是一位專業的八字命理師，專精財運分析。請基於用戶的八字信息，提供準確、詳細的財運發展分析。請嚴格按照要求的JSON格式回應，不要添加任何額外的文字說明或 markdown 代碼塊。",
 							},
 							{
 								role: "user",
 								content: prompt,
 							},
 						],
-						temperature: 0.7,
-						max_tokens: 2000,
+						temperature: 0.5,
+						max_tokens: 3500,
 					}),
 				}
 			);

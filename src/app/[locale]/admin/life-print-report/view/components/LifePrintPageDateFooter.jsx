@@ -35,8 +35,8 @@ export default function LifePrintPageDateFooter() {
 			<div
 				style={{
 					position: "absolute",
-					bottom: "15mm",
-					left: "20mm",
+					bottom: "8mm",
+					left: "5mm",
 				}}
 			>
 				<Image

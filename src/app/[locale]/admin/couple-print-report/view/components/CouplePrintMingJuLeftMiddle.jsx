@@ -109,6 +109,8 @@ function parseJsonContent(content) {
 }
 
 const MIDDLE_ACCENT = "#A47584";
+/** Width of the colored title bar in SubBlock (e.g. 付出與感受失衡, 溝通模式). Use "100%", "85%", or a fixed value like "200px". */
+const SUBBLOCK_TITLE_BAR_WIDTH = "47%";
 const MIDDLE_BODY_SIZE = "12px";
 const MIDDLE_TITLE_NUM_SIZE = "25px";
 const MIDDLE_TITLE_TEXT_SIZE = "18px";
@@ -172,7 +174,7 @@ function renderStructuredSections(data) {
 				style={{
 					fontSize: MIDDLE_TITLE_NUM_SIZE,
 					fontWeight: 700,
-					color: "red",
+					color: "#B4003C",
 					fontFamily:
 						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 				}}
@@ -205,6 +207,8 @@ function renderStructuredSections(data) {
 					marginBottom: "8px",
 					textAlign: "center",
 					fontFamily: "Noto Sans HK, sans-serif",
+					width: SUBBLOCK_TITLE_BAR_WIDTH,
+					boxSizing: "border-box",
 				}}
 			>
 				{label}
@@ -227,115 +231,86 @@ function renderStructuredSections(data) {
 			{entries.map(([section, sectionData], index) => {
 				const norm = normalizeSectionData(sectionData);
 				return (
-				<div key={index} style={{ marginBottom: "5px" }}>
-					<SectionHeader
-						num={sectionNum(index)}
-						title={sectionDisplayName(section)}
-					/>
+					<div key={index} style={{ marginBottom: "5px" }}>
+						<SectionHeader
+							num={sectionNum(index)}
+							title={sectionDisplayName(section)}
+						/>
 
-					{/* 合盤核心: 主要内容 + 状态列表 + 结论 box */}
-					{norm.主要内容 && (
-						<p
-							style={{
-								fontSize: MIDDLE_BODY_SIZE,
-								lineHeight: 1.7,
-								color: "#333",
-								marginBottom: "10px",
-							}}
-						>
-							{norm.主要内容}
-						</p>
-					)}
-					{norm.主要分析 && (
-						<p
-							style={{
-								fontSize: MIDDLE_BODY_SIZE,
-								lineHeight: 1.7,
-								color: "#333",
-								marginBottom: "5px",
-							}}
-						>
-							{norm.主要分析}
-						</p>
-					)}
-					{norm.状态列表 &&
-						Array.isArray(norm.状态列表) &&
-						norm.状态列表.length > 0 && (
-							<ul
-								style={{
-									margin: "0 0 12px 0",
-									paddingLeft: "20px",
-									fontSize: MIDDLE_BODY_SIZE,
-									lineHeight: 1.7,
-									color: "#333",
-								}}
-							>
-								{norm.状态列表.map((item, idx) => (
-									<li
-										key={idx}
-										style={{ marginBottom: "4px" }}
-									>
-										· {item}
-									</li>
-								))}
-							</ul>
-						)}
-					{norm.结论 && (
-						<div
-							style={{
-								border: "1px solid",
-								borderRadius: "8px",
-								padding: "12px 14px",
-								marginTop: "8px",
-							}}
-						>
+						{/* 合盤核心: 主要内容 + 状态列表 + 结论 box */}
+						{norm.主要内容 && (
 							<p
 								style={{
 									fontSize: MIDDLE_BODY_SIZE,
-									fontWeight: 700,
 									lineHeight: 1.7,
 									color: "#333",
-									margin: 0,
+									marginBottom: "10px",
 								}}
 							>
-								{norm.结论}
+								{norm.主要内容}
 							</p>
-						</div>
-					)}
-
-					{/* 关键问题: two-column layout */}
-					{norm.关键问题 &&
-						typeof norm.关键问题 === "object" &&
-						Object.keys(norm.关键问题).length > 0 && (
+						)}
+						{norm.主要分析 && (
+							<p
+								style={{
+									fontSize: MIDDLE_BODY_SIZE,
+									lineHeight: 1.7,
+									color: "#333",
+									marginBottom: "5px",
+								}}
+							>
+								{norm.主要分析}
+							</p>
+						)}
+						{norm.状态列表 &&
+							Array.isArray(norm.状态列表) &&
+							norm.状态列表.length > 0 && (
+								<ul
+									style={{
+										margin: "0 0 12px 0",
+										paddingLeft: "20px",
+										fontSize: MIDDLE_BODY_SIZE,
+										lineHeight: 1.7,
+										color: "#333",
+									}}
+								>
+									{norm.状态列表.map((item, idx) => (
+										<li
+											key={idx}
+											style={{ marginBottom: "4px" }}
+										>
+											· {item}
+										</li>
+									))}
+								</ul>
+							)}
+						{norm.结论 && (
 							<div
 								style={{
-									display: "grid",
-									gridTemplateColumns: "1fr 1fr",
-									gap: "20px 24px",
-									marginTop: "12px",
+									border: "1px solid",
+									borderRadius: "8px",
+									padding: "12px 14px",
+									marginTop: "8px",
 								}}
 							>
-								{Object.entries(norm.关键问题).map(
-									([key, problem]) => {
-										const p = normalizeProblem(problem);
-										return (
-											<SubBlock
-												key={key}
-												label={p.名称}
-											>
-												{p.解释}
-											</SubBlock>
-										);
-									},
-								)}
+								<p
+									style={{
+										fontSize: MIDDLE_BODY_SIZE,
+										fontWeight: 700,
+										lineHeight: 1.7,
+										color: "#333",
+										margin: 0,
+									}}
+								>
+									{norm.结论}
+								</p>
 							</div>
 						)}
 
-					{/* 互动列表: two-column for first two, then full-width 格局核心 */}
-					{norm.互动列表 &&
-						Array.isArray(norm.互动列表) &&
-						norm.互动列表.length > 0 && (
-							<>
+						{/* 关键问题: two-column layout */}
+						{norm.关键问题 &&
+							typeof norm.关键问题 === "object" &&
+							Object.keys(norm.关键问题).length > 0 && (
 								<div
 									style={{
 										display: "grid",
@@ -344,35 +319,70 @@ function renderStructuredSections(data) {
 										marginTop: "12px",
 									}}
 								>
-									{norm.互动列表
-										.slice(0, 2)
-										.map((item, idx) => {
-											const it = normalizeInteractionItem(item);
+									{Object.entries(norm.关键问题).map(
+										([key, problem]) => {
+											const p = normalizeProblem(problem);
 											return (
 												<SubBlock
-													key={idx}
-													label={it.方面}
+													key={key}
+													label={p.名称}
 												>
-													{it.特点}
+													{p.解释}
 												</SubBlock>
 											);
-										})}
+										},
+									)}
 								</div>
-								{norm.互动列表.length > 2 &&
-									norm.互动列表
-										.slice(2)
-										.map((item, idx) => {
-											const it = normalizeInteractionItem(item);
-											return (
-												<SubBlock
-													key={idx}
-													label={it.方面}
-												>
-													{it.特点}
-												</SubBlock>
-											);
-										})}
-								{/* {sectionData.格局核心 && (
+							)}
+
+						{/* 互动列表: two-column for first two, then full-width 格局核心 */}
+						{norm.互动列表 &&
+							Array.isArray(norm.互动列表) &&
+							norm.互动列表.length > 0 && (
+								<>
+									<div
+										style={{
+											display: "grid",
+											gridTemplateColumns: "1fr 1fr",
+											gap: "20px 24px",
+											marginTop: "12px",
+										}}
+									>
+										{norm.互动列表
+											.slice(0, 2)
+											.map((item, idx) => {
+												const it =
+													normalizeInteractionItem(
+														item,
+													);
+												return (
+													<SubBlock
+														key={idx}
+														label={it.方面}
+													>
+														{it.特点}
+													</SubBlock>
+												);
+											})}
+									</div>
+									{norm.互动列表.length > 2 &&
+										norm.互动列表
+											.slice(2)
+											.map((item, idx) => {
+												const it =
+													normalizeInteractionItem(
+														item,
+													);
+												return (
+													<SubBlock
+														key={idx}
+														label={it.方面}
+													>
+														{it.特点}
+													</SubBlock>
+												);
+											})}
+									{/* {sectionData.格局核心 && (
 									<div style={{ marginTop: "12px" }}>
 										<div
 											style={{
@@ -403,44 +413,45 @@ function renderStructuredSections(data) {
 										</p>
 									</div>
 								)} */}
-							</>
-						)}
+								</>
+							)}
 
-					{/* 格局核心 only (no 互动列表) */}
-					{(norm.格局核心 ?? sectionData.格局核心) &&
-						(!norm.互动列表 ||
-							!Array.isArray(norm.互动列表) ||
-							norm.互动列表.length === 0) && (
-							<div style={{ marginTop: "12px" }}>
-								<div
-									style={{
-										backgroundColor: MIDDLE_ACCENT,
-										color: "#fff",
-										fontSize: "13px",
-										fontWeight: 700,
-										padding: "8px 12px",
-										marginBottom: "8px",
-										textAlign: "center",
-										fontFamily: "Noto Sans HK, sans-serif",
-										width: "100%",
-										boxSizing: "border-box",
-									}}
-								>
-									格局核心
+						{/* 格局核心 only (no 互动列表) */}
+						{(norm.格局核心 ?? sectionData.格局核心) &&
+							(!norm.互动列表 ||
+								!Array.isArray(norm.互动列表) ||
+								norm.互动列表.length === 0) && (
+								<div style={{ marginTop: "12px" }}>
+									<div
+										style={{
+											backgroundColor: MIDDLE_ACCENT,
+											color: "#fff",
+											fontSize: "13px",
+											fontWeight: 700,
+											padding: "8px 12px",
+											marginBottom: "8px",
+											textAlign: "center",
+											fontFamily:
+												"Noto Sans HK, sans-serif",
+											width: "100%",
+											boxSizing: "border-box",
+										}}
+									>
+										格局核心
+									</div>
+									<p
+										style={{
+											fontSize: MIDDLE_BODY_SIZE,
+											lineHeight: 1.7,
+											color: "#333",
+											margin: 0,
+										}}
+									>
+										{norm.格局核心 ?? sectionData.格局核心}
+									</p>
 								</div>
-								<p
-									style={{
-										fontSize: MIDDLE_BODY_SIZE,
-										lineHeight: 1.7,
-										color: "#333",
-										margin: 0,
-									}}
-								>
-									{norm.格局核心 ?? sectionData.格局核心}
-								</p>
-							</div>
-						)}
-				</div>
+							)}
+					</div>
 				);
 			})}
 		</div>

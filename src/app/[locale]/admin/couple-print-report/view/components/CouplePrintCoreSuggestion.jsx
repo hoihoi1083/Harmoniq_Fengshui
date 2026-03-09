@@ -362,7 +362,6 @@ export default function CouplePrintCoreSuggestion({ data }) {
 										border: `1px solid ${P2_PANEL_BORDER}`,
 										borderRadius: "10px",
 										overflow: "hidden",
-										backgroundColor: P2_PANEL_INNER_BG,
 									}}
 								>
 									<div
@@ -388,6 +387,8 @@ export default function CouplePrintCoreSuggestion({ data }) {
 													padding: "4px 8px",
 													fontSize: "11px",
 													fontWeight: 600,
+													width: "30%",
+													textAlign: "center",
 													marginBottom: "6px",
 													WebkitPrintColorAdjust:
 														"exact",
@@ -435,6 +436,9 @@ export default function CouplePrintCoreSuggestion({ data }) {
 													color: "#fff",
 													padding: "4px 8px",
 													fontSize: "11px",
+													width: "30%",
+													textAlign: "center",
+
 													fontWeight: 600,
 													marginBottom: "6px",
 													WebkitPrintColorAdjust:
@@ -467,7 +471,6 @@ export default function CouplePrintCoreSuggestion({ data }) {
 										border: `1px solid ${P2_PANEL_BORDER}`,
 										borderRadius: "10px",
 										overflow: "hidden",
-										backgroundColor: P2_PANEL_INNER_BG,
 									}}
 								>
 									<div
@@ -491,6 +494,9 @@ export default function CouplePrintCoreSuggestion({ data }) {
 														P2_ACTION_BAR_FEMALE,
 													color: "#fff",
 													padding: "4px 8px",
+													width: "30%",
+													textAlign: "center",
+
 													fontSize: "11px",
 													fontWeight: 600,
 													marginBottom: "6px",
@@ -540,6 +546,9 @@ export default function CouplePrintCoreSuggestion({ data }) {
 													color: "#fff",
 													padding: "4px 8px",
 													fontSize: "11px",
+													width: "30%",
+													textAlign: "center",
+
 													fontWeight: 600,
 													marginBottom: "6px",
 													WebkitPrintColorAdjust:
@@ -853,8 +862,6 @@ export default function CouplePrintCoreSuggestion({ data }) {
 																				width: "40px",
 																				minWidth:
 																					"40px",
-																				backgroundColor:
-																					iconBg,
 																				display:
 																					"flex",
 																				alignItems:
@@ -868,14 +875,22 @@ export default function CouplePrintCoreSuggestion({ data }) {
 																			}}
 																			aria-hidden
 																		>
-																			<span
+																			<Image
+																				src={
+																					isMale
+																						? "/images/report-print/male.png"
+																						: "/images/report-print/female.png"
+																				}
+																				alt=""
+																				width={
+																					28
+																				}
+																				height={
+																					36
+																				}
 																				style={{
-																					width: "24px",
-																					height: "28px",
-																					borderRadius:
-																						"12px 12px 0 0",
-																					backgroundColor:
-																						"rgba(0,0,0,0.08)",
+																					objectFit:
+																						"contain",
 																				}}
 																			/>
 																		</div>
@@ -968,9 +983,6 @@ export default function CouplePrintCoreSuggestion({ data }) {
 																			subIdx
 																		}
 																		style={{
-																			border: `1px solid ${TABOO_CARD_BORDER}`,
-																			borderRadius:
-																				"8px",
 																			overflow:
 																				"hidden",
 																			backgroundColor:
@@ -987,6 +999,7 @@ export default function CouplePrintCoreSuggestion({ data }) {
 																				fontSize:
 																					"13px",
 																				fontWeight: 700,
+																				width: "40%",
 																				textAlign:
 																					"center",
 																				WebkitPrintColorAdjust:
