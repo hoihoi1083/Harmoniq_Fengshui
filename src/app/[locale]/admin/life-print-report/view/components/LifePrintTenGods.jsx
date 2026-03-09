@@ -97,7 +97,7 @@ function TenGodCard({ godName, data, elementDisplay }) {
 		<div
 			style={{
 				marginBottom: "1px",
-				padding: "14px",
+				padding: "1px",
 				position: "relative",
 			}}
 		>
@@ -108,9 +108,9 @@ function TenGodCard({ godName, data, elementDisplay }) {
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontWeight: 700,
-						fontSize: "30px",
+						fontSize: "35px",
 						color: "#969E7E",
-						marginBottom: "10px",
+						marginBottom: "5px",
 					}}
 				>
 					{data.name || godName}
@@ -122,7 +122,7 @@ function TenGodCard({ godName, data, elementDisplay }) {
 						flexWrap: "wrap",
 						gap: "8px",
 						alignItems: "center",
-						marginBottom: "12px",
+						marginBottom: "5px",
 						marginLeft: "45px",
 					}}
 				>
@@ -169,9 +169,9 @@ function TenGodCard({ godName, data, elementDisplay }) {
 				<p
 					style={{
 						fontSize: "13px",
-						lineHeight: 1.75,
+						lineHeight: 1.25,
 						color: "#424242",
-						margin: "0 0 10px 0",
+						margin: "0 0 5px 0",
 					}}
 				>
 					{expression}
@@ -188,7 +188,7 @@ function TenGodCard({ godName, data, elementDisplay }) {
 							fontWeight: 700,
 							color: "#969E7E",
 							letterSpacing: "0.20em",
-							marginBottom: "6px",
+							marginBottom: "10px",
 						}}
 					>
 						實際表現
@@ -196,7 +196,7 @@ function TenGodCard({ godName, data, elementDisplay }) {
 					<p
 						style={{
 							fontSize: "13px",
-							lineHeight: 1.75,
+							lineHeight: 1.25,
 							color: "#424242",
 							margin: "0 0 10px 0",
 						}}
@@ -209,7 +209,14 @@ function TenGodCard({ godName, data, elementDisplay }) {
 			)}
 			{/* Conflict blocks: tag (subtitle) with AI color + description & example */}
 			{conflicts.length > 0 && (
-				<div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "10px" }}>
+				<div
+					style={{
+						marginTop: "5px",
+						display: "flex",
+						flexDirection: "column",
+						gap: "10px",
+					}}
+				>
 					{conflicts.map((c, i) => {
 						const tagBg =
 							c.color === "red"
@@ -220,28 +227,36 @@ function TenGodCard({ godName, data, elementDisplay }) {
 										? "#5a7a5a"
 										: "#888";
 						return (
-							<div key={i} style={{ marginBottom: "2px" }}>
+							<div
+								key={i}
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									alignItems: "flex-start",
+									gap: "10px",
+									marginBottom: "10px",
+								}}
+							>
 								<span
 									style={{
-										display: "inline-block",
+										flexShrink: 0,
 										padding: "4px 10px",
 										borderRadius: "6px",
-										background: tagBg,
+										background: "#969E7E",
 										color: "#fff",
 										fontSize: "12px",
 										fontWeight: 700,
-										marginBottom: "6px",
 									}}
 								>
 									{c.title || ""}
 								</span>
-								<p
+								<span
 									style={{
-										margin: 0,
+										flex: 1,
+										minWidth: 0,
 										fontSize: "12px",
 										lineHeight: 1.7,
 										color: "#424242",
-										paddingLeft: "2px",
 									}}
 								>
 									{c.description}
@@ -250,7 +265,7 @@ function TenGodCard({ godName, data, elementDisplay }) {
 											（例：{c.example}）
 										</span>
 									)}
-								</p>
+								</span>
 							</div>
 						);
 					})}
@@ -284,7 +299,7 @@ function TenGodsPage({ godNames, tenGodsAnalysis, wuxingData, pageNum }) {
 					display: "flex",
 					justifyContent: "space-between",
 					alignItems: "center",
-					marginBottom: "18px",
+					marginBottom: "10px",
 				}}
 			>
 				<h2

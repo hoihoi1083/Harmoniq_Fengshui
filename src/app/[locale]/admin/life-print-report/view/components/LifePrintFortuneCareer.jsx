@@ -60,7 +60,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 				style={{
 					display: "flex",
 					alignItems: "stretch",
-					marginBottom: description ? "10px" : "12px",
+					marginBottom: description ? "5px" : "5px",
 					gap: 0,
 				}}
 			>
@@ -69,7 +69,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontWeight: 700,
-						fontSize: "35px",
+						fontSize: "30px",
 						color: CAREER_BLUE,
 						letterSpacing: "0.2em",
 						lineHeight: 1.4,
@@ -83,7 +83,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 						<div
 							style={{
 								width: "1px",
-								minHeight: "1.2em",
+								minHeight: "1em",
 								backgroundColor: TEXT_DARK,
 								margin: "0 14px",
 								flexShrink: 0,
@@ -92,7 +92,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 						<p
 							style={{
 								fontSize: "13px",
-								lineHeight: 1.7,
+								lineHeight: 1.2,
 								color: TEXT_DARK,
 								margin: 0,
 								fontFamily: "Noto Sans HK, sans-serif",
@@ -130,7 +130,7 @@ function NumberedSubHeading({ num, title }) {
 				display: "flex",
 				alignItems: "baseline",
 				gap: "6px",
-				marginTop: "12px",
+				marginTop: "6px",
 				marginBottom: "6px",
 			}}
 		>
@@ -178,7 +178,7 @@ function NumberedList({ items }) {
 				margin: "0 0 8px 0",
 				paddingLeft: "22px",
 				fontSize: "13px",
-				lineHeight: 1.75,
+				lineHeight: 1.4,
 				color: TEXT_DARK,
 				fontFamily: "Noto Sans HK, sans-serif",
 			}}
@@ -194,7 +194,7 @@ function NumberedList({ items }) {
 
 const bodyText = {
 	fontSize: "13px",
-	lineHeight: 1.7,
+	lineHeight: 1.4,
 	color: TEXT_DARK,
 	fontFamily: "Noto Sans HK, sans-serif",
 };
@@ -382,7 +382,7 @@ export default function LifePrintFortuneCareer({ data, pageNumber }) {
 							fontFamily:
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 							fontWeight: 700,
-							fontSize: "35px",
+							fontSize: "30px",
 							color: CAREER_BLUE,
 							marginBottom: "8px",
 							letterSpacing: "0.2em",
@@ -478,7 +478,7 @@ export default function LifePrintFortuneCareer({ data, pageNumber }) {
 											border: "1px solid #ddd",
 											padding: "8px 10px",
 											verticalAlign: "top",
-											lineHeight: 1.6,
+											lineHeight: 1.4,
 											color: TEXT_DARK,
 										}}
 									>
@@ -491,7 +491,7 @@ export default function LifePrintFortuneCareer({ data, pageNumber }) {
 											border: "1px solid #ddd",
 											padding: "8px 10px",
 											verticalAlign: "top",
-											lineHeight: 1.6,
+											lineHeight: 1.4,
 											color: TEXT_DARK,
 										}}
 									>
@@ -569,7 +569,7 @@ export default function LifePrintFortuneCareer({ data, pageNumber }) {
 									fontFamily:
 										"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 									fontWeight: 700,
-									fontSize: "35px",
+									fontSize: "30px",
 									color: CAREER_BLUE,
 									marginBottom: "8px",
 									letterSpacing: "0.2em",

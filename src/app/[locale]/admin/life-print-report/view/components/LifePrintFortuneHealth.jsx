@@ -31,7 +31,7 @@ function TitleBar({ children }) {
 	return (
 		<div
 			style={{
-				width: "40%",
+				width: "50%",
 				backgroundColor: BLUE_GREEN,
 				color: "#fff",
 				fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
@@ -56,7 +56,7 @@ function SectionTitleWithDescription({ title, description }) {
 			style={{
 				display: "flex",
 				alignItems: "stretch",
-				marginBottom: "12px",
+				marginBottom: "2px",
 				gap: 0,
 			}}
 		>
@@ -119,7 +119,7 @@ function NumberedSubHeading({ num, title, teal }) {
 				alignItems: "baseline",
 				gap: "6px",
 				marginTop: "12px",
-				marginBottom: "6px",
+				marginBottom: "5px",
 			}}
 		>
 			<span
@@ -309,6 +309,19 @@ export default function LifePrintFortuneHealth({ data, pageNumber }) {
 									/>
 								</>
 							)}
+							{shengu.content.keyYears && (
+								<>
+									<NumberedSubHeading
+										num="03"
+										title="未來大運期間"
+									/>
+									<BulletList
+										items={[shengu.content.keyYears]}
+									/>
+								</>
+							)}
+						</div>
+						<div>
 							{shengu.content.risks &&
 								Array.isArray(shengu.content.risks) &&
 								shengu.content.risks.length > 0 && (
@@ -328,19 +341,6 @@ export default function LifePrintFortuneHealth({ data, pageNumber }) {
 										/>
 									</>
 								)}
-						</div>
-						<div>
-							{shengu.content.keyYears && (
-								<>
-									<NumberedSubHeading
-										num="03"
-										title="未來大運期間"
-									/>
-									<BulletList
-										items={[shengu.content.keyYears]}
-									/>
-								</>
-							)}
 						</div>
 					</div>
 				</div>

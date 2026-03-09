@@ -42,7 +42,7 @@ export default function LifePrintCoverPage({
 	const year = now.getFullYear();
 
 	// Cover section height: reserves space so BaZi chart sits exactly below (gray box ends at 35mm + 150mm = 185mm)
-	const COVER_SECTION_HEIGHT = "185mm";
+	const COVER_SECTION_HEIGHT = "175mm";
 
 	return (
 		<div
@@ -70,7 +70,7 @@ export default function LifePrintCoverPage({
 						top: "35mm",
 						left: "35mm",
 						width: "135mm",
-						height: "130mm",
+						height: "110mm",
 						backgroundColor: "#EDEDED",
 						zIndex: 0,
 					}}
@@ -79,7 +79,7 @@ export default function LifePrintCoverPage({
 				<div
 					style={{
 						position: "absolute",
-						top: "30mm",
+						top: "20mm",
 						left: "25mm",
 						zIndex: 2,
 					}}

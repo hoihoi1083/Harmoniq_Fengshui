@@ -36,11 +36,10 @@ function TitleBar({ children }) {
 	return (
 		<div
 			style={{
-				width: "40%",
+				width: "50%",
 				backgroundColor: RELATIONSHIP_RED,
 				color: "#fff",
-				fontFamily:
-					"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+				fontFamily: "var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 				fontWeight: 700,
 				fontSize: "17px",
 				textAlign: "center",
@@ -64,7 +63,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 				style={{
 					display: "flex",
 					alignItems: "stretch",
-					marginBottom: description ? "10px" : "12px",
+					marginBottom: description ? "5px" : "5px",
 					gap: 0,
 				}}
 			>
@@ -75,7 +74,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 						fontWeight: 700,
 						fontSize: "30px",
 						color: RELATIONSHIP_RED,
-						letterSpacing: "0.1em",
+						letterSpacing: "0.2em",
 						lineHeight: 1.4,
 						flexShrink: 0,
 					}}
@@ -87,7 +86,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 						<div
 							style={{
 								width: "1px",
-								minHeight: "1.2em",
+								minHeight: "1em",
 								backgroundColor: TEXT_DARK,
 								margin: "0 14px",
 								flexShrink: 0,
@@ -96,7 +95,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 						<p
 							style={{
 								fontSize: "13px",
-								lineHeight: 1.7,
+								lineHeight: 1.2,
 								color: TEXT_DARK,
 								margin: 0,
 								fontFamily: "Noto Sans HK, sans-serif",
@@ -126,7 +125,7 @@ function SectionVertical({ title, description, twoColumns, children }) {
 	);
 }
 
-/** Numbered sub-heading: red number + dark title */
+/** Numbered sub-heading: red number + dark title (match career: 25px number, 18px title, 6px margins) */
 function NumberedSubHeading({ num, title }) {
 	return (
 		<div
@@ -134,15 +133,16 @@ function NumberedSubHeading({ num, title }) {
 				display: "flex",
 				alignItems: "baseline",
 				gap: "6px",
-				marginTop: "12px",
+				marginTop: "6px",
 				marginBottom: "6px",
 			}}
 		>
 			<span
 				style={{
-					fontFamily: "Noto Serif TC, serif",
+					fontFamily:
+						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 					fontWeight: 700,
-					fontSize: "22px",
+					fontSize: "25px",
 					color: RELATIONSHIP_RED,
 				}}
 			>
@@ -150,7 +150,8 @@ function NumberedSubHeading({ num, title }) {
 			</span>
 			<span
 				style={{
-					fontFamily: "Noto Serif TC, serif",
+					fontFamily:
+						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 					fontWeight: 700,
 					fontSize: "18px",
 					color: TEXT_DARK,
@@ -163,8 +164,8 @@ function NumberedSubHeading({ num, title }) {
 }
 
 const bodyText = {
-	fontSize: "13px",
-	lineHeight: 1.7,
+	fontSize: "12px",
+	lineHeight: 1.4,
 	color: TEXT_DARK,
 	fontFamily: "Noto Sans HK, sans-serif",
 };
@@ -178,15 +179,16 @@ const AUTH_KEYS = [
 
 // Build table rows from romanticCycles (preserve order: 25歲前, 35歲危機, 45歲波動 or first three entries)
 function getCycleRows(romanticCycles) {
-	if (!romanticCycles || typeof romanticCycles !== "object")
-		return [];
+	if (!romanticCycles || typeof romanticCycles !== "object") return [];
 	return Object.entries(romanticCycles)
 		.slice(0, 6)
 		.map(([k, v]) => ({
 			period: v?.period || k,
 			fortune: v?.fortune || "",
 			keyAction: v?.solution || "",
-			riskWarning: [v?.dangerousYear, v?.crisis].filter(Boolean).join(" "),
+			riskWarning: [v?.dangerousYear, v?.crisis]
+				.filter(Boolean)
+				.join(" "),
 		}));
 }
 
@@ -237,7 +239,7 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 					fontFamily:
 						"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 					fontWeight: 700,
-					fontSize: "28px",
+					fontSize: "35px",
 					color: RELATIONSHIP_RED,
 					marginBottom: "8px",
 					letterSpacing: "0.2em",
@@ -245,14 +247,12 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 			>
 				感情運勢分析
 			</h2>
-			{summaryTitle && (
-				<TitleBar>{stripBold(summaryTitle)}</TitleBar>
-			)}
+			{summaryTitle && <TitleBar>{stripBold(summaryTitle)}</TitleBar>}
 			{summaryDesc && (
 				<p
 					style={{
 						...bodyText,
-						margin: "0 0 20px 0",
+						margin: "20px 0 20px 0",
 						paddingLeft: "20px",
 						position: "relative",
 						fontFamily: "Noto Serif TC, serif",
@@ -277,10 +277,7 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 
 			{/* 正緣特徵三重認證 */}
 			{hasAuth && (
-				<SectionVertical
-					title="正緣特徵三重認證"
-					twoColumns
-				>
+				<SectionVertical title="正緣特徵三重認證" twoColumns>
 					{AUTH_KEYS.map(({ key, title }, i) => {
 						const item = authenticity[key];
 						if (!item?.description) return null;
@@ -359,9 +356,9 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 							fontFamily:
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 							fontWeight: 700,
-							fontSize: "28px",
+							fontSize: "30px",
 							color: RELATIONSHIP_RED,
-							marginBottom: "12px",
+							marginBottom: "8px",
 							letterSpacing: "0.2em",
 						}}
 					>
@@ -371,7 +368,7 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 						style={{
 							width: "100%",
 							borderCollapse: "collapse",
-							fontSize: "13px",
+							fontSize: "12px",
 							fontFamily: "Noto Sans HK, sans-serif",
 						}}
 					>
@@ -490,9 +487,7 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 							/>
 							<p style={{ ...bodyText, margin: 0 }}>
 								{bestYear.year && (
-									<>
-										{stripBold(bestYear.year)} —{" "}
-									</>
+									<>{stripBold(bestYear.year)} — </>
 								)}
 								{stripBold(bestYear.description)}
 							</p>
@@ -502,7 +497,10 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 						<div style={{ marginBottom: "12px" }}>
 							<NumberedSubHeading
 								num="02"
-								title={stripBold(taboos.financial.title) || "禁止財務共有"}
+								title={
+									stripBold(taboos.financial.title) ||
+									"禁止財務共有"
+								}
 							/>
 							<p style={{ ...bodyText, margin: 0 }}>
 								{stripBold(taboos.financial.description)}
@@ -513,7 +511,10 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 						<div>
 							<NumberedSubHeading
 								num="03"
-								title={stripBold(taboos.frequency.title) || "緩解水火相激"}
+								title={
+									stripBold(taboos.frequency.title) ||
+									"緩解水火相激"
+								}
 							/>
 							<p style={{ ...bodyText, margin: 0 }}>
 								{stripBold(taboos.frequency.description)}
@@ -530,7 +531,7 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 						style={{
 							display: "flex",
 							alignItems: "stretch",
-							marginBottom: "12px",
+							marginBottom: "5px",
 							gap: 0,
 						}}
 					>
@@ -550,6 +551,7 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 								fontWeight: 700,
 								fontSize: "30px",
 								color: RELATIONSHIP_RED,
+								letterSpacing: "0.2em",
 								lineHeight: 1.4,
 							}}
 						>
@@ -558,9 +560,7 @@ export default function LifePrintFortuneRelationship({ data, pageNumber }) {
 					</div>
 					<p style={{ ...bodyText, margin: 0 }}>
 						{childrenFate.timing && (
-							<>
-								（{stripBold(childrenFate.timing)}）：
-							</>
+							<>（{stripBold(childrenFate.timing)}）：</>
 						)}{" "}
 						{stripBold(childrenFate.description)}
 					</p>

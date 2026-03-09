@@ -57,7 +57,7 @@ function SectionVertical({ title, description, children }) {
 				style={{
 					display: "flex",
 					alignItems: "stretch",
-					marginBottom: description ? "10px" : "12px",
+					marginBottom: description ? "5px" : "5px",
 					gap: 0,
 				}}
 			>
@@ -66,10 +66,10 @@ function SectionVertical({ title, description, children }) {
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						fontWeight: 700,
-						fontSize: "30px",
+						fontSize: "27px",
 						color: WEALTH_GOLD,
 						letterSpacing: "0.05em",
-						lineHeight: 1.4,
+						lineHeight: 1.2,
 						flexShrink: 0,
 					}}
 				>
@@ -88,8 +88,8 @@ function SectionVertical({ title, description, children }) {
 						/>
 						<p
 							style={{
-								fontSize: "13px",
-								lineHeight: 1.7,
+								fontSize: "11px",
+								lineHeight: 1.4,
 								color: TEXT_DARK,
 								margin: 0,
 								fontFamily: "Noto Sans HK, sans-serif",
@@ -114,8 +114,8 @@ function NumberedSubHeading({ num, title }) {
 				display: "flex",
 				alignItems: "baseline",
 				gap: "6px",
-				marginTop: "12px",
-				marginBottom: "6px",
+				marginTop: "5px",
+				marginBottom: "5px",
 			}}
 		>
 			<span
@@ -150,7 +150,7 @@ function BulletList({ items }) {
 				margin: "0 0 8px 0",
 				paddingLeft: "20px",
 				fontSize: "13px",
-				lineHeight: 1.75,
+				lineHeight: 1.45,
 				color: TEXT_DARK,
 				fontFamily: "Noto Sans HK, sans-serif",
 			}}
@@ -183,7 +183,7 @@ function NumberedList({ items }) {
 				margin: "0 0 8px 0",
 				paddingLeft: "22px",
 				fontSize: "13px",
-				lineHeight: 1.75,
+				lineHeight: 1.45,
 				color: TEXT_DARK,
 				fontFamily: "Noto Sans HK, sans-serif",
 			}}
@@ -259,10 +259,10 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 					fontWeight: 700,
 					fontSize: "28px",
 					color: WEALTH_GOLD,
-					marginBottom: "8px",
+					marginBottom: "5px",
 					letterSpacing: "0.2em",
 					width: "66%",
-					paddingBottom: "6px",
+					paddingBottom: "5px",
 				}}
 			>
 				財運運勢分析
@@ -273,7 +273,8 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 					<p
 						style={{
 							...bodyText,
-							margin: "0 0 20px 0",
+							fontSize: "11px",
+							margin: "0 0 10px 0",
 							paddingLeft: "20px",
 							position: "relative",
 							fontFamily: "Noto Serif TC, serif",
@@ -283,7 +284,7 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 							style={{
 								position: "absolute",
 								left: "0",
-								fontSize: "36px",
+								fontSize: "28px",
 								lineHeight: 1,
 								color: TEXT_DARK,
 								fontFamily: "Noto Serif TC, serif",
@@ -353,7 +354,9 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 										title="關鍵年份"
 									/>
 									<p style={{ ...bodyText, margin: 0 }}>
-										{stripBold(foundation.content.phase1.keyYear)}
+										{stripBold(
+											foundation.content.phase1.keyYear,
+										)}
 									</p>
 								</>
 							)}
@@ -364,7 +367,9 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 										title="致命陷阱"
 									/>
 									<p style={{ ...bodyText, margin: 0 }}>
-										{stripBold(foundation.content.phase1.trapYear)}
+										{stripBold(
+											foundation.content.phase1.trapYear,
+										)}
 									</p>
 								</>
 							)}
@@ -379,16 +384,18 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 									<p
 										style={{
 											...bodyText,
-											margin: "0 0 6px 0",
+											margin: "0 0 4px 0",
 										}}
 									>
-										{stripBold(foundation.content.phase2.name)}
+										{stripBold(
+											foundation.content.phase2.name,
+										)}
 									</p>
 									{foundation.content.phase2.description && (
 										<p
 											style={{
 												...bodyText,
-												margin: "0 0 6px 0",
+												margin: "0 0 4px 0",
 											}}
 										>
 											{stripBold(
@@ -542,7 +549,7 @@ export default function LifePrintFortuneWealth({ data, pageNumber }) {
 						)
 					}
 				>
-							{conservative.content.keyYear && (
+					{conservative.content.keyYear && (
 						<div style={{ marginBottom: "12px" }}>
 							<NumberedSubHeading num="01" title="關鍵年份" />
 							<p style={{ ...bodyText, margin: 0 }}>

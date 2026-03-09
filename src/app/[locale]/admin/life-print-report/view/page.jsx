@@ -457,13 +457,29 @@ function LifePrintReportViewInner() {
 			</div>
 
 			<style jsx global>{`
+				/* A4: 210mm × 297mm — fixed height so one page in browser = one sheet in print */
 				@media print {
+					@page {
+						size: 210mm 297mm;
+						margin: 0;
+					}
+					html,
+					body {
+						margin: 0 !important;
+						padding: 0 !important;
+						width: 210mm !important;
+						min-height: 100% !important;
+						background: white !important;
+						print-color-adjust: exact !important;
+						-webkit-print-color-adjust: exact !important;
+					}
 					.no-print {
 						display: none !important;
 					}
 					.print-report-pages {
 						background: white !important;
 						padding: 0 !important;
+						margin: 0 !important;
 					}
 					body {
 						print-color-adjust: exact;
@@ -481,9 +497,10 @@ function LifePrintReportViewInner() {
 						page-break-after: always;
 						page-break-inside: avoid;
 						width: 210mm !important;
+						height: 297mm !important;
 						min-height: 297mm !important;
-						max-height: none !important;
-						overflow: visible !important;
+						max-height: 297mm !important;
+						overflow: hidden !important;
 						box-sizing: border-box;
 						margin: 0 !important;
 						box-shadow: none !important;
@@ -496,8 +513,9 @@ function LifePrintReportViewInner() {
 				@media screen {
 					.page-break {
 						width: 210mm;
+						height: 297mm;
 						min-height: 297mm;
-						max-height: none;
+						max-height: 297mm;
 						overflow: hidden;
 						box-sizing: border-box;
 						margin: 0 auto 20px;

@@ -117,7 +117,6 @@ function PillarBlockStyled({ title, pillarData, labelOverride }) {
 	const labelStyle = (bgColor) => ({
 		display: "inline-block",
 		padding: "6px 14px",
-		borderRadius: "6px",
 		fontFamily: "Noto Serif TC, serif",
 		fontWeight: 900,
 		fontSize: "14px",
