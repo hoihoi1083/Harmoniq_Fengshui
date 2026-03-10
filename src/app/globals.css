@@ -71,6 +71,10 @@
     width: 100%;
     margin: 0;
     padding: 0;
+    /* Consistent font rendering across browsers (smoother on Edge/Windows) */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {

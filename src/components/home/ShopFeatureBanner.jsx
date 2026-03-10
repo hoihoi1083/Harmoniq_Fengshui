@@ -167,7 +167,7 @@ const ShopFeatureBanner = ({
 										</div>
 									))}
 								</div>
-								<Link href={buttonHref}>
+								<Link href="/smart-chat2">
 									<button
 										className="px-8 py-3 text-sm font-semibold text-white transition-all rounded-full shadow-md md:text-base hover:shadow-lg"
 										style={{
@@ -257,7 +257,7 @@ const ShopFeatureBanner = ({
 												</div>
 											))}
 										</div>
-										<Link href={buttonHref}>
+										<Link href="/price">
 											<button className="px-10 py-3 text-sm font-semibold text-white transition-all border rounded-full shadow-md md:text-base hover:shadow-lg border-white/80">
 												{t("buyReport")}
 											</button>

@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
 import { useMobile } from "../../hooks/useMobile";
 
 export default function ServiceDemoTags() {
 	const t = useTranslations("home.demo");
+	const locale = useLocale();
 	const scrollContainerRef = useRef(null);
 	const isMobile = useMobile();
 	const { region } = useRegionDetection();
@@ -22,10 +23,11 @@ export default function ServiceDemoTags() {
 		smoothness: 1,
 	};
 
+	// Use -china.png variant for Simplified Chinese (zh-CN)
 	const getImagePath = (baseName) => {
-		if (region === "china") {
-			const nameWithoutExtension = baseName.replace(".png", "");
-			return `/images/demo/${nameWithoutExtension}.png`;
+		const nameWithoutExtension = baseName.replace(".png", "");
+		if (locale === "zh-CN") {
+			return `/images/demo/${nameWithoutExtension}-china.png`;
 		}
 		return `/images/demo/${baseName}`;
 	};
