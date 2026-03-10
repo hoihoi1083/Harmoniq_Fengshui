@@ -404,7 +404,6 @@ export default function CouplePrintCoreSuggestion({ data }) {
 												<ul
 													style={{
 														margin: 0,
-														paddingLeft: "18px",
 														fontSize: "11px",
 														lineHeight: 1.6,
 														color: "#111",
@@ -514,7 +513,6 @@ export default function CouplePrintCoreSuggestion({ data }) {
 												<ul
 													style={{
 														margin: 0,
-														paddingLeft: "18px",
 														fontSize: "11px",
 														lineHeight: 1.6,
 														color: "#111",
@@ -609,7 +607,6 @@ export default function CouplePrintCoreSuggestion({ data }) {
 												display: "grid",
 												gridTemplateColumns:
 													"0.7fr 0.8fr 0.8fr 1.2fr",
-												backgroundColor: "#f1f5f9",
 												fontWeight: 600,
 												color: "#111",
 											}}
@@ -618,6 +615,8 @@ export default function CouplePrintCoreSuggestion({ data }) {
 												style={{
 													padding: "8px 10px",
 													borderRight: `1px solid ${P2_PANEL_BORDER}`,
+													fontSize: "14px",
+													fontWeight: 700,
 												}}
 											>
 												衝突類型
@@ -626,6 +625,8 @@ export default function CouplePrintCoreSuggestion({ data }) {
 												style={{
 													padding: "8px 10px",
 													borderRight: `1px solid ${P2_PANEL_BORDER}`,
+													fontSize: "14px",
+													fontWeight: 700,
 												}}
 											>
 												男方主色
@@ -634,12 +635,18 @@ export default function CouplePrintCoreSuggestion({ data }) {
 												style={{
 													padding: "8px 10px",
 													borderRight: `1px solid ${P2_PANEL_BORDER}`,
+													fontSize: "14px",
+													fontWeight: 700,
 												}}
 											>
 												女方主色
 											</div>
 											<div
-												style={{ padding: "8px 10px" }}
+												style={{
+													padding: "8px 10px",
+													fontSize: "14px",
+													fontWeight: 700,
+												}}
 											>
 												溝通策略
 											</div>
@@ -659,6 +666,8 @@ export default function CouplePrintCoreSuggestion({ data }) {
 														style={{
 															padding: "8px 10px",
 															borderRight: `1px solid ${P2_PANEL_BORDER}`,
+															fontSize: "14px",
+															fontWeight: 700,
 														}}
 													>
 														{s.title}

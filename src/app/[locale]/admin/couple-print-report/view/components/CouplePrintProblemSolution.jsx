@@ -293,7 +293,6 @@ export default function CouplePrintProblemSolution({ data, subsections }) {
 									style={{
 										display: "inline-block",
 										padding: "4px 10px",
-										borderRadius: "9999px",
 										background: COUPLE_ACCENT,
 										color: "#fff",
 										fontWeight: 700,
@@ -546,7 +545,6 @@ export default function CouplePrintProblemSolution({ data, subsections }) {
 										fontWeight: 700,
 										fontSize: "11px",
 										padding: "5px 10px",
-										borderRadius: "9999px",
 										textAlign: "center",
 									}}
 								>

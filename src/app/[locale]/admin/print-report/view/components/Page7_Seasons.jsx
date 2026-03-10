@@ -176,10 +176,15 @@ export default function Page7_Seasons({ data }) {
 				["--page-7-title-color"]: color,
 			}}
 		>
-			{/* Page Header - Title with Date (no border/line) */}
+			{/* Page Header - Title with Date (no border/line under 關鍵季節) */}
 			<div
-				className=" page-7-header"
-				style={{ border: "none", outline: "none" }}
+				className="page-7-header"
+				style={{
+					border: "none",
+					borderBottom: "none",
+					outline: "none",
+					boxShadow: "none",
+				}}
 			>
 				<div
 					className="flex items-start justify-between mb-8"
@@ -192,6 +197,7 @@ export default function Page7_Seasons({ data }) {
 							fontFamily:
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 							border: "none",
+							borderBottom: "none",
 							boxShadow: "none",
 							textDecoration: "none",
 							WebkitPrintColorAdjust: "exact",
@@ -304,13 +310,15 @@ export default function Page7_Seasons({ data }) {
 								</div>
 							</div>
 
-							{/* Content Box - Overlapping Right Side of Character - NO SHADOW, NO BORDER */}
+							{/* Content Box - Overlapping Right Side of Character - NO SHADOW, NO BORDER (avoids vertical line in print) */}
 							<div
 								className="relative px-3 py-3 bg-white rounded-lg"
 								style={{
 									marginLeft: "90px",
 									fontSize: "13px",
 									lineHeight: "1.4",
+									border: "none",
+									boxShadow: "none",
 								}}
 							>
 								{/* Current Season Indicator - Inside Content Box (print-color-adjust so 現 stays white on red) */}
@@ -352,8 +360,8 @@ export default function Page7_Seasons({ data }) {
 										{season.period || season.badge || ""}
 									</strong>
 								</div>
-								{/* Season Content */}
-								<div className="mb-2 prose-sm prose max-w-none">
+								{/* Season Content — no prose to avoid print vertical-line artifact */}
+								<div className="mb-2 max-w-none">
 									{mainText && (
 										<p className="text-xs leading-relaxed text-black whitespace-pre-wrap">
 											{mainText}
@@ -368,6 +376,7 @@ export default function Page7_Seasons({ data }) {
 												<p
 													key={idx}
 													className="text-xs leading-relaxed text-black"
+													style={{ border: "none" }}
 												>
 													{pt}
 												</p>

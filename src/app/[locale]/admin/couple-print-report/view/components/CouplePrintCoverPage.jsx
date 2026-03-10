@@ -12,7 +12,9 @@ const SCORE_COLOR = "#b45309";
 const CIRCLE_GRADIENT_START = "#D289A1";
 const CIRCLE_GRADIENT_END = "#ABBDC7";
 const BAR_GRADIENT_START = "#CC91A7";
-const BAR_GRADIENT_END = "#95A7B9";
+const BAR_GRADIENT_END = "#B5C5D7";
+/** Female/Male box background — HSL so you can set lightness by %: last value = 0–100 (e.g. 87 = 87%) */
+const COVER_BOX_BG = "hsl(0, 0%, 90%)";
 const ELEMENT_COLOR = {
 	金: "#B2A062",
 	木: "#567156",
@@ -66,12 +68,12 @@ export default function CouplePrintCoverPage({
 	const balance = elementInteraction?.balance || "五行相生，關係和諧平衡";
 	// Use current year (e.g. 2026), not next year, for the recommendation
 	const currentYearStrategy =
-		annualStrategy && annualStrategy[year]
-			? annualStrategy[year]
-			: null;
+		annualStrategy && annualStrategy[year] ? annualStrategy[year] : null;
 	const yearLabel = `${year}年`;
 	const rawDescription =
-		currentYearStrategy?.description || currentYearStrategy?.monthlyFocus || "";
+		currentYearStrategy?.description ||
+		currentYearStrategy?.monthlyFocus ||
+		"";
 	// Prefer showing the full "整體趨勢" paragraph; API structure is:
 	// [ "1. YYYY年感情運勢分析" ] 整體趨勢：...。 [ - YYYY年N月（農曆...）：... ] [ 重點月份 / 具體建議 ... ]
 	const trendLabel = "整體趨勢：";
@@ -79,7 +81,9 @@ export default function CouplePrintCoverPage({
 	const trendOnly =
 		trendStart >= 0
 			? (() => {
-					const afterLabel = rawDescription.slice(trendStart + trendLabel.length);
+					const afterLabel = rawDescription.slice(
+						trendStart + trendLabel.length,
+					);
 					// End at next section: " - 2026年N月" style, or "重點月份", "具體建議", etc.
 					// Match " - 2026年8月" style bullets, not "2026丙午年" in the first sentence
 					const bulletMatch = /\s-\s*\d{4}年\d?月/.exec(afterLabel);
@@ -91,7 +95,9 @@ export default function CouplePrintCoverPage({
 						afterLabel.indexOf("需要注意"),
 					].filter((i) => typeof i === "number" && i >= 0);
 					const end =
-						candidates.length > 0 ? Math.min(...candidates) : afterLabel.length;
+						candidates.length > 0
+							? Math.min(...candidates)
+							: afterLabel.length;
 					return (trendLabel + afterLabel.slice(0, end)).trim();
 				})()
 			: null;
@@ -448,7 +454,7 @@ export default function CouplePrintCoverPage({
 										alignItems: "center",
 										gap: "13px",
 										padding: "6px 10px",
-										backgroundColor: "#DFDFDF",
+										backgroundColor: COVER_BOX_BG,
 										borderRadius: "10px",
 									}}
 								>
@@ -486,7 +492,7 @@ export default function CouplePrintCoverPage({
 										alignItems: "center",
 										gap: "13px",
 										padding: "6px 10px",
-										backgroundColor: "#DFDFDF",
+										backgroundColor: COVER_BOX_BG,
 										borderRadius: "10px",
 									}}
 								>

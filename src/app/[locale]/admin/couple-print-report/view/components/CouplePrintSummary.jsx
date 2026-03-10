@@ -15,7 +15,12 @@ export default function CouplePrintSummary({ data }) {
 
 	const currentYear = new Date().getFullYear();
 	// Web API returns themes + quote; print layout uses coreThemes + shareableQuote
-	const coreThemes = summary.coreThemes ?? summary.themes ?? [];
+	// Deduplicate so AI-returned repeated themes (e.g. same phrase twice) show only once
+	const rawThemes = summary.coreThemes ?? summary.themes ?? [];
+	const coreThemes = rawThemes.filter(
+		(t, i, arr) =>
+			arr.findIndex((x) => String(x).trim() === String(t).trim()) === i,
+	);
 	const shareableQuote =
 		summary.shareableQuote ??
 		summary.quote ??
@@ -41,14 +46,14 @@ export default function CouplePrintSummary({ data }) {
 				{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
 			</div>
 
-			{/* Title: 我們的 + year (same style as Page10 "我的2026") */}
-			<div className="mb-8">
+			{/* Title: 我們的 + year — text-7xl so full "我們的2026" fits in print (no clip) */}
+			<div className="mb-8 min-w-0 flex-shrink-0">
 				<h1
-					className="mb-10 font-bold text-8xl"
+					className="mb-10 font-bold text-6xl"
 					style={{
 						fontFamily:
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-						letterSpacing: "0.2em",
+						letterSpacing: "0.15em",
 					}}
 				>
 					我們的
@@ -125,7 +130,7 @@ export default function CouplePrintSummary({ data }) {
 					</div>
 				</div>
 
-				<div className="flex items-center justify-center ml-15">
+				<div className="flex items-center justify-center ml-20">
 					<div
 						className="relative flex items-center justify-center p-5 rounded-full w-55 h-55"
 						style={{
@@ -134,9 +139,9 @@ export default function CouplePrintSummary({ data }) {
 						}}
 					>
 						<p className="text-base font-medium leading-relaxed text-center text-gray-800">
-							<span className="text-xl">「</span>
+							<span className="text-lg">「</span>
 							{shareableQuote}
-							<span className="text-2xl">」</span>
+							<span className="text-lg">」</span>
 						</p>
 					</div>
 				</div>
