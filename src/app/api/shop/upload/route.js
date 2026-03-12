@@ -4,8 +4,10 @@ import path from "path";
 import { getUserInfo } from "@/lib/session";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/x-png", "image/webp", "image/gif"];
+const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB (product photos often high-res)
+/** Extension → MIME when browser sends wrong/empty type (e.g. some Windows/Edge) */
+const EXT_TO_MIME = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" };
 
 function getS3Client() {
 	const region = process.env.AWS_REGION || "ap-northeast-1";
@@ -55,23 +57,32 @@ export async function POST(request) {
 		const buffer = Buffer.from(bytes);
 
 		// Validate type and size
-		const mimeType = file.type?.toLowerCase() || "";
+		let mimeType = (file.type || "").toLowerCase().trim();
+		const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "jpg");
 		if (!ALLOWED_TYPES.includes(mimeType)) {
-			return NextResponse.json(
-				{ success: false, error: "Invalid file type. Use JPEG, PNG, WebP or GIF." },
-				{ status: 400 }
-			);
+			// Some browsers (e.g. Edge on Windows) send PNG as image/x-png or empty type — infer from extension
+			const fallback = EXT_TO_MIME[ext];
+			if (fallback) {
+				mimeType = fallback;
+			} else {
+				return NextResponse.json(
+					{ success: false, error: "Invalid file type. Use JPEG, PNG, WebP or GIF." },
+					{ status: 400 }
+				);
+			}
+		}
+		if (!mimeType) {
+			mimeType = EXT_TO_MIME[ext] || "image/jpeg";
 		}
 		if (buffer.length > MAX_SIZE_BYTES) {
 			return NextResponse.json(
-				{ success: false, error: "File too large. Maximum size is 5 MB." },
+				{ success: false, error: `File too large. Maximum size is ${MAX_SIZE_BYTES / (1024 * 1024)} MB.` },
 				{ status: 400 }
 			);
 		}
 
 		const timestamp = Date.now();
 		const randomString = Math.random().toString(36).substring(2, 8);
-		const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "jpg");
 		const filename = `product_${timestamp}_${randomString}.${ext}`;
 		const bucket = process.env.AWS_S3_BUCKET;
 		const useS3 = bucket && process.env.AWS_ACCESS_KEY_ID;

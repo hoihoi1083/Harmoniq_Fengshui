@@ -408,6 +408,25 @@ function CategoryPageContent() {
 
 		let filtered = [...allProducts];
 
+		// Keywords for product type (耳飾, 手串, etc.) — DB category is charm/decoration/etc., so match by name/category keywords
+		const categoryKeywords = {
+			earring: ["耳環", "耳饰", "耳飾", "earring"],
+			bracelet: ["手串", "手链", "手鍊", "bracelet", "charm"],
+			ring: ["戒指", "ring"],
+			necklace: ["项链", "項鏈", "necklace"],
+			pendant: ["吊坠", "吊墜", "pendant"],
+			"feng-shui": ["风水", "風水", "摆件", "擺件", "feng-shui", "decoration"],
+		};
+
+		// UI element (Gold/Wood/...) → DB elementType (metal/wood/...)
+		const elementUiToDb = {
+			Gold: "metal",
+			Wood: "wood",
+			Water: "water",
+			Fire: "fire",
+			Earth: "earth",
+		};
+
 		// Filter by search query
 		if (searchQuery && searchQuery.trim()) {
 			console.log("🔍 Applying search filter for:", searchQuery);
@@ -465,20 +484,34 @@ function CategoryPageContent() {
 				"products found",
 			);
 		} else {
-			// Only apply category filter if NOT searching
-			// Filter by product type (sub-category)
+			// Filter by product type (耳飾, 手串, etc.) using keyword match — DB category is charm/decoration, not earring/bracelet
 			if (selectedProductType) {
-				filtered = filtered.filter(
-					(p) => p.category === selectedProductType,
-				);
+				const keywords = categoryKeywords[selectedProductType] || [selectedProductType];
+				filtered = filtered.filter((p) => {
+					const productCategory = (p.category || "").toLowerCase();
+					const nameZhCN = (p.name?.zh_CN || p.name?.["zh-CN"] || "").toLowerCase();
+					const nameZhTW = (p.name?.zh_TW || p.name?.["zh-TW"] || "").toLowerCase();
+					const nameEn = (p.name?.en || "").toLowerCase();
+					const nameStr = typeof p.name === "string" ? p.name.toLowerCase() : "";
+					return keywords.some(
+						(kw) =>
+							productCategory.includes(kw.toLowerCase()) ||
+							nameZhCN.includes(kw) ||
+							nameZhTW.includes(kw) ||
+							nameEn.includes(kw) ||
+							nameStr.includes(kw.toLowerCase()),
+					);
+				});
 			}
 		}
 
-		// Filter by element type
+		// Filter by element type — map UI (Gold/Wood/...) to DB (metal/wood/...) and compare
 		if (selectedElement) {
-			filtered = filtered.filter(
-				(p) => p.elementType === selectedElement,
-			);
+			const dbElement = elementUiToDb[selectedElement] || selectedElement?.toLowerCase();
+			filtered = filtered.filter((p) => {
+				const el = (p.elementType || "").toLowerCase();
+				return el && el === dbElement;
+			});
 		}
 
 		// Filter by price range

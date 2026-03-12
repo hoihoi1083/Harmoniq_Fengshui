@@ -46,6 +46,12 @@ const FooterV2 = () => {
 							>
 								{locale === "zh-CN" ? "用户条款" : "用戶條款"}
 							</Link>
+							<Link
+								href="/customer/returns"
+								className="hover:text-[#8B9F3A] transition-colors py-0.5"
+							>
+								{locale === "zh-CN" ? "退换货政策" : "退換貨政策"}
+							</Link>
 						</nav>
 					</div>
 					<div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">

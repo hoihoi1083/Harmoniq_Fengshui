@@ -295,9 +295,9 @@ export default function AdminShopPage() {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
-		// Check file size (max 5MB)
-		if (file.size > 5 * 1024 * 1024) {
-			toast.error("圖片大小不能超過 5MB");
+		// Check file size (max 10MB, must match server)
+		if (file.size > 10 * 1024 * 1024) {
+			toast.error("圖片大小不能超過 10MB");
 			return;
 		}
 
@@ -317,7 +317,7 @@ export default function AdminShopPage() {
 				body: uploadFormData,
 			});
 
-			const data = await res.json();
+			const data = await res.json().catch(() => ({}));
 
 			if (data.success) {
 				// Update the image URL at the specific index
@@ -326,10 +326,11 @@ export default function AdminShopPage() {
 				setFormData({ ...formData, images: newImages });
 				toast.success("圖片上傳成功！");
 			} else {
-				throw new Error(data.error);
+				const msg = data.error || (res.ok ? "" : `HTTP ${res.status}`) || "Unknown error";
+				throw new Error(msg);
 			}
 		} catch (error) {
-			toast.error("上傳失敗：" + error.message);
+			toast.error(error.message ? `上傳失敗：${error.message}` : "上傳失敗");
 		} finally {
 			setUploadingImage(false);
 		}
