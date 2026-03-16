@@ -45,11 +45,21 @@ export async function POST(request, { params }) {
 			);
 		}
 
-		const giftReportTypes = [...new Set(
-			(order.items || [])
-				.filter((i) => i.giftReportType)
-				.map((i) => i.giftReportType)
-		)];
+		// Only treat normal gift reports from products (wealth/love/career/health).
+		// Exclude report-print / report-digital which use per-item API.
+		const giftReportTypes = [
+			...new Set(
+				(order.items || [])
+					.filter(
+						(i) =>
+							i.giftReportType &&
+							["wealth", "love", "career", "health"].includes(
+								i.giftReportType,
+							),
+					)
+					.map((i) => i.giftReportType),
+			),
+		];
 		if (giftReportTypes.length === 0) {
 			return NextResponse.json(
 				{ success: false, error: "Order has no gift report item" },

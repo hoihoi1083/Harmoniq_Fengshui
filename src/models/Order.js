@@ -22,7 +22,16 @@ const OrderSchema = new mongoose.Schema({
 			quantity: Number,
 			price: Number,
 			isDigital: Boolean,
-			giftReportType: String, // "wealth" | "love" | "career" | "health" - chosen report as gift
+			// "wealth" | "love" | "career" | "health" | "report-print" | "report-digital"
+			giftReportType: String,
+			// Per-item info for standalone reports (digital or print)
+			reportPrintInfo: {
+				sex: { type: String, enum: ["male", "female"] },
+				birthday: String,
+				birthTime: String,
+				question: String,
+				submittedAt: Date,
+			},
 		},
 	],
 	subtotal: Number,

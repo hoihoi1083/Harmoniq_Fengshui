@@ -96,7 +96,7 @@ export async function POST(request) {
 			// Base price after product discount
 			let finalPrice = Math.round(unitPrice * (1 - discount / 100));
 
-			// Extra fee for printed report items (must match cart / checkout logic)
+			// Extra fee for printed report items (must match cart / checkout / invoice logic)
 			if (item.giftReportType === "report-print" || item.isPrintedReport) {
 				const extraPerUnit =
 					region === "taiwan"
@@ -149,7 +149,8 @@ export async function POST(request) {
 				productName: product.name.zh_TW || product.name["zh-CN"],
 				productImage: product.images?.[0] || "",
 				quantity: item.quantity,
-				price: unitPrice,
+				// Store final per-unit amount (including print fee) so invoices show the same price as Stripe
+				price: finalPrice,
 				isDigital: product.isDigital,
 				giftReportType: item.giftReportType || undefined,
 			});

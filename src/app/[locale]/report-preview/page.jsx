@@ -315,7 +315,10 @@ const ReportPreviewPage = () => {
 				body: JSON.stringify({
 					productId,
 					quantity: 1,
-					giftReportType: wantPrint ? "report-print" : undefined,
+					// Always mark reports so invoice can show per-report form:
+					// - "report-print" when user wants printed copy
+					// - "report-digital" when email-only
+					giftReportType: wantPrint ? "report-print" : "report-digital",
 				}),
 			});
 

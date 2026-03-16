@@ -514,6 +514,11 @@ function AdminOrderDetailContent({ orderId, locale }) {
 														item.quantity
 													).toFixed(2)}
 												</p>
+												{item.giftReportType === "report-print" && item.reportPrintInfo?.birthday && (
+													<p className="mt-1 text-xs text-green-700">
+														已填寫印刷報告資料
+													</p>
+												)}
 											</div>
 										</div>
 									);
@@ -548,7 +553,7 @@ function AdminOrderDetailContent({ orderId, locale }) {
 						</Card>
 
 						{/* Customer report input (sex, birthday, questions) - for orders with gift report */}
-						{order.items?.some((i) => i.giftReportType) && (
+						{order.items?.some((i) => i.giftReportType && i.giftReportType !== "report-print") && (
 							<Card className="p-6 bg-white border-slate-200 shadow-lg">
 								<h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800">
 									<FileText className="w-5 h-5 text-green-600" />
@@ -609,6 +614,83 @@ function AdminOrderDetailContent({ orderId, locale }) {
 										</div>
 									);
 								})()}
+							</Card>
+						)}
+
+						{/* Printed / standalone report per-item info (for report-print / report-digital items) */}
+						{order.items?.some(
+							(i) =>
+								i.giftReportType === "report-print" ||
+								i.giftReportType === "report-digital",
+						) && (
+							<Card className="p-6 bg-white border-slate-200 shadow-lg">
+								<h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800">
+									<FileText className="w-5 h-5 text-blue-600" />
+									報告資料（逐項目）
+								</h2>
+								<div className="space-y-4">
+									{order.items
+										.filter(
+											(i) =>
+												i.giftReportType ===
+													"report-print" ||
+												i.giftReportType ===
+													"report-digital",
+										)
+										.map((item, idx) => {
+											const product = item.productId || {};
+											const productName = product.name
+												? (typeof product.name === "string"
+														? product.name
+														: product.name.zh_TW ||
+															product.name["zh-CN"] ||
+															product.name.en)
+												: item.productName || "報告";
+
+											return (
+												<div
+													key={item._id || idx}
+													className="border border-slate-200 rounded-xl p-4 bg-slate-50"
+												>
+													<p className="font-medium text-slate-800 mb-2">
+														{productName}
+													</p>
+													{item.reportPrintInfo?.birthday ? (
+														<div className="space-y-1 text-sm text-slate-700">
+															<p>
+																性別：{" "}
+																{item.reportPrintInfo.sex === "female"
+																	? "女"
+																	: "男"}
+															</p>
+															<p>出生日期： {item.reportPrintInfo.birthday}</p>
+															{item.reportPrintInfo.birthTime && (
+																<p>出生時間： {item.reportPrintInfo.birthTime}</p>
+															)}
+															{item.reportPrintInfo.question && (
+																<p>想問的問題： {item.reportPrintInfo.question}</p>
+															)}
+															{item.reportPrintInfo.address && (
+																<p>郵寄地址： {item.reportPrintInfo.address}</p>
+															)}
+															{item.reportPrintInfo.submittedAt && (
+																<p className="text-xs text-slate-500 pt-1">
+																	提交時間：
+																	{new Date(
+																		item.reportPrintInfo.submittedAt,
+																	).toLocaleString("zh-TW")}
+																</p>
+															)}
+														</div>
+													) : (
+														<p className="text-sm text-slate-500">
+															客戶尚未填寫此紙本報告的資料
+														</p>
+													)}
+												</div>
+											);
+										})}
+								</div>
 							</Card>
 						)}
 

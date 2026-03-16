@@ -43,9 +43,16 @@ export default function OrderConfirmationPage() {
 	const params = useParams();
 	const [order, setOrder] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const [reportForm, setReportForm] = useState({ sex: "male", birthday: "", questions: {} });
+	const [reportForm, setReportForm] = useState({
+		sex: "male",
+		birthday: "",
+		questions: {},
+	});
 	const [reportSubmitting, setReportSubmitting] = useState(false);
 	const [reportFormVisible, setReportFormVisible] = useState(false);
+	// Per-item printed report forms keyed by order item _id
+	const [printForms, setPrintForms] = useState({});
+	const [printSubmittingIds, setPrintSubmittingIds] = useState({});
 
 	useEffect(() => {
 		if (!params.orderId) return;
@@ -100,29 +107,27 @@ export default function OrderConfirmationPage() {
 		return statusMap[status] || status;
 	};
 
-	// Gift reports from shop products (wealth / love / career / health)
-	const hasGiftReport = order?.items?.some(
-		(i) => i.giftReportType && i.giftReportType !== "report-print",
+	// Gift reports from shop products (wealth / love / career / health) – not standalone reports
+	const GIFT_TYPES = ["wealth", "love", "career", "health"];
+	const hasGiftReport = order?.items?.some((i) =>
+		GIFT_TYPES.includes(i.giftReportType),
 	);
 	const giftReportTypes = order?.items
 		? [
 				...new Set(
 					order.items
-						.filter(
-							(i) =>
-								i.giftReportType &&
-								i.giftReportType !== "report-print",
-						)
+						.filter((i) => GIFT_TYPES.includes(i.giftReportType))
 						.map((i) => i.giftReportType),
 				),
 			]
 		: [];
 
-	// Standalone / paid reports where user selected printed report
+	// Standalone / paid reports (digital or printed)
 	const hasPrintedReport = order?.items?.some(
-		(i) => i.giftReportType === "report-print",
+		(i) =>
+			i.giftReportType === "report-print" ||
+			i.giftReportType === "report-digital",
 	);
-	const hasAnyReport = hasGiftReport || hasPrintedReport;
 	const hasReportQuestion =
 		order?.reportInput?.question ||
 		(order?.reportInput?.questions && Object.values(order.reportInput.questions || {}).some((q) => q));
@@ -176,6 +181,65 @@ export default function OrderConfirmationPage() {
 			toast.error(locale === "zh-CN" ? "提交失敗" : "提交失敗");
 		} finally {
 			setReportSubmitting(false);
+		}
+	};
+
+	// Submit per-item printed report info (for items with giftReportType === "report-print")
+	const handleSubmitPrintInfo = async (itemId) => {
+		if (printSubmittingIds[itemId]) return;
+		const form = printForms[itemId] || {};
+		if (!form.birthday?.trim()) {
+			toast.error(
+				locale === "zh-CN"
+					? "請填寫此報告的出生日期"
+					: "請填寫此報告的出生日期",
+			);
+			return;
+		}
+
+		setPrintSubmittingIds((prev) => ({ ...prev, [itemId]: true }));
+
+		try {
+			const res = await fetch(
+				`/api/shop/orders/${params.orderId}/items/${itemId}/report-print-input`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						sex: form.sex || "male",
+						birthday: form.birthday,
+						birthTime: form.birthTime || "",
+						question: form.question || "",
+					}),
+				},
+			);
+			const data = await res.json();
+			if (!res.ok || !data.success) {
+				throw new Error(
+					data.error ||
+						(locale === "zh-CN" ? "提交失敗" : "提交失敗"),
+				);
+			}
+
+			if (data.data) {
+				setOrder(data.data);
+			} else {
+				await fetchOrder();
+			}
+
+			toast.success(
+				locale === "zh-CN"
+					? "報告資料已提交（此項目僅可提交一次）"
+					: "報告資料已提交（此項目僅可提交一次）",
+			);
+		} catch (error) {
+			console.error("Submit printed report info error:", error);
+			toast.error(
+				error.message ||
+					(locale === "zh-CN" ? "提交失敗" : "提交失敗"),
+			);
+		} finally {
+			setPrintSubmittingIds((prev) => ({ ...prev, [itemId]: false }));
 		}
 	};
 
@@ -329,7 +393,7 @@ export default function OrderConfirmationPage() {
 																	.zh_TW}
 														</p>
 													)}
-													{item.giftReportType && (
+													{item.giftReportType && item.giftReportType !== "report-print" && (
 														<p className="text-sm text-[#6B8E23] mb-1">
 															{locale === "zh-CN"
 																? "贈送報告"
@@ -340,6 +404,14 @@ export default function OrderConfirmationPage() {
 																	.giftReportType
 															] ||
 																item.giftReportType}
+														</p>
+													)}
+													{(item.giftReportType === "report-print" ||
+														item.giftReportType === "report-digital") && (
+														<p className="text-sm text-[#1C312E] mb-2">
+															{locale === "zh-CN"
+																? "付費印刷版報告"
+																: "付費印刷版報告"}
 														</p>
 													)}
 													<div className="flex justify-between items-center">
@@ -359,6 +431,156 @@ export default function OrderConfirmationPage() {
 															).toFixed(0)}
 														</span>
 													</div>
+
+													{(item.giftReportType === "report-print" ||
+														item.giftReportType === "report-digital") && (
+														<div className="mt-4 border-t border-dashed border-gray-200 pt-4">
+															{item.reportPrintInfo?.birthday ? (
+																<div className="space-y-1 text-sm text-gray-600">
+																	<p>
+																		{locale === "zh-CN" ? "性別：" : "性別："}{" "}
+																		{item.reportPrintInfo.sex === "female"
+																			? (locale === "zh-CN" ? "女" : "女")
+																			: (locale === "zh-CN" ? "男" : "男")}
+																	</p>
+																	<p>
+																		{locale === "zh-CN" ? "出生日期：" : "出生日期："}{" "}
+																		{item.reportPrintInfo.birthday}
+																	</p>
+																	{item.reportPrintInfo.birthTime && (
+																		<p>
+																			{locale === "zh-CN" ? "出生時間：" : "出生時間："}{" "}
+																			{item.reportPrintInfo.birthTime}
+																		</p>
+																	)}
+																	{item.reportPrintInfo.question && (
+																		<p>
+																			{locale === "zh-CN" ? "想問的問題：" : "想問的問題："}{" "}
+																			{item.reportPrintInfo.question}
+																		</p>
+																	)}
+																	<p className="text-xs text-green-700 mt-1">
+																		{locale === "zh-CN"
+																			? "已提交（此報告僅可提交一次）"
+																			: "已提交（此報告僅可提交一次）"}
+																	</p>
+																</div>
+															) : (
+																<form
+																	onSubmit={(e) => {
+																		e.preventDefault();
+																		handleSubmitPrintInfo(
+																			item._id,
+																		);
+																	}}
+																	className="space-y-3 text-sm"
+																>
+																	<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+																		<div>
+																			<label className="block text-xs font-medium text-gray-700 mb-1">
+																				{locale === "zh-CN" ? "性別" : "性別"}
+																			</label>
+																			<select
+																				value={printForms[item._id]?.sex || "male"}
+																				onChange={(e) =>
+																					setPrintForms((prev) => ({
+																						...prev,
+																						[item._id]: {
+																							...(prev[item._id] || {}),
+																							sex: e.target.value,
+																						},
+																					}))
+																				}
+																				className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:ring-2 focus:ring-[#6B8E23] focus:border-[#6B8E23]"
+																			>
+																				<option value="male">
+																					{locale === "zh-CN" ? "男" : "男"}
+																				</option>
+																				<option value="female">
+																					{locale === "zh-CN" ? "女" : "女"}
+																				</option>
+																			</select>
+																		</div>
+																		<div>
+																			<label className="block text-xs font-medium text-gray-700 mb-1">
+																				{locale === "zh-CN" ? "出生日期" : "出生日期"}
+																			</label>
+																			<input
+																				type="date"
+																				value={printForms[item._id]?.birthday || ""}
+																				onChange={(e) =>
+																					setPrintForms((prev) => ({
+																						...prev,
+																						[item._id]: {
+																							...(prev[item._id] || {}),
+																							birthday: e.target.value,
+																						},
+																					}))
+																				}
+																				className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:ring-2 focus:ring-[#6B8E23] focus:border-[#6B8E23]"
+																				required
+																			/>
+																		</div>
+																	</div>
+																	<div>
+																		<label className="block text-xs font-medium text-gray-700 mb-1">
+																			{locale === "zh-CN" ? "出生時間（可選）" : "出生時間（可選）"}
+																		</label>
+																		<input
+																			type="text"
+																			placeholder={locale === "zh-CN" ? "例如：上午 10:30 或 大約早上" : "例如：上午 10:30 或 大約早上"}
+																			value={printForms[item._id]?.birthTime || ""}
+																			onChange={(e) =>
+																				setPrintForms((prev) => ({
+																					...prev,
+																					[item._id]: {
+																						...(prev[item._id] || {}),
+																						birthTime: e.target.value,
+																					},
+																				}))
+																			}
+																			className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:ring-2 focus:ring-[#6B8E23] focus:border-[#6B8E23]"
+																		/>
+																	</div>
+																	<div>
+																		<label className="block text-xs font-medium text-gray-700 mb-1">
+																			{locale === "zh-CN" ? "想問的問題（可選）" : "想問的問題（可選）"}
+																		</label>
+																		<textarea
+																			rows={2}
+																			placeholder={locale === "zh-CN" ? "例如：我想了解今年整體運勢與感情發展" : "例如：我想了解今年整體運勢與感情發展"}
+																			value={printForms[item._id]?.question || ""}
+																			onChange={(e) =>
+																				setPrintForms((prev) => ({
+																					...prev,
+																					[item._id]: {
+																						...(prev[item._id] || {}),
+																						question: e.target.value,
+																					},
+																				}))
+																			}
+																			className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:ring-2 focus:ring-[#6B8E23] focus:border-[#6B8E23] resize-none"
+																		/>
+																	</div>
+																	<div className="flex gap-3 pt-1">
+																		<Button
+																			type="submit"
+																			disabled={!!printSubmittingIds[item._id]}
+																			className="bg-[#6B8E23] hover:bg-[#5A7A1E] text-white text-sm px-4 py-2 rounded-full"
+																		>
+																			{printSubmittingIds[item._id]
+																				? locale === "zh-CN"
+																					? "提交中..."
+																					: "提交中..."
+																				: locale === "zh-CN"
+																					? "提交此報告資料"
+																					: "提交此報告資料"}
+																		</Button>
+																	</div>
+																</form>
+															)}
+														</div>
+													)}
 												</div>
 											</div>
 										);
@@ -373,8 +595,8 @@ export default function OrderConfirmationPage() {
 							</div>
 						</div>
 
-						{/* Report input (one-time: sex, birthday, question) - for gift reports and/or standalone paid reports */}
-						{hasAnyReport && (
+						{/* Report input (one-time: sex, birthday, question) - only for gift reports from products */}
+						{hasGiftReport && (
 							<div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-gray-100">
 								<div className="flex flex-wrap items-center gap-3 mb-6">
 									<div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#6B8E23] to-[#5A7A1E] flex items-center justify-center">
@@ -389,16 +611,6 @@ export default function OrderConfirmationPage() {
 												? "贈送報告資料"
 												: "贈送報告資料"}
 									</h2>
-									{hasGiftReport && (
-										<span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6B8E23] bg-[#F4F8E8] px-3 py-1 rounded-full">
-											{locale === "zh-CN" ? "含：商品贈送報告" : "含：商品贈送報告"}
-										</span>
-									)}
-									{hasPrintedReport && (
-										<span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1C312E] bg-[#E6F0FF] px-3 py-1 rounded-full">
-											{locale === "zh-CN" ? "含：付費印刷版報告" : "含：付費印刷版報告"}
-										</span>
-									)}
 									{reportAlreadySubmitted && (
 										<span className="flex items-center gap-1.5 text-sm font-medium text-green-700 bg-green-50 px-3 py-1.5 rounded-full">
 											<Lock className="w-4 h-4" />
@@ -698,13 +910,6 @@ export default function OrderConfirmationPage() {
 							>
 								<Sparkles className="w-4 h-4 mr-2" />
 								{locale === "zh-CN" ? "继续购物" : "繼續購物"}
-							</Button>
-							<Button
-								variant="outline"
-								className="w-full border-2 border-gray-200 hover:bg-gray-50 h-12 text-base rounded-xl transition-all hover:-translate-y-0.5"
-								onClick={() => window.print()}
-							>
-								{locale === "zh-CN" ? "打印订单" : "列印訂單"}
 							</Button>
 						</div>
 					</div>
