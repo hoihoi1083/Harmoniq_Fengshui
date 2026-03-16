@@ -89,7 +89,7 @@ export default function () {
 						</svg>
 					</a>
 					<a
-						href="https://www.instagram.com/harmoniq_fengshui/"
+						href="https://www.instagram.com/harmoniqbell_luckyshop/"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="text-white transition-colors duration-200 hover:text-gray-300"

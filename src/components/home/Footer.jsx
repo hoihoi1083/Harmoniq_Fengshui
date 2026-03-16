@@ -20,7 +20,7 @@ export default function Footer() {
 			},
 			{
 				icon: "/images/footer/Instagram.png",
-				href: "https://www.instagram.com/harmoniq_fengshui/",
+				href: "https://www.instagram.com/harmoniqbell_luckyshop/",
 			},
 		],
 	};

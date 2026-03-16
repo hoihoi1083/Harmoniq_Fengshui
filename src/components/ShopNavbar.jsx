@@ -99,25 +99,25 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 								href={`/${locale}`}
 								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
-								首頁
+								{locale === "zh-CN" ? "首页" : "首頁"}
 							</Link>
 							<Link
 								href={`/${locale}/smart-chat2`}
 								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
-								風鈴資訊室
+								{locale === "zh-CN" ? "风铃资讯室" : "風鈴資訊室"}
 							</Link>
 							<Link
 								href={`/${locale}/shop/all`}
 								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
-								風鈴商店
+								{locale === "zh-CN" ? "风铃商城" : "風鈴商城"}
 							</Link>
 							<Link
 								href={`/${locale}/price`}
 								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
-								測算報告定價
+								{locale === "zh-CN" ? "测算报告定价" : "測算報告定價"}
 							</Link>
 						</div>
 
@@ -298,28 +298,28 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
 									onClick={() => setMobileMenuOpen(false)}
 								>
-									首頁
+									{locale === "zh-CN" ? "首页" : "首頁"}
 								</Link>
 								<Link
 									href={`/${locale}/smart-chat2`}
 									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
 									onClick={() => setMobileMenuOpen(false)}
 								>
-									風鈴資訊室
+									{locale === "zh-CN" ? "风铃资讯室" : "風鈴資訊室"}
 								</Link>
 								<Link
 									href={`/${locale}/shop/all`}
 									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
 									onClick={() => setMobileMenuOpen(false)}
 								>
-									風鈴商店
+									{locale === "zh-CN" ? "风铃商城" : "風鈴商城"}
 								</Link>
 								<Link
 									href={`/${locale}/price`}
 									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
 									onClick={() => setMobileMenuOpen(false)}
 								>
-									測算報告定價
+									{locale === "zh-CN" ? "测算报告定价" : "測算報告定價"}
 								</Link>
 							</div>
 						</div>

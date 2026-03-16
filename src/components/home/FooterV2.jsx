@@ -56,7 +56,7 @@ const FooterV2 = () => {
 					</div>
 					<div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
 						<a
-							href="https://facebook.com"
+							href="https://www.facebook.com/profile.php?id=61578389876952"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="transition-opacity hover:opacity-80"
@@ -71,7 +71,7 @@ const FooterV2 = () => {
 							/>
 						</a>
 						<a
-							href="https://instagram.com"
+							href="https://www.instagram.com/harmoniqbell_luckyshop/"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="transition-opacity hover:opacity-80"
@@ -86,7 +86,7 @@ const FooterV2 = () => {
 							/>
 						</a>
 						<a
-							href="https://www.threads.net"
+							href="https://www.threads.com/@harmoniqbell_luckyshop?hl=zh-hk"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="transition-opacity hover:opacity-80"

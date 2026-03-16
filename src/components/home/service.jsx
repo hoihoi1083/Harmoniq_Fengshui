@@ -140,7 +140,7 @@ const ServiceSection = () => {
 				{/* 2026 Lucky Crystals */}
 				<section className="py-1 md:py-10">
 					<h2
-						className="text-4xl md:text-5xl lg:text-5xl font-bold text-center md:mb-20 mb-5 text-[#2C2C2C]"
+						className="text-4xl md:text-5xl lg:text-5xl font-bold text-center md:mb-4 mb-5 text-[#2C2C2C]"
 						style={{
 							fontFamily:
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
@@ -148,6 +148,35 @@ const ServiceSection = () => {
 					>
 						{locale === "zh-CN" ? "2026幸运水晶" : "2026幸運水晶"}
 					</h2>
+					<p
+						className="text-xs md:text-sm text-center text-[#2C2C2C]/80 max-w-2xl mx-auto mb-8 md:mb-16 leading-relaxed"
+						style={{
+							fontFamily:
+								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
+						}}
+					>
+						{locale === "zh-CN" ? (
+							<>
+								2026年是丙午火马年，气场「火」元素非常旺盛。因此，今年挑选幸运水晶的核心逻辑，不再是单纯地「生火」，而是要「平衡」与「转化」这股强大的能量，使之为己所用。
+								<br />
+								土属性(黄色系)水晶，将过旺的火气转化为稳定的财气与执行力。
+								<br />
+								水属性(黑色、蓝色系)水晶，制衡过旺的火，让人冷静思考，守住财库。
+								<br />
+								白色、紫色系水晶安神静心，减少因烦躁而引发的口舌是非。
+							</>
+						) : (
+							<>
+								2026年是丙午火馬年，氣場「火」元素非常旺盛。因此，今年挑選幸運水晶的核心邏輯，不再是單純地「生火」，而是要「平衡」與「轉化」這股強大的能量，使之為己所用。
+								<br />
+								土屬性(黃色系)水晶，將過旺的火氣轉化為穩定的財氣與執行力。
+								<br />
+								水屬性(黑色、藍色系)水晶，制衡過旺的火，讓人冷靜思考，守住財庫。
+								<br />
+								白色、紫色系水晶安神靜心，減少因煩躁而引發的口舌是非。
+							</>
+						)}
+					</p>
 					{loadingProducts ? (
 						<div className="flex items-center justify-center py-12">
 							<div className="text-center">

@@ -142,7 +142,7 @@ export default function Features() {
 						/>
 					</a>
 					<a
-						href="https://www.instagram.com/harmoniq_fengshui/"
+						href="https://www.instagram.com/harmoniqbell_luckyshop/"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="transition-all duration-200 hover:opacity-80 hover:scale-110"
@@ -270,7 +270,7 @@ export default function Features() {
 						/>
 					</a>
 					<a
-						href="https://www.instagram.com/harmoniq_fengshui/"
+						href="https://www.instagram.com/harmoniqbell_luckyshop/"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="transition-opacity hover:opacity-80"

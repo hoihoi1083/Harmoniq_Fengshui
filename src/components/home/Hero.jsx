@@ -220,11 +220,11 @@ export default function Hero() {
 			},
 			{
 				icon: "/images/footer/Instagram.png",
-				href: "https://www.instagram.com/harmoniq_fengshui/",
+				href: "https://www.instagram.com/harmoniqbell_luckyshop/",
 			},
 			{
 				icon: "/images/footer/thread-grey.png",
-				href: "https://www.threads.net",
+				href: "https://www.threads.com/@harmoniqbell_luckyshop?hl=zh-hk",
 			},
 		],
 	};

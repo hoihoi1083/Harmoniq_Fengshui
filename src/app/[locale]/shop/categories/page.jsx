@@ -207,7 +207,7 @@ export default function CategoriesPage() {
 								</div>
 								<div className="flex gap-4 mt-6">
 									<a
-										href="https://facebook.com"
+										href="https://www.facebook.com/profile.php?id=61578389876952"
 										target="_blank"
 										rel="noopener noreferrer"
 										className="hover:opacity-80 transition-opacity"
@@ -221,7 +221,7 @@ export default function CategoriesPage() {
 										/>
 									</a>
 									<a
-										href="https://instagram.com"
+										href="https://www.instagram.com/harmoniqbell_luckyshop/"
 										target="_blank"
 										rel="noopener noreferrer"
 										className="hover:opacity-80 transition-opacity"
