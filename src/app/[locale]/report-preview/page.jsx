@@ -25,6 +25,7 @@ const ReportPreviewPage = () => {
 	const [selectedRating, setSelectedRating] = useState("newest");
 	const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 	const [region, setRegion] = useState("hongkong");
+	const [cartCount, setCartCount] = useState(0);
 
 	// Sync region from localStorage (china → CNY, hongkong → HKD, taiwan → TWD)
 	useEffect(() => {
@@ -33,6 +34,29 @@ const ReportPreviewPage = () => {
 		if (stored && ["china", "hongkong", "taiwan"].includes(stored))
 			setRegion(stored);
 	}, []);
+
+	// Fetch cart count so navbar badge is in sync on this page
+	useEffect(() => {
+		const fetchCartCount = async () => {
+			try {
+				const res = await fetch("/api/shop/cart");
+				const data = await res.json();
+				if (data.success) {
+					const totalQuantity = data.data.items.reduce(
+						(total, item) => total + item.quantity,
+						0,
+					);
+					setCartCount(totalQuantity);
+				}
+			} catch (error) {
+				console.error("Failed to fetch cart in report-preview:", error);
+			}
+		};
+
+		if (session?.user) {
+			fetchCartCount();
+		}
+	}, [session]);
 
 	// Carousel scroll state and refs
 	const carouselRef = useRef(null);
@@ -115,9 +139,19 @@ const ReportPreviewPage = () => {
 	const currencySymbol = displayInfo.symbol;
 	const priceInfo =
 		displayInfo.prices[reportType] || displayInfo.prices.fengshui;
-	const currentPrice = priceInfo?.discount ?? currentReport.price;
+	const basePrice = priceInfo?.discount ?? currentReport.price;
 	const currentOriginalPrice =
 		priceInfo?.original ?? currentReport.originalPrice;
+
+	// Printed report toggle and extra fee
+	const [wantPrint, setWantPrint] = useState(false);
+	const getPrintFee = () => {
+		if (region === "taiwan") return 100;
+		if (region === "china" || locale === "zh-CN") return 20;
+		return 20;
+	};
+	const printFee = wantPrint ? getPrintFee() : 0;
+	const currentPrice = basePrice + printFee;
 
 	const handleNewsletterSubmit = () => {
 		// Function to be implemented
@@ -245,6 +279,64 @@ const ReportPreviewPage = () => {
 		currentReport.endpoint,
 		currentReport.concernType,
 	]);
+
+	// Map report type -> admin-created Product productId
+	const reportProductIds = {
+		fengshui: "PROD-1773654077760-p5vrxxf68",
+		life: "PROD-1773654009332-fdzzwzj5k",
+		relationship: "PROD-1773653942040-vkyyg3odg",
+		couple: "PROD-1773653893920-vf0knv1on",
+		wealth: "PROD-1773652721585-zkqex7z3b",
+		health: "PROD-1773653711364-csmw0kdk9",
+		career: "PROD-1773653789018-15wz4fbmp",
+	};
+
+	// Add selected report to cart instead of direct Stripe checkout
+	const handleAddToCart = useCallback(async () => {
+		if (!session) {
+			console.log("❌ User not logged in, redirecting to login page");
+			router.push(
+				`/${locale}/auth/login?redirect=/report-preview?type=${reportType}`,
+			);
+			return;
+		}
+
+		setIsProcessingPayment(true);
+
+		try {
+			const productId =
+				reportProductIds[reportType] || reportProductIds.fengshui;
+
+			const response = await fetch("/api/shop/cart", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					productId,
+					quantity: 1,
+					giftReportType: wantPrint ? "report-print" : undefined,
+				}),
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+				const totalQuantity = data.data.items.reduce(
+					(total, item) => total + item.quantity,
+					0,
+				);
+				setCartCount(totalQuantity);
+				setIsProcessingPayment(false);
+			} else {
+				const errorData = await response.json();
+				throw new Error(errorData.error || "Cart error");
+			}
+		} catch (error) {
+			console.error("Add-to-cart error:", error);
+			setIsProcessingPayment(false);
+		}
+	}, [session, locale, reportType, wantPrint, router]);
+
 	// Carousel scroll handlers - auto-scroll on mouse proximity and drag
 	const startAutoScroll = useCallback(
 		(direction) => {
@@ -421,7 +513,7 @@ const ReportPreviewPage = () => {
 
 			{/* Navbar - Non-sticky */}
 			<div className="[&>nav]:!relative [&>nav]:!top-auto">
-				<ShopNavbar />
+				<ShopNavbar cartCount={cartCount} />
 			</div>
 
 			{/* Main Content Area */}
@@ -508,6 +600,27 @@ const ReportPreviewPage = () => {
 											%
 										</span>
 									</div>
+
+									{/* Print option toggle */}
+									<div className="mt-2 flex items-start gap-2 text-xs sm:text-sm text-gray-700">
+										<input
+											id="want-print"
+											type="checkbox"
+											checked={wantPrint}
+											onChange={(e) =>
+												setWantPrint(e.target.checked)
+											}
+											className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#7E8A00] focus:ring-[#7E8A00]"
+										/>
+										<label
+											htmlFor="want-print"
+											className="leading-snug"
+										>
+											{locale === "zh-CN"
+												? "需要纸本报告（加收运费及印刷成本）"
+												: "需要紙本報告（加收運費及印刷成本）"}
+										</label>
+									</div>
 								</div>
 
 								{/* Description */}
@@ -568,7 +681,7 @@ const ReportPreviewPage = () => {
 								{/* Action Buttons */}
 								<div className="space-y-3">
 									<button
-										onClick={handlePayment}
+										onClick={handleAddToCart}
 										disabled={isProcessingPayment}
 										className="w-full sm:w-auto px-10 py-3 text-sm sm:text-base font-semibold text-white transition bg-[#7E8A00] rounded-full hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
 									>

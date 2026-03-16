@@ -92,7 +92,20 @@ export async function POST(request) {
 			// Price for selected region (CNY / HKD / TWD)
 			const unitPrice = getPriceForRegion(product, region);
 			const discount = product.discount?.percentage || 0;
-			const finalPrice = Math.round(unitPrice * (1 - discount / 100));
+
+			// Base price after product discount
+			let finalPrice = Math.round(unitPrice * (1 - discount / 100));
+
+			// Extra fee for printed report items (must match cart / checkout logic)
+			if (item.giftReportType === "report-print" || item.isPrintedReport) {
+				const extraPerUnit =
+					region === "taiwan"
+						? 100
+						: region === "china"
+						  ? 20
+						  : 20;
+				finalPrice += extraPerUnit;
+			}
 			subtotal += finalPrice * item.quantity;
 
 			// Filter valid image URLs for Stripe

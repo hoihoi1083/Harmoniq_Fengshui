@@ -1604,7 +1604,7 @@ export default function Home() {
 	return (
 		<div className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
 			{/* Navigation Bar */}
-			<ShopNavbar onSearch={() => {}} cartCount={0} />
+			<ShopNavbar onSearch={() => {}} />
 			<div className="relative flex h-[calc(100vh-4rem)]  overflow-hidden">
 				{/* 移動端菜單按鈕 */}
 				<button

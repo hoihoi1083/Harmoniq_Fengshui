@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import dbConnect from "@/lib/mongoose";
 import Cart from "@/models/Cart";
 import Product from "@/models/Product";
@@ -76,8 +77,17 @@ export async function POST(request) {
 
 		await dbConnect();
 
+		// Resolve product by Mongo _id or by system productId (e.g. PROD-...)
+		let resolvedProductId = productId;
+		let product;
+		if (mongoose.Types.ObjectId.isValid(productId)) {
+			product = await Product.findById(productId);
+		} else {
+			product = await Product.findOne({ productId });
+			if (product?._id) resolvedProductId = product._id.toString();
+		}
+
 		// Verify product exists and has stock
-		const product = await Product.findById(productId);
 		if (!product || !product.isActive) {
 			return NextResponse.json(
 				{ success: false, error: "Product not found" },
@@ -97,7 +107,7 @@ export async function POST(request) {
 
 		// Check if product already in cart
 		const existingItemIndex = cart.items.findIndex(
-			(item) => item.productId.toString() === productId
+			(item) => item.productId.toString() === resolvedProductId
 		);
 
 		// Calculate final quantity after adding
@@ -128,7 +138,7 @@ export async function POST(request) {
 			if (giftReportType !== undefined) cart.items[existingItemIndex].giftReportType = giftReportType || undefined;
 		} else {
 			// Add new item
-			const newItem = { productId, quantity };
+			const newItem = { productId: resolvedProductId, quantity };
 			if (giftReportType) newItem.giftReportType = giftReportType;
 			cart.items.push(newItem);
 		}
@@ -185,6 +195,13 @@ export async function DELETE(request) {
 
 		await dbConnect();
 
+		// Resolve productId (Mongo _id or system productId)
+		let resolvedProductId = productId;
+		if (!mongoose.Types.ObjectId.isValid(productId)) {
+			const product = await Product.findOne({ productId });
+			if (product?._id) resolvedProductId = product._id.toString();
+		}
+
 		// Find user's cart
 		let cart = await Cart.findOne({ userId: session.user.email });
 
@@ -198,7 +215,7 @@ export async function DELETE(request) {
 
 		// Remove item from cart
 		cart.items = cart.items.filter(
-			(item) => item.productId.toString() !== productId
+			(item) => item.productId.toString() !== resolvedProductId
 		);
 
 		await cart.save();

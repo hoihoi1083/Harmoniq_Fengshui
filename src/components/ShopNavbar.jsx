@@ -28,6 +28,34 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 	const [showPromoBanner, setShowPromoBanner] = useState(true);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+	const [internalCartCount, setInternalCartCount] = useState(0);
+
+	// When no cartCount prop is provided, fetch cart here so badge works on all pages
+	useEffect(() => {
+		if (!session?.user) return;
+		if (typeof cartCount === "number") return;
+
+		const fetchCartCount = async () => {
+			try {
+				const res = await fetch("/api/shop/cart");
+				const data = await res.json();
+				if (data.success) {
+					const totalQuantity = data.data.items.reduce(
+						(total, item) => total + item.quantity,
+						0,
+					);
+					setInternalCartCount(totalQuantity);
+				}
+			} catch (error) {
+				console.error("ShopNavbar: failed to fetch cart", error);
+			}
+		};
+
+		fetchCartCount();
+	}, [session, cartCount]);
+
+	const effectiveCartCount =
+		typeof cartCount === "number" ? cartCount : internalCartCount;
 
 	const handleSearch = (e) => {
 		const value = e.target.value;
@@ -174,9 +202,9 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 									className="relative hover:bg-gray-100 rounded-full"
 								>
 									<ShoppingCart className="w-6 h-6 text-[#6B8E23]" />
-									{cartCount > 0 && (
+									{effectiveCartCount > 0 && (
 										<span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-											{cartCount}
+											{effectiveCartCount}
 										</span>
 									)}
 								</Button>

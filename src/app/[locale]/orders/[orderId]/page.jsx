@@ -100,11 +100,31 @@ export default function OrderConfirmationPage() {
 		return statusMap[status] || status;
 	};
 
-	const hasGiftReport = order?.items?.some((i) => i.giftReportType);
+	// Gift reports from shop products (wealth / love / career / health)
+	const hasGiftReport = order?.items?.some(
+		(i) => i.giftReportType && i.giftReportType !== "report-print",
+	);
 	const giftReportTypes = order?.items
-		? [...new Set(order.items.filter((i) => i.giftReportType).map((i) => i.giftReportType))]
+		? [
+				...new Set(
+					order.items
+						.filter(
+							(i) =>
+								i.giftReportType &&
+								i.giftReportType !== "report-print",
+						)
+						.map((i) => i.giftReportType),
+				),
+			]
 		: [];
-	const hasReportQuestion = order?.reportInput?.question ||
+
+	// Standalone / paid reports where user selected printed report
+	const hasPrintedReport = order?.items?.some(
+		(i) => i.giftReportType === "report-print",
+	);
+	const hasAnyReport = hasGiftReport || hasPrintedReport;
+	const hasReportQuestion =
+		order?.reportInput?.question ||
 		(order?.reportInput?.questions && Object.values(order.reportInput.questions || {}).some((q) => q));
 	const reportAlreadySubmitted = !!(order?.reportInput?.birthday && hasReportQuestion);
 
@@ -353,16 +373,32 @@ export default function OrderConfirmationPage() {
 							</div>
 						</div>
 
-						{/* Report input (one-time: sex, birthday, question) - only when order has gift report */}
-						{hasGiftReport && (
+						{/* Report input (one-time: sex, birthday, question) - for gift reports and/or standalone paid reports */}
+						{hasAnyReport && (
 							<div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-gray-100">
-								<div className="flex items-center gap-3 mb-6">
+								<div className="flex flex-wrap items-center gap-3 mb-6">
 									<div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#6B8E23] to-[#5A7A1E] flex items-center justify-center">
 										<FileText className="w-5 h-5 text-white" />
 									</div>
 									<h2 className="text-2xl font-bold text-[#1C312E]">
-										{locale === "zh-CN" ? "贈送報告資料" : "贈送報告資料"}
+										{hasPrintedReport
+											? locale === "zh-CN"
+												? "報告資料填寫"
+												: "報告資料填寫"
+											: locale === "zh-CN"
+												? "贈送報告資料"
+												: "贈送報告資料"}
 									</h2>
+									{hasGiftReport && (
+										<span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6B8E23] bg-[#F4F8E8] px-3 py-1 rounded-full">
+											{locale === "zh-CN" ? "含：商品贈送報告" : "含：商品贈送報告"}
+										</span>
+									)}
+									{hasPrintedReport && (
+										<span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1C312E] bg-[#E6F0FF] px-3 py-1 rounded-full">
+											{locale === "zh-CN" ? "含：付費印刷版報告" : "含：付費印刷版報告"}
+										</span>
+									)}
 									{reportAlreadySubmitted && (
 										<span className="flex items-center gap-1.5 text-sm font-medium text-green-700 bg-green-50 px-3 py-1.5 rounded-full">
 											<Lock className="w-4 h-4" />

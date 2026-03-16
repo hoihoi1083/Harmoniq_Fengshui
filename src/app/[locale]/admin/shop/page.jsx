@@ -30,6 +30,8 @@ export default function AdminShopPage() {
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [editingProductId, setEditingProductId] = useState(null);
 	const [isEditMode, setIsEditMode] = useState(false);
+	// Display-only system productId (string like PROD-...)
+	const [currentProductSystemId, setCurrentProductSystemId] = useState("");
 	const [formData, setFormData] = useState({
 		name: { zh_TW: "", zh_CN: "", en: "" },
 		description: { zh_TW: "", zh_CN: "", en: "" },
@@ -180,6 +182,7 @@ export default function AdminShopPage() {
 					},
 					images: [""],
 				});
+				setCurrentProductSystemId("");
 			} else {
 				throw new Error(data.error);
 			}
@@ -193,6 +196,7 @@ export default function AdminShopPage() {
 	const handleEdit = (product) => {
 		setIsEditMode(true);
 		setEditingProductId(product._id);
+		setCurrentProductSystemId(product.productId || "");
 		setShowForm(true);
 		setFormData({
 			name: product.name || { zh_TW: "", zh_CN: "", en: "" },
@@ -273,23 +277,24 @@ export default function AdminShopPage() {
 			elementType: "none",
 			tags: [],
 			benefits: [""],
-				specifications: {
-					material: "",
-					size: "",
-					weight: "",
-				},
-				giftReportTypes: [],
-				rating: {
-					average: 0,
-					count: 0,
-				},
-				discount: {
-					percentage: 0,
-					validUntil: "",
-				},
-				images: [""],
-			});
-		};
+			specifications: {
+				material: "",
+				size: "",
+				weight: "",
+			},
+			giftReportTypes: [],
+			rating: {
+				average: 0,
+				count: 0,
+			},
+			discount: {
+				percentage: 0,
+				validUntil: "",
+			},
+			images: [""],
+		});
+		setCurrentProductSystemId("");
+	};
 
 	const handleImageUpload = async (e, index) => {
 		const file = e.target.files?.[0];
@@ -465,6 +470,31 @@ export default function AdminShopPage() {
 						</h2>
 
 						<form onSubmit={handleSubmit} className="space-y-6">
+							{/* IDs (only visible in edit mode) */}
+							{isEditMode && (
+								<div className="grid grid-cols-1 gap-4 md:grid-cols-2 p-4 rounded-xl bg-gray-50 border border-gray-200">
+									<div>
+										<Label>資料庫 ID (_id)</Label>
+										<Input
+											value={editingProductId || ""}
+											readOnly
+											className="mt-1 bg-gray-100 text-xs"
+										/>
+									</div>
+									<div>
+										<Label>系統 Product ID</Label>
+										<Input
+											value={
+												currentProductSystemId ||
+												"建立商品後由系統自動產生"
+											}
+											readOnly
+											className="mt-1 bg-gray-100 text-xs"
+										/>
+									</div>
+								</div>
+							)}
+
 							{/* Product Names */}
 							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<div>

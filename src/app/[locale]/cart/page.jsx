@@ -144,10 +144,22 @@ export default function CartPage() {
 				item.product,
 				region,
 			);
-			const finalPrice =
+			let finalPrice =
 				discountedPrice ??
 				item.product.price *
 					(1 - (item.product.discount?.percentage || 0) / 100);
+
+			// Extra fee for printed report items
+			if (item.giftReportType === "report-print") {
+				const extraPerUnit =
+					region === "taiwan"
+						? 100
+						: region === "china"
+						  ? 20
+						  : 20;
+				finalPrice += extraPerUnit;
+			}
+
 			return total + finalPrice * item.quantity;
 		}, 0);
 	};
@@ -291,7 +303,18 @@ export default function CartPage() {
 									getProductDisplayPrice(product, region);
 								const hasDiscount =
 									product.discount?.percentage > 0;
-								const finalPrice = discountedPrice ?? price;
+								let finalPrice = discountedPrice ?? price;
+
+								// Extra fee for printed report items
+								if (item.giftReportType === "report-print") {
+									const extraPerUnit =
+										region === "taiwan"
+											? 100
+											: region === "china"
+											  ? 20
+											  : 20;
+									finalPrice += extraPerUnit;
+								}
 
 								return (
 									<div

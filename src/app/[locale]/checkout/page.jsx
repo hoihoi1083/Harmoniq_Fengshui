@@ -90,8 +90,26 @@ export default function CheckoutPage() {
 	const calculateSubtotal = () => {
 		if (!cart?.items) return 0;
 		return cart.items.reduce((total, item) => {
-			const { discountedPrice } = getProductDisplayPrice(item.product, region);
-			const finalPrice = discountedPrice ?? item.product.price * (1 - (item.product.discount?.percentage || 0) / 100);
+			const { discountedPrice } = getProductDisplayPrice(
+				item.product,
+				region,
+			);
+			let finalPrice =
+				discountedPrice ??
+				item.product.price *
+					(1 - (item.product.discount?.percentage || 0) / 100);
+
+			// Extra fee for printed report items (must match cart logic)
+			if (item.giftReportType === "report-print") {
+				const extraPerUnit =
+					region === "taiwan"
+						? 100
+						: region === "china"
+						  ? 20
+						  : 20;
+				finalPrice += extraPerUnit;
+			}
+
 			return total + finalPrice * item.quantity;
 		}, 0);
 	};
@@ -124,6 +142,8 @@ export default function CheckoutPage() {
 					price: item.product.price,
 					discount: item.product.discount?.percentage || 0,
 					giftReportType: item.giftReportType || undefined,
+					// Extra info so backend can add print fee if needed
+					isPrintedReport: item.giftReportType === "report-print",
 				})),
 				shippingInfo,
 				billingInfo: billingSameAsShipping ? shippingInfo : billingInfo,
