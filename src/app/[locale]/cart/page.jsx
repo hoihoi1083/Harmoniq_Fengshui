@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { useRegionDetection } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
+import { getProductName, getProductDescription } from "@/lib/productLocale";
 
 const GIFT_REPORT_LABELS = {
 	wealth: "財運",
@@ -326,10 +327,7 @@ export default function CartPage() {
 											{product.images?.length > 0 ? (
 												<Image
 													src={product.images[0]}
-													alt={
-														product.name[locale] ||
-														product.name.zh_TW
-													}
+													alt={getProductName(product, locale)}
 													fill
 													className="object-cover"
 												/>
@@ -353,8 +351,7 @@ export default function CartPage() {
 										{/* Product Info */}
 										<div className="flex-1 min-w-0">
 											<h3 className="mb-1 text-base font-semibold">
-												{product.name[locale] ||
-													product.name.zh_TW}
+												{getProductName(product, locale)}
 											</h3>
 											{item.giftReportType && (
 												<p className="mb-1 text-sm text-[#6B8E23]">
@@ -368,17 +365,8 @@ export default function CartPage() {
 												</p>
 											)}
 											<p className="mb-3 text-sm text-gray-500">
-												{product.description[
-													locale
-												]?.substring(0, 30) ||
-													product.description.zh_TW?.substring(
-														0,
-														30,
-													)}
-												{(product.description[locale]
-													?.length > 30 ||
-													product.description.zh_TW
-														?.length > 30) &&
+												{getProductDescription(product, locale)?.substring(0, 30)}
+												{getProductDescription(product, locale)?.length > 30 &&
 													"..."}
 											</p>
 

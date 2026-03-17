@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useLocale } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Heart, Sparkles } from "lucide-react";
+import { ShoppingCart, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
+import { getProductName } from "@/lib/productLocale";
 
 export default function ProductCard({
 	product,
@@ -35,9 +36,9 @@ export default function ProductCard({
 			: null;
 
 	const GIFT_REPORT_LABELS = {
-		wealth: locale === "zh-CN" ? "財運" : "財運",
+		wealth: locale === "zh-CN" ? "财运" : "財運",
 		love: locale === "zh-CN" ? "感情" : "感情",
-		career: locale === "zh-CN" ? "事業" : "事業",
+		career: locale === "zh-CN" ? "事业" : "事業",
 		health: locale === "zh-CN" ? "健康" : "健康",
 	};
 
@@ -129,7 +130,7 @@ export default function ProductCard({
 							<Image
 								key={activeImageIndex}
 								src={displayImageSrc}
-								alt={product.name[locale] || product.name.zh_TW}
+								alt={getProductName(product, locale)}
 								fill
 								className="object-cover transition-opacity duration-200"
 								sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -200,7 +201,7 @@ export default function ProductCard({
 
 					{/* Product Name */}
 					<h3 className="font-semibold text-base line-clamp-2 min-h-[3rem] group-hover:text-[#1C312E] transition-colors">
-						{product.name[locale] || product.name.zh_TW}
+						{getProductName(product, locale)}
 					</h3>
 
 					{/* Gift report type - fixed min-height so rating starts at same vertical position on every card (1 or 2 rows of tags) */}
@@ -337,22 +338,6 @@ export default function ProductCard({
 
 						{/* Buttons: row below price on mobile, same row on sm+ */}
 						<div className="flex gap-2 justify-end flex-shrink-0">
-							<Button
-								size="sm"
-								variant="ghost"
-								className="w-9 h-9 sm:w-10 sm:h-10 p-0 transition-colors rounded-full hover:bg-red-50 hover:text-red-500"
-								onClick={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
-									toast.success(
-										locale === "zh-CN"
-											? "已添加到收藏"
-											: "已加入收藏",
-									);
-								}}
-							>
-								<Heart className="w-4 h-4" />
-							</Button>
 							<Button
 								size="sm"
 								className="h-9 w-9 sm:h-10 sm:px-4 sm:w-auto p-0 rounded-full bg-gradient-to-r from-[#1C312E] to-[#1A3B2C] hover:from-[#2A4A3E] hover:to-[#2A4A3E] shadow-lg hover:shadow-xl transition-all"

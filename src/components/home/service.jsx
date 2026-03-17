@@ -9,6 +9,7 @@ import ServiceDemoTags from "./ServiceDemoTags";
 import useMobile from "../../app/hooks/useMobile";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
+import { getProductName } from "@/lib/productLocale";
 
 const ServiceSection = () => {
 	const t = useTranslations("home.services");
@@ -238,14 +239,7 @@ const ServiceSection = () => {
 																	product
 																		.images[0]
 																}
-																alt={
-																	product
-																		.name[
-																		locale
-																	] ||
-																	product.name
-																		.zh_TW
-																}
+																alt={getProductName(product, locale)}
 																fill
 																className="object-cover transition-transform duration-300 group-hover:scale-105"
 																sizes="260px"
@@ -256,11 +250,7 @@ const ServiceSection = () => {
 													</div>
 													<div className="p-3 space-y-2">
 														<h3 className="text-sm font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
-															{product.name[
-																locale
-															] ||
-																product.name
-																	.zh_TW}
+															{getProductName(product, locale)}
 														</h3>
 														<div className="flex items-center gap-2">
 															<div className="flex">
@@ -365,13 +355,7 @@ const ServiceSection = () => {
 																product
 																	.images[0]
 															}
-															alt={
-																product.name[
-																	locale
-																] ||
-																product.name
-																	.zh_TW
-															}
+															alt={getProductName(product, locale)}
 															fill
 															className="object-cover transition-transform duration-300 group-hover:scale-105"
 															sizes="(max-width: 768px) 50vw, 25vw"
@@ -382,8 +366,7 @@ const ServiceSection = () => {
 												</div>
 												<div className="p-3 space-y-2">
 													<h3 className="text-sm md:text-base font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
-														{product.name[locale] ||
-															product.name.zh_TW}
+														{getProductName(product, locale)}
 													</h3>
 													<div className="flex items-center gap-2">
 														<div className="flex">
@@ -471,7 +454,7 @@ const ServiceSection = () => {
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 						}}
 					>
-						{locale === "zh-CN" ? "热销产品" : "熱銷產品"}
+						{locale === "zh-CN" ? "精选产品" : "精選產品"}
 					</h2>
 					{loadingProducts ? (
 						<div className="flex items-center justify-center py-12">
@@ -534,14 +517,7 @@ const ServiceSection = () => {
 																	product
 																		.images[0]
 																}
-																alt={
-																	product
-																		.name[
-																		locale
-																	] ||
-																	product.name
-																		.zh_TW
-																}
+																alt={getProductName(product, locale)}
 																fill
 																className="object-cover transition-transform duration-300 group-hover:scale-105"
 																sizes="260px"
@@ -552,11 +528,7 @@ const ServiceSection = () => {
 													</div>
 													<div className="p-3 space-y-2">
 														<h3 className="text-sm font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
-															{product.name[
-																locale
-															] ||
-																product.name
-																	.zh_TW}
+															{getProductName(product, locale)}
 														</h3>
 														<div className="flex items-center gap-2">
 															<div className="flex">
@@ -661,13 +633,7 @@ const ServiceSection = () => {
 																product
 																	.images[0]
 															}
-															alt={
-																product.name[
-																	locale
-																] ||
-																product.name
-																	.zh_TW
-															}
+															alt={getProductName(product, locale)}
 															fill
 															className="object-cover transition-transform duration-300 group-hover:scale-105"
 															sizes="(max-width: 768px) 50vw, 25vw"
@@ -678,8 +644,7 @@ const ServiceSection = () => {
 												</div>
 												<div className="p-3 space-y-2">
 													<h3 className="text-sm md:text-base font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
-														{product.name[locale] ||
-															product.name.zh_TW}
+														{getProductName(product, locale)}
 													</h3>
 													<div className="flex items-center gap-2">
 														<div className="flex">

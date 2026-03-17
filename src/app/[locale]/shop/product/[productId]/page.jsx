@@ -32,6 +32,7 @@ import FooterV2 from "@/components/home/FooterV2";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
 import { REPORT_PRODUCT_IDS } from "@/lib/reportProducts";
+import { getProductName, getProductDescription } from "@/lib/productLocale";
 
 export default function ProductDetailPage() {
 	const { data: session } = useSession();
@@ -64,9 +65,9 @@ export default function ProductDetailPage() {
 
 	// Gift report type labels (財運, 感情, 事業, 健康)
 	const GIFT_REPORT_LABELS = {
-		wealth: locale === "zh-CN" ? "財運" : "財運",
+		wealth: locale === "zh-CN" ? "财运" : "財運",
 		love: locale === "zh-CN" ? "感情" : "感情",
-		career: locale === "zh-CN" ? "事業" : "事業",
+		career: locale === "zh-CN" ? "事业" : "事業",
 		health: locale === "zh-CN" ? "健康" : "健康",
 	};
 
@@ -492,7 +493,7 @@ export default function ProductDetailPage() {
 					</Link>
 					<ChevronRight className="w-4 h-4" />
 					<span className="font-medium text-gray-900 line-clamp-1">
-						{product?.name[locale] || product?.name.zh_TW}
+						{product ? getProductName(product, locale) : ""}
 					</span>
 				</nav>
 
@@ -537,10 +538,7 @@ export default function ProductDetailPage() {
 									<>
 										<Image
 											src={product.images[selectedImage]}
-											alt={
-												product.name[locale] ||
-												product.name.zh_TW
-											}
+											alt={getProductName(product, locale)}
 											fill
 											className="object-contain p-8"
 											priority
@@ -579,7 +577,7 @@ export default function ProductDetailPage() {
 																selectedImage
 															]
 														}
-														alt={`${product.name[locale] || product.name.zh_TW} - Zoomed`}
+														alt={`${getProductName(product, locale)} - Zoomed`}
 														fill
 														className="object-contain"
 														sizes="1500px"
@@ -596,7 +594,7 @@ export default function ProductDetailPage() {
 					<div className="order-3 space-y-6 lg:col-span-6">
 						{/* Product Title */}
 						<h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-							{product?.name[locale] || product?.name.zh_TW}
+							{product ? getProductName(product, locale) : ""}
 						</h1>
 
 						{/* Rating */}
@@ -666,8 +664,7 @@ export default function ProductDetailPage() {
 						{/* Description */}
 						<div className="py-4 text-sm leading-relaxed text-gray-600 border-t border-b border-gray-200">
 							<p>
-								{product?.description[locale] ||
-									product?.description.zh_TW}
+								{product ? getProductDescription(product, locale) : ""}
 							</p>
 						</div>
 
@@ -703,7 +700,7 @@ export default function ProductDetailPage() {
 								<div className="space-y-3">
 									<span className="text-sm font-medium text-gray-700">
 										{locale === "zh-CN"
-											? "選擇贈送報告類型"
+											? "选择赠送报告类型"
 											: "選擇贈送報告類型"}
 									</span>
 									<div className="flex flex-wrap gap-2">
@@ -787,13 +784,15 @@ export default function ProductDetailPage() {
 									: "加入中..."
 								: needsLogin
 									? locale === "zh-CN"
-										? "請先登入"
+										? "请先登录"
 										: "請先登入"
 									: needsGiftReport
 										? locale === "zh-CN"
-											? "請選擇贈送報告類型"
+											? "请选择赠送报告类型"
 											: "請選擇贈送報告類型"
-										: "加到購物車";
+										: locale === "zh-CN"
+											? "加入购物车"
+											: "加到購物車";
 							return (
 								<div className="space-y-2">
 									<Button
@@ -816,7 +815,7 @@ export default function ProductDetailPage() {
 												!
 											</span>
 											{locale === "zh-CN"
-												? "請先登入後再加入購物車"
+												? "请先登录后再加入购物车"
 												: "請先登入後再加入購物車"}
 										</p>
 									)}
@@ -833,7 +832,7 @@ export default function ProductDetailPage() {
 													!
 												</span>
 												{locale === "zh-CN"
-													? "請先選擇贈送報告類型後再加入購物車"
+													? "请先选择赠送报告类型后再加入购物车"
 													: "請先選擇贈送報告類型後再加入購物車"}
 											</p>
 										)}
@@ -1098,11 +1097,7 @@ export default function ProductDetailPage() {
 																.images[0]
 														}
 														alt={
-															relatedProduct.name[
-																locale
-															] ||
-															relatedProduct.name
-																.zh_TW
+															getProductName(relatedProduct, locale)
 														}
 														fill
 														draggable={false}
@@ -1130,11 +1125,7 @@ export default function ProductDetailPage() {
 											{/* Product Info */}
 											<div className="p-4 space-y-2">
 												<h3 className="font-medium text-gray-900 text-sm line-clamp-2 min-h-[2.5rem]">
-													{relatedProduct.name[
-														locale
-													] ||
-														relatedProduct.name
-															.zh_TW}
+													{getProductName(relatedProduct, locale)}
 												</h3>
 
 												{/* Star Rating */}
