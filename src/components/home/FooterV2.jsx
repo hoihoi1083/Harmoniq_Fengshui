@@ -50,7 +50,9 @@ const FooterV2 = () => {
 								href="/customer/returns"
 								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
-								{locale === "zh-CN" ? "退换货政策" : "退換貨政策"}
+								{locale === "zh-CN"
+									? "退换货政策"
+									: "退換貨政策"}
 							</Link>
 						</nav>
 					</div>
@@ -107,14 +109,14 @@ const FooterV2 = () => {
 				<div className="flex flex-col items-start gap-6 mt-8 sm:mt-10 md:mt-12 lg:flex-row lg:items-center lg:justify-between">
 					<div className="w-full lg:w-auto">
 						<div className="inline-block bg-[#9AA620] text-[#1C1F26] px-3 py-1.5 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm mb-3 sm:mb-4">
-							{locale === "zh-CN" ? "联系我们：" : "聯絡我們："}
+							{locale === "zh-CN" ? "关于我们：" : "關於我們："}
 						</div>
 						<p className="text-white/90 text-sm sm:text-base">
 							{locale === "zh-CN" ? "电邮" : "電郵"}:
 							support@harmoniqfengshui.com
 						</p>
 					</div>
-					<div className="w-full max-w-full lg:max-w-[560px] rounded-xl sm:rounded-[20px] bg-[#2A2E36] p-4 sm:p-6">
+					{/* <div className="w-full max-w-full lg:max-w-[560px] rounded-xl sm:rounded-[20px] bg-[#2A2E36] p-4 sm:p-6">
 						<div className="flex flex-col gap-3 sm:flex-row">
 							<Input
 								type="email"
@@ -130,14 +132,14 @@ const FooterV2 = () => {
 								{locale === "zh-CN" ? "联系我们" : "聯絡我們"}
 							</Button>
 						</div>
-					</div>
+					</div> */}
 				</div>
 
 				{/* Bottom Section */}
 				<div className="pt-6 sm:pt-8 mt-8 sm:mt-10 border-t border-white/20">
 					<div className="flex flex-col items-center justify-between gap-4 md:flex-row text-center md:text-left">
 						<p className="text-xs sm:text-sm text-white/60 order-2 md:order-1">
-							© 2025 HarmoniQ.{" "}
+							© 2026 HarmoniQ.{" "}
 							{locale === "zh-CN"
 								? "保留所有权利"
 								: "保留所有權利"}

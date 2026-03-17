@@ -25,6 +25,7 @@ import { useSession } from "next-auth/react";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
 import ProductCard from "@/components/shop/ProductCard";
+import { REPORT_PRODUCT_IDS } from "@/lib/reportProducts";
 
 function CategoryPageContent() {
 	const { data: session } = useSession();
@@ -319,7 +320,9 @@ function CategoryPageContent() {
 			console.log("API Response:", data);
 
 			if (data.success) {
-				let products = data.data.products;
+				let products = (data.data.products || []).filter(
+					(p) => !REPORT_PRODUCT_IDS.includes(p.productId),
+				);
 				console.log("Total products from API:", products.length);
 
 				// Filter by category if specified
@@ -1095,66 +1098,7 @@ function CategoryPageContent() {
 								)}
 							</div>
 
-							{/* Featured Section */}
-							<div className="border-b border-gray-200 pb-4">
-								<button
-									onClick={() => toggleSection("featured")}
-									className="flex items-center justify-between w-full mb-4"
-								>
-									<h3 className="font-bold text-lg">
-										{locale === "zh-CN"
-											? "精选推荐"
-											: "精選推薦"}
-									</h3>
-									{expandedSections.featured ? (
-										<ChevronUp className="w-5 h-5 text-gray-400" />
-									) : (
-										<ChevronDown className="w-5 h-5 text-gray-400" />
-									)}
-								</button>
-								{expandedSections.featured && (
-									<div className="space-y-3">
-										{[
-											{
-												key: "2025",
-												label:
-													locale === "zh-CN"
-														? "2025新年打造属蛇"
-														: "2025新年打造屬蛇",
-											},
-											{
-												key: "month",
-												label:
-													locale === "zh-CN"
-														? "一月诞生石｜石榴石"
-														: "一月誕生石｜石榴石",
-											},
-											{
-												key: "featured",
-												label:
-													locale === "zh-CN"
-														? "精选产品"
-														: "精選產品",
-											},
-											{
-												key: "star",
-												label:
-													locale === "zh-CN"
-														? "天干系列"
-														: "天干系列",
-											},
-										].map((item) => (
-											<button
-												key={item.key}
-												className="flex items-center justify-between w-full text-gray-700 hover:text-[#8B9F3A] transition-colors"
-											>
-												<span>{item.label}</span>
-												<ChevronRight className="w-4 h-4" />
-											</button>
-										))}
-									</div>
-								)}
-							</div>
+							{/* Featured Section - hidden per request */}
 						</div>
 					</aside>
 

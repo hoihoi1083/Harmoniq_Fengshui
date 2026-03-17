@@ -12,8 +12,8 @@ const TermsHeader = () => {
 			<p className="max-w-2xl mx-auto mt-4 mb-2 font-lora text-brown-light">
 				{t("description")}
 			</p>
-			<p>更新日期：2025年【3】月【16】日</p>
-			<p>生效日期：2025年【3】月【16】日</p>
+			<p>更新日期：2026年【3】月【16】日</p>
+			<p>生效日期：2026年【3】月【16】日</p>
 		</div>
 	);
 };

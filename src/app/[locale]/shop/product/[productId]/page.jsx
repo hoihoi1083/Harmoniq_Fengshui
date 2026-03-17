@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import FooterV2 from "@/components/home/FooterV2";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
+import { REPORT_PRODUCT_IDS } from "@/lib/reportProducts";
 
 export default function ProductDetailPage() {
 	const { data: session } = useSession();
@@ -138,7 +139,9 @@ export default function ProductDetailPage() {
 			const data = await res.json();
 			if (data.success && product) {
 				const allProducts = data.data.products.filter(
-					(p) => p._id !== params.productId,
+					(p) =>
+						p._id !== params.productId &&
+						!REPORT_PRODUCT_IDS.includes(p.productId),
 				);
 
 				// Smart recommendation algorithm
@@ -847,9 +850,6 @@ export default function ProductDetailPage() {
 								<>
 									<div>
 										<p className="font-medium text-gray-600 mb-1">
-											手串/开运好物类统一说明：
-										</p>
-										<p className="font-medium text-gray-600 mb-1">
 											退款及退换货政策：
 										</p>
 										<p className="whitespace-pre-line">
@@ -857,59 +857,16 @@ export default function ProductDetailPage() {
 											请留意，此冷静期旨在让您有充分时间检视商品，并非试用期。如需退货，商品必须保持未经使用、未经损坏的完整状态（包含商品、所有原装包装、配件及赠品），否则我们可能无法受理您的退货申请。如有任何商品质量或物流运输问题，请在收货后7日内联络我们的在线客服并提供凭证，我们定当积极为您妥善处理。
 										</p>
 									</div>
-									<div>
-										<p className="font-medium text-gray-600 mb-1">
-											报告类统一说明：
-										</p>
-										<p className="font-medium text-gray-600 mb-1">
-											退款政策
-										</p>
-										<p className="whitespace-pre-line">
-											请留意，本商品系基于您提供之生辰资讯专属定制，具有独一无二的个人属性。为保障您的权益，付款完成后两小时内，您可申请免费取消订单并全额退款。若超过两小时期限，恕不接受任何理由之退款、退换或修改服务。请您于付款前再次确认出生资讯正确无误。因资讯错误所致之内容差异，本公司概不负责。
-										</p>
-									</div>
-									<div>
-										<p className="font-medium text-gray-600 mb-1">
-											发货方式（内地用户习惯看商品详情，这里可以再提醒一次）
-										</p>
-										<p className="whitespace-pre-line">
-											由于《个人命理能量报告》均由真人顾问亲自为您分析编写，量身定制需要投入必要的时间与心力，无法仓促完成。
-											在您提交完整出生信息后，我们将在72小时内将电子版发送至您的邮箱，或在7天内完成报告的撰写、校对、精致印刷，寄到您的手中。感谢您的理解。这份等待，是为了交付一份不负您信任的诚意之作。
-										</p>
-									</div>
 								</>
 							) : (
 								<>
 									<div>
-										<p className="font-medium text-gray-600 mb-1">
-											手串/開運好物類統一說明：
-										</p>
 										<p className="font-medium text-gray-600 mb-1">
 											退款及退換貨政策：
 										</p>
 										<p className="whitespace-pre-line">
 											本商品送達後享有【七天冷靜期】的權利。
 											請留意，此冷靜期旨在讓您有充分時間檢視商品，並非試用期。如需退貨，商品必須保持未經使用、未經損壞的完整狀態（包含商品、所有原裝包裝、配件及贈品），否則我們可能無法受理您的退貨申請。如有任何商品質量或物流運輸問題，請在收貨後7日內聯絡我們的在線客服並提供憑證，我們定當積極為您妥善處理。
-										</p>
-									</div>
-									<div>
-										<p className="font-medium text-gray-600 mb-1">
-											報告類統一說明：
-										</p>
-										<p className="font-medium text-gray-600 mb-1">
-											退款政策
-										</p>
-										<p className="whitespace-pre-line">
-											請留意，本商品係基於您提供之生辰資訊專屬定制，具有獨一無二的個人屬性。為保障您的權益，付款完成後兩小時內，您可申請免費取消訂單並全額退款。若超過兩小時期限，恕不接受任何理由之退款、退換或修改服務。請您於付款前再次確認出生資訊正確無誤。因資訊錯誤所致之內容差異，本公司概不負責。
-										</p>
-									</div>
-									<div>
-										<p className="font-medium text-gray-600 mb-1">
-											發貨方式（內地用戶習慣看商品詳情，這裏可以再提醒一次）
-										</p>
-										<p className="whitespace-pre-line">
-											由於《個人命理能量報告》均由真人顧問親自為您分析編寫，量身定制需要投入必要的時間與心力，無法倉促完成。
-											在您提交完整出生資訊後，我們將在72小時內將電子版發送至您的郵箱，或在7天內完成報告的撰寫、校對、精緻印刷，寄到您的手中。感謝您的理解。這份等待，是為了交付一份不負您信任的誠意之作。
 										</p>
 									</div>
 								</>

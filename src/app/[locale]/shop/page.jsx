@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
+import { REPORT_PRODUCT_IDS } from "@/lib/reportProducts";
 
 export default function ShopPage() {
 	const { data: session } = useSession();
@@ -53,7 +54,10 @@ export default function ShopPage() {
 			const res = await fetch("/api/shop/products?limit=100");
 			const data = await res.json();
 			if (data.success) {
-				setProducts(data.data.products);
+				const list = (data.data.products || []).filter(
+					(p) => !REPORT_PRODUCT_IDS.includes(p.productId),
+				);
+				setProducts(list);
 			}
 		} catch (error) {
 			console.error("Failed to fetch products:", error);

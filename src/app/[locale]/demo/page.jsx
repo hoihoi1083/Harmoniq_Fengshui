@@ -1027,15 +1027,12 @@ export default function DemoPage() {
 							</span>
 						</div>
 					</div>
-					<button
-						onClick={handleDiscountPayment}
-						disabled={isProcessingPayment}
-						className="py-3 font-semibold text-white transition bg-black rounded-full px-30 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+					<Link
+						href={`/report-preview?type=${activeTag}`}
+						className="inline-flex items-center justify-center py-3 font-semibold text-white transition bg-black rounded-full px-30 hover:bg-gray-900"
 					>
-						{isProcessingPayment
-							? t("ui.processing")
-							: t("ui.buyNow")}
-					</button>
+						{t("ui.buyNow")}
+					</Link>
 				</div>
 			</div>
 

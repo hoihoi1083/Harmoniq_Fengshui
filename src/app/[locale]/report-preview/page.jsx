@@ -10,6 +10,7 @@ import FooterV2 from "@/components/home/FooterV2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getDisplayPrices } from "@/utils/regionalPricing";
+import { REPORT_PRODUCT_ID_BY_TYPE } from "@/lib/reportProducts";
 
 const ReportPreviewPage = () => {
 	const locale = useLocale();
@@ -281,15 +282,7 @@ const ReportPreviewPage = () => {
 	]);
 
 	// Map report type -> admin-created Product productId
-	const reportProductIds = {
-		fengshui: "PROD-1773654077760-p5vrxxf68",
-		life: "PROD-1773654009332-fdzzwzj5k",
-		relationship: "PROD-1773653942040-vkyyg3odg",
-		couple: "PROD-1773653893920-vf0knv1on",
-		wealth: "PROD-1773652721585-zkqex7z3b",
-		health: "PROD-1773653711364-csmw0kdk9",
-		career: "PROD-1773653789018-15wz4fbmp",
-	};
+	const reportProductIds = REPORT_PRODUCT_ID_BY_TYPE;
 
 	// Add selected report to cart instead of direct Stripe checkout
 	const handleAddToCart = useCallback(async () => {
@@ -318,7 +311,9 @@ const ReportPreviewPage = () => {
 					// Always mark reports so invoice can show per-report form:
 					// - "report-print" when user wants printed copy
 					// - "report-digital" when email-only
-					giftReportType: wantPrint ? "report-print" : "report-digital",
+					giftReportType: wantPrint
+						? "report-print"
+						: "report-digital",
 				}),
 			});
 
@@ -695,7 +690,7 @@ const ReportPreviewPage = () => {
 								</div>
 
 								{/* User Reviews Section */}
-								<div className="pt-4 sm:pt-6 border-t">
+								{/* <div className="pt-4 sm:pt-6 border-t">
 									<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
 										<h3 className="text-base sm:text-lg font-semibold text-[#073E31]">
 											{t("userReviews")}
@@ -722,9 +717,9 @@ const ReportPreviewPage = () => {
 											</button>
 										</div>
 									</div>
-
-									{/* Rating Summary */}
-									<div className="flex items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg bg-gray-50">
+ */}
+								{/* Rating Summary */}
+								{/* <div className="flex items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg bg-gray-50">
 										<div>
 											<div className="text-3xl sm:text-4xl font-bold text-[#073E31]">
 												4.6
@@ -761,9 +756,9 @@ const ReportPreviewPage = () => {
 											))}
 										</div>
 									</div>
-
-									{/* Review Cards */}
-									<div className="space-y-3 sm:space-y-4">
+ */}
+								{/* Review Cards */}
+								{/* <div className="space-y-3 sm:space-y-4">
 										{reviews.map((review) => (
 											<div
 												key={review.id}
@@ -818,18 +813,67 @@ const ReportPreviewPage = () => {
 												</div>
 											</div>
 										))}
-									</div>
+									</div> */}
 
-									{/* Load More Reviews */}
-									<button className="w-full py-2.5 sm:py-3 mt-4 sm:mt-6 text-sm sm:text-base font-semibold text-white transition bg-black rounded-full hover:bg-gray-900">
+								{/* Load More Reviews */}
+								{/* <button className="w-full py-2.5 sm:py-3 mt-4 sm:mt-6 text-sm sm:text-base font-semibold text-white transition bg-black rounded-full hover:bg-gray-900">
 										{t("moreReviews")}
 									</button>
-								</div>
+								</div> */}
 							</div>
 						</div>
 					</div>
 				</section>
 			</div>
+
+			{/* 報告類統一說明 - above more calculations */}
+			<section className="relative w-full px-4 py-6 sm:py-8 bg-white border-t border-gray-100">
+				<div className="container mx-auto max-w-3xl">
+					<div className="text-xs sm:text-sm text-gray-500 leading-relaxed space-y-6">
+						{locale === "zh-CN" ? (
+							<>
+								<div>
+									<p className="font-medium text-gray-600 mb-1">
+										退款政策
+									</p>
+									<p className="whitespace-pre-line">
+										请留意，本商品系基于您提供之生辰资讯专属定制，具有独一无二的个人属性。为保障您的权益，付款完成后两小时内，您可申请免费取消订单并全额退款。若超过两小时期限，恕不接受任何理由之退款、退换或修改服务。请您于付款前再次确认出生资讯正确无误。因资讯错误所致之内容差异，本公司概不负责。
+									</p>
+								</div>
+								<div>
+									<p className="font-medium text-gray-600 mb-1">
+										发货方式
+									</p>
+									<p className="whitespace-pre-line">
+										由于《个人命理能量报告》均由真人顾问亲自为您分析编写，量身定制需要投入必要的时间与心力，无法仓促完成。
+										在您提交完整出生信息后，我们将在72小时内将电子版发送至您的邮箱，或在7天内完成报告的撰写、校对、精致印刷，寄到您的手中。感谢您的理解。这份等待，是为了交付一份不负您信任的诚意之作。
+									</p>
+								</div>
+							</>
+						) : (
+							<>
+								<div>
+									<p className="font-medium text-gray-600 mb-1">
+										退款政策
+									</p>
+									<p className="whitespace-pre-line">
+										請留意，本商品係基於您提供之生辰資訊專屬定制，具有獨一無二的個人屬性。為保障您的權益，付款完成後兩小時內，您可申請免費取消訂單並全額退款。若超過兩小時期限，恕不接受任何理由之退款、退換或修改服務。請您於付款前再次確認出生資訊正確無誤。因資訊錯誤所致之內容差異，本公司概不負責。
+									</p>
+								</div>
+								<div>
+									<p className="font-medium text-gray-600 mb-1">
+										發貨方式
+									</p>
+									<p className="whitespace-pre-line">
+										由於《個人命理能量報告》均由真人顧問親自為您分析編寫，量身定制需要投入必要的時間與心力，無法倉促完成。
+										在您提交完整出生資訊後，我們將在72小時內將電子版發送至您的郵箱，或在7天內完成報告的撰寫、校對、精緻印刷，寄到您的手中。感謝您的理解。這份等待，是為了交付一份不負您信任的誠意之作。
+									</p>
+								</div>
+							</>
+						)}
+					</div>
+				</div>
+			</section>
 
 			{/* More Calculations Section */}
 			<section className="relative w-full px-4 py-8 sm:py-10 md:py-12 bg-white">
