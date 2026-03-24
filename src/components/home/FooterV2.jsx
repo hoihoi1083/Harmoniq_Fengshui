@@ -32,7 +32,7 @@ const FooterV2 = () => {
 								href="/customer/contact"
 								className="hover:text-[#8B9F3A] transition-colors py-0.5"
 							>
-								{locale === "zh-CN" ? "关于我们" : "關於我們"}
+								{locale === "zh-CN" ? "联系我们" : "聯絡我們"}
 							</Link>
 							<Link
 								href="/customer/privacy"
@@ -109,7 +109,7 @@ const FooterV2 = () => {
 				<div className="flex flex-col items-start gap-6 mt-8 sm:mt-10 md:mt-12 lg:flex-row lg:items-center lg:justify-between">
 					<div className="w-full lg:w-auto">
 						<div className="inline-block bg-[#9AA620] text-[#1C1F26] px-3 py-1.5 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm mb-3 sm:mb-4">
-							{locale === "zh-CN" ? "关于我们：" : "關於我們："}
+							{locale === "zh-CN" ? "联系我们：" : "聯絡我們："}
 						</div>
 						<p className="text-white/90 text-sm sm:text-base">
 							{locale === "zh-CN" ? "电邮" : "電郵"}:
@@ -147,7 +147,10 @@ const FooterV2 = () => {
 						</p>
 						<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 order-1 md:order-2">
 							{[
-								{ src: "/images/footer/payments/visa.svg", alt: "Visa" },
+								{
+									src: "/images/footer/payments/visa.svg",
+									alt: "Visa",
+								},
 								{
 									src: "/images/footer/payments/mastercard.svg",
 									alt: "Mastercard",

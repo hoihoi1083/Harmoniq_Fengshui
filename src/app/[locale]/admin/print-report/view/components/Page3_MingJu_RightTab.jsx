@@ -49,7 +49,7 @@ const TAB_CONFIG = {
 			unselectedImg: "#D09900",
 		},
 		right: {
-			label: "財星定位",
+			label: "事業定位",
 			img: "/images/report/money.png",
 			selectedBg: "#3263C4",
 			selectedImg: "#FFFFFF",
@@ -67,7 +67,7 @@ const TAB_CONFIG = {
 			unselectedImg: "#D09900",
 		},
 		right: {
-			label: "財星定位",
+			label: "事業定位",
 			img: "/images/report/money.png",
 			selectedBg: "#3263C4",
 			selectedImg: "#FFFFFF",

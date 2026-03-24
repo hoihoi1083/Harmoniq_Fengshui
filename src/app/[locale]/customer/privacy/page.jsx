@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 export default function () {
 	const t = useTranslations("home.privacy");
-	let arr = Array.from(new Array(4));
+	let arr = Array.from(new Array(7));
 	return (
 		<div className="py-25 bg-[#EFEFEF] min-h-screen">
 			<div className="max-w-4xl px-6 mx-auto">

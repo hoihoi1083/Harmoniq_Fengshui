@@ -66,19 +66,47 @@ export default function FAQ() {
 							</AccordionContent>
 						</AccordionItem>
 						{showMore && (
-							<AccordionItem
-								value="item-4"
-								className={itemClassName}
-							>
-								<AccordionTrigger className={triggerClassName}>
-									<span className={triggerSpanClassName}>
-										{t("q4")}
-									</span>
-								</AccordionTrigger>
-								<AccordionContent className={contentClassName}>
-									{t("a4")}
-								</AccordionContent>
-							</AccordionItem>
+							<>
+								<AccordionItem
+									value="item-4"
+									className={itemClassName}
+								>
+									<AccordionTrigger className={triggerClassName}>
+										<span className={triggerSpanClassName}>
+											{t("q4")}
+										</span>
+									</AccordionTrigger>
+									<AccordionContent className={contentClassName}>
+										{t("a4")}
+									</AccordionContent>
+								</AccordionItem>
+								<AccordionItem
+									value="item-5"
+									className={itemClassName}
+								>
+									<AccordionTrigger className={triggerClassName}>
+										<span className={triggerSpanClassName}>
+											{t("q9")}
+										</span>
+									</AccordionTrigger>
+									<AccordionContent className={contentClassName}>
+										{t("a9")}
+									</AccordionContent>
+								</AccordionItem>
+								<AccordionItem
+									value="item-6"
+									className={itemClassName}
+								>
+									<AccordionTrigger className={triggerClassName}>
+										<span className={triggerSpanClassName}>
+											{t("q10")}
+										</span>
+									</AccordionTrigger>
+									<AccordionContent className={contentClassName}>
+										{t("a10")}
+									</AccordionContent>
+								</AccordionItem>
+							</>
 						)}
 					</Accordion>
 					<button

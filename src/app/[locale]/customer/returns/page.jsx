@@ -30,7 +30,9 @@ function highlightParts(text, phrases) {
 		);
 		remaining = remaining.slice(earliest + found.length);
 	}
-	return parts.length === 1 && typeof parts[0] === "string" ? parts[0] : parts;
+	return parts.length === 1 && typeof parts[0] === "string"
+		? parts[0]
+		: parts;
 }
 
 export default function ReturnsPage() {
@@ -52,7 +54,6 @@ export default function ReturnsPage() {
 			label: t("section1.item2.label"),
 			text: t("section1.item2.text"),
 			highlight: [t("section1.item2.highlightPhrase")],
-			sub: t("section1.item2.sub"),
 		},
 	];
 
@@ -77,6 +78,8 @@ export default function ReturnsPage() {
 				intro: t("section2.intro"),
 				items: section2Items,
 			},
+			{ title: t("section4.title"), body: t("section4.body") },
+			{ title: t("section5.title"), body: t("section5.body") },
 			{ title: t("section3.title"), body: t("section3.body") },
 		],
 	};
@@ -102,7 +105,7 @@ export default function ReturnsPage() {
 						>
 							{section.numbered ? (
 								<>
-									<h2 className="font-lora text-xl font-semibold text-brown mb-4 pl-4 border-l-4 border-[#5a6b2a]">
+									<h2 className="font-lora text-xl font-semibold text-brown mb-4 pl-4 ">
 										{section.title}
 									</h2>
 									<div className="space-y-4 font-lora text-brown-light">
@@ -112,7 +115,8 @@ export default function ReturnsPage() {
 													<span className="font-semibold text-brown">
 														{i + 1}. {item.label}
 													</span>
-													{item.highlight === "all" ? (
+													{item.highlight ===
+													"all" ? (
 														<span className="text-[#5a6b2a]">
 															{" "}
 															{item.text}
@@ -122,14 +126,17 @@ export default function ReturnsPage() {
 															{" "}
 															{highlightParts(
 																item.text,
-																item.highlight || [],
+																item.highlight ||
+																	[],
 															)}
 														</>
 													)}
 												</p>
 												{item.sub && (
 													<p className="mt-2 ml-4 text-[#5a6b2a]">
-														<span className="mr-1.5">○</span>
+														<span className="mr-1.5">
+															○
+														</span>
 														{item.sub}
 													</p>
 												)}
@@ -139,7 +146,7 @@ export default function ReturnsPage() {
 								</>
 							) : section.bulleted ? (
 								<>
-									<h2 className="font-lora text-xl font-semibold text-brown mb-4 pl-4 border-l-4 border-[#5a6b2a]">
+									<h2 className="font-lora text-xl font-semibold text-brown mb-4 pl-4 ">
 										{section.title}
 									</h2>
 									<div className="space-y-3 font-lora text-brown-light">
@@ -150,8 +157,13 @@ export default function ReturnsPage() {
 										)}
 										<ul className="list-none space-y-3 pl-0">
 											{section.items.map((item, i) => (
-												<li key={i} className="flex gap-2">
-													<span className="text-brown flex-shrink-0">•</span>
+												<li
+													key={i}
+													className="flex gap-2"
+												>
+													<span className="text-brown flex-shrink-0">
+														•
+													</span>
 													<span>
 														<span className="font-medium text-brown">
 															{item.label}
