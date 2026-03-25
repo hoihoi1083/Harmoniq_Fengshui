@@ -72,16 +72,21 @@ const ServiceSection = () => {
 		},
 	];
 
-	const luckyProducts = products
-		.filter((product) => product.isFeatured)
-		.slice(0, 4);
-
-	const hotProducts = products
-		.filter((product) => (product.soldCount || product.sold || 0) > 0)
+	// 2026幸運水晶: show best-selling ranking
+	const luckyProducts = [...products]
 		.sort(
 			(a, b) =>
 				(b.soldCount || b.sold || 0) - (a.soldCount || a.sold || 0),
 		)
+		.slice(0, 4);
+
+	// 精選產品: show most recently updated products
+	const featuredProducts = [...products]
+		.sort((a, b) => {
+			const aTime = new Date(a.updatedAt || a.createdAt || 0).getTime();
+			const bTime = new Date(b.updatedAt || b.createdAt || 0).getTime();
+			return bTime - aTime;
+		})
 		.slice(0, 4);
 
 	// Horizontal carousel: touch + mouse drag to scroll (single row on small screens)
@@ -471,7 +476,7 @@ const ServiceSection = () => {
 								</p>
 							</div>
 						</div>
-					) : hotProducts.length > 0 ? (
+					) : featuredProducts.length > 0 ? (
 						<>
 							{/* Single-row carousel on small/mobile */}
 							<div
@@ -485,7 +490,7 @@ const ServiceSection = () => {
 								onTouchMove={handleCarouselDragMove}
 								onTouchEnd={handleCarouselTouchEnd}
 							>
-								{hotProducts.map((product) => {
+								{featuredProducts.map((product) => {
 									const hasDiscount =
 										product.discount &&
 										product.discount.percentage > 0 &&
@@ -600,7 +605,7 @@ const ServiceSection = () => {
 							</div>
 							{/* Grid on md+ */}
 							<div className="hidden md:grid grid-cols-2 gap-4 mb-6 md:grid-cols-4 md:gap-6">
-								{hotProducts.map((product) => {
+								{featuredProducts.map((product) => {
 									const hasDiscount =
 										product.discount &&
 										product.discount.percentage > 0 &&
