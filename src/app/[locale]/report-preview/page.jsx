@@ -134,6 +134,15 @@ const ReportPreviewPage = () => {
 	};
 
 	const currentReport = reportConfig[reportType] || reportConfig.fengshui;
+	const reportPreviewImageMap = {
+		fengshui: "/images/report-preview/report.png",
+		life: "/images/report-preview/life-report.png",
+		relationship: "/images/report-preview/relationship-report.png",
+		couple: "/images/report-preview/couple-report.png",
+		wealth: "/images/report-preview/wealth-report.png",
+		health: "/images/report-preview/health-report.png",
+		career: "/images/report-preview/career-report.png",
+	};
 
 	// Regional pricing: show correct symbol and amounts for CNY / HKD / TWD
 	const displayInfo = getDisplayPrices(locale, region);
@@ -544,7 +553,10 @@ const ReportPreviewPage = () => {
 									{/* Report Preview Image */}
 									<div className="relative w-full">
 										<Image
-											src="/images/report-preview/report.png"
+											src={
+												reportPreviewImageMap[reportType] ||
+												reportPreviewImageMap.fengshui
+											}
 											alt={t("reportImageAlt")}
 											width={400}
 											height={500}
@@ -625,16 +637,6 @@ const ReportPreviewPage = () => {
 								<div className="text-sm sm:text-base leading-relaxed text-gray-700">
 									<p>{currentReport.description}</p>
 								</div>
-
-								{/* Expandable Content */}
-								<button
-									onClick={() =>
-										(window.location.href = `/demo?category=${reportType}`)
-									}
-									className="flex items-center justify-center w-full sm:w-auto px-4 py-3 text-sm sm:text-base font-semibold text-white transition bg-[#7E8A00] rounded-full hover:bg-gray-900"
-								>
-									<span>{t("learnMore")}</span>
-								</button>
 
 								{/* Divider Line */}
 								<div className="border-t border-gray-300"></div>
