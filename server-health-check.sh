@@ -51,10 +51,11 @@ else
 fi
 echo ""
 
-# 3. Check disk space
+# 3. Check disk space (avoid df|tail pipe — can show "broken pipe" / SIGPIPE under I/O pressure)
 echo "3️⃣ Disk Space:"
-df -h / | tail -1
-DISK_USED=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+df -h /
+DISK_USED=$(df -P / 2>/dev/null | awk 'NR==2 {gsub(/%/,"",$5); print $5}')
+case "$DISK_USED" in ''|*[!0-9]*) DISK_USED=0 ;; esac
 if [ "$DISK_USED" -gt 90 ]; then
     echo "   🚨 ALERT: Disk space critical (${DISK_USED}%)"
 elif [ "$DISK_USED" -gt 80 ]; then

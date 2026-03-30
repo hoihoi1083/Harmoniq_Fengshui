@@ -93,6 +93,10 @@ upload_source() {
 # Build locally and upload .next/standalone (use when npm install fails on server)
 local_build_and_upload_standalone() {
     print_status "Building application locally..."
+    # Dev with `next dev --turbopack` leaves Turbopack artifacts in .next/; mixing them
+    # with `next build` causes MODULE_NOT_FOUND for ../chunks/ssr/[turbopack]_runtime.js
+    print_status "Removing stale .next (required after turbopack dev)..."
+    rm -rf .next
     if ! npm run build; then
         print_error "Local build failed. Fix errors above and re-run."
         exit 1

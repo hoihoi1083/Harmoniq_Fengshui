@@ -25,6 +25,7 @@ import { useSession } from "next-auth/react";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
 import ProductCard from "@/components/shop/ProductCard";
+import ShopAssistantWidget from "@/components/shop/ShopAssistantWidget";
 import { REPORT_PRODUCT_IDS } from "@/lib/reportProducts";
 
 function CategoryPageContent() {
@@ -418,7 +419,14 @@ function CategoryPageContent() {
 			ring: ["戒指", "ring"],
 			necklace: ["项链", "項鏈", "necklace"],
 			pendant: ["吊坠", "吊墜", "pendant"],
-			"feng-shui": ["风水", "風水", "摆件", "擺件", "feng-shui", "decoration"],
+			"feng-shui": [
+				"风水",
+				"風水",
+				"摆件",
+				"擺件",
+				"feng-shui",
+				"decoration",
+			],
 		};
 
 		// UI element (Gold/Wood/...) → DB elementType (metal/wood/...)
@@ -489,13 +497,24 @@ function CategoryPageContent() {
 		} else {
 			// Filter by product type (耳飾, 手串, etc.) using keyword match — DB category is charm/decoration, not earring/bracelet
 			if (selectedProductType) {
-				const keywords = categoryKeywords[selectedProductType] || [selectedProductType];
+				const keywords = categoryKeywords[selectedProductType] || [
+					selectedProductType,
+				];
 				filtered = filtered.filter((p) => {
 					const productCategory = (p.category || "").toLowerCase();
-					const nameZhCN = (p.name?.zh_CN || p.name?.["zh-CN"] || "").toLowerCase();
-					const nameZhTW = (p.name?.zh_TW || p.name?.["zh-TW"] || "").toLowerCase();
+					const nameZhCN = (
+						p.name?.zh_CN ||
+						p.name?.["zh-CN"] ||
+						""
+					).toLowerCase();
+					const nameZhTW = (
+						p.name?.zh_TW ||
+						p.name?.["zh-TW"] ||
+						""
+					).toLowerCase();
 					const nameEn = (p.name?.en || "").toLowerCase();
-					const nameStr = typeof p.name === "string" ? p.name.toLowerCase() : "";
+					const nameStr =
+						typeof p.name === "string" ? p.name.toLowerCase() : "";
 					return keywords.some(
 						(kw) =>
 							productCategory.includes(kw.toLowerCase()) ||
@@ -510,7 +529,9 @@ function CategoryPageContent() {
 
 		// Filter by element type — map UI (Gold/Wood/...) to DB (metal/wood/...) and compare
 		if (selectedElement) {
-			const dbElement = elementUiToDb[selectedElement] || selectedElement?.toLowerCase();
+			const dbElement =
+				elementUiToDb[selectedElement] ||
+				selectedElement?.toLowerCase();
 			filtered = filtered.filter((p) => {
 				const el = (p.elementType || "").toLowerCase();
 				return el && el === dbElement;
@@ -1410,7 +1431,7 @@ function CategoryPageContent() {
 			</section>
 
 			{/* Newsletter Banner - mobile: stacked, centered, envelope icon; desktop: same as price page */}
-			<div className="relative z-10 -mb-6 px-4 sm:px-6">
+			{/* <div className="relative z-10 -mb-6 px-4 sm:px-6">
 				<div className="container mx-auto max-w-full">
 					<div className="bg-[#8B9F3A] rounded-2xl sm:rounded-3xl overflow-hidden max-w-5xl mx-auto">
 						<div className="px-5 py-8 sm:px-8 sm:py-10 md:px-12">
@@ -1427,9 +1448,9 @@ function CategoryPageContent() {
 											: "我們的最新優惠"}
 									</h2>
 								</div>
-								<div className="flex flex-col gap-4 w-full max-w-md md:w-auto md:min-w-[320px] lg:min-w-[400px]">
-									{/* Email input with envelope icon - full width on mobile */}
-									<div className="relative w-full">
+								<div className="flex flex-col gap-4 w-full max-w-md md:w-auto md:min-w-[320px] lg:min-w-[400px]"> */}
+			{/* Email input with envelope icon - full width on mobile */}
+			{/* <div className="relative w-full">
 										<Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
 										<Input
 											type="email"
@@ -1459,10 +1480,12 @@ function CategoryPageContent() {
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> */}
 
 			{/* Footer */}
 			<FooterV2 />
+
+			{category === "all" && <ShopAssistantWidget locale={locale} />}
 		</div>
 	);
 }

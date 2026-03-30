@@ -153,11 +153,7 @@ export default function CartPage() {
 			// Extra fee for printed report items
 			if (item.giftReportType === "report-print") {
 				const extraPerUnit =
-					region === "taiwan"
-						? 100
-						: region === "china"
-						  ? 20
-						  : 20;
+					region === "taiwan" ? 100 : region === "china" ? 20 : 20;
 				finalPrice += extraPerUnit;
 			}
 
@@ -312,8 +308,8 @@ export default function CartPage() {
 										region === "taiwan"
 											? 100
 											: region === "china"
-											  ? 20
-											  : 20;
+												? 20
+												: 20;
 									finalPrice += extraPerUnit;
 								}
 
@@ -327,7 +323,10 @@ export default function CartPage() {
 											{product.images?.length > 0 ? (
 												<Image
 													src={product.images[0]}
-													alt={getProductName(product, locale)}
+													alt={getProductName(
+														product,
+														locale,
+													)}
 													fill
 													className="object-cover"
 												/>
@@ -351,7 +350,10 @@ export default function CartPage() {
 										{/* Product Info */}
 										<div className="flex-1 min-w-0">
 											<h3 className="mb-1 text-base font-semibold">
-												{getProductName(product, locale)}
+												{getProductName(
+													product,
+													locale,
+												)}
 											</h3>
 											{item.giftReportType && (
 												<p className="mb-1 text-sm text-[#6B8E23]">
@@ -365,9 +367,14 @@ export default function CartPage() {
 												</p>
 											)}
 											<p className="mb-3 text-sm text-gray-500">
-												{getProductDescription(product, locale)?.substring(0, 30)}
-												{getProductDescription(product, locale)?.length > 30 &&
-													"..."}
+												{getProductDescription(
+													product,
+													locale,
+												)?.substring(0, 30)}
+												{getProductDescription(
+													product,
+													locale,
+												)?.length > 30 && "..."}
 											</p>
 
 											<div className="flex items-center justify-between">
@@ -542,7 +549,7 @@ export default function CartPage() {
 			</div>
 
 			{/* Newsletter Banner - Overlapping Footer */}
-			<div className="relative z-10 -mb-10">
+			{/* <div className="relative z-10 -mb-10">
 				<div className="container px-4 mx-auto">
 					<div className="bg-[#8B9F3A] rounded-3xl overflow-hidden max-w-5xl mx-auto">
 						<div className="px-8 py-10 md:px-12">
@@ -582,7 +589,7 @@ export default function CartPage() {
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> */}
 
 			{/* Footer */}
 			<FooterV2 />

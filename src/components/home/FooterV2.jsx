@@ -1,17 +1,10 @@
 "use client";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useLocale } from "next-intl";
 
 const FooterV2 = () => {
 	const locale = useLocale();
-
-	const handleContactSubmit = () => {
-		// Function to be implemented
-		console.log("Contact submitted");
-	};
 
 	return (
 		<footer className="bg-[#1C1F26] w-full text-white pt-8 pb-8 sm:pt-10 sm:pb-10 rounded-t-2xl sm:rounded-t-3xl md:rounded-t-[60px]">
@@ -103,36 +96,6 @@ const FooterV2 = () => {
 							/>
 						</a>
 					</div>
-				</div>
-
-				{/* Contact Row */}
-				<div className="flex flex-col items-start gap-6 mt-8 sm:mt-10 md:mt-12 lg:flex-row lg:items-center lg:justify-between">
-					<div className="w-full lg:w-auto">
-						<div className="inline-block bg-[#9AA620] text-[#1C1F26] px-3 py-1.5 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm mb-3 sm:mb-4">
-							{locale === "zh-CN" ? "联系我们：" : "聯絡我們："}
-						</div>
-						<p className="text-white/90 text-sm sm:text-base">
-							{locale === "zh-CN" ? "电邮" : "電郵"}:
-							support@harmoniqfengshui.com
-						</p>
-					</div>
-					{/* <div className="w-full max-w-full lg:max-w-[560px] rounded-xl sm:rounded-[20px] bg-[#2A2E36] p-4 sm:p-6">
-						<div className="flex flex-col gap-3 sm:flex-row">
-							<Input
-								type="email"
-								placeholder={
-									locale === "zh-CN" ? "您的电邮" : "您的電郵"
-								}
-								className="h-11 sm:h-12 px-4 sm:px-6 text-sm sm:text-base text-white bg-[#2A2E36] border border-white/80 rounded-full placeholder:text-white/70"
-							/>
-							<Button
-								onClick={handleContactSubmit}
-								className="h-11 sm:h-12 bg-[#9AA620] hover:bg-[#7E8B1D] text-[#1C1F26] rounded-full px-6 sm:px-8 font-semibold text-sm sm:text-base shrink-0"
-							>
-								{locale === "zh-CN" ? "联系我们" : "聯絡我們"}
-							</Button>
-						</div>
-					</div> */}
 				</div>
 
 				{/* Bottom Section */}

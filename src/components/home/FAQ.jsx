@@ -9,6 +9,27 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+function FaqItems({ indices, itemClassName, triggerClassName, triggerSpanClassName, contentClassName, t }) {
+	return (
+		<>
+			{indices.map((n) => (
+				<AccordionItem
+					key={n}
+					value={`item-${n}`}
+					className={itemClassName}
+				>
+					<AccordionTrigger className={triggerClassName}>
+						<span className={triggerSpanClassName}>{t(`q${n}`)}</span>
+					</AccordionTrigger>
+					<AccordionContent className={contentClassName}>
+						{t(`a${n}`)}
+					</AccordionContent>
+				</AccordionItem>
+			))}
+		</>
+	);
+}
+
 export default function FAQ() {
 	const t = useTranslations("home.FAQ");
 	const [showMore, setShowMore] = useState(false);
@@ -21,6 +42,14 @@ export default function FAQ() {
 		"font-sans font-[400] text-sm sm:text-[16px] md:text-[20px] text-[#073E31] text-left";
 	const contentClassName =
 		"pt-2 sm:pt-3 md:pt-4 pb-0 font-sans font-light text-xs sm:text-[14px] md:text-[18px] text-[#2E3933] leading-relaxed";
+
+	const faqProps = {
+		itemClassName,
+		triggerClassName,
+		triggerSpanClassName,
+		contentClassName,
+		t,
+	};
 
 	return (
 		<section className="relative py-6 sm:py-8 md:py-20 mt-6 md:mt-10 mb-10 md:mb-5 bg-[#CCCDCF] rounded-2xl md:rounded-[60px] z-50">
@@ -35,81 +64,11 @@ export default function FAQ() {
 						className="w-full"
 						defaultValue="item-1"
 					>
-						<AccordionItem value="item-1" className={itemClassName}>
-							<AccordionTrigger className={triggerClassName}>
-								<span className={triggerSpanClassName}>
-									{t("q1")}
-								</span>
-							</AccordionTrigger>
-							<AccordionContent className={contentClassName}>
-								{t("a1")}
-							</AccordionContent>
-						</AccordionItem>
-						<AccordionItem value="item-2" className={itemClassName}>
-							<AccordionTrigger className={triggerClassName}>
-								<span className={triggerSpanClassName}>
-									{t("q2")}
-								</span>
-							</AccordionTrigger>
-							<AccordionContent className={contentClassName}>
-								{t("a2")}
-							</AccordionContent>
-						</AccordionItem>
-						<AccordionItem value="item-3" className={itemClassName}>
-							<AccordionTrigger className={triggerClassName}>
-								<span className={triggerSpanClassName}>
-									{t("q3")}
-								</span>
-							</AccordionTrigger>
-							<AccordionContent className={contentClassName}>
-								{t("a3")}
-							</AccordionContent>
-						</AccordionItem>
-						{showMore && (
-							<>
-								<AccordionItem
-									value="item-4"
-									className={itemClassName}
-								>
-									<AccordionTrigger className={triggerClassName}>
-										<span className={triggerSpanClassName}>
-											{t("q4")}
-										</span>
-									</AccordionTrigger>
-									<AccordionContent className={contentClassName}>
-										{t("a4")}
-									</AccordionContent>
-								</AccordionItem>
-								<AccordionItem
-									value="item-5"
-									className={itemClassName}
-								>
-									<AccordionTrigger className={triggerClassName}>
-										<span className={triggerSpanClassName}>
-											{t("q9")}
-										</span>
-									</AccordionTrigger>
-									<AccordionContent className={contentClassName}>
-										{t("a9")}
-									</AccordionContent>
-								</AccordionItem>
-								<AccordionItem
-									value="item-6"
-									className={itemClassName}
-								>
-									<AccordionTrigger className={triggerClassName}>
-										<span className={triggerSpanClassName}>
-											{t("q10")}
-										</span>
-									</AccordionTrigger>
-									<AccordionContent className={contentClassName}>
-										{t("a10")}
-									</AccordionContent>
-								</AccordionItem>
-							</>
-						)}
+						<FaqItems indices={[1, 2, 3, 4]} {...faqProps} />
+						{showMore && <FaqItems indices={[5, 6, 7, 8]} {...faqProps} />}
 					</Accordion>
 					<button
+						type="button"
 						onClick={() => setShowMore(!showMore)}
 						className="flex items-center justify-center mt-4 sm:mt-5 min-h-11 sm:min-h-0 w-full sm:w-[140px] md:w-[168px] h-11 sm:h-10 md:h-[50px] rounded-full bg-[#A3B116] text-white font-sans font-[400] text-sm sm:text-[14px] md:text-[16px] border-none cursor-pointer touch-manipulation"
 					>

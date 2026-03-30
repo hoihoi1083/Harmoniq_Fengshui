@@ -762,7 +762,7 @@ export default function ShopPage() {
 			</section>
 
 			{/* Newsletter Banner - Overlapping Footer */}
-			<div className="relative z-10 -mb-16">
+			{/* <div className="relative z-10 -mb-16">
 				<div className="container px-4 mx-auto">
 					<div className="bg-[#8B9F3A] rounded-3xl overflow-hidden max-w-5xl mx-auto">
 						<div className="px-8 md:px-12 py-10">
@@ -807,7 +807,7 @@ export default function ShopPage() {
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> */}
 
 			<FooterV2 />
 		</div>

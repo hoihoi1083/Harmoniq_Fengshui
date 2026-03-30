@@ -16,8 +16,12 @@ const PricePage = () => {
 	const [region, setRegion] = useState("hongkong");
 	const scrollRef = useRef(null);
 	useEffect(() => {
-		const stored = typeof window !== "undefined" ? localStorage.getItem("userRegion") : null;
-		if (stored && ["china", "hongkong", "taiwan"].includes(stored)) setRegion(stored);
+		const stored =
+			typeof window !== "undefined"
+				? localStorage.getItem("userRegion")
+				: null;
+		if (stored && ["china", "hongkong", "taiwan"].includes(stored))
+			setRegion(stored);
 	}, []);
 	const hasDraggedRef = useRef(false);
 	const isJumpingRef = useRef(false);
@@ -75,7 +79,8 @@ const PricePage = () => {
 	];
 
 	// Image suffix by region: China → CNY, Hong Kong → HKD, Taiwan → TWD
-	const imageSuffix = region === "china" ? "CNY" : region === "taiwan" ? "TWD" : "HKD";
+	const imageSuffix =
+		region === "china" ? "CNY" : region === "taiwan" ? "TWD" : "HKD";
 	const pricingCards = [
 		{
 			id: 1,
@@ -541,7 +546,7 @@ const PricePage = () => {
 			</div>
 
 			{/* Newsletter Banner - Overlapping Footer (hidden on mobile, shown on desktop) */}
-			<div className="relative z-10 -mb-6 px-4 sm:px-6 hidden md:block">
+			{/* <div className="relative z-10 -mb-6 px-4 sm:px-6 hidden md:block">
 				<div className="container mx-auto max-w-full">
 					<div className="bg-[#8B9F3A] rounded-2xl sm:rounded-3xl overflow-hidden max-w-5xl mx-auto">
 						<div className="px-5 py-8 sm:px-8 sm:py-10 md:px-12">
@@ -586,7 +591,7 @@ const PricePage = () => {
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> */}
 
 			{/* Footer */}
 			<FooterV2 />

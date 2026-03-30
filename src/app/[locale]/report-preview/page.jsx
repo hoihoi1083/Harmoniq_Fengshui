@@ -554,7 +554,9 @@ const ReportPreviewPage = () => {
 									<div className="relative w-full">
 										<Image
 											src={
-												reportPreviewImageMap[reportType] ||
+												reportPreviewImageMap[
+													reportType
+												] ||
 												reportPreviewImageMap.fengshui
 											}
 											alt={t("reportImageAlt")}
@@ -981,7 +983,7 @@ const ReportPreviewPage = () => {
 			</section>
 
 			{/* Newsletter Banner - Overlapping Footer (hidden on mobile) */}
-			<div className="relative z-10 hidden -mb-6 md:block">
+			{/* <div className="relative z-10 hidden -mb-6 md:block">
 				<div className="container px-4 mx-auto">
 					<div className="bg-[#8B9F3A] rounded-2xl sm:rounded-3xl overflow-hidden max-w-5xl mx-auto">
 						<div className="px-4 py-6 sm:px-6 sm:py-8 md:px-12 md:py-10">
@@ -1016,7 +1018,7 @@ const ReportPreviewPage = () => {
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> */}
 
 			{/* Footer */}
 			<FooterV2 />

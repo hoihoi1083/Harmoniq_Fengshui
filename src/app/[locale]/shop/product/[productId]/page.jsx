@@ -538,7 +538,10 @@ export default function ProductDetailPage() {
 									<>
 										<Image
 											src={product.images[selectedImage]}
-											alt={getProductName(product, locale)}
+											alt={getProductName(
+												product,
+												locale,
+											)}
 											fill
 											className="object-contain p-8"
 											priority
@@ -664,7 +667,9 @@ export default function ProductDetailPage() {
 						{/* Description */}
 						<div className="py-4 text-sm leading-relaxed text-gray-600 border-t border-b border-gray-200">
 							<p>
-								{product ? getProductDescription(product, locale) : ""}
+								{product
+									? getProductDescription(product, locale)
+									: ""}
 							</p>
 						</div>
 
@@ -1096,9 +1101,10 @@ export default function ProductDetailPage() {
 															relatedProduct
 																.images[0]
 														}
-														alt={
-															getProductName(relatedProduct, locale)
-														}
+														alt={getProductName(
+															relatedProduct,
+															locale,
+														)}
 														fill
 														draggable={false}
 														className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -1125,7 +1131,10 @@ export default function ProductDetailPage() {
 											{/* Product Info */}
 											<div className="p-4 space-y-2">
 												<h3 className="font-medium text-gray-900 text-sm line-clamp-2 min-h-[2.5rem]">
-													{getProductName(relatedProduct, locale)}
+													{getProductName(
+														relatedProduct,
+														locale,
+													)}
 												</h3>
 
 												{/* Star Rating */}
@@ -1212,7 +1221,7 @@ export default function ProductDetailPage() {
 			</div>
 
 			{/* Newsletter Banner - mobile: stacked, centered, envelope icon; desktop: same as price page */}
-			<div className="relative z-10 -mb-6 px-4 sm:px-6">
+			{/* <div className="relative z-10 -mb-6 px-4 sm:px-6">
 				<div className="container mx-auto max-w-full">
 					<div className="bg-[#8B9F3A] rounded-2xl sm:rounded-3xl overflow-hidden max-w-5xl mx-auto">
 						<div className="px-5 py-8 sm:px-8 sm:py-10 md:px-12">
@@ -1229,9 +1238,9 @@ export default function ProductDetailPage() {
 											: "我們的最新優惠"}
 									</h2>
 								</div>
-								<div className="flex flex-col gap-4 w-full max-w-md md:w-auto md:min-w-[320px] lg:min-w-[400px]">
-									{/* Email input with envelope icon - full width on mobile */}
-									<div className="relative w-full">
+								<div className="flex flex-col gap-4 w-full max-w-md md:w-auto md:min-w-[320px] lg:min-w-[400px]"> */}
+			{/* Email input with envelope icon - full width on mobile */}
+			{/* <div className="relative w-full">
 										<Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
 										<Input
 											type="email"
@@ -1262,7 +1271,7 @@ export default function ProductDetailPage() {
 					</div>
 				</div>
 			</div>
-
+ */}
 			{/* Footer */}
 			<FooterV2 />
 		</div>
