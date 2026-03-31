@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 
-export default function Page10_Summary({ data }) {
+export default function Page10_Summary({ data, locale = "zh-TW" }) {
+	const isCn = locale === "zh-CN";
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const { summary, concern, color } = data;
 
 	if (!summary) {
@@ -23,14 +25,19 @@ export default function Page10_Summary({ data }) {
 	const colorMap = {
 		金色: "#B8860B",
 		墨綠色: "#2F4F4F",
+		墨绿色: "#2F4F4F",
 		綠色: "#2F4F4F",
+		绿色: "#2F4F4F",
 		紫色: "#663399",
 		黑色: "#000000",
 		白色: "#FFFFFF",
+		蓝色: "#1E40AF",
 		藍色: "#1E40AF",
 		紅色: "#DC2626",
+		红色: "#DC2626",
 		橙色: "#EA580C",
 		黃色: "#FBBF24",
+		黄色: "#FBBF24",
 		粉色: "#EC4899",
 		棕色: "#92400E",
 		灰色: "#808080",
@@ -50,7 +57,7 @@ export default function Page10_Summary({ data }) {
 					textAlign: "right",
 				}}
 			>
-				{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+				{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 			</div>
 
 			{/* Title Section */}
@@ -85,7 +92,7 @@ export default function Page10_Summary({ data }) {
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 					}}
 				>
-					{summary.keyPhrase || "破關成蝶 / 格局煥新"}
+					{summary.keyPhrase || (isCn ? "破关成蝶 / 格局焕新" : "破關成蝶 / 格局煥新")}
 				</h2>
 			</div>
 
@@ -149,7 +156,9 @@ export default function Page10_Summary({ data }) {
 						<p className="text-base font-medium leading-relaxed text-center text-gray-800">
 							<span className="text-xl">"</span>
 							{summary.shareableQuote ||
-								"2026年，是打破舊有框架、迎接全新自我的時刻。每一次勇敢的改變，都在為更廣阔的人生铺路。"}
+								(isCn
+									? "2026年，是打破旧有框架、迎接全新自我的时刻。每一次勇敢的改变，都在为更广阔的人生铺路。"
+									: "2026年，是打破舊有框架、迎接全新自我的時刻。每一次勇敢的改變，都在為更廣阔的人生铺路。")}
 							<span className="text-2xl">"</span>
 						</p>
 					</div>
@@ -175,7 +184,9 @@ export default function Page10_Summary({ data }) {
 				</h3>
 				<p className="flex-1 text-base leading-relaxed text-gray-800">
 					{summary.yearOverview ||
-						"2026年是你人生格局煥然一新的一年。整體運勢呈現「先破後立」的態勢，上半年可能面臨一些舊有模式的結束或挫戰，這正是為下半年的新生鋪出空間。事業與個人發展將迎來重要的轉折點，需要你拿出勇氣做出選擇。財運上有意想不到的機會，但伴隨風險，需理性分析。人際關係將歷練洗牌，真誠的夥伴將成為你前進的助力。這一年，主動擁抱變化將定成功的關鍵。"}
+						(isCn
+							? "2026年是你人生格局焕然一新的一年。整体运势呈现「先破后立」的态势，上半年可能面临一些旧有模式的结束或挑战，这正是为下半年的新生铺出空间。事业与个人发展将迎来重要的转折点，需要你拿出勇气做出选择。财运上有意想不到的机会，但伴随风险，需理性分析。人际关系将经历洗牌，真诚的伙伴将成为你前进的助力。这一年，主动拥抱变化将决定成功的关键。"
+							: "2026年是你人生格局煥然一新的一年。整體運勢呈現「先破後立」的態勢，上半年可能面臨一些舊有模式的結束或挫戰，這正是為下半年的新生鋪出空間。事業與個人發展將迎來重要的轉折點，需要你拿出勇氣做出選擇。財運上有意想不到的機會，但伴隨風險，需理性分析。人際關係將歷練洗牌，真誠的夥伴將成為你前進的助力。這一年，主動擁抱變化將定成功的關鍵。")}
 				</p>
 			</div>
 
@@ -192,11 +203,12 @@ export default function Page10_Summary({ data }) {
 							letterSpacing: "0.2em",
 						}}
 					>
-						開運色彩
+						{isCn ? "开运色彩" : "開運色彩"}
 					</h3>
 					<div className="flex gap-6">
 						{(
-							summary.luckyColors || ["金色", "墨綠色", "紫色"]
+							summary.luckyColors ||
+							(isCn ? ["金色", "墨绿色", "紫色"] : ["金色", "墨綠色", "紫色"])
 						).map((colorName, index) => (
 							<div key={index} className="text-center">
 								<div
@@ -231,14 +243,14 @@ export default function Page10_Summary({ data }) {
 							letterSpacing: "0.2em",
 						}}
 					>
-						開運配飾
+						{isCn ? "开运配饰" : "開運配飾"}
 					</h3>
 					<div className="flex gap-6">
 						{(
 							summary.luckyAccessories || [
-								"黃水晶飾品",
-								"金屬錢幣掛飾",
-								"檀木手串",
+								isCn ? "黄水晶饰品" : "黃水晶飾品",
+								isCn ? "金属钱币挂饰" : "金屬錢幣掛飾",
+								isCn ? "檀木手串" : "檀木手串",
 							]
 						).map((accessory, index) => (
 							<div key={index} className="text-center">

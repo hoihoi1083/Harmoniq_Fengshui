@@ -1,7 +1,8 @@
 // Page 5-6: 總流年{Concern} - Detailed analysis with numbered sections and large decorative characters
 import Image from "next/image";
 
-export default function Page5_6_CareerDetailed({ data }) {
+export default function Page5_6_CareerDetailed({ data, locale = "zh-TW" }) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const { jixiong, concern, color } = data;
 
 	// Debug logging
@@ -93,7 +94,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						color: "#666",
 					}}
 				>
-					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+					{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 				</div>
 
 				{/* Page Header with large decorative character */}
@@ -295,7 +296,7 @@ export default function Page5_6_CareerDetailed({ data }) {
 						color: "#666",
 					}}
 				>
-					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+					{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 				</div>
 
 				{/* Page Header with large decorative character */}

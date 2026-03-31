@@ -2834,8 +2834,15 @@ function getFallbackContent(concernArea, tab) {
 	return "分析內容生成中...";
 }
 
-export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
-	const locale = useLocale();
+export function MingJu({
+	userInfo,
+	currentYear,
+	isPrintMode = false,
+	locale: localeProp,
+}) {
+	const routeLocale = useLocale();
+	const locale = localeProp || routeLocale;
+	const isCn = locale === "zh-CN";
 	const t = useTranslations("fengShuiReport.components.mingJu");
 	const [contentCache, setContentCache] = useState({}); // Cache for storing loaded content
 	const [allTabsLoaded, setAllTabsLoaded] = useState(false); // Track if all tabs are loaded
@@ -2843,14 +2850,14 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 
 	// Create a unique cache key for this tab and user info combination
 	const getCacheKey = (tab, userInfo, currentYear) => {
-		return `${tab}_${userInfo.birthDateTime}_${userInfo.concern}_${currentYear}`;
+		return `${tab}_${userInfo.birthDateTime}_${userInfo.concern}_${currentYear}_${locale}`;
 	};
 
 	// Clear cache when user info changes significantly
 	useEffect(() => {
 		setContentCache({});
 		setAllTabsLoaded(false);
-	}, [userInfo.birthDateTime, userInfo.concern]);
+	}, [userInfo.birthDateTime, userInfo.concern, locale]);
 
 	// Preload content for all tabs when component mounts or user info changes
 	useEffect(() => {
@@ -2873,7 +2880,10 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 				// Pre-populate cache with existing data
 				const newContentCache = {};
 				TABS.forEach((tab) => {
-					if (existingMingJuData[tab]?.content) {
+					if (
+						existingMingJuData[tab]?.content &&
+						existingMingJuData[tab]?.locale === locale
+					) {
 						const cacheKey = getCacheKey(
 							tab,
 							userInfo,
@@ -2889,7 +2899,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 					setContentCache(newContentCache);
 					// Only set allTabsLoaded to true if ALL tabs are present
 					const allTabsPresent = TABS.every(
-						(tab) => existingMingJuData[tab]?.content,
+						(tab) =>
+							existingMingJuData[tab]?.content &&
+							existingMingJuData[tab]?.locale === locale,
 					);
 					if (allTabsPresent) {
 						setAllTabsLoaded(true);
@@ -2938,6 +2950,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 						window.componentDataStore.mingJuAnalysis[tab] = {
 							content: result.content,
 							isAI: result.isAI,
+							locale,
 							timestamp: new Date().toISOString(),
 						};
 						console.log(
@@ -2951,7 +2964,9 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 					// Store error content in cache to prevent retry
 					setContentCache((prev) => ({
 						...prev,
-						[cacheKey]: "內容載入失敗，請稍後再試。",
+						[cacheKey]: isCn
+							? "内容载入失败，请稍后再试。"
+							: "內容載入失敗，請稍後再試。",
 					}));
 				}
 			});
@@ -3079,13 +3094,13 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 
 			let rightContent =
 				contentCache[getCacheKey("right", userInfo, currentYear)] ||
-				"內容載入中...";
+				(isCn ? "内容载入中..." : "內容載入中...");
 			const middleContent =
 				contentCache[getCacheKey("middle", userInfo, currentYear)] ||
-				"內容載入中...";
+				(isCn ? "内容载入中..." : "內容載入中...");
 			const leftContent =
 				contentCache[getCacheKey("日主特性", userInfo, currentYear)] ||
-				"內容載入中...";
+				(isCn ? "内容载入中..." : "內容載入中...");
 			let extractedSummary = "";
 
 			console.log("🔍 RAW rightContent:", rightContent);
@@ -3164,6 +3179,15 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 				typeof rightContent === "string" ? rightContent : "",
 			);
 			const summary = extractedSummary; // Use extracted summary from JSON
+			const normalizePrintText = (text, maxLen = 220) => {
+				if (!text) return "";
+				const s = String(text).replace(/\s+/g, " ").trim();
+				return s.length > maxLen ? `${s.slice(0, maxLen)}...` : s;
+			};
+			const printSections = (sections || []).slice(0, 3).map((sec) => ({
+				title: normalizePrintText(sec.title, 12),
+				content: normalizePrintText(sec.content, 240),
+			}));
 
 			console.log("📋 Final sections count:", sections.length);
 			console.log("📋 Final summary length:", summary?.length || 0);
@@ -3183,15 +3207,26 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 				let mainText = "";
 				let yearText = "";
 
-				// Try to split at year mention (針對20XX or 針對2025乙巳流年 etc.)
-				const yearMatch = summaryText.match(/(針對\d{4}[^，。]+)/);
+				// Try to split at year mention in both Traditional/Simplified Chinese
+				// Examples: 針對2026... / 针对2026... / 在2026年... / 2026年...
+				const yearMatch = summaryText.match(
+					/(針對|针对|在)\s*\d{4}[^，。]*/u,
+				);
 				if (yearMatch) {
 					splitIndex = yearMatch.index;
 				} else {
-					// If no year mention found, split by first mention of "建議"
-					const suggestionMatch = summaryText.match(/(建議[^。]+)/);
+					// If no explicit year marker found, split by first mention of suggestion words
+					const suggestionMatch = summaryText.match(
+						/(建議|建议|重點|重点)[^。]*/u,
+					);
 					if (suggestionMatch) {
 						splitIndex = suggestionMatch.index;
+					} else {
+						// Last fallback: split from first 4-digit year appearance
+						const plainYear = summaryText.match(/\d{4}年/u);
+						if (plainYear) {
+							splitIndex = plainYear.index;
+						}
 					}
 				}
 
@@ -3199,8 +3234,11 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 					mainText = summaryText.substring(0, splitIndex);
 					yearText = summaryText.substring(splitIndex);
 
-					// Remove year reference from yearText (針對20XX乙巳流年，etc.) but keep the rest
-					yearText = yearText.replace(/針對\d{4}[^，。]+[，。]?/, "");
+					// Remove leading connector phrase, keep meaningful year content
+					yearText = yearText
+						.replace(/^(針對|针对|在)\s*/u, "")
+						.replace(/^\d{4}[^，。]*[，。]?/u, "")
+						.trim();
 				} else {
 					// Fallback: use full text
 					mainText = summaryText;
@@ -3234,6 +3272,10 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 
 			const { mainKeywords, yearKeywords, mainText, yearText } =
 				extractKeywordsFromSummary(summary);
+			const displayMainKeywords = (mainKeywords || []).slice(0, 2);
+			const displayYearKeywords = (yearKeywords || []).slice(0, 4);
+			const displayMainText = normalizePrintText(mainText, 260);
+			const displayYearText = normalizePrintText(yearText, 260);
 
 			// Get current year Ganzhi info
 			const currentYearInfo = getCurrentYearGanZhi();
@@ -3268,7 +3310,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								}}
 							>
 								{new Date()
-									.toLocaleDateString("zh-TW")
+									.toLocaleDateString(locale === "zh-CN" ? "zh-CN" : "zh-TW")
 									.replace(/\//g, "/")}
 							</div>
 
@@ -3794,7 +3836,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 								}}
 							>
 								{new Date()
-									.toLocaleDateString("zh-TW")
+									.toLocaleDateString(locale === "zh-CN" ? "zh-CN" : "zh-TW")
 									.replace(/\//g, "/")}
 							</div>
 
@@ -3843,7 +3885,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 											textOrientation: "upright",
 										}}
 									>
-										定位
+										{isCn ? "定位" : "定位"}
 									</h2>
 								</div>
 
@@ -3863,67 +3905,67 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 											lineHeight: "1.6",
 										}}
 									>
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										甚麼是
+										{isCn ? "什么是" : "甚麼是"}
 										{getTabLabel(
 											"right",
 											concern,
 											t,
 										).substring(0, 2)}
-										。
+										{isCn ? "。" : "。"}
 									</div>
 								</div>
 							</div>
@@ -3935,7 +3977,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 									gridTemplateColumns: "1fr 1fr",
 								}}
 							>
-								{sections.map((section, index) => (
+								{printSections.map((section, index) => (
 									<div
 										key={index}
 										style={{
@@ -4000,13 +4042,13 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 													marginBottom: "15px",
 												}}
 											>
-												綜合而言
+												{isCn ? "综合而言" : "綜合而言"}
 											</h2>
 										</div>
 										{/* Content area */}
 										<div style={{ flex: 1 }}>
 											{/* Main summary text */}
-											{mainText && (
+											{displayMainText && (
 												<p
 													style={{
 														fontSize: "13px",
@@ -4015,11 +4057,11 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 														marginBottom: "4px",
 													}}
 												>
-													{mainText}
+													{displayMainText}
 												</p>
 											)}
 											{/* Main Keywords display */}
-											{mainKeywords.length > 0 && (
+											{displayMainKeywords.length > 0 && (
 												<div
 													style={{
 														display: "flex",
@@ -4029,7 +4071,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 															"center",
 													}}
 												>
-													{mainKeywords.map(
+													{displayMainKeywords.map(
 														(keyword, idx) => (
 															<div
 																key={idx}
@@ -4071,7 +4113,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 											)}
 
 											{/* Year Section */}
-											{yearText && (
+											{displayYearText && (
 												<>
 													<h3
 														style={{
@@ -4097,10 +4139,10 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 																"10px",
 														}}
 													>
-														{yearText}
+														{displayYearText}
 													</p>
 													{/* Year Keywords display */}
-													{yearKeywords.length >
+													{displayYearKeywords.length >
 														0 && (
 														<div
 															style={{
@@ -4110,7 +4152,7 @@ export function MingJu({ userInfo, currentYear, isPrintMode = false }) {
 																	"center",
 															}}
 														>
-															{yearKeywords.map(
+															{displayYearKeywords.map(
 																(
 																	keyword,
 																	idx,

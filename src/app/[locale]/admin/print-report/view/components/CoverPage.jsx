@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { getConcernColor } from "@/utils/colorTheme";
 
-export default function CoverPage({ concern, productName }) {
+export default function CoverPage({ concern, productName, locale = "zh-TW" }) {
+	const isCn = locale === "zh-CN";
 	// Get current date for the report
 	const now = new Date();
 	const year = now.getFullYear();
@@ -11,7 +12,9 @@ export default function CoverPage({ concern, productName }) {
 	// Map concern to Chinese text
 	const concernTextMap = {
 		財運: "財運",
+		财运: "财运",
 		事業: "事業",
+		事业: "事业",
 		感情: "感情",
 		健康: "健康",
 	};
@@ -131,7 +134,7 @@ export default function CoverPage({ concern, productName }) {
 						marginBottom: "0px",
 					}}
 				>
-					個人化訂製專屬
+					{isCn ? "个性化订制专属" : "個人化訂製專屬"}
 				</div>
 
 				{/* Report type label */}
@@ -149,7 +152,7 @@ export default function CoverPage({ concern, productName }) {
 				>
 					{concernText}
 					<br />
-					報告
+					{isCn ? "报告" : "報告"}
 				</div>
 			</div>
 
@@ -175,7 +178,7 @@ export default function CoverPage({ concern, productName }) {
 							paddingBottom: "4px",
 						}}
 					>
-						產品
+						{isCn ? "产品" : "產品"}
 					</span>
 				</div>
 
@@ -190,7 +193,8 @@ export default function CoverPage({ concern, productName }) {
 						marginBottom: "12px",
 					}}
 				>
-					{productName || "梨花木龜狀砭砂掛墜"}
+					{productName ||
+						(isCn ? "梨花木钥匙珠砂挂坠" : "梨花木龜狀砭砂掛墜")}
 				</div>
 
 				{/* Product name in English */}

@@ -117,9 +117,6 @@ const TestimonialSection = () => {
 						{t("title")}
 					</span>
 				</div>
-				<p className="text-xs sm:text-base leading-relaxed text-black md:text-base w-full md:w-[60%]">
-					{t("description")}
-				</p>
 			</div>
 
 			{/* Testimonial Cards - single row, horizontal scroll (touch/drag) */}

@@ -51,7 +51,12 @@ function SectionTitle({ children }) {
 	);
 }
 
-export default function CouplePrintProblemSolution({ data, subsections }) {
+export default function CouplePrintProblemSolution({
+	data,
+	subsections,
+	locale = "zh-TW",
+}) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	if (!data) return null;
 
 	const { question, female, male, raw } = data;
@@ -128,7 +133,7 @@ export default function CouplePrintProblemSolution({ data, subsections }) {
 						textAlign: "right",
 					}}
 				>
-					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+					{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 				</div>
 			</div>
 

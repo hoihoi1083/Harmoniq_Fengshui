@@ -14,14 +14,14 @@ const notoSerifSC = Noto_Serif_SC({
 });
 
 export const metadata = {
-	title: "風鈴命理聊天室 | 风铃命理聊天室 - 開啟運勢之門 | 开启运势之门",
+	title: "風鈴命理館 | 风铃命理馆 - 開啟運勢之門 | 开启运势之门",
 	description:
-		"風鈴命理聊天室歡迎您線上即時分享命運小謎團，不論尋找甜蜜桃花或喚醒財富寶藏，風鈴都會免費提供測算。风铃命理聊天室欢迎您线上即时分享命运小谜团，不论寻找甜蜜桃花或唤醒财富宝藏，风铃都会免费提供测算。",
+		"風鈴命理館歡迎您線上即時分享命運小謎團，不論尋找甜蜜桃花或喚醒財富寶藏，風鈴都會免費提供測算。风铃命理馆欢迎您线上即时分享命运小谜团，不论寻找甜蜜桃花或唤醒财富宝藏，风铃都会免费提供测算。",
 	keywords:
 		"風水, 命理, 運勢, 八字, 紫微斗數, 桃花運, 財運, 事業運, 风水, 命理, 运势, 八字, 紫微斗数, 桃花运, 财运, 事业运, feng shui, fortune telling",
-	authors: [{ name: "風鈴命理聊天室 | 风铃命理聊天室" }],
-	creator: "風鈴命理聊天室 | 风铃命理聊天室",
-	publisher: "風鈴命理聊天室 | 风铃命理聊天室",
+	authors: [{ name: "風鈴命理館 | 风铃命理馆" }],
+	creator: "風鈴命理館 | 风铃命理馆",
+	publisher: "風鈴命理館 | 风铃命理馆",
 
 	// Open Graph meta tags for social media sharing
 	openGraph: {
@@ -29,16 +29,16 @@ export const metadata = {
 		locale: "zh_TW",
 		alternateLocale: ["zh_CN"],
 		url: "https://www.harmoniqfengshui.com",
-		siteName: "風鈴命理聊天室 | 风铃命理聊天室",
-		title: "風鈴命理聊天室 | 风铃命理聊天室 - 開啟運勢之門 | 开启运势之门",
+		siteName: "風鈴命理館 | 风铃命理馆",
+		title: "風鈴命理館 | 风铃命理馆 - 開啟運勢之門 | 开启运势之门",
 		description:
-			"風鈴命理聊天室歡迎您線上即時分享命運小謎團。风铃命理聊天室欢迎您线上即时分享命运小谜团。",
+			"風鈴命理館歡迎您線上即時分享命運小謎團。风铃命理馆欢迎您线上即时分享命运小谜团。",
 		images: [
 			{
 				url: "/images/hero/hero-bg.png", // Using hero background for better social media preview
 				width: 1200,
 				height: 630,
-				alt: "風鈴命理聊天室 - 開啟運勢之門",
+				alt: "風鈴命理館 - 開啟運勢之門",
 			},
 		],
 	},
@@ -46,18 +46,17 @@ export const metadata = {
 	// Twitter Card meta tags
 	twitter: {
 		card: "summary_large_image",
-		title: "風鈴命理聊天室 | 风铃命理聊天室 - 開啟運勢之門 | 开启运势之门",
+		title: "風鈴命理館 | 风铃命理馆 - 開啟運勢之門 | 开启运势之门",
 		description:
-			"風鈴命理聊天室歡迎您線上即時分享命運小謎團。风铃命理聊天室欢迎您线上即时分享命运小谜团。",
+			"風鈴命理館歡迎您線上即時分享命運小謎團。风铃命理馆欢迎您线上即时分享命运小谜团。",
 		images: ["/images/hero/hero-bg.png"], // Using hero background for consistent branding
-		creator: "@風鈴命理聊天室",
+		creator: "@風鈴命理館",
 		site: "@風鈴命理聊天室",
 	},
 
 	// Favicon and app icons
 	icons: {
 		icon: [
-			{ url: "/favicon.ico" },
 			{
 				url: "/images/風水妹/風水妹.png",
 				sizes: "32x32",
@@ -69,7 +68,6 @@ export const metadata = {
 				type: "image/png",
 			},
 		],
-		shortcut: "/favicon.ico",
 		apple: "/images/風水妹/風水妹.png",
 	},
 

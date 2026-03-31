@@ -35,6 +35,7 @@ function CouplePrintReportInputForm() {
 		birthTime2: "",
 		productName: "梨花木鑰匙珠砂掛墜",
 		question: "",
+		outputLang: locale === "zh-CN" ? "zh-CN" : "zh-TW",
 	});
 
 	const handleSubmit = async (e) => {
@@ -49,6 +50,7 @@ function CouplePrintReportInputForm() {
 			birthTime1: formData.birthTime1,
 			birthTime2: formData.birthTime2,
 			question: formData.question || "感情關係和諧改善建議",
+			outputLang: formData.outputLang,
 		});
 		if (formData.name1) params.set("name1", formData.name1);
 		if (formData.name2) params.set("name2", formData.name2);
@@ -239,6 +241,38 @@ function CouplePrintReportInputForm() {
 							placeholder="請描述雙方感情方面的具體問題或關注點，例如：冷戰、異地、溝通爭吵等..."
 							className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none"
 						/>
+					</div>
+
+					<div>
+						<label className="block text-gray-700 font-medium mb-3">輸出語言</label>
+						<div className="flex gap-6">
+							<label className="flex items-center cursor-pointer">
+								<input
+									type="radio"
+									name="outputLang"
+									value="zh-TW"
+									checked={formData.outputLang === "zh-TW"}
+									onChange={(e) =>
+										setFormData({ ...formData, outputLang: e.target.value })
+									}
+									className="w-5 h-5 mr-2"
+								/>
+								<span>繁體中文</span>
+							</label>
+							<label className="flex items-center cursor-pointer">
+								<input
+									type="radio"
+									name="outputLang"
+									value="zh-CN"
+									checked={formData.outputLang === "zh-CN"}
+									onChange={(e) =>
+										setFormData({ ...formData, outputLang: e.target.value })
+									}
+									className="w-5 h-5 mr-2"
+								/>
+								<span>简体中文</span>
+							</label>
+						</div>
 					</div>
 
 					<button

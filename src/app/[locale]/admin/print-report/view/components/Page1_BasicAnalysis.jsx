@@ -34,8 +34,20 @@ export default function Page1_BasicAnalysis({
 	wuxingAnalysis,
 	aiContent,
 	analyzeWuxingStrength,
+	locale = "zh-TW",
 }) {
-	const defaultQuestion = `我想了解我的${concern}運勢`;
+	const isCn = locale === "zh-CN";
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
+	const concernTextMap = {
+		財運: isCn ? "财运" : "財運",
+		事業: isCn ? "事业" : "事業",
+		健康: isCn ? "健康" : "健康",
+		感情: isCn ? "感情" : "感情",
+	};
+	const concernText = concernTextMap[concern] || concern;
+	const defaultQuestion = isCn
+		? `我想了解我的${concernText}运势`
+		: `我想了解我的${concernText}運勢`;
 	const showUserQuestion =
 		question && question.trim() && question.trim() !== defaultQuestion;
 	return (
@@ -98,7 +110,7 @@ export default function Page1_BasicAnalysis({
 							color: getConcernColor(concern),
 						}}
 					>
-						基礎分析
+						{isCn ? "基础分析" : "基礎分析"}
 					</div>
 
 					{/* Vertical Line */}
@@ -133,11 +145,11 @@ export default function Page1_BasicAnalysis({
 							gap: "8px",
 						}}
 					>
-						<div>姓名：{name || "未提供"}</div>
+						<div>{isCn ? "姓名：" : "姓名："}{name || (isCn ? "未提供" : "未提供")}</div>
 						<div>
-							生辰：
+							{isCn ? "生辰：" : "生辰："}
 							{new Date(birthday)
-								.toLocaleDateString("zh-TW")
+								.toLocaleDateString(dateLocale)
 								.replace(/\//g, "/")}{" "}
 							{birthTime.split("(")[0]}
 						</div>
@@ -159,7 +171,7 @@ export default function Page1_BasicAnalysis({
 						}}
 					>
 						{new Date()
-							.toLocaleDateString("zh-TW")
+							.toLocaleDateString(dateLocale)
 							.replace(/\//g, "/")}
 					</div>
 				</div>
@@ -520,7 +532,7 @@ export default function Page1_BasicAnalysis({
 																"0.5px 0 0 currentColor, -0.5px 0 0 currentColor",
 														}}
 													>
-														五行 -{" "}
+														{isCn ? "五行 - " : "五行 - "}
 														{
 															strengthAnalysis.strengthDesc
 														}
@@ -541,8 +553,12 @@ export default function Page1_BasicAnalysis({
 														{wuxingAnalysis
 															.missingElements
 															.length > 0
-															? `${wuxingAnalysis.missingElements.join("、")}需要後天補充以達到平衡`
-															: "五行齊全 - 沒有嚴重缺失某一元素"}
+															? isCn
+																? `${wuxingAnalysis.missingElements.join("、")}需要后天补充以达到平衡`
+																: `${wuxingAnalysis.missingElements.join("、")}需要後天補充以達到平衡`
+															: isCn
+																? "五行齐全 - 没有严重缺失某一元素"
+																: "五行齊全 - 沒有嚴重缺失某一元素"}
 													</div>
 												</div>
 											</div>
@@ -600,10 +616,15 @@ export default function Page1_BasicAnalysis({
 										paddingLeft: "40px",
 									}}
 								>
-									根據你的五行配置分析，建議以「
+									{isCn
+										? "根据你的五行配置分析，建议以「"
+										: "根據你的五行配置分析，建議以「"}
 									{primaryGod}
-									」為首選用神，「{secondaryGod}
-									」為輔助用神。透過補足所缺的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力
+									{isCn ? "」为首选用神，「" : "」為首選用神，「"}
+									{secondaryGod}
+									{isCn
+										? "」为辅助用神。透过补足所缺的策略，两者协同作用可有效调节五行能量，达到阴阳平衡，提升整体运势发展。在日常生活中，可通过相应的颜色、方位、职业选择等方式来强化这些有利元素的影响力"
+										: "」為輔助用神。透過補足所缺的策略，兩者協同作用可有效調節五行能量，達到陰陽平衡，提升整體運勢發展。在日常生活中，可通過相應的顏色、方位、職業選擇等方式來強化這些有利元素的影響力"}
 								</div>
 							</div>
 						);
@@ -633,7 +654,7 @@ export default function Page1_BasicAnalysis({
 											textOrientation: "upright",
 										}}
 									>
-										疑問
+										{isCn ? "疑问" : "疑問"}
 									</h2>
 									<h2
 										style={{
@@ -649,7 +670,7 @@ export default function Page1_BasicAnalysis({
 											textOrientation: "upright",
 										}}
 									>
-										重點
+										{isCn ? "重点" : "重點"}
 									</h2>
 								</div>
 							</div>
@@ -670,7 +691,7 @@ export default function Page1_BasicAnalysis({
 												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 										}}
 									>
-										<strong>您的問題：</strong>
+										<strong>{isCn ? "您的问题：" : "您的問題："}</strong>
 										{question.trim()}
 									</h3>
 								) : (
@@ -683,7 +704,7 @@ export default function Page1_BasicAnalysis({
 												"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 										}}
 									>
-										一般{concern}分析
+										{isCn ? `一般${concernText}分析` : `一般${concernText}分析`}
 									</h3>
 								)}
 								<h4
@@ -695,7 +716,7 @@ export default function Page1_BasicAnalysis({
 											"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 									}}
 								>
-									{concern}分析指導
+									{isCn ? `${concernText}分析指导` : `${concernText}分析指導`}
 								</h4>
 								<div
 									className="text-gray-700"

@@ -1847,28 +1847,22 @@ export default function Home() {
 							></div>
 						</Link>
 						{/* 其他功能 */}
-						<Link href="/demo?category=fengshui">
-							<div
-								className="bg-[#768976] rounded-lg py-7 mb-3 cursor-pointer hover:bg-[#6b7d6b] transition-colors relative overflow-hidden"
-								style={{
-									backgroundImage:
-										getChatboxImage("house.png"),
-									backgroundSize: "cover",
-									backgroundPosition: "center",
-									backgroundRepeat: "no-repeat",
-								}}
-								onClick={handleMobileNavigation}
-							>
-								{/* Coming Soon Overlay */}
-								<div className="absolute inset-0 bg-black/20 backdrop-blur-[1px] rounded-lg z-10 flex items-center justify-center">
-									<div className="bg-gradient-to-r from-[#E8F37A] to-[#A3B116] px-3 py-1 rounded-lg shadow-lg">
-										<div className="text-sm font-bold text-[#374A37]">
-											{t("comingSoon")}
-										</div>
-									</div>
-								</div>
+						<div
+							className="bg-[#768976] rounded-lg py-7 mb-3 cursor-not-allowed opacity-95 relative overflow-hidden"
+							style={{
+								backgroundImage: getChatboxImage("house.png"),
+								backgroundSize: "cover",
+								backgroundPosition: "center",
+								backgroundRepeat: "no-repeat",
+							}}
+							aria-disabled="true"
+						>
+							<div className="absolute inset-0 z-10 flex items-center justify-center">
+								<span className="inline-flex items-center rounded-full border border-[#073E31]/20 bg-white/95 px-4 py-1.5 text-sm font-extrabold text-[#073E31] shadow-sm sm:text-base">
+									{t("comingSoon")}
+								</span>
 							</div>
-						</Link>
+						</div>
 
 						<Link href="/demo?category=relationship">
 							<div

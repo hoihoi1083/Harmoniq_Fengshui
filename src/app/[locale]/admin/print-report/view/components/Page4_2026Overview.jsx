@@ -1,7 +1,9 @@
 // Page 4: 2026流年詳解 - Styled exactly like the attached image
 import Image from "next/image";
 
-export default function Page4_2026Overview({ data }) {
+export default function Page4_2026Overview({ data, locale = "zh-TW" }) {
+	const isCn = locale === "zh-CN";
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const { year, concern, color } = data;
 
 	// Extract year analysis - the API response is in aiAnalysis
@@ -13,13 +15,13 @@ export default function Page4_2026Overview({ data }) {
 
 		// Extract 【流年干支作用】 section (section 1)
 		const ganzhiMatch = rawText.match(
-			/### 1\. 【流年干支作用】\s*([\s\S]*?)(?=### 2\.|### 【|$)/,
+			/### 1\. 【(?:流年干支作用|流年干支作用)】\s*([\s\S]*?)(?=### 2\.|### 【|$)/,
 		);
 		let ganzhiEffect = ganzhiMatch ? ganzhiMatch[1].trim() : "";
 
 		// Extract 【流年實際表現】 special section (after section 3, before section 4)
 		const practicalMatch = rawText.match(
-			/### 【流年實際表現】\s*([\s\S]*?)(?=### 4\.|$)/,
+			/### 【(?:流年實際表現|流年实际表现)】\s*([\s\S]*?)(?=### 4\.|$)/,
 		);
 		let practicalResults = practicalMatch ? practicalMatch[1].trim() : "";
 
@@ -37,7 +39,10 @@ export default function Page4_2026Overview({ data }) {
 			return (
 				text
 					// Remove analysis prefix
-					.replace(/^分析2026年丙午對原局的整體作用[:：]\s*/m, "")
+					.replace(
+						/^分析2026年丙午(?:對|对)原局的整體作用[:：]\s*/m,
+						"",
+					)
 					// Remove markdown bold
 					.replace(/\*\*/g, "")
 					// Keep line breaks for structure
@@ -62,7 +67,7 @@ export default function Page4_2026Overview({ data }) {
 		// Split by main sections (時間點與變化, 影響程度與形式, 可能情況與挑戰)
 		const sections = [];
 		const mainSectionRegex =
-			/^- (時間點與變化|影響程度與形式|可能情況與挑戰)：/gm;
+			/^- (時間點與變化|时间点与变化|影響程度與形式|影响程度与形式|可能情況與挑戰|可能情况与挑战)[:：]/gm;
 
 		let matches = [...text.matchAll(mainSectionRegex)];
 
@@ -99,7 +104,9 @@ export default function Page4_2026Overview({ data }) {
 							.trim();
 
 						// Split by 💡 實際場景：marker
-						const parts = sectionText.split(/💡\s*實際場景：/);
+						const parts = sectionText.split(
+							/💡\s*(?:實際場景|实际场景)[:：]/,
+						);
 						const mainContent = parts[0].trim();
 
 						// Parse scenarios (if exists)
@@ -140,7 +147,9 @@ export default function Page4_2026Overview({ data }) {
 					});
 				} else {
 					// No time periods found, treat as regular content
-					const parts = sectionContent.split(/💡 實際場景：/);
+					const parts = sectionContent.split(
+						/💡\s*(?:實際場景|实际场景)[:：]/,
+					);
 					sections.push({
 						title: sectionTitle,
 						mainContent: parts[0].trim().replace(/^- /, ""),
@@ -149,7 +158,9 @@ export default function Page4_2026Overview({ data }) {
 				}
 			} else {
 				// For other sections, just split by 💡 實際場景
-				const parts = sectionContent.split(/💡 實際場景：/);
+				const parts = sectionContent.split(
+					/💡\s*(?:實際場景|实际场景)[:：]/,
+				);
 				sections.push({
 					title: sectionTitle,
 					mainContent: parts[0].trim().replace(/^- /, ""),
@@ -194,7 +205,9 @@ export default function Page4_2026Overview({ data }) {
 					}}
 				>
 					2026丙午年 <span style={{ margin: "0 12px" }}>|</span>{" "}
-					<span style={{ color: color }}>流年詳解</span>
+					<span style={{ color: color }}>
+						{isCn ? "流年详解" : "流年詳解"}
+					</span>
 				</h1>
 				<div
 					style={{
@@ -203,7 +216,7 @@ export default function Page4_2026Overview({ data }) {
 						fontFamily: "Noto Serif TC, serif",
 					}}
 				>
-					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+					{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 				</div>
 			</div>
 
@@ -220,7 +233,7 @@ export default function Page4_2026Overview({ data }) {
 						marginTop: "0",
 					}}
 				>
-					01 流年干支作用
+					{isCn ? "01 流年干支作用" : "01 流年干支作用"}
 				</h3>
 				<p
 					style={{
@@ -231,7 +244,7 @@ export default function Page4_2026Overview({ data }) {
 						margin: "0",
 					}}
 				>
-					{ganzhiEffect || "內容載入中..."}
+					{ganzhiEffect || (isCn ? "内容载入中..." : "內容載入中...")}
 				</p>
 			</div>
 
@@ -248,7 +261,7 @@ export default function Page4_2026Overview({ data }) {
 						marginTop: "0",
 					}}
 				>
-					02 在專案領域的具體表現
+					{isCn ? "02 在专项领域的具体表现" : "02 在專案領域的具體表現"}
 				</h3>
 
 				{structuredResults.length > 0 ? (
@@ -348,7 +361,7 @@ export default function Page4_2026Overview({ data }) {
 											}}
 										>
 											<span style={{ fontWeight: "900" }}>
-												實際場景：
+												{isCn ? "实际场景：" : "實際場景："}
 											</span>
 											{section.scenario}
 										</p>
@@ -366,7 +379,7 @@ export default function Page4_2026Overview({ data }) {
 							color: "#333",
 						}}
 					>
-						{practicalResults || "內容載入中..."}
+						{practicalResults || (isCn ? "内容载入中..." : "內容載入中...")}
 					</div>
 				)}
 			</div>

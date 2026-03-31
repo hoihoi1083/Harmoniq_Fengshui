@@ -1006,7 +1006,9 @@ const dateStyle = {
 export default function CouplePrintMingJuLeftMiddle({
 	leftContent,
 	middleContent,
+	locale = "zh-TW",
 }) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const hasLeft =
 		leftContent != null &&
 		(typeof leftContent !== "string" || leftContent.trim() !== "");
@@ -1031,7 +1033,7 @@ export default function CouplePrintMingJuLeftMiddle({
 						}}
 					>
 						{new Date()
-							.toLocaleDateString("zh-TW")
+							.toLocaleDateString(dateLocale)
 							.replace(/\//g, "/")}
 					</div>
 					<div style={{ width: "100%", boxSizing: "border-box" }}>
@@ -1087,7 +1089,7 @@ export default function CouplePrintMingJuLeftMiddle({
 						</h3>
 						<div style={dateStyle}>
 							{new Date()
-								.toLocaleDateString("zh-TW")
+								.toLocaleDateString(dateLocale)
 								.replace(/\//g, "/")}
 						</div>
 					</div>

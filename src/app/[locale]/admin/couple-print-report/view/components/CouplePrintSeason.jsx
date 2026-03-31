@@ -3,9 +3,12 @@ import Page7_Seasons from "@/app/[locale]/admin/print-report/view/components/Pag
 /** 關鍵季節 title and theme color for couple print report */
 const COUPLE_SEASON_COLOR = "#A47584";
 
-export default function CouplePrintSeason({ data }) {
+export default function CouplePrintSeason({ data, locale = "zh-TW" }) {
 	return (
-		<Page7_Seasons data={{ ...data, color: COUPLE_SEASON_COLOR }} />
+		<Page7_Seasons
+			data={{ ...data, color: COUPLE_SEASON_COLOR }}
+			locale={locale}
+		/>
 	);
 }
 

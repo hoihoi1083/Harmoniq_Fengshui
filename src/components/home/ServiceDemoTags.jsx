@@ -249,9 +249,23 @@ export default function ServiceDemoTags() {
 						key={tag.id}
 						className="relative flex-shrink-0 group snap-center"
 					>
+						{tag.id === "fengshui" && (
+							<div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg pointer-events-none">
+								<span className="px-4 py-1.5 text-sm sm:text-base font-extrabold rounded-full bg-white/95 text-[#073E31] border border-[#073E31]/20 shadow-sm">
+									{locale === "zh-CN" ? "即将推出" : "即將推出"}
+								</span>
+							</div>
+						)}
 						<div
-							className="relative transition-transform duration-300 rounded-lg cursor-pointer hover:scale-102 active:scale-100"
-							onClick={(e) => handleImageClick(e, tag.id)}
+							className={`relative transition-transform duration-300 rounded-lg ${
+								tag.id === "fengshui"
+									? "cursor-not-allowed"
+									: "cursor-pointer hover:scale-102 active:scale-100"
+							}`}
+							onClick={(e) => {
+								if (tag.id === "fengshui") return;
+								handleImageClick(e, tag.id);
+							}}
 							style={{ userSelect: "none" }}
 						>
 							<img

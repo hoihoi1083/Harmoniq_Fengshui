@@ -109,12 +109,12 @@
 		"services": {
 			"steps": {
 				"step1": {
-					"title": "瀏覽水晶",
-					"subtitle": "購買水晶商品"
+					"title": "查詢客服",
+					"subtitle": "了解什麼吉物適合自已"
 				},
 				"step2": {
-					"title": "選擇報告",
-					"subtitle": "挑選心儀測算模式（可預覽）"
+					"title": "選擇吉物/報告",
+					"subtitle": "挑選心儀吉物/報告"
 				},
 				"step3": {
 					"title": "填寫信息",

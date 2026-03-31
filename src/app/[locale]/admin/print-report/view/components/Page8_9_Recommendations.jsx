@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 
-export default function Page8_9_Recommendations({ data }) {
+export default function Page8_9_Recommendations({ data, locale = "zh-TW" }) {
+	const isCn = locale === "zh-CN";
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const { summary, concern, color } = data;
 
 	// Extract suggestions and taboos from the API response
@@ -13,68 +15,88 @@ export default function Page8_9_Recommendations({ data }) {
 	// Fallback suggestions if API returns empty
 	const defaultSuggestions = [
 		{
-			title: "方位調整",
-			description: "根據您的八字，建議在2026年多往有利方位活動...",
+			title: isCn ? "方位调整" : "方位調整",
+			description: isCn
+				? "根据您的八字，建议在2026年多往有利方位活动..."
+				: "根據您的八字，建議在2026年多往有利方位活動...",
 			icon: "🎯",
-			category: "核心型",
+			category: isCn ? "核心型" : "核心型",
 		},
 		{
-			title: "時機把握",
-			description: "把握關鍵時段，可以事半功倍...",
+			title: isCn ? "时机把握" : "時機把握",
+			description: isCn
+				? "把握关键时段，可以事半功倍..."
+				: "把握關鍵時段，可以事半功倍...",
 			icon: "💡",
-			category: "實用型",
+			category: isCn ? "实用型" : "實用型",
 		},
 		{
-			title: "人際互動",
-			description: "注意人際關係的經營，貴人相助...",
+			title: isCn ? "人际互动" : "人際互動",
+			description: isCn
+				? "注意人际关系的经营，贵人相助..."
+				: "注意人際關係的經營，貴人相助...",
 			icon: "⭐",
-			category: "提升型",
+			category: isCn ? "提升型" : "提升型",
 		},
 		{
-			title: "自我提升",
-			description: "持續學習和提升自我能力...",
+			title: isCn ? "自我提升" : "自我提升",
+			description: isCn
+				? "持续学习和提升自我能力..."
+				: "持續學習和提升自我能力...",
 			icon: "🚀",
-			category: "突破型",
+			category: isCn ? "突破型" : "突破型",
 		},
 		{
-			title: "健康調養",
-			description: "注意身心健康的平衡...",
+			title: isCn ? "健康调养" : "健康調養",
+			description: isCn
+				? "注意身心健康的平衡..."
+				: "注意身心健康的平衡...",
 			icon: "🔮",
-			category: "智慧型",
+			category: isCn ? "智慧型" : "智慧型",
 		},
 	];
 
 	// Fallback taboos if API returns empty
 	const defaultTaboos = [
 		{
-			title: "避免衝動決策",
-			description: "在重要決定前，建議三思而後行...",
+			title: isCn ? "避免冲动决策" : "避免衝動決策",
+			description: isCn
+				? "在重要决定前，建议三思而后行..."
+				: "在重要決定前，建議三思而後行...",
 			icon: "⚠️",
-			severity: "高",
+			severity: isCn ? "高" : "高",
 		},
 		{
-			title: "注意健康問題",
-			description: "避免過度勞累，注意作息規律...",
+			title: isCn ? "注意健康问题" : "注意健康問題",
+			description: isCn
+				? "避免过度劳累，注意作息规律..."
+				: "避免過度勞累，注意作息規律...",
 			icon: "⚠️",
-			severity: "中",
+			severity: isCn ? "中" : "中",
 		},
 		{
-			title: "慎選合作對象",
-			description: "合作需謹慎評估，避免不必要的損失...",
+			title: isCn ? "慎选合作对象" : "慎選合作對象",
+			description: isCn
+				? "合作需谨慎评估，避免不必要的损失..."
+				: "合作需謹慎評估，避免不必要的損失...",
 			icon: "⚠️",
-			severity: "中",
+			severity: isCn ? "中" : "中",
 		},
 		{
-			title: "遠離是非口舌",
-			description: "保持低調，避免捲入不必要的爭端...",
+			title: isCn ? "远离是非口舌" : "遠離是非口舌",
+			description: isCn
+				? "保持低调，避免卷入不必要的争端..."
+				: "保持低調，避免捲入不必要的爭端...",
 			icon: "⚠️",
-			severity: "高",
+			severity: isCn ? "高" : "高",
 		},
 		{
-			title: "控制財務風險",
-			description: "避免高風險投資，穩健理財為上...",
+			title: isCn ? "控制财务风险" : "控制財務風險",
+			description: isCn
+				? "避免高风险投资，稳健理财为上..."
+				: "避免高風險投資，穩健理財為上...",
 			icon: "⚠️",
-			severity: "高",
+			severity: isCn ? "高" : "高",
 		},
 	];
 
@@ -102,7 +124,7 @@ export default function Page8_9_Recommendations({ data }) {
 						}}
 					>
 						{new Date()
-							.toLocaleDateString("zh-TW")
+							.toLocaleDateString(dateLocale)
 							.replace(/\//g, "/")}
 					</div>
 
@@ -117,7 +139,7 @@ export default function Page8_9_Recommendations({ data }) {
 									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 							}}
 						>
-							開運建議
+							{isCn ? "开运建议" : "開運建議"}
 						</h1>
 
 						{/* Vertical divider */}
@@ -126,10 +148,12 @@ export default function Page8_9_Recommendations({ data }) {
 						{/* Right: Title and description */}
 						<div>
 							<p className="mb-2 text-xl font-bold text-blue-600">
-								建議方案
+								{isCn ? "建议方案" : "建議方案"}
 							</p>
 							<p className="text-sm text-gray-500">
-								針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。
+								{isCn
+									? "针对您当前的具体困扰提供实用解决方案，帮助您应对眼前挑战。"
+									: "針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。"}
 							</p>
 						</div>
 					</div>
@@ -288,7 +312,7 @@ export default function Page8_9_Recommendations({ data }) {
 						}}
 					>
 						{new Date()
-							.toLocaleDateString("zh-TW")
+							.toLocaleDateString(dateLocale)
 							.replace(/\//g, "/")}
 					</div>
 
@@ -303,7 +327,7 @@ export default function Page8_9_Recommendations({ data }) {
 									"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 							}}
 						>
-							開運建議
+							{isCn ? "开运建议" : "開運建議"}
 						</h1>
 
 						{/* Vertical divider */}
@@ -312,10 +336,12 @@ export default function Page8_9_Recommendations({ data }) {
 						{/* Right: Title and description */}
 						<div>
 							<p className="mb-2 text-xl font-bold text-red-600">
-								禁忌行為
+								{isCn ? "禁忌行为" : "禁忌行為"}
 							</p>
 							<p className="text-sm text-gray-500">
-								針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。
+								{isCn
+									? "针对您当前的具体困扰提供实用解决方案，帮助您应对眼前挑战。"
+									: "針對您當前的具體困擾提供實用解決方案，幫助您應對眼前挑戰。"}
 							</p>
 						</div>
 					</div>

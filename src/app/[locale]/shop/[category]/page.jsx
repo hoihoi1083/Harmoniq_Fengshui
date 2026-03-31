@@ -265,9 +265,6 @@ function CategoryPageContent() {
 					0,
 				);
 				setCartCount(totalQuantity);
-				toast.success(
-					locale === "zh-CN" ? "已加入购物车" : "已加入購物車",
-				);
 			} else {
 				toast.error(
 					data.error ||

@@ -24,6 +24,16 @@ function PrintReportView() {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const locale = useLocale();
+	const outputLangParam = searchParams.get("outputLang");
+	const outputLang = outputLangParam === "zh-CN" ? "zh-CN" : "zh-TW";
+	const isSimplified = outputLang === "zh-CN";
+	const uiText = {
+		loading: isSimplified ? "生成报告中..." : "生成報告中...",
+		error: isSimplified ? "无法生成报告，请检查输入资料" : "無法生成報告，請檢查輸入資料",
+		back: isSimplified ? "返回" : "返回",
+		previewSuffix: isSimplified ? "报告 - 预览模式" : "報告 - 預覽模式",
+		print: isSimplified ? "打印报告" : "列印報告",
+	};
 
 	const [aiContent, setAiContent] = useState(null);
 	const [questionFocus, setQuestionFocus] = useState(null);
@@ -224,7 +234,8 @@ function PrintReportView() {
 							},
 							concern: concern,
 							problem: question,
-							locale: locale,
+							locale: outputLang,
+							isSimplified,
 						}),
 					}).then((res) => res.json()),
 
@@ -249,7 +260,8 @@ function PrintReportView() {
 									wuxingResult.wuxingData.dayStemWuxing,
 							},
 							currentYear: new Date().getFullYear(),
-							locale: locale,
+							locale: outputLang,
+							isSimplified,
 						}),
 					}).then((res) => res.json()),
 
@@ -273,7 +285,8 @@ function PrintReportView() {
 								dayElement:
 									wuxingResult.wuxingData.dayStemWuxing,
 							},
-							locale: locale,
+							locale: outputLang,
+							isSimplified,
 						}),
 					}).then((res) => res.json()),
 
@@ -310,7 +323,8 @@ function PrintReportView() {
 									return ["冬季", "春季", "夏季", "秋季"];
 								})(),
 							},
-							locale: locale,
+							locale: outputLang,
+							isSimplified,
 						}),
 					}).then((res) => res.json()),
 
@@ -325,7 +339,8 @@ function PrintReportView() {
 								time: birthTime,
 								concern: concern,
 							},
-							locale: locale,
+							locale: outputLang,
+							isSimplified,
 						}),
 					}).then((res) => res.json()),
 
@@ -390,7 +405,8 @@ function PrintReportView() {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({
-							locale: locale,
+							locale: outputLang,
+							isSimplified,
 							concernType: concern,
 							questionFocusData:
 								questionData.solution?.content || "",
@@ -425,7 +441,7 @@ function PrintReportView() {
 		if (birthday && birthTime) {
 			loadData();
 		}
-	}, [birthday, birthTime, gender, concern, question, locale]);
+	}, [birthday, birthTime, gender, concern, question, outputLang, isSimplified]);
 
 	// Mark body so global print styles are skipped — print should match screen
 	useEffect(() => {
@@ -438,7 +454,7 @@ function PrintReportView() {
 			<div className="flex items-center justify-center min-h-screen">
 				<div className="text-center">
 					<div className="w-12 h-12 mx-auto mb-4 border-b-2 border-gray-900 rounded-full animate-spin"></div>
-					<p>生成報告中...</p>
+					<p>{uiText.loading}</p>
 				</div>
 			</div>
 		);
@@ -446,7 +462,7 @@ function PrintReportView() {
 
 	if (!baziData) {
 		return (
-			<div className="p-8 text-center">無法生成報告，請檢查輸入資料</div>
+			<div className="p-8 text-center">{uiText.error}</div>
 		);
 	}
 
@@ -459,22 +475,23 @@ function PrintReportView() {
 						onClick={() => router.back()}
 						className="px-4 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-700"
 					>
-						返回
+						{uiText.back}
 					</button>
 					<h1 className="text-xl font-bold">
-						{concern}報告 - 預覽模式
+						{concern}
+						{uiText.previewSuffix}
 					</h1>
 				</div>
 				<button
 					onClick={() => window.print()}
 					className="px-6 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
 				>
-					列印報告
+					{uiText.print}
 				</button>
 			</div>
 
 			{/* Cover Page */}
-			<CoverPage concern={concern} productName={productName} />
+			<CoverPage concern={concern} productName={productName} locale={outputLang} />
 
 			<Page1_BasicAnalysis
 				name={name}
@@ -486,6 +503,7 @@ function PrintReportView() {
 				wuxingAnalysis={wuxingAnalysis}
 				aiContent={aiContent}
 				analyzeWuxingStrength={analyzeWuxingStrength}
+				locale={outputLang}
 			/>
 
 			{/* Pages 2 & 3: MingJu Analysis */}
@@ -498,6 +516,7 @@ function PrintReportView() {
 				}}
 				currentYear={new Date().getFullYear()}
 				isPrintMode={true}
+				locale={outputLang}
 			/>
 
 			{/* Page 4: 2026 Year Analysis */}
@@ -512,6 +531,7 @@ function PrintReportView() {
 						concern: concern,
 						color: getConcernColor({ concern: concern }),
 					}}
+					locale={outputLang}
 				/>
 			)}
 
@@ -540,6 +560,7 @@ function PrintReportView() {
 							concern: concern,
 							color: getConcernColor({ concern: concern }),
 						}}
+						locale={outputLang}
 					/>
 				</>
 			)}
@@ -554,6 +575,7 @@ function PrintReportView() {
 							concern: concern,
 							color: getConcernColor({ concern: concern }),
 						}}
+						locale={outputLang}
 					/>
 				)}
 
@@ -565,6 +587,7 @@ function PrintReportView() {
 						concern: concern,
 						color: getConcernColor({ concern: concern }),
 					}}
+					locale={outputLang}
 				/>
 			)}
 
@@ -786,18 +809,29 @@ function PrintReportView() {
 						font-size: 13px !important;
 						line-height: 1.8 !important;
 					}
-					.page-break.print-report-mingju-page3 .mingju-zongjie h3 + p {
+					.page-break.print-report-mingju-page3
+						.mingju-zongjie
+						h3
+						+ p {
 						font-size: 14px !important;
 						margin-bottom: 10px !important;
 					}
-					.page-break.print-report-mingju-page3 .mingju-zongjie p + div[style*="flex"] {
+					.page-break.print-report-mingju-page3
+						.mingju-zongjie
+						p
+						+ div[style*="flex"] {
 						gap: 40px !important;
 						margin-bottom: 15px !important;
 					}
-					.page-break.print-report-mingju-page3 .mingju-zongjie [style*="100px"][style*="borderRadius"] span {
+					.page-break.print-report-mingju-page3
+						.mingju-zongjie
+						[style*="100px"][style*="borderRadius"]
+						span {
 						font-size: 18px !important;
 					}
-					.page-break.print-report-mingju-page3 .mingju-zongjie > div {
+					.page-break.print-report-mingju-page3
+						.mingju-zongjie
+						> div {
 						padding: 20px !important;
 					}
 					/* Page 7 關鍵季節: lock padding and spacing so print matches browser */

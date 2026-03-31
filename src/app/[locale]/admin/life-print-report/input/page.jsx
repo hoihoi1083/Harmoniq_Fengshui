@@ -30,6 +30,7 @@ function LifePrintReportInputForm() {
 		gender: "male",
 		birthday: "",
 		birthTime: "",
+		outputLang: locale === "zh-CN" ? "zh-CN" : "zh-TW",
 	});
 
 	const handleSubmit = async (e) => {
@@ -40,6 +41,7 @@ function LifePrintReportInputForm() {
 			gender: formData.gender,
 			birthday: formData.birthday,
 			birthTime: formData.birthTime,
+			outputLang: formData.outputLang,
 		});
 		if (formData.name) params.set("name", formData.name);
 		if (formData.productName) params.set("productName", formData.productName);
@@ -146,6 +148,38 @@ function LifePrintReportInputForm() {
 								<option key={opt} value={opt}>{opt}</option>
 							))}
 						</select>
+					</div>
+
+					<div>
+						<label className="block text-gray-700 font-medium mb-3">輸出語言</label>
+						<div className="flex gap-6">
+							<label className="flex items-center cursor-pointer">
+								<input
+									type="radio"
+									name="outputLang"
+									value="zh-TW"
+									checked={formData.outputLang === "zh-TW"}
+									onChange={(e) =>
+										setFormData({ ...formData, outputLang: e.target.value })
+									}
+									className="w-5 h-5 mr-2"
+								/>
+								<span>繁體中文</span>
+							</label>
+							<label className="flex items-center cursor-pointer">
+								<input
+									type="radio"
+									name="outputLang"
+									value="zh-CN"
+									checked={formData.outputLang === "zh-CN"}
+									onChange={(e) =>
+										setFormData({ ...formData, outputLang: e.target.value })
+									}
+									className="w-5 h-5 mr-2"
+								/>
+								<span>简体中文</span>
+							</label>
+						</div>
 					</div>
 
 					<button

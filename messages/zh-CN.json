@@ -109,12 +109,12 @@
 		"services": {
 			"steps": {
 				"step1": {
-					"title": "风铃聊天室",
-					"subtitle": "免费测评命理"
+					"title": "查询客服",
+					"subtitle": "了解什么吉物适合自己"
 				},
 				"step2": {
-					"title": "选择报告",
-					"subtitle": "挑选心仪测算模式"
+					"title": "选择吉物/报告",
+					"subtitle": "挑选心仪吉物/报告"
 				},
 				"step3": {
 					"title": "填写信息",

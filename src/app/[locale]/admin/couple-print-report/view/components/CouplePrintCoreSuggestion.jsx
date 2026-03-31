@@ -129,7 +129,8 @@ function renderWithColorCircles(text) {
 	);
 }
 
-export default function CouplePrintCoreSuggestion({ data }) {
+export default function CouplePrintCoreSuggestion({ data, locale = "zh-TW" }) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const {
 		relationshipDevelopment,
 		energyEnhancement,
@@ -174,7 +175,7 @@ export default function CouplePrintCoreSuggestion({ data }) {
 						}}
 					>
 						{new Date()
-							.toLocaleDateString("zh-TW")
+							.toLocaleDateString(dateLocale)
 							.replace(/\//g, "/")}
 					</div>
 
@@ -340,7 +341,7 @@ export default function CouplePrintCoreSuggestion({ data }) {
 								}}
 							>
 								{new Date()
-									.toLocaleDateString("zh-TW")
+									.toLocaleDateString(dateLocale)
 									.replace(/\//g, "/")}
 							</span>
 						</div>

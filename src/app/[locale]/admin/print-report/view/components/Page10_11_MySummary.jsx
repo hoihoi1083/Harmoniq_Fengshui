@@ -1,6 +1,7 @@
 // Page 10-11: 我的2026 - Final summary with quote, lucky colors, and accessories
 
-export default function Page10_11_MySummary({ data }) {
+export default function Page10_11_MySummary({ data, locale = "zh-TW" }) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const { summary, concern, color, birthday, gender } = data;
 
 	// Extract summary data
@@ -27,7 +28,7 @@ export default function Page10_11_MySummary({ data }) {
 			<div className="page-break bg-white px-16 py-12 min-h-[297mm]">
 				{/* Date - Top Right */}
 				<div className="text-right text-gray-400 text-sm mb-6">
-					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+					{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 				</div>
 
 				{/* Page Header with large decorative year */}

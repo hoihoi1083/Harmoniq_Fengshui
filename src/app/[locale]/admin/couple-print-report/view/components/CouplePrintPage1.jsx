@@ -25,14 +25,22 @@ const COMPAT_MATRIX = {
 	火: { 金: 35, 木: 85, 水: 30, 火: 75, 土: 80 },
 	土: { 金: 80, 木: 45, 水: 50, 火: 80, 土: 70 },
 };
-const getLevel = (s) =>
+const getLevel = (s, isCn = false) =>
 	s >= 80
-		? "優秀配對"
+		? isCn
+			? "优秀配对"
+			: "優秀配對"
 		: s >= 70
-			? "良好配對"
+			? isCn
+				? "良好配对"
+				: "良好配對"
 			: s >= 60
-				? "穩定配對"
-				: "需要努力";
+				? isCn
+					? "稳定配对"
+					: "穩定配對"
+				: isCn
+					? "需要努力"
+					: "需要努力";
 
 export default function CouplePrintPage1({
 	name1,
@@ -49,19 +57,22 @@ export default function CouplePrintPage1({
 	individual2Data,
 	birthDateTime1,
 	birthDateTime2,
+	locale = "zh-TW",
 }) {
 	const now = new Date();
-	const dateStr = now.toLocaleDateString("zh-TW").replace(/\//g, "/");
+	const isCn = locale === "zh-CN";
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
+	const dateStr = now.toLocaleDateString(dateLocale).replace(/\//g, "/");
 
 	const el1 = wuxing1?.dayStemWuxing || "木";
 	const el2 = wuxing2?.dayStemWuxing || "火";
 	const score = COMPAT_MATRIX[el1]?.[el2] ?? 60;
-	const level = getLevel(score);
+	const level = getLevel(score, isCn);
 
 	const compatibility = annualResult?.compatibility || {
 		score,
 		level,
-		description: "基於八字基礎分析的配對評估",
+		description: isCn ? "基于八字基础分析的配对评估" : "基於八字基礎分析的配對評估",
 	};
 	const user1Analysis = annualResult?.user1Analysis || {
 		dominantElement: el1,
@@ -72,9 +83,11 @@ export default function CouplePrintPage1({
 		elementType: ELEMENT_DESC[el2] || "火命",
 	};
 	const elementInteraction = annualResult?.elementInteraction || {
-		balance: "五行互動分析",
+		balance: isCn ? "五行互动分析" : "五行互動分析",
 		missing: "",
-		advice: `${el1}命與${el2}命的配對，建議注重五行調和`,
+		advice: isCn
+			? `${el1}命与${el2}命的配对，建议注重五行调和`
+			: `${el1}命與${el2}命的配對，建議注重五行調和`,
 	};
 	const annualStrategy = annualResult?.annualStrategy || null;
 
@@ -131,7 +144,7 @@ export default function CouplePrintPage1({
 						color: "#A47584",
 					}}
 				>
-					命主八字分析
+					{isCn ? "命主八字分析" : "命主八字分析"}
 				</div>
 				<div
 					style={{
@@ -346,7 +359,9 @@ export default function CouplePrintPage1({
 				>
 					{question && question.trim()
 						? question.trim()
-						: "感情關係和諧改善建議"}
+						: isCn
+							? "感情关系和谐改善建议"
+							: "感情關係和諧改善建議"}
 				</div>
 			</div>
  */}

@@ -274,7 +274,9 @@ export default function Page2_MingJu_DayMaster({
 	userInfo,
 	leftContent,
 	middleContent,
+	locale = "zh-TW",
 }) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const concern = userInfo?.concern || "財運";
 	const concernColor = getConcernColor(concern);
 
@@ -296,7 +298,11 @@ export default function Page2_MingJu_DayMaster({
 
 	// Parse leftContent into sections
 	const parseSections = (content) => {
-		if (!content || content === "內容載入中...")
+		if (
+			!content ||
+			content === "內容載入中..." ||
+			content === "内容载入中..."
+		)
 			return {
 				characteristics: [],
 				sections: [],
@@ -376,7 +382,7 @@ export default function Page2_MingJu_DayMaster({
 					color: "#666",
 				}}
 			>
-				{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+				{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 			</div>
 
 			{/* Vertical Title */}

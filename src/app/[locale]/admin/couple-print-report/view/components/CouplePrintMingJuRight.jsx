@@ -370,7 +370,11 @@ function SectionHeader({ num, title }) {
 	);
 }
 
-export default function CouplePrintMingJuRight({ rightContent }) {
+export default function CouplePrintMingJuRight({
+	rightContent,
+	locale = "zh-TW",
+}) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const parsed =
 		rightContent != null &&
 		(typeof rightContent !== "string" || rightContent.trim() !== "")
@@ -429,7 +433,7 @@ export default function CouplePrintMingJuRight({ rightContent }) {
 						textAlign: "right",
 					}}
 				>
-					{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+					{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 				</div>
 			</div>
 

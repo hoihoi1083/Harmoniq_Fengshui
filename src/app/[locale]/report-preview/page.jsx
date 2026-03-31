@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getDisplayPrices } from "@/utils/regionalPricing";
 import { REPORT_PRODUCT_ID_BY_TYPE } from "@/lib/reportProducts";
+import { toast } from "react-toastify";
 
 const ReportPreviewPage = () => {
 	const locale = useLocale();
@@ -333,6 +334,33 @@ const ReportPreviewPage = () => {
 					0,
 				);
 				setCartCount(totalQuantity);
+				const cartLabel = locale === "zh-CN" ? "查看购物车" : "查看購物車";
+				const isMobile =
+					typeof window !== "undefined" &&
+					window.matchMedia &&
+					window.matchMedia("(max-width: 640px)").matches;
+				toast.success(
+					<div className="flex flex-col gap-1">
+						<span>
+							{locale === "zh-CN"
+								? "已加入购物车："
+								: "已加入購物車："}
+							{currentReport.title}
+						</span>
+						<button
+							type="button"
+							onClick={() => router.push(`/${locale}/cart`)}
+							className="text-left underline font-medium"
+						>
+							{cartLabel}
+						</button>
+					</div>,
+					{
+						autoClose: 2800,
+						position: isMobile ? "bottom-center" : "top-right",
+						closeOnClick: false,
+					},
+				);
 				setIsProcessingPayment(false);
 			} else {
 				const errorData = await response.json();
@@ -935,13 +963,20 @@ const ReportPreviewPage = () => {
 											career: "/images/report-preview/career.png",
 										};
 
+										const isComingSoon =
+											key === "fengshui";
 										return (
 											<div
 												key={key}
-												className="flex-shrink-0 w-52 sm:w-64 overflow-hidden transition cursor-pointer"
-												onClick={(e) =>
-													handleCardClick(e, key)
-												}
+												className={`flex-shrink-0 w-52 sm:w-64 overflow-hidden transition ${
+													isComingSoon
+														? "cursor-not-allowed opacity-95"
+														: "cursor-pointer"
+												}`}
+												onClick={(e) => {
+													if (isComingSoon) return;
+													handleCardClick(e, key);
+												}}
 											>
 												<div className="relative w-full overflow-hidden aspect-square">
 													<Image
@@ -953,6 +988,15 @@ const ReportPreviewPage = () => {
 														fill
 														className="object-cover transition hover:scale-110"
 													/>
+													{isComingSoon && (
+														<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+															<span className="px-4 py-1.5 text-sm sm:text-base font-extrabold rounded-full bg-white/95 text-[#073E31] border border-[#073E31]/20 shadow-sm">
+																{locale === "zh-CN"
+																	? "即将推出"
+																	: "即將推出"}
+															</span>
+														</div>
+													)}
 												</div>
 												<div className="p-3 sm:p-4">
 													<h3 className="font-semibold text-[#073E31] mb-1.5 sm:mb-2 text-md sm:text-lg line-clamp-2">

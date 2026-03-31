@@ -1,7 +1,8 @@
 // Page 7: 關鍵季節 - Four seasons analysis
 import Image from "next/image";
 
-export default function Page7_Seasons({ data }) {
+export default function Page7_Seasons({ data, locale = "zh-TW" }) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const { seasons: seasonsData, concern, color } = data;
 
 	console.log("🌸 Page7_Seasons received data:", {
@@ -218,7 +219,7 @@ export default function Page7_Seasons({ data }) {
 						}}
 					>
 						{new Date()
-							.toLocaleDateString("zh-TW")
+							.toLocaleDateString(dateLocale)
 							.replace(/\//g, "/")}
 					</div>
 				</div>

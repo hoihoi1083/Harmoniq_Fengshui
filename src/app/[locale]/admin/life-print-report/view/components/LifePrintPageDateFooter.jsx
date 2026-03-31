@@ -5,6 +5,7 @@
  * Use on every page except the cover. Match couple-print-report style.
  */
 import Image from "next/image";
+import { useLocale } from "next-intl";
 
 const dateStyle = {
 	fontFamily: "Noto Serif TC, serif",
@@ -15,11 +16,13 @@ const dateStyle = {
 	textAlign: "right",
 };
 
-export function getReportDateString() {
-	return new Date().toLocaleDateString("zh-TW").replace(/\//g, "/");
+export function getReportDateString(locale = "zh-TW") {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
+	return new Date().toLocaleDateString(dateLocale).replace(/\//g, "/");
 }
 
 export default function LifePrintPageDateFooter() {
+	const locale = useLocale();
 	return (
 		<>
 			<div
@@ -30,7 +33,7 @@ export default function LifePrintPageDateFooter() {
 					...dateStyle,
 				}}
 			>
-				{getReportDateString()}
+				{getReportDateString(locale)}
 			</div>
 			<div
 				style={{

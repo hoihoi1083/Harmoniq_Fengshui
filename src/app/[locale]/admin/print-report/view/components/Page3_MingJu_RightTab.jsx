@@ -111,7 +111,12 @@ function getTabLabel(tab, concern) {
 	return "";
 }
 
-export default function Page3_MingJu_RightTab({ userInfo, rightContent }) {
+export default function Page3_MingJu_RightTab({
+	userInfo,
+	rightContent,
+	locale = "zh-TW",
+}) {
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const concern = userInfo?.concern || "財運";
 	const concernColor = getConcernColor(concern);
 
@@ -191,7 +196,7 @@ export default function Page3_MingJu_RightTab({ userInfo, rightContent }) {
 					color: "#666",
 				}}
 			>
-				{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+				{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 			</div>
 
 			{/* Vertical Title - Two Columns */}

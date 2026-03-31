@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
 import { getProductName } from "@/lib/productLocale";
@@ -68,8 +68,35 @@ export default function ProductCard({
 				product,
 				showGiftReport ? selectedGiftReport || undefined : undefined,
 			);
+			const productName = getProductName(product, locale);
+			const cartLabel = locale === "zh-CN" ? "查看购物车" : "查看購物車";
+			const isMobile =
+				typeof window !== "undefined" &&
+				window.matchMedia &&
+				window.matchMedia("(max-width: 640px)").matches;
 			toast.success(
-				locale === "zh-CN" ? "已添加到购物车" : "已加入購物車",
+				<div className="flex flex-col gap-1">
+					<span>
+						{locale === "zh-CN" ? "已加入购物车：" : "已加入購物車："}
+						{productName}
+					</span>
+					<button
+						type="button"
+						onClick={() => {
+							if (typeof window !== "undefined") {
+								window.location.href = `/${locale}/cart`;
+							}
+						}}
+						className="text-left underline font-medium"
+					>
+						{cartLabel}
+					</button>
+				</div>,
+				{
+					autoClose: 2800,
+					position: isMobile ? "bottom-center" : "top-right",
+					closeOnClick: false,
+				},
 			);
 		} catch (error) {
 			toast.error(locale === "zh-CN" ? "添加失败" : "加入失敗");

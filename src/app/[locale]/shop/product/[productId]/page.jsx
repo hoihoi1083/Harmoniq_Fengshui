@@ -27,7 +27,7 @@ import {
 	ZoomIn,
 	Mail,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import FooterV2 from "@/components/home/FooterV2";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
@@ -275,8 +275,30 @@ export default function ProductDetailPage() {
 				);
 				setCartCount(totalQuantity);
 
+				const cartLabel = locale === "zh-CN" ? "查看购物车" : "查看購物車";
+				const isMobile =
+					typeof window !== "undefined" &&
+					window.matchMedia &&
+					window.matchMedia("(max-width: 640px)").matches;
 				toast.success(
-					locale === "zh-CN" ? "已添加到购物车" : "已加入購物車",
+					<div className="flex flex-col gap-1">
+						<span>
+							{locale === "zh-CN" ? "已加入购物车：" : "已加入購物車："}
+							{getProductName(product, locale)}
+						</span>
+						<button
+							type="button"
+							onClick={() => router.push(`/${locale}/cart`)}
+							className="text-left underline font-medium"
+						>
+							{cartLabel}
+						</button>
+					</div>,
+					{
+						autoClose: 2800,
+						position: isMobile ? "bottom-center" : "top-right",
+						closeOnClick: false,
+					},
 				);
 			} else {
 				throw new Error(

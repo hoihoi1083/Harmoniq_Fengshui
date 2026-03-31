@@ -17,6 +17,7 @@ function PrintReportInputForm() {
 		birthday: "",
 		birthTime: "",
 		question: "",
+		outputLang: locale === "zh-CN" ? "zh-CN" : "zh-TW",
 	});
 
 	const [isGenerating, setIsGenerating] = useState(false);
@@ -42,6 +43,7 @@ function PrintReportInputForm() {
 			birthday: formData.birthday,
 			birthTime: formData.birthTime,
 			question: formData.question,
+			outputLang: formData.outputLang,
 		});
 		if (formData.name) params.set("name", formData.name);
 		if (formData.productName) params.set("productName", formData.productName);
@@ -203,6 +205,46 @@ function PrintReportInputForm() {
 							placeholder={`請描述您在${concern}方面的具體問題或關注點...`}
 							className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-2 resize-none"
 						/>
+					</div>
+
+					<div className="mb-8">
+						<label className="block text-gray-700 font-medium mb-3">
+							輸出語言
+						</label>
+						<div className="flex gap-6">
+							<label className="flex items-center cursor-pointer">
+								<input
+									type="radio"
+									name="outputLang"
+									value="zh-TW"
+									checked={formData.outputLang === "zh-TW"}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											outputLang: e.target.value,
+										})
+									}
+									className="w-5 h-5 mr-2"
+								/>
+								<span>繁體中文</span>
+							</label>
+							<label className="flex items-center cursor-pointer">
+								<input
+									type="radio"
+									name="outputLang"
+									value="zh-CN"
+									checked={formData.outputLang === "zh-CN"}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											outputLang: e.target.value,
+										})
+									}
+									className="w-5 h-5 mr-2"
+								/>
+								<span>简体中文</span>
+							</label>
+						</div>
 					</div>
 
 					{/* Submit Button */}

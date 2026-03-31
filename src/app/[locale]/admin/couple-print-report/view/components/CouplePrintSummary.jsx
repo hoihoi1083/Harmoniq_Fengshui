@@ -6,7 +6,9 @@ import Image from "next/image";
 
 const COUPLE_SUMMARY_COLOR = "#B4003C";
 
-export default function CouplePrintSummary({ data }) {
+export default function CouplePrintSummary({ data, locale = "zh-TW" }) {
+	const isCn = locale === "zh-CN";
+	const dateLocale = locale === "zh-CN" ? "zh-CN" : "zh-TW";
 	const { summary, concern, color } = data || {};
 
 	if (!summary) {
@@ -24,7 +26,9 @@ export default function CouplePrintSummary({ data }) {
 	const shareableQuote =
 		summary.shareableQuote ??
 		summary.quote ??
-		"2026年，讓我們用愛與理解，共同書寫屬於我們的幸福篇章。";
+		(isCn
+			? "2026年，让我们用爱与理解，共同书写属于我们的幸福篇章。"
+			: "2026年，讓我們用愛與理解，共同書寫屬於我們的幸福篇章。");
 
 	return (
 		<div
@@ -43,7 +47,7 @@ export default function CouplePrintSummary({ data }) {
 					textAlign: "right",
 				}}
 			>
-				{new Date().toLocaleDateString("zh-TW").replace(/\//g, "/")}
+				{new Date().toLocaleDateString(dateLocale).replace(/\//g, "/")}
 			</div>
 
 			{/* Title: 我們的 + year — text-7xl so full "我們的2026" fits in print (no clip) */}
@@ -56,7 +60,7 @@ export default function CouplePrintSummary({ data }) {
 						letterSpacing: "0.15em",
 					}}
 				>
-					我們的
+					{isCn ? "我们的" : "我們的"}
 					<span
 						style={{
 							background: `linear-gradient(to bottom, ${color || COUPLE_SUMMARY_COLOR}, #880000)`,
@@ -77,7 +81,7 @@ export default function CouplePrintSummary({ data }) {
 							"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
 					}}
 				>
-					{summary.keyPhrase || "攜手同行，共創未來"}
+					{summary.keyPhrase || (isCn ? "携手同行，共创未来" : "攜手同行，共創未來")}
 				</h2>
 			</div>
 
@@ -98,7 +102,7 @@ export default function CouplePrintSummary({ data }) {
 							writingMode: "vertical-rl",
 						}}
 					>
-						核心洞察
+						{isCn ? "核心洞察" : "核心洞察"}
 					</h3>
 					<div className="flex gap-8 ml-5">
 						{coreThemes.map((theme, index) => (
@@ -162,11 +166,13 @@ export default function CouplePrintSummary({ data }) {
 						letterSpacing: "0.2em",
 					}}
 				>
-					全年展望
+					{isCn ? "全年展望" : "全年展望"}
 				</h3>
 				<p className="flex-1 text-base leading-relaxed text-gray-800 whitespace-pre-line">
 					{summary.yearOverview ||
-						"2026年是你們感情深化的一年。珍惜彼此，用心經營，必能收穫更美好的未來。"}
+						(isCn
+							? "2026年是你们感情深化的一年。珍惜彼此，用心经营，必能收获更美好的未来。"
+							: "2026年是你們感情深化的一年。珍惜彼此，用心經營，必能收穫更美好的未來。")}
 				</p>
 			</div>
 

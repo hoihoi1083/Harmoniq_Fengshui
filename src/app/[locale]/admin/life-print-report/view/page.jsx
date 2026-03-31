@@ -20,6 +20,16 @@ function LifePrintReportViewInner() {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const locale = useLocale();
+	const outputLangParam = searchParams.get("outputLang");
+	const outputLang = outputLangParam === "zh-CN" ? "zh-CN" : "zh-TW";
+	const isSimplified = outputLang === "zh-CN";
+	const uiText = {
+		loading: isSimplified ? "生成命理报告中..." : "生成命理報告中...",
+		error: isSimplified ? "无法生成报告，请检查出生日期与时辰" : "無法生成報告，請檢查出生日期與時辰",
+		back: isSimplified ? "返回" : "返回",
+		preview: isSimplified ? "命理报告 - 预览" : "命理報告 - 預覽",
+		print: isSimplified ? "打印报告" : "列印報告",
+	};
 
 	const [fullAnalysis, setFullAnalysis] = useState(null);
 	const [reportDocData, setReportDocData] = useState(null);
@@ -250,18 +260,19 @@ function LifePrintReportViewInner() {
 						body: JSON.stringify({
 							birthDateTime: fullDateTime,
 							gender,
-							locale,
+							locale: outputLang,
+							isSimplified,
 						}),
 					}).then((r) => r.json()),
 					fetch("/api/element-flow-analysis", {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ userInfo }),
+						body: JSON.stringify({ userInfo, locale: outputLang, isSimplified }),
 					}).then((r) => r.json()),
 					fetch("/api/wuxing-analysis", {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ userInfo }),
+						body: JSON.stringify({ userInfo, locale: outputLang, isSimplified }),
 					}).then((r) => r.json()),
 				]);
 
@@ -274,6 +285,8 @@ function LifePrintReportViewInner() {
 						userInfo,
 						wuxingData,
 						prompt: healthPrompt,
+						locale: outputLang,
+						isSimplified,
 					}),
 				}).then((r) => r.json());
 				const careerRes = await fetch("/api/career-fortune-analysis", {
@@ -283,6 +296,8 @@ function LifePrintReportViewInner() {
 						userInfo,
 						wuxingData,
 						prompt: careerPrompt,
+						locale: outputLang,
+						isSimplified,
 					}),
 				}).then((r) => r.json());
 				const wealthRes = await fetch("/api/wealth-fortune-analysis", {
@@ -292,6 +307,8 @@ function LifePrintReportViewInner() {
 						userInfo,
 						wuxingData,
 						prompt: wealthPrompt,
+						locale: outputLang,
+						isSimplified,
 					}),
 				}).then((r) => r.json());
 				const relationshipRes = await fetch(
@@ -303,8 +320,10 @@ function LifePrintReportViewInner() {
 							userInfo,
 							wuxingData,
 							prompt: relationshipPrompt,
+							locale: outputLang,
+							isSimplified,
 						}),
-					}
+					},
 				).then((r) => r.json());
 
 				if (pillarRes && !pillarRes.error) setReportDocData(pillarRes);
@@ -329,16 +348,28 @@ function LifePrintReportViewInner() {
 						res.analysis.romanticCycles);
 				setFourFortuneData({
 					health: valid(healthRes)
-						? { analysis: healthRes.analysis, isAIGenerated: healthRes.isAIGenerated }
+						? {
+								analysis: healthRes.analysis,
+								isAIGenerated: healthRes.isAIGenerated,
+							}
 						: null,
 					career: valid(careerRes)
-						? { analysis: careerRes.analysis, isAIGenerated: careerRes.isAIGenerated }
+						? {
+								analysis: careerRes.analysis,
+								isAIGenerated: careerRes.isAIGenerated,
+							}
 						: null,
 					wealth: valid(wealthRes)
-						? { analysis: wealthRes.analysis, isAIGenerated: wealthRes.isAIGenerated }
+						? {
+								analysis: wealthRes.analysis,
+								isAIGenerated: wealthRes.isAIGenerated,
+							}
 						: null,
 					relationship: valid(relationshipRes)
-						? { analysis: relationshipRes.analysis, isAIGenerated: relationshipRes.isAIGenerated }
+						? {
+								analysis: relationshipRes.analysis,
+								isAIGenerated: relationshipRes.isAIGenerated,
+							}
 						: null,
 				});
 			} catch (err) {
@@ -348,7 +379,7 @@ function LifePrintReportViewInner() {
 			}
 		};
 		loadData();
-	}, [birthday, birthTime, gender, locale]);
+	}, [birthday, birthTime, gender, outputLang, isSimplified]);
 
 	useEffect(() => {
 		document.body.classList.add("print-report-view");
@@ -360,7 +391,7 @@ function LifePrintReportViewInner() {
 			<div className="flex items-center justify-center min-h-screen bg-[#EFEFEF]">
 				<div className="text-center">
 					<div className="w-12 h-12 mx-auto mb-4 border-b-2 border-teal-600 rounded-full animate-spin" />
-					<p>生成命理報告中...</p>
+					<p>{uiText.loading}</p>
 				</div>
 			</div>
 		);
@@ -369,7 +400,7 @@ function LifePrintReportViewInner() {
 	if (!fullAnalysis?.wuxingData) {
 		return (
 			<div className="p-8 text-center min-h-screen flex items-center justify-center">
-				無法生成報告，請檢查出生日期與時辰
+				{uiText.error}
 			</div>
 		);
 	}
@@ -407,16 +438,16 @@ function LifePrintReportViewInner() {
 						onClick={() => router.back()}
 						className="px-4 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-700"
 					>
-						返回
+						{uiText.back}
 					</button>
-					<h1 className="text-xl font-bold">命理報告 - 預覽</h1>
+					<h1 className="text-xl font-bold">{uiText.preview}</h1>
 				</div>
 				<button
 					onClick={() => window.print()}
 					className="px-6 py-2 font-bold text-white rounded-lg hover:bg-teal-700"
 					style={{ backgroundColor: "#0d9488" }}
 				>
-					列印報告
+					{uiText.print}
 				</button>
 			</div>
 
