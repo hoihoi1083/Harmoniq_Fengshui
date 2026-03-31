@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import FooterV2 from "@/components/home/FooterV2";
+import ShopAssistantWidget from "@/components/shop/ShopAssistantWidget";
 import { useRegionDetectionWithRedirect } from "@/hooks/useRegionDetectionEnhanced";
 import { getProductDisplayPrice } from "@/lib/productPrice";
 import { REPORT_PRODUCT_IDS } from "@/lib/reportProducts";
@@ -1296,6 +1297,7 @@ export default function ProductDetailPage() {
  */}
 			{/* Footer */}
 			<FooterV2 />
+			<ShopAssistantWidget locale={locale} />
 		</div>
 	);
 }

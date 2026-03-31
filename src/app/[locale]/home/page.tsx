@@ -16,9 +16,11 @@ import TheoryTips from "@/components/home/TheoryTips";
 import ServiceSection from "@/components/home/service";
 import TestimonialSection from "@/components/home/TestimonialSection";
 import FortuneTips from "@/components/home/FortuneTips";
+import ShopAssistantWidget from "@/components/shop/ShopAssistantWidget";
 
 import { get } from "@/lib/ajax";
-export default function Home() {
+export default function Home({ params }) {
+	const locale = params?.locale || "zh-TW";
 	return (
 		<div className="min-h-screen bg-[#EFEFEF]">
 			<ShopNavbar />
@@ -34,6 +36,7 @@ export default function Home() {
 				{/* <Message /> */}
 			</main>
 			<FooterV2 />
+			<ShopAssistantWidget locale={locale} />
 		</div>
 	);
 }

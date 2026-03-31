@@ -6,7 +6,7 @@ import Link from "next/link";
 import { X, Send, Loader2 } from "lucide-react";
 
 /** 小風購物助理浮動按鈕圖示 */
-const LAUNCHER_IMAGE_SRC = "/images/風水妹/小風.png";
+const LAUNCHER_IMAGE_SRC = "/images/風水妹/ShopAssist.png";
 
 function renderTextWithLinks(text) {
 	if (!text) return null;
@@ -94,16 +94,17 @@ export default function ShopAssistantWidget({ locale }) {
 		if (!trimmed || loading) return;
 
 		const userMsg = { role: "user", content: trimmed };
-		const historyForApi = [...messages, userMsg].map(({ role, content }) => ({
-			role,
-			content,
-		}));
+		const historyForApi = [...messages, userMsg].map(
+			({ role, content }) => ({
+				role,
+				content,
+			}),
+		);
 		setInput("");
 		setMessages((prev) => [...prev, userMsg]);
 		setLoading(true);
 
 		try {
-
 			const res = await fetch("/api/shop/assistant", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -120,7 +121,10 @@ export default function ShopAssistantWidget({ locale }) {
 			const msgId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 			typingMsgIdRef.current = msgId;
 
-			setMessages((prev) => [...prev, { role: "assistant", content: "", _id: msgId }]);
+			setMessages((prev) => [
+				...prev,
+				{ role: "assistant", content: "", _id: msgId },
+			]);
 
 			if (typingTimerRef.current) clearInterval(typingTimerRef.current);
 
@@ -128,16 +132,20 @@ export default function ShopAssistantWidget({ locale }) {
 			const step = () => {
 				// If a newer message started typing, stop.
 				if (typingMsgIdRef.current !== msgId) {
-					if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+					if (typingTimerRef.current)
+						clearInterval(typingTimerRef.current);
 					return;
 				}
 				i += Math.max(1, Math.floor(full.length / 120));
 				const slice = full.slice(0, i);
 				setMessages((prev) =>
-					prev.map((m) => (m._id === msgId ? { ...m, content: slice } : m)),
+					prev.map((m) =>
+						m._id === msgId ? { ...m, content: slice } : m,
+					),
 				);
 				if (i >= full.length) {
-					if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+					if (typingTimerRef.current)
+						clearInterval(typingTimerRef.current);
 				}
 			};
 
@@ -270,21 +278,18 @@ export default function ShopAssistantWidget({ locale }) {
 			<button
 				type="button"
 				onClick={() => setOpen((v) => !v)}
-				className="pointer-events-auto flex items-center gap-2 rounded-full border border-white/20 bg-white p-1.5 pr-3 shadow-lg shadow-[#A3B116]/25 transition hover:scale-[1.02] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7E8A00]"
+				className="pointer-events-auto inline-flex items-center bg-transparent p-0 shadow-none transition hover:scale-[1.02] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7E8A00]"
 				aria-expanded={open}
 				aria-label={isCn ? "打开小风购物助理" : "開啟小風購物助理"}
 			>
-				<span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-[#A3B116]/40">
+				<span className="relative h-[110px] w-[110px] md:h-[200px] md:w-[200px] shrink-0 overflow-hidden">
 					<Image
 						src={LAUNCHER_IMAGE_SRC}
 						alt=""
-						width={56}
-						height={56}
-						className="h-full w-full object-cover"
+						width={200}
+						height={200}
+						className="h-full w-full object-contain"
 					/>
-				</span>
-				<span className="hidden text-sm font-semibold text-[#073E31] sm:inline">
-					{isCn ? "小风" : "小風"}
 				</span>
 			</button>
 		</div>

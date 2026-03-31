@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ShopNavbar from "@/components/ShopNavbar";
 import FooterV2 from "@/components/home/FooterV2";
+import ShopAssistantWidget from "@/components/shop/ShopAssistantWidget";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getDisplayPrices } from "@/utils/regionalPricing";
@@ -1066,6 +1067,7 @@ const ReportPreviewPage = () => {
 
 			{/* Footer */}
 			<FooterV2 />
+			<ShopAssistantWidget locale={locale} />
 		</main>
 	);
 };

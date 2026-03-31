@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import ShopNavbar from "@/components/ShopNavbar";
 import FooterV2 from "@/components/home/FooterV2";
+import ShopAssistantWidget from "@/components/shop/ShopAssistantWidget";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 const PricePage = () => {
@@ -623,6 +624,7 @@ const PricePage = () => {
 
 			{/* Footer */}
 			<FooterV2 />
+			<ShopAssistantWidget locale={locale} />
 		</main>
 	);
 };
