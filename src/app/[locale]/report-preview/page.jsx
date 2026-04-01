@@ -335,7 +335,8 @@ const ReportPreviewPage = () => {
 					0,
 				);
 				setCartCount(totalQuantity);
-				const cartLabel = locale === "zh-CN" ? "查看购物车" : "查看購物車";
+				const cartLabel =
+					locale === "zh-CN" ? "查看购物车" : "查看購物車";
 				const isMobile =
 					typeof window !== "undefined" &&
 					window.matchMedia &&
@@ -964,8 +965,7 @@ const ReportPreviewPage = () => {
 											career: "/images/report-preview/career.png",
 										};
 
-										const isComingSoon =
-											key === "fengshui";
+										const isComingSoon = key === "fengshui";
 										return (
 											<div
 												key={key}
@@ -992,7 +992,8 @@ const ReportPreviewPage = () => {
 													{isComingSoon && (
 														<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
 															<span className="px-4 py-1.5 text-sm sm:text-base font-extrabold rounded-full bg-white/95 text-[#073E31] border border-[#073E31]/20 shadow-sm">
-																{locale === "zh-CN"
+																{locale ===
+																"zh-CN"
 																	? "即将推出"
 																	: "即將推出"}
 															</span>

@@ -18,9 +18,12 @@ import TestimonialSection from "@/components/home/TestimonialSection";
 import FortuneTips from "@/components/home/FortuneTips";
 import ShopAssistantWidget from "@/components/shop/ShopAssistantWidget";
 
-import { get } from "@/lib/ajax";
-export default function Home({ params }) {
-	const locale = params?.locale || "zh-TW";
+export default async function Home({
+	params,
+}: {
+	params: Promise<{ locale?: string }>;
+}) {
+	const { locale = "zh-TW" } = (await params) || {};
 	return (
 		<div className="min-h-screen bg-[#EFEFEF]">
 			<ShopNavbar />
