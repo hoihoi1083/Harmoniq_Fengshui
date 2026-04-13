@@ -135,7 +135,7 @@ export default function Home() {
 	useEffect(() => {
 		// 防止重複初始化
 		if (isInitialized) {
-			console.log("⏭️ Smart-Chat2 已初始化，跳過重複初始化");
+			console.log("⏭️ Comfort-Chat 已初始化，跳過重複初始化");
 			return;
 		}
 
@@ -191,11 +191,11 @@ export default function Home() {
 			return;
 		}
 
-		console.log("🔄 初始化 Smart-Chat2，用戶:", userId);
+		console.log("🔄 初始化 Comfort-Chat，用戶:", userId);
 
 		setCurrentUserId(userId);
 
-		const newSessionId = `smart-chat2-${Date.now()}`;
+		const newSessionId = `comfort-chat-${Date.now()}`;
 		setSessionId(newSessionId);
 
 		// 初始狀態顯示落地頁，不設置歡迎消息
@@ -663,14 +663,14 @@ export default function Home() {
 			// Get current region for pricing display
 			const currentRegion =
 				localStorage.getItem("userRegion") || "hongkong";
-			console.log("🌍 Sending region to smart-chat2:", currentRegion);
+			console.log("🌍 Sending region to comfort-chat:", currentRegion);
 
 			// 🔧 FIX: Use URL locale as source of truth, not localStorage region
 			// This ensures navbar and content language stay in sync
 			const aiLocale = currentLocale; // Always use URL-based locale
 			console.log("🌐 AI response locale (from URL):", aiLocale);
 
-			const response = await fetch("/api/smart-chat2", {
+			const response = await fetch("/api/comfort-chat", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -1176,7 +1176,7 @@ export default function Home() {
 
 		// For individual analysis, continue with API call
 		try {
-			const response = await fetch("/api/smart-chat2", {
+			const response = await fetch("/api/comfort-chat", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -1311,7 +1311,7 @@ export default function Home() {
 				console.log("🆔 Added anonymous userId:", userId);
 			}
 
-			queryParams.append("chatProduct", "smart-chat2");
+			queryParams.append("chatProduct", "comfort-chat");
 
 			const url = `/api/conversation-history?${queryParams.toString()}`;
 			console.log("🌐 Fetching from:", url);
@@ -1438,7 +1438,7 @@ export default function Home() {
 		try {
 			setIsLoading(true);
 			const response = await fetch(
-				`/api/load-conversation?conversationId=${encodeURIComponent(conversationId)}&chatProduct=smart-chat2`,
+				`/api/load-conversation?conversationId=${encodeURIComponent(conversationId)}&chatProduct=comfort-chat`,
 			);
 
 			if (response.ok) {
@@ -1457,7 +1457,7 @@ export default function Home() {
 							content: msg.content || "",
 							timestamp: new Date(msg.timestamp),
 							aiAnalysis: msg.aiAnalysis || null,
-							systemType: msg.systemType || "smart-chat2",
+							systemType: msg.systemType || "comfort-chat",
 							id: msg.id || `loaded-${index}`,
 						}),
 					);
@@ -1466,19 +1466,21 @@ export default function Home() {
 					const hasWelcomeMessage = formattedMessages.some(
 						(msg) =>
 							msg.role === "assistant" &&
-							msg.content.includes("歡迎來到風鈴聊天室"),
+							(msg.content.includes("歡迎來到風鈴聊天室") ||
+								msg.content.includes("歡迎來到暖心聊天室") ||
+								msg.content.includes("歡迎回到暖心聊天室")),
 					);
 
 					if (!hasWelcomeMessage) {
 						formattedMessages.unshift({
 							role: "assistant",
 							content:
-								"你好呀～我是小鈴！✨ 歡迎回到風鈴聊天室！\n\n繼續您之前的對話...",
+								"你好呀～我是小鈴！✨ 歡迎回到暖心聊天室！\n\n繼續您之前的對話...",
 							timestamp: new Date(
 								data.metadata?.createdAt || Date.now(),
 							),
 							aiAnalysis: null,
-							systemType: "smart-chat2",
+							systemType: "comfort-chat",
 						});
 					}
 
@@ -1490,10 +1492,10 @@ export default function Home() {
 						{
 							role: "assistant",
 							content:
-								"你好呀～我是小鈴！✨ 歡迎來到風鈴聊天室！\n\n這是您之前的對話，請繼續...",
+								"你好呀～我是小鈴！✨ 歡迎來到暖心聊天室！\n\n這是您之前的對話，請繼續...",
 							timestamp: new Date(),
 							aiAnalysis: null,
-							systemType: "smart-chat2",
+							systemType: "comfort-chat",
 						},
 					]);
 					setShowLandingPage(false); // 載入對話時隱藏落地頁
@@ -1503,7 +1505,7 @@ export default function Home() {
 				if (data.metadata) {
 					const metadata = data.metadata;
 					setSessionId(
-						metadata.sessionId || `smart-chat2-${Date.now()}`,
+						metadata.sessionId || `comfort-chat-${Date.now()}`,
 					);
 					setConcern(metadata.primaryConcern || "");
 					setIsCoupleAnalysis(
@@ -1551,7 +1553,7 @@ export default function Home() {
 		setConcern("");
 		setIsCoupleAnalysis(false);
 		setReportType("");
-		setSessionId(`smart-chat2-${Date.now()}`);
+		setSessionId(`comfort-chat-${Date.now()}`);
 		setShowLandingPage(true);
 		// Close mobile menu after creating new conversation
 		setIsMobileMenuOpen(false);

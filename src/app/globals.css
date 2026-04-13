@@ -66,7 +66,8 @@
     @apply border-border outline-ring/50;
   }
 
-  html, body {
+  html,
+  body {
     overflow-x: hidden;
     width: 100%;
     margin: 0;
@@ -121,6 +122,7 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -354,6 +356,7 @@ section#hero * {
    (Excluded when printing admin print-report so that view matches browser)
    =================================== */
 @media print {
+
   /* Page setup for A4 size — only when not on print-report view */
   body:not(.print-report-view) {
     /* @page is document-level; print-report view uses its own @page in page.jsx */
@@ -432,9 +435,9 @@ section#hero * {
     print-color-adjust: exact !important;
   }
 
-  body:not(.print-report-view) h1 + *,
-  body:not(.print-report-view) h2 + *,
-  body:not(.print-report-view) h3 + * {
+  body:not(.print-report-view) h1+*,
+  body:not(.print-report-view) h2+*,
+  body:not(.print-report-view) h3+* {
     page-break-before: avoid !important;
     break-before: avoid !important;
   }
@@ -512,24 +515,67 @@ section#hero * {
     height: auto !important;
   }
 
-  body:not(.print-report-view) .text-sm { font-size: 9pt !important; }
-  body:not(.print-report-view) .text-base { font-size: 11pt !important; }
-  body:not(.print-report-view) .text-lg { font-size: 12pt !important; }
-  body:not(.print-report-view) .text-xl { font-size: 14pt !important; }
-  body:not(.print-report-view) .text-2xl { font-size: 16pt !important; }
-  body:not(.print-report-view) .text-3xl { font-size: 18pt !important; }
-  body:not(.print-report-view) .text-4xl { font-size: 20pt !important; }
+  body:not(.print-report-view) .text-sm {
+    font-size: 9pt !important;
+  }
+
+  body:not(.print-report-view) .text-base {
+    font-size: 11pt !important;
+  }
+
+  body:not(.print-report-view) .text-lg {
+    font-size: 12pt !important;
+  }
+
+  body:not(.print-report-view) .text-xl {
+    font-size: 14pt !important;
+  }
+
+  body:not(.print-report-view) .text-2xl {
+    font-size: 16pt !important;
+  }
+
+  body:not(.print-report-view) .text-3xl {
+    font-size: 18pt !important;
+  }
+
+  body:not(.print-report-view) .text-4xl {
+    font-size: 20pt !important;
+  }
 
   body:not(.print-report-view) [class*="shadow"] {
     box-shadow: none !important;
   }
 
-  body:not(.print-report-view) .py-8 { padding-top: 6pt !important; padding-bottom: 6pt !important; }
-  body:not(.print-report-view) .py-6 { padding-top: 5pt !important; padding-bottom: 5pt !important; }
-  body:not(.print-report-view) .py-4 { padding-top: 4pt !important; padding-bottom: 4pt !important; }
-  body:not(.print-report-view) .px-8 { padding-left: 6pt !important; padding-right: 6pt !important; }
-  body:not(.print-report-view) .px-6 { padding-left: 5pt !important; padding-right: 5pt !important; }
-  body:not(.print-report-view) .px-4 { padding-left: 4pt !important; padding-right: 4pt !important; }
+  body:not(.print-report-view) .py-8 {
+    padding-top: 6pt !important;
+    padding-bottom: 6pt !important;
+  }
+
+  body:not(.print-report-view) .py-6 {
+    padding-top: 5pt !important;
+    padding-bottom: 5pt !important;
+  }
+
+  body:not(.print-report-view) .py-4 {
+    padding-top: 4pt !important;
+    padding-bottom: 4pt !important;
+  }
+
+  body:not(.print-report-view) .px-8 {
+    padding-left: 6pt !important;
+    padding-right: 6pt !important;
+  }
+
+  body:not(.print-report-view) .px-6 {
+    padding-left: 5pt !important;
+    padding-right: 5pt !important;
+  }
+
+  body:not(.print-report-view) .px-4 {
+    padding-left: 4pt !important;
+    padding-right: 4pt !important;
+  }
 
   body:not(.print-report-view) p,
   body:not(.print-report-view) span,
@@ -562,7 +608,7 @@ section#hero * {
   .print-only {
     display: block !important;
   }
-  
+
   .screen-only {
     display: none !important;
   }
@@ -571,7 +617,7 @@ section#hero * {
      Page 7 Seasons - Print Overrides
      Override global print styles to match browser view
      =================================== */
-  
+
   .page-7-seasons .page-7-title {
     font-size: 36px !important;
     color: inherit !important;
@@ -629,7 +675,7 @@ section#hero * {
   }
 
   /* Ensure spacing is preserved */
-  .page-7-seasons .space-y-1 > * + * {
+  .page-7-seasons .space-y-1>*+* {
     margin-top: 4px !important;
   }
 
@@ -646,7 +692,7 @@ section#hero * {
   }
 
   /* Preserve list styling */
-  .page-7-seasons ul.space-y-0\.5 > * + * {
+  .page-7-seasons ul.space-y-0\.5>*+* {
     margin-top: 2px !important;
   }
 

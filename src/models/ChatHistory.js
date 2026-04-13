@@ -28,6 +28,18 @@ const ChatHistorySchema = new mongoose.Schema(
 			required: false,
 		},
 
+		// Which product owns this thread (sidebar / load filtering)
+		chatProduct: {
+			type: String,
+			default: "smart-chat2",
+			index: true,
+		},
+		// comfort-chat: server may append one birthday invite; only once per thread
+		comfortBirthdayInviteSent: {
+			type: Boolean,
+			default: false,
+		},
+
 		// Conversation metadata
 		title: {
 			type: String,
@@ -160,7 +172,8 @@ const ChatHistorySchema = new mongoose.Schema(
 ChatHistorySchema.methods.addMessage = function (
 	role,
 	content,
-	aiAnalysis = null
+	aiAnalysis = null,
+	systemType = "smart-chat2"
 ) {
 	const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -170,7 +183,7 @@ ChatHistorySchema.methods.addMessage = function (
 		content,
 		timestamp: new Date(),
 		aiAnalysis,
-		systemType: "smart-chat2",
+		systemType,
 	});
 
 	this.stats.totalMessages = this.messages.length;

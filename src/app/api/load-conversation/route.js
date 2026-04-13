@@ -10,6 +10,7 @@ export async function GET(request) {
 		const sessionId = searchParams.get("sessionId");
 		const conversationId = searchParams.get("conversationId");
 		const userEmail = searchParams.get("userEmail");
+		const chatProductParam = searchParams.get("chatProduct");
 
 		// 支援兩種會話識別方式：sessionId 或 conversationId
 		const targetSessionId = sessionId || conversationId;
@@ -36,6 +37,16 @@ export async function GET(request) {
 				{ error: "找不到該會話記錄" },
 				{ status: 404 }
 			);
+		}
+
+		if (chatProductParam) {
+			const docProduct = chatHistory.chatProduct || "smart-chat2";
+			if (docProduct !== chatProductParam) {
+				return NextResponse.json(
+					{ error: "找不到該會話記錄" },
+					{ status: 404 }
+				);
+			}
 		}
 
 		// 構建對話消息數組

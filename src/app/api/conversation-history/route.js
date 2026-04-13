@@ -10,6 +10,7 @@ export async function GET(request) {
 		const userEmail = searchParams.get("userEmail");
 		const userId = searchParams.get("userId");
 		const limit = parseInt(searchParams.get("limit")) || 20;
+		const chatProductParam = searchParams.get("chatProduct");
 
 		// 支援兩種用戶識別方式：userEmail 或 userId（或兩者）
 		if (!userEmail && !userId) {
@@ -25,13 +26,28 @@ export async function GET(request) {
 			limit,
 		});
 
-		// 從ChatHistory獲取對話歷史 - 查詢兩者以確保跨瀏覽器一致性
-		const query = {
+		// 依產品分開列表：comfort-chat 僅暖心聊天；smart-chat2 / 缺省 = 風鈴 + 舊資料（無 chatProduct）
+		let productMatch;
+		if (chatProductParam === "comfort-chat") {
+			productMatch = { chatProduct: "comfort-chat" };
+		} else {
+			productMatch = {
+				$or: [
+					{ chatProduct: "smart-chat2" },
+					{ chatProduct: { $exists: false } },
+					{ chatProduct: null },
+				],
+			};
+		}
+
+		const userMatch = {
 			$or: [
 				...(userEmail ? [{ userEmail: userEmail }] : []),
 				...(userId ? [{ userId: userId }] : []),
 			],
 		};
+
+		const query = { $and: [userMatch, productMatch] };
 
 		console.log("🔍 Query:", JSON.stringify(query));
 
