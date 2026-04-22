@@ -122,6 +122,17 @@ export default function MenuBar({ className, isOpen, setIsOpen, from }) {
 
 					{/* My Orders Link - only show for logged in users */}
 					{isLogined && (
+						<>
+							<Link
+								className="block text-base focus:bg-secondary focus:text-primary py-3.5 px-4"
+								href="/profile"
+								onClick={() => setIsOpen(false)}
+							>
+								{currentLocale === "zh-CN" ? "个人资料" : "個人資料"}
+							</Link>
+						</>
+					)}
+					{isLogined && (
 						<Link
 							className="block text-base focus:bg-secondary focus:text-primary py-3.5 px-4"
 							href="/orders"

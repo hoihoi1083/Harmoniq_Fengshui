@@ -70,6 +70,15 @@ function sleep(ms) {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DEFAULT_BIRTHDAY_TS = new Date(1996, 2, 12, 22, 0, 0, 0).getTime();
+
+function hasProvidedBirthday(user) {
+	if (!user?.birthDateTime) return false;
+	const birthTs = new Date(user.birthDateTime).getTime();
+	if (Number.isNaN(birthTs)) return false;
+	if (user.birthdayProvided === true) return true;
+	return birthTs !== DEFAULT_BIRTHDAY_TS;
+}
 
 /**
  * POST /api/cron/weekly-emails
@@ -125,8 +134,9 @@ export async function POST(request) {
 
 		const users = await User.find({
 			email: { $exists: true, $nin: [null, ""] },
+			weeklyAdviceEnabled: { $ne: false },
 		})
-			.select({ email: 1, name: 1, birthDateTime: 1, userId: 1 })
+			.select({ email: 1, name: 1, birthDateTime: 1, userId: 1, birthdayProvided: 1 })
 			.lean()
 			.limit(limit);
 
@@ -156,7 +166,7 @@ export async function POST(request) {
 
 		for (const user of users) {
 			const to = String(user.email || "").trim();
-			if (!EMAIL_RE.test(to)) {
+			if (!EMAIL_RE.test(to) || !hasProvidedBirthday(user)) {
 				results.skipped += 1;
 				continue;
 			}

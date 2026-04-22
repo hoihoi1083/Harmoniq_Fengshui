@@ -60,6 +60,8 @@ export async function POST(request) {
 			emailVerified: false,
 			gender: "female",
 			birthDateTime: new Date(1996, 2, 12, 22),
+			birthdayProvided: false,
+			weeklyAdviceEnabled: true,
 			isLock: true, // Default from schema
 		};
 

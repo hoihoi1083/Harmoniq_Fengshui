@@ -18,6 +18,7 @@ import {
 	X,
 	Menu,
 } from "lucide-react";
+import MissingBirthdayBanner from "./MissingBirthdayBanner";
 
 export default function ShopNavbar({ onSearch, cartCount }) {
 	const { data: session } = useSession();
@@ -265,6 +266,17 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 													</p>
 												</div>
 												<Link
+													href={`/${locale}/profile`}
+													className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+													onClick={() =>
+														setShowUserMenu(false)
+													}
+												>
+													{locale === "zh-CN"
+														? "个人资料"
+														: "個人資料"}
+												</Link>
+												<Link
 													href={`/${locale}/orders`}
 													className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
 													onClick={() =>
@@ -406,6 +418,7 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 					/>
 				)}
 			</nav>
+			<MissingBirthdayBanner />
 		</>
 	);
 }

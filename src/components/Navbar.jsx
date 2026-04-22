@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import UnlockButton from "./UnlockButton";
 import Avatar from "./Avatar";
+import MissingBirthdayBanner from "./MissingBirthdayBanner";
 
 export default function Navbar({ from, backgroundColor = "transparent" }) {
 	const t = useTranslations("Navigation");
@@ -390,6 +391,7 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 					onClick={() => setIsMobileMenuOpen(false)}
 				></div>
 			)}
+			<MissingBirthdayBanner className="absolute top-full left-0 right-0" />
 		</nav>
 	);
 }

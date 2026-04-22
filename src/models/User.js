@@ -40,9 +40,17 @@ const UserSchema = new mongoose.Schema({
 		required: true,
 		default: new Date(1996, 2, 12, 22),
 	},
+	birthdayProvided: {
+		type: Boolean,
+		default: false,
+	},
 	email: {
 		type: String,
 		required: false,
+	},
+	weeklyAdviceEnabled: {
+		type: Boolean,
+		default: true,
 	},
 	isLock: {
 		type: Boolean,

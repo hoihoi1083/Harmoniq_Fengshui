@@ -15,6 +15,8 @@ export async function createUserIfNotExists(userId, email) {
 				email: email,
 				gender: "female", // default
 				birthDateTime: new Date(1996, 2, 12, 22), // default
+				birthdayProvided: false,
+				weeklyAdviceEnabled: true,
 				isLock: true, // user starts locked
 				genStatus: "none", // default status
 			});

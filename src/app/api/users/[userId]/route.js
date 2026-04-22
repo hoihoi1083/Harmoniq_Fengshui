@@ -63,6 +63,7 @@ export async function POST(request, { params }) {
             for (let key in data) {
                 if (key === "birthDateTime") {
                     user[key] = new Date(data[key]);
+                    user.birthdayProvided = true;
                 } else {
                     user[key] = data[key];
                 }
