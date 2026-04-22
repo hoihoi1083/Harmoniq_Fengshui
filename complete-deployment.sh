@@ -75,6 +75,8 @@ upload_source() {
         --exclude '.next' \
         --exclude '.git' \
         --exclude '*.log' \
+        --exclude '.env' \
+        --exclude '.env.production' \
         --exclude '.env.local' \
         --exclude '.env.development' \
         --exclude 'logs/' \
@@ -109,9 +111,7 @@ local_build_and_upload_standalone() {
     cp -r public .next/standalone/ 2>/dev/null || true
     mkdir -p .next/standalone/.next
     cp -r .next/static .next/standalone/.next/
-    if [ -f ".env.production" ]; then
-        cp .env.production .next/standalone/.env
-    fi
+    # Do not package local env into standalone; use server-side .env/.env.production only.
     print_status "Uploading standalone build to server..."
     rsync -avz -e "ssh" \
         --progress \
