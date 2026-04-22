@@ -29,6 +29,7 @@ if ! command -v curl >/dev/null 2>&1; then
 fi
 
 echo "POST ${BASE_URL}/api/cron/weekly-emails"
+echo "Triggered at: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 curl -sS --max-time 0 -X POST "${BASE_URL}/api/cron/weekly-emails" \
 	-H "Content-Type: application/json" \
 	-H "x-cron-secret: ${SECRET}" \

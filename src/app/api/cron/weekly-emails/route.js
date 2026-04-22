@@ -60,6 +60,12 @@ function getWeekNumber(d) {
 	return Math.ceil(((t - yearStart) / 86400000 + 1) / 7);
 }
 
+function getWeekKey(d = new Date()) {
+	const y = d.getUTCFullYear();
+	const w = String(getWeekNumber(d)).padStart(2, "0");
+	return `${y}-W${w}`;
+}
+
 function emailLocalPart(email) {
 	const part = String(email).trim().split("@")[0];
 	return part || "朋友";
@@ -116,6 +122,11 @@ export async function POST(request) {
 		const body = await request.json().catch(() => ({}));
 		const dryRun = body.dryRun === true;
 		const skipAi = body.skipAi === true;
+		const runId =
+			(typeof crypto !== "undefined" && crypto.randomUUID?.()) ||
+			`${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+		const startedAt = new Date();
+		const weekKey = getWeekKey(startedAt);
 		const limit = Math.min(
 			Math.max(
 				1,
@@ -129,14 +140,28 @@ export async function POST(request) {
 			0,
 			Number(body.delayMs) || Number(process.env.WEEKLY_EMAIL_SEND_DELAY_MS) || 600
 		);
+		const lockTimeoutMs = Math.max(
+			60000,
+			Number(process.env.WEEKLY_EMAIL_LOCK_TIMEOUT_MS) || 2 * 60 * 60 * 1000
+		);
 
 		await connectDB();
 
 		const users = await User.find({
 			email: { $exists: true, $nin: [null, ""] },
 			weeklyAdviceEnabled: { $ne: false },
+			weeklyAdviceLastSentWeek: { $ne: weekKey },
 		})
-			.select({ email: 1, name: 1, birthDateTime: 1, userId: 1, birthdayProvided: 1 })
+			.select({
+				email: 1,
+				name: 1,
+				birthDateTime: 1,
+				userId: 1,
+				birthdayProvided: 1,
+				weeklyAdviceLastSentWeek: 1,
+				weeklyAdviceSendingWeek: 1,
+				weeklyAdviceSendingAt: 1,
+			})
 			.lean()
 			.limit(limit);
 
@@ -147,15 +172,21 @@ export async function POST(request) {
 
 		const results = {
 			ok: true,
+			runId,
+			startedAt: startedAt.toISOString(),
 			weekLabel,
+			weekKey,
 			dryRun,
 			skipAi,
 			limit,
 			delayMs,
+			lockTimeoutMs,
 			totalCandidates: users.length,
 			sent: 0,
 			wouldSend: 0,
 			skipped: 0,
+			alreadySentThisWeek: 0,
+			lockedByAnotherRun: 0,
 			failed: 0,
 			/** Addresses Resend accepted this run (to + userId + resendId); capped */
 			sentTo: [],
@@ -166,6 +197,12 @@ export async function POST(request) {
 
 		for (const user of users) {
 			const to = String(user.email || "").trim();
+			if (user.weeklyAdviceLastSentWeek === weekKey) {
+				results.alreadySentThisWeek += 1;
+				results.skipped += 1;
+				continue;
+			}
+
 			if (!EMAIL_RE.test(to) || !hasProvidedBirthday(user)) {
 				results.skipped += 1;
 				continue;
@@ -173,6 +210,36 @@ export async function POST(request) {
 
 			if (dryRun) {
 				results.wouldSend += 1;
+				continue;
+			}
+
+			const now = new Date();
+			const staleBefore = new Date(now.getTime() - lockTimeoutMs);
+			const claim = await User.updateOne(
+				{
+					_id: user._id,
+					weeklyAdviceLastSentWeek: { $ne: weekKey },
+					$or: [
+						{ weeklyAdviceSendingWeek: { $exists: false } },
+						{ weeklyAdviceSendingWeek: null },
+						{ weeklyAdviceSendingWeek: { $ne: weekKey } },
+						{
+							weeklyAdviceSendingWeek: weekKey,
+							weeklyAdviceSendingAt: { $lt: staleBefore },
+						},
+					],
+				},
+				{
+					$set: {
+						weeklyAdviceSendingWeek: weekKey,
+						weeklyAdviceSendingAt: now,
+					},
+				}
+			);
+
+			if ((claim?.modifiedCount || 0) === 0) {
+				results.lockedByAnotherRun += 1;
+				results.skipped += 1;
 				continue;
 			}
 
@@ -227,6 +294,23 @@ export async function POST(request) {
 					subject,
 					html,
 				});
+
+				await User.updateOne(
+					{
+						_id: user._id,
+						weeklyAdviceSendingWeek: weekKey,
+					},
+					{
+						$set: {
+							weeklyAdviceLastSentWeek: weekKey,
+							weeklyAdviceLastSentAt: new Date(),
+						},
+						$unset: {
+							weeklyAdviceSendingWeek: "",
+							weeklyAdviceSendingAt: "",
+						},
+					}
+				);
 				results.sent += 1;
 				if (results.sentTo.length < maxSentToLogged) {
 					results.sentTo.push({
@@ -236,6 +320,18 @@ export async function POST(request) {
 					});
 				}
 			} catch (e) {
+				await User.updateOne(
+					{
+						_id: user._id,
+						weeklyAdviceSendingWeek: weekKey,
+					},
+					{
+						$unset: {
+							weeklyAdviceSendingWeek: "",
+							weeklyAdviceSendingAt: "",
+						},
+					}
+				);
 				results.failed += 1;
 				const msg = e?.message || String(e);
 				if (results.errors.length < 30) {
@@ -247,6 +343,7 @@ export async function POST(request) {
 				await sleep(delayMs);
 			}
 		}
+		results.finishedAt = new Date().toISOString();
 
 		return NextResponse.json(results);
 	} catch (e) {

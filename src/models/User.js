@@ -52,6 +52,22 @@ const UserSchema = new mongoose.Schema({
 		type: Boolean,
 		default: true,
 	},
+	weeklyAdviceLastSentWeek: {
+		type: String,
+		default: null,
+	},
+	weeklyAdviceLastSentAt: {
+		type: Date,
+		default: null,
+	},
+	weeklyAdviceSendingWeek: {
+		type: String,
+		default: null,
+	},
+	weeklyAdviceSendingAt: {
+		type: Date,
+		default: null,
+	},
 	isLock: {
 		type: Boolean,
 		required: true,
