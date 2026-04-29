@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import getWuxingData from "../../lib/nayin.js";
 import Image from "next/image";
-import RoomCanvas from "../report/RoomCanvas";
 import { useImage } from "../../context/ImageContext";
+import {
+	getFlyingStarsByYear,
+	getBazhaiNameByGroup,
+	getBazhaiFortuneByGroup,
+} from "@/lib/bazhaiConfig";
 
 export default function OverallBazhaiAnalysis({
 	analysis,
@@ -12,8 +16,11 @@ export default function OverallBazhaiAnalysis({
 	userProfile,
 	designSummary,
 	roomAnalyses,
+	layoutItems,
 	yearlyAdvice,
+	comprehensiveAdvice,
 }) {
+	const CURRENT_YEAR = new Date().getFullYear();
 	const [activeSection, setActiveSection] = useState("overview");
 	const [activeRoomIndex, setActiveRoomIndex] = useState(0); // Set first room as active by default
 	const [localPersonalData, setLocalPersonalData] = useState(null);
@@ -36,11 +43,6 @@ export default function OverallBazhaiAnalysis({
 		}));
 	};
 
-	// Room canvas state variables
-	const [activeRoom, setActiveRoom] = useState(null);
-	const [designData, setDesignData] = useState(null);
-	const [roomList, setRoomList] = useState([]);
-
 	// Overlay layer states
 	const [showBazhaiLayer, setShowBazhaiLayer] = useState(false);
 	const [showFlyingStarLayer, setShowFlyingStarLayer] = useState(false);
@@ -48,19 +50,6 @@ export default function OverallBazhaiAnalysis({
 
 	// Get the uploaded layout image from ImageContext
 	const { preview: layoutImage } = useImage();
-
-	// Room canvas helper functions
-	const fetchDesignData = (designData) => {
-		setDesignData(designData);
-	};
-
-	const fetchRoomList = (roomList) => {
-		setRoomList(roomList);
-	};
-
-	const onSetActiveRoom = (room) => {
-		setActiveRoom(room);
-	};
 
 	// 命卦映射 (from bazhai-analysis/route.js)
 	const mingGuaMapping = {
@@ -474,76 +463,10 @@ export default function OverallBazhaiAnalysis({
 		}
 	}, [userProfile]);
 
-	// 2025年飛星數據
-	const flyingStars2025 = {
-		northEast: {
-			star: "五黃廉貞星",
-			element: "土",
-			type: "凶",
-			color: "bg-red-500",
-		},
-		east: {
-			star: "九紫右弼星",
-			element: "火",
-			type: "吉",
-			color: "bg-green-500",
-		},
-		southEast: {
-			star: "一白貪狼星",
-			element: "水",
-			type: "吉",
-			color: "bg-green-500",
-		},
-		south: {
-			star: "二黑巨門星",
-			element: "土",
-			type: "凶",
-			color: "bg-red-500",
-		},
-		southWest: {
-			star: "八白左輔星",
-			element: "土",
-			type: "吉",
-			color: "bg-green-500",
-		},
-		west: {
-			star: "七赤破軍星",
-			element: "金",
-			type: "凶",
-			color: "bg-red-500",
-		},
-		northWest: {
-			star: "三碧祿存星",
-			element: "木",
-			type: "凶",
-			color: "bg-red-500",
-		},
-		north: {
-			star: "四綠文曲星",
-			element: "木",
-			type: "吉",
-			color: "bg-green-500",
-		},
-		center: {
-			star: "六白武曲星",
-			element: "金",
-			type: "吉",
-			color: "bg-green-500",
-		},
-	};
+	const flyingStars2025 = getFlyingStarsByYear(CURRENT_YEAR);
 
-	// 八宅方位對應 (西南201°住宅)
-	const bazhaiMapping = {
-		northEast: "生氣",
-		east: "五鬼",
-		southEast: "禍害",
-		south: "六煞",
-		southWest: "伏位",
-		west: "延年",
-		northWest: "天醫",
-		north: "絕命",
-		center: "中宮", // Center position
-	};
+	const currentMingGuaGroup =
+		localPersonalData?.mingGuaInfo?.group || mingGuaInfo?.group || "西四命";
 
 	const getCompatibilityScore = () => {
 		const totalRooms = designSummary.totalRooms;
@@ -577,19 +500,24 @@ export default function OverallBazhaiAnalysis({
 			center: "中宮",
 		};
 
-		// 西南201°住宅的八宅吉凶分類
-		const auspiciousPositions = [
-			"northEast",
-			"west",
-			"northWest",
-			"southWest",
-			"center",
-		]; // 生氣、延年、天醫、伏位、中宮
-		const inauspiciousPositions = ["east", "southEast", "south", "north"]; // 五鬼、禍害、六煞、絕命
+		const allNonCenterPositions = allDirections.filter(
+			(direction) => direction !== "center"
+		);
+		const auspiciousPositions = allNonCenterPositions.filter(
+			(direction) =>
+				getBazhaiFortuneByGroup(currentMingGuaGroup, direction) === "大吉"
+		);
+		const inauspiciousPositions = allNonCenterPositions.filter(
+			(direction) =>
+				getBazhaiFortuneByGroup(currentMingGuaGroup, direction) === "大凶"
+		);
 
 		const auspiciousData = auspiciousPositions.map((direction) => {
 			const starInfo = flyingStars2025[direction];
-			const bazhaiName = bazhaiMapping[direction];
+			const bazhaiName = getBazhaiNameByGroup(
+				currentMingGuaGroup,
+				direction
+			);
 			return {
 				position: getBazhaiDescription(bazhaiName),
 				direction: directionNames[direction],
@@ -600,7 +528,10 @@ export default function OverallBazhaiAnalysis({
 
 		const inauspiciousData = inauspiciousPositions.map((direction) => {
 			const starInfo = flyingStars2025[direction];
-			const bazhaiName = bazhaiMapping[direction];
+			const bazhaiName = getBazhaiNameByGroup(
+				currentMingGuaGroup,
+				direction
+			);
 			return {
 				position: getBazhaiDescription(bazhaiName),
 				direction: directionNames[direction],
@@ -628,6 +559,71 @@ export default function OverallBazhaiAnalysis({
 	};
 
 	const { auspiciousData, inauspiciousData } = generateBazhaiPositions();
+
+	const directionNames = {
+		northEast: "東北",
+		east: "東",
+		southEast: "東南",
+		south: "南",
+		southWest: "西南",
+		west: "西",
+		northWest: "西北",
+		north: "北",
+		center: "中宮",
+	};
+
+	const normalizedLayoutItems = useMemo(() => {
+		const source = (layoutItems || []).filter(
+			(item) => item?.position && item?.size
+		);
+		if (!source.length) return [];
+
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+		source.forEach((room) => {
+			minX = Math.min(minX, room.position.x);
+			minY = Math.min(minY, room.position.y);
+			maxX = Math.max(maxX, room.position.x + room.size.width);
+			maxY = Math.max(maxY, room.position.y + room.size.height);
+		});
+
+		const totalW = Math.max(1, maxX - minX);
+		const totalH = Math.max(1, maxY - minY);
+		const pad = 2;
+
+		return source.map((item, idx) => {
+			const left = ((item.position.x - minX) / totalW) * (100 - pad * 2) + pad;
+			const top = ((item.position.y - minY) / totalH) * (100 - pad * 2) + pad;
+			const width = (item.size.width / totalW) * (100 - pad * 2);
+			const height = (item.size.height / totalH) * (100 - pad * 2);
+			return {
+				...item,
+				_idx: idx,
+				left,
+				top,
+				width,
+				height,
+			};
+		});
+	}, [layoutItems]);
+
+	const normalizedLayoutRooms = useMemo(
+		() =>
+			normalizedLayoutItems.filter(
+				(item) => item.type === "room" || item._type === "room"
+			),
+		[normalizedLayoutItems]
+	);
+
+	const normalizedFurnitureItems = useMemo(
+		() =>
+			normalizedLayoutItems.filter(
+				(item) => item.type === "furniture" || item._type === "furniture"
+			),
+		[normalizedLayoutItems]
+	);
 
 	// 計算房屋方位信息
 	const calculateHouseDirectionInfo = () => {
@@ -919,7 +915,7 @@ export default function OverallBazhaiAnalysis({
 										? "書房"
 										: "房間";
 
-			let summary = `${baseRoomType}位於${directionName}方，2025年飛星${starInfo?.star}屬${element}，為${isLucky ? "吉星" : "凶星"}方位。`;
+			let summary = `${baseRoomType}位於${directionName}方，${CURRENT_YEAR}年飛星${starInfo?.star}屬${element}，為${isLucky ? "吉星" : "凶星"}方位。`;
 
 			if (isLucky) {
 				const roomSpecificBenefits = {
@@ -1652,9 +1648,9 @@ export default function OverallBazhaiAnalysis({
 
 		// Overall 2025 year influence analysis (200+ characters)
 		if (isLucky) {
-			advice.overall = `根據2025年玄空飛星分析，此${baseRoomType}位於${directionChinese}的${starInfo?.star}吉星位置，將為居住者帶來顯著的正面影響。${element}屬性的吉星能量與${baseRoomType}的功能完美結合，創造出極為有利的風水環境。預期在使用此空間時，將會感受到明顯的能量提升和生活品質改善，各項活動都能獲得宇宙正能量的加持和支持，是2025年的重要吉利方位。`;
+			advice.overall = `根據${CURRENT_YEAR}年玄空飛星分析，此${baseRoomType}位於${directionChinese}的${starInfo?.star}吉星位置，將為居住者帶來顯著的正面影響。${element}屬性的吉星能量與${baseRoomType}的功能完美結合，創造出極為有利的風水環境。預期在使用此空間時，將會感受到明顯的能量提升和生活品質改善，各項活動都能獲得宇宙正能量的加持和支持，是${CURRENT_YEAR}年的重要吉利方位。`;
 		} else {
-			advice.overall = `2025年此${baseRoomType}位於${directionChinese}的${starInfo?.star}凶星影響下，需要特別謹慎處理和積極化解。${element}屬性的負面能量可能對${baseRoomType}的正常使用造成干擾，影響居住者的身心健康和運勢發展。透過適當的風水調理和空間改善，可以有效減輕凶星的不利影響，甚至轉化為成長和學習的機會，關鍵在於正確理解和應對。`;
+			advice.overall = `${CURRENT_YEAR}年此${baseRoomType}位於${directionChinese}的${starInfo?.star}凶星影響下，需要特別謹慎處理和積極化解。${element}屬性的負面能量可能對${baseRoomType}的正常使用造成干擾，影響居住者的身心健康和運勢發展。透過適當的風水調理和空間改善，可以有效減輕凶星的不利影響，甚至轉化為成長和學習的機會，關鍵在於正確理解和應對。`;
 		}
 
 		// Seasonal adjustments (120+ characters)
@@ -1752,7 +1748,7 @@ export default function OverallBazhaiAnalysis({
 
 		// Extract year summary - look for comprehensive patterns
 		const yearPatterns = [
-			/2025年[^。]*。/,
+			new RegExp(`${CURRENT_YEAR}年[^。]*。`, "g"),
 			new RegExp(`${room.roomType}位於[^。]*。`, "g"),
 			/飛星[^。]*屬[^。]*。/,
 			/八宅位置[^。]*。/,
@@ -1860,7 +1856,7 @@ export default function OverallBazhaiAnalysis({
 		const validated = {
 			yearSummary:
 				aiData.yearSummary ||
-				`正在為${room.roomType}生成2025年AI風水分析...`,
+				`正在為${room.roomType}生成${CURRENT_YEAR}年風水分析...`,
 			recommendations: {
 				furniture: ensureArray(
 					aiData.recommendations?.furniture,
@@ -1965,7 +1961,7 @@ export default function OverallBazhaiAnalysis({
 				書房: "極利文昌運勢和學習工作效率，有助於智慧開發和事業進展，適合重要決策",
 			};
 
-			return `${baseRoomType}位於${directionName}方，2025年飛星${starInfo?.star}屬${element}，為吉星方位。${roomSpecificBenefits[baseRoomType] || "此方位有利於提升整體運勢"}，建議善用此空間的正向能量，可作為日常重要活動區域。`;
+			return `${baseRoomType}位於${directionName}方，${CURRENT_YEAR}年飛星${starInfo?.star}屬${element}，為吉星方位。${roomSpecificBenefits[baseRoomType] || "此方位有利於提升整體運勢"}，建議善用此空間的正向能量，可作為日常重要活動區域。`;
 		} else {
 			const roomSpecificConcerns = {
 				臥室: "可能影響睡眠品質和身體健康，需特別注意化解負能量以避免失眠或情緒不穩",
@@ -1976,7 +1972,7 @@ export default function OverallBazhaiAnalysis({
 				書房: "不利學習和工作效率，容易分心或決策錯誤，需要化解煞氣以維持清晰思維",
 			};
 
-			return `${baseRoomType}位於${directionName}方，2025年飛星${starInfo?.star}屬${element}，為凶星方位。${roomSpecificConcerns[baseRoomType] || "此方位可能產生不利影響"}，需要特別注意化解負面能量和調整使用方式。`;
+			return `${baseRoomType}位於${directionName}方，${CURRENT_YEAR}年飛星${starInfo?.star}屬${element}，為凶星方位。${roomSpecificConcerns[baseRoomType] || "此方位可能產生不利影響"}，需要特別注意化解負面能量和調整使用方式。`;
 		}
 	};
 
@@ -2003,7 +1999,7 @@ export default function OverallBazhaiAnalysis({
 			birthMonth,
 			birthDay,
 			gender,
-			age: 2025 - birthYear,
+			age: CURRENT_YEAR - birthYear,
 			yearlyAdvice: yearlyAdvice || null,
 		};
 	};
@@ -2011,6 +2007,25 @@ export default function OverallBazhaiAnalysis({
 	const personalInfo = calculatePersonalInfo();
 
 	const compatibilityScore = getCompatibilityScore();
+
+	const safeParseJsonText = (value) => {
+		if (!value) return null;
+		if (typeof value === "object") return value;
+		if (typeof value !== "string") return null;
+		try {
+			const matched = value.match(/\{[\s\S]*\}/);
+			return JSON.parse(matched ? matched[0] : value);
+		} catch {
+			return null;
+		}
+	};
+
+	const parsedOverall = safeParseJsonText(analysis);
+	const overallSections = [
+		parsedOverall?.overallAnalysis,
+		parsedOverall?.personalMingGuaAnalysis,
+		parsedOverall?.annualForecast,
+	].filter(Boolean);
 
 	return (
 		<div
@@ -2048,6 +2063,7 @@ export default function OverallBazhaiAnalysis({
 					</p>
 				</div>
 			</div>
+
 			{/* 個人命卦 Section */}
 			<div
 				className="p-3 mb-4 bg-white sm:p-4 lg:p-6"
@@ -3315,7 +3331,7 @@ export default function OverallBazhaiAnalysis({
 						</div>
 					</div>
 
-					{/* Layout map display (uploaded image first, fallback to saved room canvas) */}
+					{/* Layout map display (uploaded image first, fallback to normalized room layout) */}
 					{layoutImage ? (
 						<div
 							className="relative flex items-center justify-center w-full min-h-[320px] sm:min-h-[420px]"
@@ -3336,39 +3352,129 @@ export default function OverallBazhaiAnalysis({
 							/>
 						</div>
 					) : (
-						<div className="roomcanvas-container relative w-full min-h-[420px]">
-							<div
-								style={{
-									filter:
-										showBazhaiLayer ||
-										showFlyingStarLayer ||
-										showDirectionLayer
-											? "grayscale(100%) brightness(0.7)"
-											: "none",
-									transition: "filter 0.3s ease",
-								}}
-							>
-								<RoomCanvas
-									activeRoom={activeRoom}
-									setActiveRoom={onSetActiveRoom}
-									onChangeDesignData={fetchDesignData}
-									onChangeRoomList={fetchRoomList}
-								/>
+						<div className="relative w-full overflow-hidden border border-gray-200 rounded-2xl bg-gray-50 min-h-[320px] sm:min-h-[460px]">
+							<div className="absolute inset-0 bg-[radial-gradient(circle,#d9d9d9_1px,transparent_1px)] [background-size:12px_12px] opacity-40" />
+							<div className="relative w-full h-full p-3">
+								<div
+									className="relative w-full mx-auto"
+									style={{
+										aspectRatio: "16 / 10",
+										maxWidth: "1100px",
+										filter:
+											showBazhaiLayer ||
+											showFlyingStarLayer ||
+											showDirectionLayer
+												? "brightness(0.92)"
+												: "none",
+										transition: "all 0.2s ease",
+									}}
+								>
+									{normalizedLayoutRooms.map((room) => {
+										const roomType = room.roomType || "房間";
+										const starInfo = flyingStars2025[room.direction];
+										const bazhaiName = getBazhaiNameByGroup(
+											currentMingGuaGroup,
+											room.direction
+										);
+										const compactRoom =
+											Number(room.width) < 14 ||
+											Number(room.height) < 14;
+										const directionLabel =
+											directionNames[room.direction] || room.direction;
+										const bazhaiLabel =
+											getBazhaiDescription(bazhaiName);
+										const flyingStarLabel = compactRoom
+											? (starInfo?.star || "未知星").replace("星", "")
+											: starInfo?.star || "未知星";
+										const isLucky =
+											getBazhaiFortuneByGroup(
+												currentMingGuaGroup,
+												room.direction
+											) === "大吉";
+
+										return (
+											<div
+												key={`${room.roomId || room.id || roomType}-${room._idx}`}
+												className="absolute border-2 border-white shadow-sm rounded-xl"
+												style={{
+													left: `${room.left}%`,
+													top: `${room.top}%`,
+													width: `${room.width}%`,
+													height: `${room.height}%`,
+													backgroundColor: isLucky
+														? "rgba(163,177,22,0.15)"
+														: "rgba(180,0,60,0.12)",
+													borderColor: isLucky
+														? "rgba(163,177,22,0.55)"
+														: "rgba(180,0,60,0.55)",
+												}}
+											>
+												<div className="absolute z-30 top-1 left-1 max-w-[60%] px-1.5 py-0.5 text-[10px] sm:text-xs bg-white/90 rounded truncate">
+													{roomType}
+												</div>
+
+												{showDirectionLayer && (
+													<div className="absolute z-30 right-1 top-1 max-w-[38%] px-2 py-1 text-[10px] sm:text-xs text-white bg-gray-700 rounded-full truncate">
+														{directionLabel}
+													</div>
+												)}
+
+												{(showBazhaiLayer || showFlyingStarLayer) && (
+													<div className="absolute z-30 left-1 right-1 bottom-1 flex flex-col items-start gap-1 pointer-events-none">
+														{showBazhaiLayer && (
+															<div
+																className="max-w-full px-2 py-1 text-[10px] sm:text-xs text-white rounded-full truncate"
+																style={{
+																	backgroundColor: isLucky
+																		? "#A3B116"
+																		: "#B4003C",
+																}}
+															>
+																{bazhaiLabel}
+															</div>
+														)}
+														{showFlyingStarLayer && (
+															<div className="max-w-full px-2 py-1 text-[10px] sm:text-xs text-white bg-blue-600 rounded-full truncate">
+																{flyingStarLabel}
+															</div>
+														)}
+													</div>
+												)}
+											</div>
+										);
+									})}
+									{normalizedFurnitureItems.map((item) => {
+										const iconSrc =
+											item.activeIcon ||
+											item.data?.activeIcon ||
+											item.data?.icon ||
+											item.icon;
+										if (!iconSrc) return null;
+										return (
+											<img
+												key={`fur-${item.id || item._idx}`}
+												src={iconSrc}
+												alt={item.data?.label || "furniture"}
+												className="absolute object-contain pointer-events-none z-20"
+												style={{
+													left: `${item.left}%`,
+													top: `${item.top}%`,
+													width: `${Math.max(item.width, 2)}%`,
+													height: `${Math.max(item.height, 2)}%`,
+													transform:
+														item.rotation != null
+															? `rotate(${item.rotation}deg)`
+															: "none",
+													transformOrigin: "center",
+												}}
+											/>
+										);
+									})}
+								</div>
 							</div>
 						</div>
 					)}
 				</div>
-
-				<style jsx>{`
-					.roomcanvas-container :global(.canvasImage > div) {
-						height: 1200px !important;
-						overflow: visible !important;
-					}
-					.roomcanvas-container :global(.h-135) {
-						height: 1200px !important;
-						overflow: visible !important;
-					}
-				`}</style>
 			</div>
 
 			{/* 四吉位&流年飛星 和 四凶位&流年飛星 */}
@@ -3686,8 +3792,10 @@ export default function OverallBazhaiAnalysis({
 
 								const starInfo =
 									flyingStars2025[room.direction];
-								const bazhaiName =
-									bazhaiMapping[room.direction];
+								const bazhaiName = getBazhaiNameByGroup(
+									currentMingGuaGroup,
+									room.direction
+								);
 								const isLucky = starInfo?.type === "吉";
 								const directionName =
 									directionNames[room.direction];
@@ -3782,7 +3890,7 @@ export default function OverallBazhaiAnalysis({
 											</div>
 										</div>
 
-										{/* 2025年總結 */}
+										{/* 當年度總結 */}
 										<div className="px-3 mb-4 sm:px-6">
 											<h5
 												style={{
@@ -3794,7 +3902,7 @@ export default function OverallBazhaiAnalysis({
 													marginBottom: "12px",
 												}}
 											>
-												2025年總結
+												{`${CURRENT_YEAR}年總結`}
 											</h5>
 											<div className="mb-4">
 												<div>
@@ -4172,6 +4280,60 @@ export default function OverallBazhaiAnalysis({
 				)}
 			</div>
 
+			{/* 綜合分析摘要（來自 /api/bazhai-analysis） */}
+			{(overallSections.length > 0 || comprehensiveAdvice) && (
+				<div
+					className="p-5 mb-4 bg-white sm:p-8"
+					style={{
+						borderRadius: "clamp(25px, 6vw, 45px)",
+						boxShadow: "0 4px 5.3px rgba(0, 0, 0, 0.25)",
+					}}
+				>
+					<div className="flex items-center mb-5">
+						<h2
+							className="font-bold text-[#374A37]"
+							style={{
+								fontFamily: "Noto Serif TC, serif",
+								fontSize: "clamp(18px, 4vw, 30px)",
+							}}
+						>
+							綜合分析摘要
+						</h2>
+					</div>
+					<div className="space-y-3 sm:space-y-4">
+						{overallSections.map((text, idx) => (
+							<div
+								key={`overall-${idx}`}
+								className="p-3 border border-[#E8E8E8] rounded-xl sm:p-4 bg-[#FCFCFC]"
+							>
+								<p
+									className="leading-relaxed text-[#1F2937]"
+									style={{
+										fontFamily: "Noto Sans HK, sans-serif",
+										fontSize: "clamp(14px, 2.8vw, 16px)",
+									}}
+								>
+									{text}
+								</p>
+							</div>
+						))}
+						{comprehensiveAdvice && (
+							<div className="p-3 border border-[#E8E8E8] rounded-xl sm:p-4 bg-[#FCFCFC]">
+								<p
+									className="leading-relaxed text-[#1F2937]"
+									style={{
+										fontFamily: "Noto Sans HK, sans-serif",
+										fontSize: "clamp(14px, 2.8vw, 16px)",
+									}}
+								>
+									{comprehensiveAdvice}
+								</p>
+							</div>
+						)}
+					</div>
+				</div>
+			)}
+
 			{/* 流年提醒 */}
 			<div
 				className="p-5 mb-4 bg-white rounded-[65px] sm:p-8"
@@ -4187,7 +4349,7 @@ export default function OverallBazhaiAnalysis({
 							fontSize: "clamp(18px, 4vw, 30px)",
 						}}
 					>
-						流年提醒 2024~2043-下元九運
+						{`流年提醒（${CURRENT_YEAR}年起，下元九運）`}
 					</h2>
 				</div>
 
@@ -4197,7 +4359,7 @@ export default function OverallBazhaiAnalysis({
 						<>
 							{/* 按鈕區域 - 水平排列 */}
 							<div className="flex flex-row justify-center gap-2 mb-8 sm:gap-6">
-								{/* 2025年度重點提醒按鈕 */}
+								{/* 當年度重點提醒按鈕 */}
 								<div
 									className="flex flex-col items-center p-3 text-center transition-opacity cursor-pointer sm:p-4 hover:opacity-80"
 									onClick={() => toggleSection("yearlyFocus")}
@@ -4205,7 +4367,7 @@ export default function OverallBazhaiAnalysis({
 									<div className="flex items-center justify-center w-12 h-12 mb-3 bg-red-100 border-red-300 rounded-full sm:w-16 sm:h-16 border-3">
 										<Image
 											src="/images/report/personal-1.png"
-											alt="2025重點提醒"
+											alt={`${CURRENT_YEAR}重點提醒`}
 											width={10}
 											height={10}
 											className="object-contain"
@@ -4217,7 +4379,7 @@ export default function OverallBazhaiAnalysis({
 											fontSize: "clamp(12px, 3vw, 14px)",
 										}}
 									>
-										2025重點提醒
+										{`${CURRENT_YEAR}重點提醒`}
 									</h4>
 								</div>
 
@@ -4284,7 +4446,7 @@ export default function OverallBazhaiAnalysis({
 												"clamp(16px, 3.5vw, 18px)",
 										}}
 									>
-										2025年度重點提醒
+										{`${CURRENT_YEAR}年度重點提醒`}
 									</h3>
 									<p
 										style={{

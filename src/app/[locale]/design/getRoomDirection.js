@@ -15,6 +15,9 @@ export default function getRoomDirection(designData) {
 	let furnitureList = designData.localItems.filter(
 		(item) => item.type === "furniture"
 	);
+	if (!roomList.length) {
+		return designData;
+	}
 	// 找到中宫房间（最中心的房间）
 	const findCenterRoom = (rooms) => {
 		let centerX = 0,
@@ -92,11 +95,17 @@ export default function getRoomDirection(designData) {
 	// 主处理逻辑
 	const { centerRoom, centerX, centerY } = findCenterRoom(roomList);
 	const rotation = designData.compassRotation || 0;
+	const normalizedRotation = ((rotation % 360) + 360) % 360;
+	const normalizedTo45 = Math.round(normalizedRotation / 45) * 45;
+	const snappedRotation = normalizedTo45 % 360;
 
 	// 将角度根据指南针角度重新计算基准
 	let northIndex = directions.findIndex(
-		(item) => item.baseAngle === rotation % 360
+		(item) => item.baseAngle === snappedRotation
 	);
+	if (northIndex < 0) {
+		northIndex = 0;
+	}
 	let newDirections = directions
 		.slice(northIndex)
 		.concat(directions.slice(0, northIndex))

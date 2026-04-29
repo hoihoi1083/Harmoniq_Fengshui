@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
+import {
+	getFlyingStarsByYear,
+	getBazhaiNameByGroup,
+	getBazhaiFortuneByGroup,
+} from "@/lib/bazhaiConfig";
 
 const DEEPSEEK_API_KEY = process.env.API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+const CURRENT_YEAR = new Date().getFullYear();
 
 // 命卦映射
 const mingGuaMapping = {
@@ -63,93 +69,7 @@ const mingGuaMapping = {
 	},
 };
 
-// 2025年九宮飛星 (蛇年)
-const flyingStars2025 = {
-	east: {
-		trigram: "震宮",
-		element: "木",
-		star2025: "九紫右弼星",
-		description: "吉",
-		angle: 90,
-		wuxing: "火",
-		energy: "陽",
-	},
-	southEast: {
-		trigram: "巽宮",
-		element: "木",
-		star2025: "一白貪狼星",
-		description: "吉",
-		angle: 135,
-		wuxing: "水",
-		energy: "陽",
-	},
-	south: {
-		trigram: "離宮",
-		element: "火",
-		star2025: "二黑巨門星",
-		description: "凶",
-		angle: 180,
-		wuxing: "土",
-		energy: "陰",
-	},
-	southWest: {
-		trigram: "坤宮",
-		element: "土",
-		star2025: "八白左輔星",
-		description: "吉",
-		angle: 225,
-		wuxing: "土",
-		energy: "陰",
-	},
-	west: {
-		trigram: "兌宮",
-		element: "金",
-		star2025: "三碧祿存星",
-		description: "凶",
-		angle: 270,
-		wuxing: "金",
-		energy: "陰",
-	},
-	northWest: {
-		trigram: "乾宮",
-		element: "金",
-		star2025: "六白武曲星",
-		description: "吉",
-		angle: 315,
-		wuxing: "金",
-		energy: "陽",
-	},
-	north: {
-		trigram: "坎宮",
-		element: "水",
-		star2025: "七赤破軍星",
-		description: "中性",
-		angle: 0,
-		wuxing: "水",
-		energy: "陽",
-	},
-	northEast: {
-		trigram: "艮卦",
-		element: "土",
-		star2025: "五黃廉貞星",
-		description: "凶",
-		angle: 45,
-		wuxing: "土",
-		energy: "陽",
-	},
-};
-
-// 八宅吉凶方位對應
-const bazhaiFortune = {
-	東四命: {
-		大吉: ["east", "south", "north", "southEast"],
-		大凶: ["west", "northWest", "southWest", "northEast"],
-	},
-	西四命: {
-		大吉: ["west", "northWest", "southWest", "northEast"],
-		大凶: ["east", "south", "north", "southEast"],
-	},
-};
+const flyingStarsForYear = getFlyingStarsByYear(CURRENT_YEAR);
 
 // 計算個人命卦
 function calculateMingGua(birthYear, userGender) {
@@ -196,15 +116,7 @@ function calculateMingGua(birthYear, userGender) {
 
 // 判斷八宅吉凶
 function getBazhaiResult(mingGuaGroup, roomDirection) {
-	const auspicious = bazhaiFortune[mingGuaGroup]?.大吉 || [];
-	const inauspicious = bazhaiFortune[mingGuaGroup]?.大凶 || [];
-
-	if (auspicious.includes(roomDirection)) {
-		return "大吉";
-	} else if (inauspicious.includes(roomDirection)) {
-		return "大凶";
-	}
-	return "中性";
+	return getBazhaiFortuneByGroup(mingGuaGroup, roomDirection);
 }
 
 // DeepSeek AI 调用函数
@@ -258,65 +170,14 @@ function generateBazhaiPrompt(roomData, userProfile, mingGuaInfo) {
 	const fengShuiData = roomData.fengShuiData;
 	const bazhaiStatus = roomData.bazhaiFortune;
 
-	// 根據方位獲取2025年飛星和八宅吉凶
-	const directionMapping = {
-		east: {
-			flyingStar: "九紫右弼星",
-			element: "火",
-			starType: "吉",
-			bazhaiName: "五鬼",
-		},
-		southEast: {
-			flyingStar: "一白貪狼星",
-			element: "水",
-			starType: "吉",
-			bazhaiName: "禍害",
-		},
-		south: {
-			flyingStar: "二黑巨門星",
-			element: "土",
-			starType: "凶",
-			bazhaiName: "六煞",
-		},
-		southWest: {
-			flyingStar: "八白左輔星",
-			element: "土",
-			starType: "吉",
-			bazhaiName: "伏位",
-		},
-		west: {
-			flyingStar: "七赤破軍星",
-			element: "金",
-			starType: "凶",
-			bazhaiName: "延年",
-		},
-		northWest: {
-			flyingStar: "三碧祿存星",
-			element: "木",
-			starType: "凶",
-			bazhaiName: "天醫",
-		},
-		north: {
-			flyingStar: "四綠文曲星",
-			element: "木",
-			starType: "吉",
-			bazhaiName: "絕命",
-		},
-		northEast: {
-			flyingStar: "五黃廉貞星",
-			element: "土",
-			starType: "凶",
-			bazhaiName: "生氣",
-		},
-		center: {
-			flyingStar: "六白武曲星",
-			element: "金",
-			starType: "吉",
-			bazhaiName: "中宮",
-		},
+	const starInfo =
+		flyingStarsForYear[roomDirection] || flyingStarsForYear.center;
+	const directionInfo = {
+		flyingStar: starInfo.star,
+		element: starInfo.element,
+		starType: starInfo.type,
+		bazhaiName: getBazhaiNameByGroup(mingGuaInfo.group, roomDirection),
 	};
-
-	const directionInfo = directionMapping[roomDirection];
 	const isLuckyStar = directionInfo.starType === "吉";
 
 	// 根據房間類型定義合適的家具和使用方式
@@ -472,7 +333,7 @@ function generateBazhaiPrompt(roomData, userProfile, mingGuaInfo) {
 • 命主信息：${userProfile.birthYear}年出生${userProfile.gender === "male" ? "男" : "女"}性
 • 命卦：${mingGuaInfo.name}（${mingGuaGroup}，${mingGuaElement}）
 • 八宅位置：${bazhaiPosition}（${bazhaiStatus === "大吉" ? "吉位" : "凶位"}）
-• 2025年飛星：${directionInfo.flyingStar}（${directionInfo.element}，${directionInfo.starType}星）
+• ${CURRENT_YEAR}年飛星：${directionInfo.flyingStar}（${directionInfo.element}，${directionInfo.starType}星）
 • 主要活動：${roomInfo.activities.join("、")}
 
 【絕對要求】：
@@ -486,7 +347,7 @@ function generateBazhaiPrompt(roomData, userProfile, mingGuaInfo) {
 請按以下嚴格的JSON格式輸出：
 
 {
-  "yearSummary": "${roomType}位於${roomDirection}方，2025年飛星${directionInfo.flyingStar}屬${directionInfo.element}（${directionInfo.starType}星），八宅位置為${bazhaiPosition}。對${mingGuaGroup}的${mingGuaInfo.name}卦命主在${roomType}中進行${roomInfo.activities.join("、")}活動的具體影響分析，包含星宿能量、方位特性、對命主的個人化影響，約120-150字",
+  "yearSummary": "${roomType}位於${roomDirection}方，${CURRENT_YEAR}年飛星${directionInfo.flyingStar}屬${directionInfo.element}（${directionInfo.starType}星），八宅位置為${bazhaiPosition}。對${mingGuaGroup}的${mingGuaInfo.name}卦命主在${roomType}中進行${roomInfo.activities.join("、")}活動的具體影響分析，包含星宿能量、方位特性、對命主的個人化影響，約120-150字",
   
   "recommendations": {
     "furniture": [
@@ -499,7 +360,7 @@ function generateBazhaiPrompt(roomData, userProfile, mingGuaInfo) {
       "適合${roomType}的主色調建議，基於${directionInfo.element}元素五行相生",
       "適合${roomType}的輔助色彩，考慮${mingGuaElement}命卦元素平衡", 
       "${roomType}中應避免的顏色及風水原因，特別是與${directionInfo.flyingStar}相克色彩",
-      "${roomType}的季節性色彩調整，配合2025年流年特點"
+      "${roomType}的季節性色彩調整，配合${CURRENT_YEAR}年流年特點"
     ],
     "habits": [
       "針對${mingGuaInfo.name}卦命主在${roomType}中${roomInfo.activities.join("、")}的個人化行為建議",
@@ -555,7 +416,7 @@ function generateOverallBazhaiPrompt(roomAnalyses, userProfile, mingGuaInfo) {
 	const mingGuaElement = mingGuaInfo.element;
 	const birthYear = userProfile.birthYear;
 	const gender = userProfile.gender === "male" ? "男" : "女";
-	const age = 2025 - parseInt(birthYear);
+	const age = CURRENT_YEAR - parseInt(birthYear);
 
 	return `
 你是一位資深風水師，請根據以下整體住宅信息生成專業的八宅綜合分析報告。
@@ -567,18 +428,18 @@ function generateOverallBazhaiPrompt(roomAnalyses, userProfile, mingGuaInfo) {
 • 覆蓋方位：${allDirections}
 • 吉位房間：${auspiciousRooms.length}個
 • 凶位房間：${inauspiciousRooms.length}個
-• 分析年份：2026年（丙午馬年）
+• 分析年份：${CURRENT_YEAR}年
 
 【要求】：請生成完整的綜合風水分析，包含：
 
 請按以下JSON格式輸出：
 
 {
-  "overallAnalysis": "全屋風水綜合分析：基於${mingGuaInfo.name}卦命主的整體住宅風水評估，結合2025年飛星布局，詳述住宅的總體風水格局、能量流向、以及對居住者的綜合影響。分析吉凶房間的分佈平衡，提出整體優化策略。200-250字",
+  "overallAnalysis": "全屋風水綜合分析：基於${mingGuaInfo.name}卦命主的整體住宅風水評估，結合${CURRENT_YEAR}年飛星布局，詳述住宅的總體風水格局、能量流向、以及對居住者的綜合影響。分析吉凶房間的分佈平衡，提出整體優化策略。200-250字",
   
-  "personalMingGuaAnalysis": "個人命卦深度分析：詳述${mingGuaInfo.name}卦（${mingGuaInfo.group}，${mingGuaInfo.element}）的五行特質、個性特點、運勢傾向。分析命主與當前住宅的匹配度，以及2025年的個人運勢趨勢。結合年齡（${age}歲）和性別（${gender}性）的生命階段特點，提供個性化的風水調整建議。200-250字",
+  "personalMingGuaAnalysis": "個人命卦深度分析：詳述${mingGuaInfo.name}卦（${mingGuaInfo.group}，${mingGuaInfo.element}）的五行特質、個性特點、運勢傾向。分析命主與當前住宅的匹配度，以及${CURRENT_YEAR}年的個人運勢趨勢。結合年齡（${age}歲）和性別（${gender}性）的生命階段特點，提供個性化的風水調整建議。200-250字",
   
-  "annualForecast": "2025年運勢預測：基於命主${mingGuaInfo.name}卦與2025年玄空飛星的互動，詳細預測各方面運勢發展。包含事業、財運、健康、感情等方面的具體走向，指出需要特別注意的月份和方位，提供全年的風水調整時機建議。分析流年對住宅各房間的影響變化。200-250字",
+  "annualForecast": "${CURRENT_YEAR}年運勢預測：基於命主${mingGuaInfo.name}卦與${CURRENT_YEAR}年玄空飛星的互動，詳細預測各方面運勢發展。包含事業、財運、健康、感情等方面的具體走向，指出需要特別注意的月份和方位，提供全年的風水調整時機建議。分析流年對住宅各房間的影響變化。200-250字",
   
   "recommendations": {
     "layout": "空間布局優化建議：基於八宅理論和飛星布局，提供具體的房間功能調整、家具重新配置、空間動線優化等建議",
@@ -638,7 +499,7 @@ function generateYearlyAdvicePrompt(userProfile, mingGuaInfo) {
 {
   "currentYear": "${currentYear}年度重點提醒：結合${gender}性用戶命卦${mingGuaInfo.name}和流年特點，分析本年度的整體運勢趨勢，重點提醒需要注意的方位和時機，提供具體的風水調整建議。內容要實用具體，避免空泛理論。120-150字",
   
-  "nineStarCycle": "下元九運影響分析：詳述2024-2043年九運期間對${gender}性${mingGuaInfo.name}卦命主的影響，分析九紫火星當運對${mingGuaInfo.element}元素命主的具體影響，提供這個20年週期內的風水策略建議。120-150字",
+  "nineStarCycle": "下元九運影響分析：聚焦${currentYear}年起至2043年的九運期間對${gender}性${mingGuaInfo.name}卦命主的影響，分析九紫火星當運對${mingGuaInfo.element}元素命主的具體影響，提供未來階段的風水策略建議。120-150字",
   
   "personalizedAdvice": "個人化年度建議：基於${age}歲${gender}性${mingGuaInfo.name}卦命主的特質，結合生命階段和運勢週期，提供本年度的個人化風水實踐建議。包含適合${gender}性的居家布局、重要決策時機、季節性調整等具體可行的建議。120-150字"
 }
@@ -826,7 +687,7 @@ export async function POST(request) {
 					};
 					bazhaiFortuneResult = "中性"; // Neutral position
 				} else {
-					fengShuiData = flyingStars2025[item.direction];
+					fengShuiData = flyingStarsForYear[item.direction];
 					if (!fengShuiData) return null;
 
 					bazhaiFortuneResult = getBazhaiResult(

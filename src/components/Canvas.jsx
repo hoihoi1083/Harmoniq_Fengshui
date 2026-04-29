@@ -26,6 +26,10 @@ import {
 	Undo2,
 	Redo2,
 	Copy,
+	Hand,
+	Move,
+	Crosshair,
+	Target,
 } from "lucide-react";
 import Image from "next/image";
 import Undo from "./canvasComp/Undo";
@@ -64,6 +68,7 @@ export const Canvas = forwardRef(
 			onGenReport,
 			locale,
 			onDemoAction = () => {}, // ADD THIS PROP
+			onItemsChange = () => {},
 		},
 		ref
 	) => {
@@ -129,6 +134,9 @@ export const Canvas = forwardRef(
 			showZoomHint: true,
 			showRotateHint: true,
 		});
+		const [mobileMode, setMobileMode] = useState("move"); // move | select | pan
+		const panRafRef = useRef(null);
+		const pendingPanRef = useRef(null);
 
 		// Debug position changes and test transforms
 		useEffect(() => {const canvas = document.getElementById("canvas");
@@ -150,6 +158,14 @@ export const Canvas = forwardRef(
 		// Enhanced mobile touch handling - REPLACE your handleItemTouchStart
 		const handleItemTouchStart = (e, item) => {
 			if (!isMobile) return;
+			if (mobileMode === "pan") return;
+			if (mobileMode === "select") {
+				setMobileSelectedItem(item);
+				onHandleActiveRoom(item);
+				e.preventDefault();
+				e.stopPropagation();
+				return;
+			}
 
 			// Clear any existing tap timeout
 			if (tapTimeout.current) {
@@ -172,9 +188,6 @@ export const Canvas = forwardRef(
 					} else {
 						return [...prev, item.id];
 					}
-				});
-				toast.info(t("multiSelectToast"), {
-					autoClose: 600,
 				});
 			}, 500);
 
@@ -220,9 +233,6 @@ export const Canvas = forwardRef(
 				if (mobileSelectedItem?.id !== item.id) {
 					setMobileSelectedItem(item);
 					onHandleActiveRoom(item);
-					toast.info(t("itemSelected"), {
-						autoClose: 500,
-					});
 				}
 				tapTimeout.current = null;
 			}, 50);
@@ -478,6 +488,9 @@ export const Canvas = forwardRef(
 				}
 
 				// Start canvas panning
+				if (isMobile && mobileMode !== "pan") {
+					return;
+				}
 				setActiveRoom(null);
 				setIsDragging(true);
 				if (e.touches?.length === 1) {
@@ -491,7 +504,7 @@ export const Canvas = forwardRef(
 						y: e.clientY - position.y,
 					});
 				}},
-			[position, scale, isMobile]
+			[position, scale, isMobile, mobileMode]
 		);
 
 		const furnitureInroom = (furniture, parentRoom) => {
@@ -629,7 +642,7 @@ export const Canvas = forwardRef(
 				containerRect = containerRef.current.getBoundingClientRect();
 			}
 
-			// Improved pinch-to-zoom
+			// Improved pinch-to-zoom (continuous)
 			if (e.touches?.length === 2 && isPinching) {
 				const touch1 = e.touches[0];
 				const touch2 = e.touches[1];
@@ -640,15 +653,14 @@ export const Canvas = forwardRef(
 					touch2.pageY
 				);
 
-				if (lastPinchDistance > 0) {
-					const ratio = currentDistance / lastPinchDistance;
-					if (ratio > 1.02) {
-						handleZoom("in", 2);
-						setLastPinchDistance(currentDistance);
-					} else if (ratio < 0.98) {
-						handleZoom("out", 2);
-						setLastPinchDistance(currentDistance);
-					}
+				if (touchStore.initialDistance > 0) {
+					const ratio = currentDistance / touchStore.initialDistance;
+					const nextScale = Math.max(
+						MIN_SCALE,
+						Math.min(MAX_SCALE, touchStore.originScale * ratio)
+					);
+					setScale(nextScale);
+					setLastPinchDistance(currentDistance);
 				}
 				return;
 			}
@@ -856,9 +868,15 @@ export const Canvas = forwardRef(
 					canvasHeight = (2000 - newY) / (scale / 100);
 				}
 
-				setPosition((prevPosition) => {
-					const newPosition = { x: newX, y: newY };return newPosition;
-				});
+				pendingPanRef.current = { x: newX, y: newY };
+				if (!panRafRef.current) {
+					panRafRef.current = requestAnimationFrame(() => {
+						if (pendingPanRef.current) {
+							setPosition(pendingPanRef.current);
+						}
+						panRafRef.current = null;
+					});
+				}
 				setCanvasSize({
 					width: canvasWidth || canvasSize.width,
 					height: canvasHeight || canvasSize.height,
@@ -1125,6 +1143,86 @@ export const Canvas = forwardRef(
 			},
 			[scale, isMobile, canvasSize, position.x, position.y, onDemoAction]
 		);
+
+		const fitToContent = useCallback(() => {
+			if (!localItems.length || !containerRef.current) return;
+			const bounds = localItems.reduce(
+				(acc, item) => ({
+					minX: Math.min(acc.minX, item.position.x),
+					minY: Math.min(acc.minY, item.position.y),
+					maxX: Math.max(acc.maxX, item.position.x + item.size.width),
+					maxY: Math.max(acc.maxY, item.position.y + item.size.height),
+				}),
+				{ minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
+			);
+			const c = containerRef.current.getBoundingClientRect();
+			// Keep content away from mobile UI clusters (top-left tools, bottom actions)
+			const mobileInset = isMobile
+				? { left: 120, right: 24, top: 150, bottom: 190 }
+				: { left: 16, right: 16, top: 16, bottom: 16 };
+			const availableWidth = Math.max(
+				120,
+				c.width - mobileInset.left - mobileInset.right
+			);
+			const availableHeight = Math.max(
+				120,
+				c.height - mobileInset.top - mobileInset.bottom
+			);
+			const contentW = Math.max(1, bounds.maxX - bounds.minX);
+			const contentH = Math.max(1, bounds.maxY - bounds.minY);
+			const minFitScale = isMobile ? 30 : MIN_SCALE;
+			const nextScale = Math.max(
+				minFitScale,
+				Math.min(
+					MAX_SCALE,
+					Math.floor(
+						Math.min(
+							(availableWidth * 0.8) / contentW,
+							(availableHeight * 0.8) / contentH
+						) * 100
+					)
+				)
+			);
+			const targetCenterX = mobileInset.left + availableWidth / 2;
+			const targetCenterY = mobileInset.top + availableHeight / 2;
+			const contentCenterX = bounds.minX + contentW / 2;
+			const contentCenterY = bounds.minY + contentH / 2;
+			setScale(nextScale);
+			setPosition({
+				x: targetCenterX - contentCenterX * (nextScale / 100),
+				y: targetCenterY - contentCenterY * (nextScale / 100),
+			});
+		}, [localItems, isMobile]);
+
+		const centerOnActiveRoom = useCallback(() => {
+			const room = activeRoom || mobileSelectedItem;
+			if (!room || !containerRef.current) return;
+			const c = containerRef.current.getBoundingClientRect();
+			const mobileInset = isMobile
+				? { left: 120, right: 24, top: 150, bottom: 190 }
+				: { left: 16, right: 16, top: 16, bottom: 16 };
+			const availableWidth = Math.max(
+				120,
+				c.width - mobileInset.left - mobileInset.right
+			);
+			const availableHeight = Math.max(
+				120,
+				c.height - mobileInset.top - mobileInset.bottom
+			);
+			const targetCenterX = mobileInset.left + availableWidth / 2;
+			const targetCenterY = mobileInset.top + availableHeight / 2;
+			const cx = room.position.x + room.size.width / 2;
+			const cy = room.position.y + room.size.height / 2;
+			setPosition({
+				x: targetCenterX - cx * (scale / 100),
+				y: targetCenterY - cy * (scale / 100),
+			});
+		}, [activeRoom, mobileSelectedItem, scale, isMobile]);
+
+		const resetView = useCallback(() => {
+			setPosition({ x: 0, y: 0 });
+			setScale(isMobile ? 35 : 60);
+		}, [isMobile]);
 
 		const handleRotate = useCallback(() => {
 			if (!activeRoom) return;
@@ -1585,6 +1683,18 @@ export const Canvas = forwardRef(
 			};
 		}, [handleZoom]);
 
+		useEffect(() => {
+			onItemsChange(localItems);
+		}, [localItems, onItemsChange]);
+
+		useEffect(() => {
+			return () => {
+				if (panRafRef.current) {
+					cancelAnimationFrame(panRafRef.current);
+				}
+			};
+		}, []);
+
 		return (
 			<div
 				ref={(node) => {
@@ -1600,7 +1710,7 @@ export const Canvas = forwardRef(
 					className={`fixed flex items-center gap-2 z-9
                     ${
 						isMobile
-							? "top-16 left-2 right-2 justify-between flex-wrap"
+							? "bottom-24 right-3 flex-col items-end"
 							: "top-20 right-6 gap-4"
 					}`}
 				>
@@ -1620,101 +1730,142 @@ export const Canvas = forwardRef(
 					)}
 					{/* Mobile: Enhanced zoom controls with better visibility */}
 					{isMobile && (
-						<div className="flex items-center justify-end w-full gap-2">
-							{/* Enhanced zoom control for mobile */}
-							<div className="flex items-center gap-1 px-3 py-2 border border-gray-200 rounded-full shadow-lg bg-white/90 backdrop-blur-sm">
+						<div className="flex flex-col items-end gap-2">
+							<div className="flex items-center gap-1 px-2 py-1 border border-gray-200 rounded-full shadow bg-white/90">
 								<button
-									className="p-2 text-gray-600 rounded-full hover:bg-gray-100 active:bg-gray-200"
-									onClick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();handleZoom("out");
-									}}
-									disabled={scale <= MIN_SCALE}
+									className={cn("p-1 rounded-full", mobileMode === "select" && "bg-gray-200")}
+									onClick={() => setMobileMode("select")}
+									title="選取"
 								>
-									<Minus className="w-4 h-4" />
+									<Hand className="w-4 h-4" />
 								</button>
-								<span className="text-sm font-medium text-gray-700 min-w-[40px] text-center">
-									{scale}%
-								</span>
 								<button
-									className="p-2 text-gray-600 rounded-full hover:bg-gray-100 active:bg-gray-200"
-									onClick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();handleZoom("in");
-									}}
-									disabled={scale >= 120}
+									className={cn("p-1 rounded-full", mobileMode === "move" && "bg-gray-200")}
+									onClick={() => setMobileMode("move")}
+									title="移動"
 								>
-									<Plus className="w-4 h-4" />
+									<Move className="w-4 h-4" />
+								</button>
+								<button
+									className={cn("p-1 rounded-full", mobileMode === "pan" && "bg-gray-200")}
+									onClick={() => setMobileMode("pan")}
+									title="平移"
+								>
+									<Crosshair className="w-4 h-4" />
 								</button>
 							</div>
-
-							{/* Enhanced compass for mobile */}
-							<div className="flex flex-col items-center compass-btn">
-								<div
-									style={{
-										width: 52,
-										height: 52,
-										borderRadius: "50%",
-										background: "rgba(255,255,255,0.9)",
-										backdropFilter: "blur(8px)",
-										boxShadow:
-											"0 4px 20px rgba(0,0,0,0.15)",
-										display: "flex",
-										alignItems: "center",
-										justifyContent: "center",
-										position: "relative",
-										cursor: "pointer",
-										border: "2px solid rgba(200,200,200,0.3)",
-										userSelect: "none",
-										zIndex: 20,
-									}}
-									onClick={onCompassClick}
-									title={t("compassTooltip")}
-								>
-									<Image
-										src="/images/compass.png"
-										alt="方向"
-										width={60}
-										height={60}
-										style={{
-											pointerEvents: "none",
-											transition:
-												"transform 0.4s cubic-bezier(.4,2,.6,1)",
-											transform: `rotate(${compassRotation}deg)`,
-											filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.2)) brightness(1.1)",
+							<div className="flex items-center gap-2">
+								{/* Enhanced zoom control for mobile */}
+								<div className="flex items-center gap-1 px-3 py-2 border border-gray-200 rounded-full shadow-lg bg-white/90 backdrop-blur-sm">
+									<button
+										className="p-2 text-gray-600 rounded-full hover:bg-gray-100 active:bg-gray-200"
+										onClick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();handleZoom("out");
 										}}
-									/>
-									<span
-										style={{
-											position: "absolute",
-											left: "50%",
-											top: "50%",
-											transform: "translate(-50%, -50%)",
-											fontSize: 9,
-											fontWeight: 700,
-											color: "#fff",
-											textShadow:
-												"0 1px 3px rgba(0,0,0,0.8)",
-											WebkitTextStroke: "0.3px #222",
-										}}
+										disabled={scale <= MIN_SCALE}
 									>
-										{getDirectionLabel(compassRotation)}
+										<Minus className="w-4 h-4" />
+									</button>
+									<span className="text-sm font-medium text-gray-700 min-w-[40px] text-center">
+										{scale}%
 									</span>
+									<button
+										className="p-2 text-gray-600 rounded-full hover:bg-gray-100 active:bg-gray-200"
+										onClick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();handleZoom("in");
+										}}
+										disabled={scale >= 120}
+									>
+										<Plus className="w-4 h-4" />
+									</button>
+								</div>
+
+								{/* Enhanced compass for mobile */}
+								<div className="flex flex-col items-center compass-btn">
+									<div
+										style={{
+											width: 52,
+											height: 52,
+											borderRadius: "50%",
+											background: "rgba(255,255,255,0.9)",
+											backdropFilter: "blur(8px)",
+											boxShadow:
+												"0 4px 20px rgba(0,0,0,0.15)",
+											display: "flex",
+											alignItems: "center",
+											justifyContent: "center",
+											position: "relative",
+											cursor: "pointer",
+											border: "2px solid rgba(200,200,200,0.3)",
+											userSelect: "none",
+											zIndex: 20,
+										}}
+										onClick={onCompassClick}
+										title={t("compassTooltip")}
+									>
+										<Image
+											src="/images/compass.png"
+											alt="方向"
+											width={60}
+											height={60}
+											style={{
+												pointerEvents: "none",
+												transition:
+													"transform 0.4s cubic-bezier(.4,2,.6,1)",
+												transform: `rotate(${compassRotation}deg)`,
+												filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.2)) brightness(1.1)",
+											}}
+										/>
+										<span
+											style={{
+												position: "absolute",
+												left: "50%",
+												top: "50%",
+												transform: "translate(-50%, -50%)",
+												fontSize: 9,
+												fontWeight: 700,
+												color: "#fff",
+												textShadow:
+													"0 1px 3px rgba(0,0,0,0.8)",
+												WebkitTextStroke: "0.3px #222",
+											}}
+										>
+											{getDirectionLabel(compassRotation)}
+										</span>
+									</div>
 								</div>
 							</div>
 
-							{/* Clear button with better mobile styling */}
-							<button
-								className="px-3 py-2 text-white transition-all bg-red-500 rounded-full shadow-lg hover:bg-red-600 active:scale-95 clear-canvas-btn"
-								onClick={() => {
-									setLocalItems([]);
-									setActiveRoom(null);
-									setSelectedItems([]);
-								}}
-								title={t("clearTooltip")}
-							>
-								{t("clear")}
-							</button>
+							<div className="flex items-center gap-2">
+								{/* Clear button with better mobile styling */}
+								<button
+									className="px-3 py-2 text-white transition-all bg-red-500 rounded-full shadow-lg hover:bg-red-600 active:scale-95 clear-canvas-btn"
+									onClick={() => {
+										setLocalItems([]);
+										setActiveRoom(null);
+										setSelectedItems([]);
+									}}
+									title={t("clearTooltip")}
+								>
+									{t("clear")}
+								</button>
+								<button
+									className="p-2 bg-white border border-gray-200 rounded-full shadow"
+									onClick={fitToContent}
+									title="Fit"
+								>
+									<Target className="w-4 h-4" />
+								</button>
+								<button
+									className="p-2 bg-white border border-gray-200 rounded-full shadow"
+									onClick={centerOnActiveRoom}
+									title="Center"
+								>
+									<Crosshair className="w-4 h-4" />
+								</button>
+							</div>
 						</div>
 					)}
 
@@ -1749,13 +1900,24 @@ export const Canvas = forwardRef(
 								{/* Desktop reset view button */}
 								<button
 									className="px-3 py-2 text-sm font-medium text-gray-700 transition-colors border border-gray-200 rounded-full shadow-sm bg-white/90 backdrop-blur-sm hover:bg-gray-50"
-									onClick={() => {
-										setPosition({ x: 0, y: 0 });
-										setScale(60); // Desktop default scale
-									}}
+									onClick={resetView}
 									title={t("resetView")}
 								>
 									{t("resetView")}
+								</button>
+								<button
+									className="px-3 py-2 text-sm font-medium text-gray-700 transition-colors border border-gray-200 rounded-full shadow-sm bg-white/90 backdrop-blur-sm hover:bg-gray-50"
+									onClick={fitToContent}
+									title="Fit"
+								>
+									Fit
+								</button>
+								<button
+									className="px-3 py-2 text-sm font-medium text-gray-700 transition-colors border border-gray-200 rounded-full shadow-sm bg-white/90 backdrop-blur-sm hover:bg-gray-50"
+									onClick={centerOnActiveRoom}
+									title="Center"
+								>
+									Center
 								</button>
 							</div>
 
@@ -1853,7 +2015,7 @@ export const Canvas = forwardRef(
 
 					{/* Mobile: Multi-select controls in second row if active */}
 					{isMobile && selectedItems.length > 0 && (
-						<div className="flex items-center justify-center gap-2 px-3 py-2 mx-auto mt-0 bg-white rounded-full shadow-lg w-fit">
+						<div className="fixed z-40 flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-lg left-3 bottom-28">
 							<button onClick={handleMultiRotate}>
 								<RotateCcwSquare className="w-4 h-4" />
 							</button>
@@ -2278,7 +2440,7 @@ export const Canvas = forwardRef(
 				{activeRoom && (
 					<div
 						className={cn(
-							"min-w-fit whitespace-nowrap fixed  left-1/2 -translate-x-1/2 h-10 rounded-4xl bg-white shadow-lg flex items-center px-3 gap-2 md:hidden",
+							"min-w-fit whitespace-nowrap fixed left-3 h-10 rounded-4xl bg-white shadow-lg flex items-center px-3 gap-2 md:hidden",
 							showTab ? "bottom-85" : "bottom-30 "
 						)}
 					>
@@ -2377,20 +2539,6 @@ export const Canvas = forwardRef(
 					</AlertDialog>
 				</div>
 
-				{/* Keep the mobile resetView button but remove the desktop-only one at the bottom */}
-				{isMobile && (
-					<button
-						className="fixed z-50 px-4 py-3 border border-gray-200 rounded-full shadow-lg bg-white/90 backdrop-blur-sm bottom-20 right-4"
-						onClick={() => {
-							setPosition({ x: 0, y: 0 });
-							setScale(40); // Better default for mobile
-						}}
-					>
-						<span className="text-sm font-medium">
-							{t("resetView")}
-						</span>
-					</button>
-				)}
 				{/* Common context menu for both room and furniture */}
 				<div
 					id="context-menu"

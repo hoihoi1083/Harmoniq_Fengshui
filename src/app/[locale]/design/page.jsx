@@ -21,7 +21,7 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { redirect } from "next/navigation";
-import { use, useState, useRef, useEffect, Suspense } from "react";
+import { use, useState, useRef, useEffect, Suspense, useCallback } from "react";
 import {
 	ITEM_TYPES,
 	ROOM_TYPES,
@@ -695,6 +695,12 @@ export default function DesignPage({ params }) {
 	const [moduleAlertOpen, setModuleAlertOpen] = useState(false);
 	const [wizardOpen, setWizardOpen] = useState(false); // <-- Add this line
 	const [showDemo, setShowDemo] = useState(false); // Add demo state
+	const [showMobileQuickEntry, setShowMobileQuickEntry] = useState(false);
+	const [designChecklist, setDesignChecklist] = useState({
+		rooms: 0,
+		hasDoor: false,
+		hasWindow: false,
+	});
 	// const defaultFurSize = { width: draggingItemSize, height: 32 }
 
 	const roomItems = [
@@ -837,6 +843,98 @@ export default function DesignPage({ params }) {
 			window.removeEventListener("resize", updateWidth);
 		};
 	}, []);
+
+	useEffect(() => {
+		if (!isMobile) {
+			setShowMobileQuickEntry(false);
+			return;
+		}
+		const timer = setTimeout(() => {
+			const items = canvasRef.current?.getLocalItems?.() || [];
+			const hasRoom = items.some((item) => item.type === ITEM_TYPES.ROOM);
+			if (!hasRoom) {
+				setShowMobileQuickEntry(true);
+			}
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [isMobile]);
+
+	const handleCanvasItemsChange = useCallback((items = []) => {
+		const rooms = items.filter((item) => item.type === ITEM_TYPES.ROOM).length;
+		const hasDoor = items.some(
+			(item) => item.data?.type === FURNITURE_TYPES.DOOR
+		);
+		const hasWindow = items.some(
+			(item) => item.data?.type === FURNITURE_TYPES.WINDOW
+		);
+		setDesignChecklist({ rooms, hasDoor, hasWindow });
+	}, []);
+
+	const ensureRequiredOpenings = () => {
+		const items = canvasRef.current?.getLocalItems?.() || [];
+		const rooms = items.filter((item) => item.type === ITEM_TYPES.ROOM);
+		if (!rooms.length) return items;
+
+		const hasDoor = items.some((item) => item.data?.type === FURNITURE_TYPES.DOOR);
+		const hasWindow = items.some((item) => item.data?.type === FURNITURE_TYPES.WINDOW);
+		if (hasDoor && hasWindow) return items;
+
+		const anchorRoom = rooms[0];
+		const newItems = [...items];
+		let seq = newItems.length + 1;
+		const nextId = (prefix) => `${prefix}-auto-${seq++}`;
+
+		if (!hasDoor) {
+			newItems.push({
+				id: nextId("door"),
+				type: ITEM_TYPES.FURNITURE,
+				data: {
+					cateType: ITEM_TYPES.FURNITURE,
+					type: FURNITURE_TYPES.DOOR,
+					label: FURNITURE_TYPES_LABEL[FURNITURE_TYPES.DOOR],
+					icon: "/images/fur-icon/door.png",
+					activeIcon: "/images/fur-icon/door-gr.png",
+					size: { width: 50, height: 50 },
+					parentRoom: anchorRoom,
+				},
+				size: { width: 50, height: 50 },
+				position: {
+					x: anchorRoom.position.x + 10,
+					y: anchorRoom.position.y + 10,
+				},
+				parentId: anchorRoom.id,
+				rotation: 0,
+				offset: { x: 10, y: 10 },
+			});
+		}
+
+		if (!hasWindow) {
+			newItems.push({
+				id: nextId("window"),
+				type: ITEM_TYPES.FURNITURE,
+				data: {
+					cateType: ITEM_TYPES.FURNITURE,
+					type: FURNITURE_TYPES.WINDOW,
+					label: FURNITURE_TYPES_LABEL[FURNITURE_TYPES.WINDOW],
+					icon: "/images/fur-icon/window.png",
+					activeIcon: "/images/fur-icon/window-gr.png",
+					size: { width: 50, height: 50 },
+					parentRoom: anchorRoom,
+				},
+				size: { width: 50, height: 50 },
+				position: {
+					x: anchorRoom.position.x + Math.max(20, anchorRoom.size.width - 60),
+					y: anchorRoom.position.y + 10,
+				},
+				parentId: anchorRoom.id,
+				rotation: 0,
+				offset: { x: Math.max(20, anchorRoom.size.width - 60), y: 10 },
+			});
+		}
+
+		canvasRef.current?.setLocalItems(newItems);
+		return newItems;
+	};
 
 	// 加载设计数据  TODO
 	useEffect(() => {
@@ -993,7 +1091,10 @@ export default function DesignPage({ params }) {
 			redirect("/auth/login");
 		}
 		let userId = session.user.userId;
-		const items = canvasRef.current.getLocalItems();
+		let items = canvasRef.current.getLocalItems();
+		if (isMobile) {
+			items = ensureRequiredOpenings();
+		}
 
 		let doorFlag = false,
 			windowFlag = false;
@@ -1296,6 +1397,14 @@ export default function DesignPage({ params }) {
 		setModuleAlertOpen(false);
 	};
 
+	const handleMobileQuickTemplate = (moduleId = "1") => {
+		onCoverDesign(moduleId);
+		setTimeout(() => {
+			ensureRequiredOpenings();
+		}, 50);
+		setShowMobileQuickEntry(false);
+	};
+
 	// ADD THIS REF:
 	const demoActionsRef = useRef(new Set());
 
@@ -1415,6 +1524,43 @@ export default function DesignPage({ params }) {
 							onUserOpen={setShowUserInfoDialog}
 						/>
 					)}
+					{isMobile && (
+						<div className="fixed z-40 flex items-center gap-2 px-3 py-2 text-xs text-gray-700 bg-white border rounded-full shadow top-18 left-2">
+							<span>{designChecklist.rooms > 0 ? "房間✓" : "房間✗"}</span>
+							<span>{designChecklist.hasDoor ? "門✓" : "門✗"}</span>
+							<span>{designChecklist.hasWindow ? "窗✓" : "窗✗"}</span>
+						</div>
+					)}
+
+					{isMobile && showMobileQuickEntry && (
+						<div className="fixed inset-0 z-50 flex items-end bg-black/40">
+							<div className="w-full p-4 bg-white rounded-t-2xl">
+								<div className="mb-3 text-base font-semibold text-gray-800">
+									手機快速開始
+								</div>
+								<p className="mb-3 text-sm text-gray-600">
+									先選一個戶型模板，系統會自動補齊門和窗，之後你再微調即可。
+								</p>
+								<div className="grid grid-cols-3 gap-2">
+									{["1", "2", "3", "4", "5", "6"].map((id) => (
+										<button
+											key={id}
+											onClick={() => handleMobileQuickTemplate(id)}
+											className="px-2 py-2 text-sm font-medium text-white rounded-lg bg-primary"
+										>
+											模板 {id}
+										</button>
+									))}
+								</div>
+								<button
+									onClick={() => setShowMobileQuickEntry(false)}
+									className="w-full py-2 mt-3 text-sm text-gray-700 bg-gray-100 rounded-lg"
+								>
+									稍後再選
+								</button>
+							</div>
+						</div>
+					)}
 					<div className="pt-16">
 						<DndContext
 							sensors={sensors}
@@ -1515,6 +1661,7 @@ export default function DesignPage({ params }) {
 												showTab={showTab}
 												onShowTab={onShowTab}
 												onDemoAction={handleDemoAction} // ADD THIS LINE
+												onItemsChange={handleCanvasItemsChange}
 											/>
 										</div>
 									</div>

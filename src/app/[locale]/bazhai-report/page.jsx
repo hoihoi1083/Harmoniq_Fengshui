@@ -14,6 +14,11 @@ import getRoomDirection from "../design/getRoomDirection";
 import { ROOM_TYPES, ROOM_TYPES_LABEL_TW } from "@/types/room";
 import ShopNavbar from "@/components/ShopNavbar";
 import Footer from "@/components/home/Footer";
+import {
+	getFlyingStarsByYear,
+	getBazhaiFortuneByGroup,
+	getBazhaiNameByGroup,
+} from "@/lib/bazhaiConfig";
 
 const ROOM_TYPE_MAPPING = {
 	[ROOM_TYPES.LIVING_ROOM]: "客廳",
@@ -42,6 +47,8 @@ const ROOM_TYPE_MAPPING = {
 };
 
 export default function BazhaiReportPage() {
+	const currentYear = new Date().getFullYear();
+	const flyingStarsForYear = getFlyingStarsByYear(currentYear);
 	const [analysisData, setAnalysisData] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
@@ -50,6 +57,62 @@ export default function BazhaiReportPage() {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const { data: session, status } = useSession();
+
+	const verifyBazhaiConsistency = (data) => {
+		// Dev-only verification to ensure API output and shared mapping stay consistent.
+		if (process.env.NODE_ENV === "production") return;
+		const group = data?.mingGuaInfo?.group;
+		const rooms = data?.roomAnalyses || [];
+		if (!group || !rooms.length) return;
+
+		const mismatches = [];
+		for (const room of rooms) {
+			const direction = room.direction;
+			if (!direction) continue;
+			const expectedStar =
+				flyingStarsForYear[direction] || flyingStarsForYear.center;
+			const expectedFortune = getBazhaiFortuneByGroup(group, direction);
+			const expectedBazhaiName = getBazhaiNameByGroup(group, direction);
+			const actual = room.fengShuiData || {};
+
+			const hit =
+				actual.flyingStar === expectedStar.star &&
+				actual.element === expectedStar.element &&
+				actual.starType === expectedStar.type &&
+				room.bazhaiFortune === expectedFortune;
+
+			if (!hit) {
+				mismatches.push({
+					roomId: room.roomId,
+					direction,
+					expected: {
+						flyingStar: expectedStar.star,
+						element: expectedStar.element,
+						starType: expectedStar.type,
+						bazhaiFortune: expectedFortune,
+						bazhaiName: expectedBazhaiName,
+					},
+					actual: {
+						flyingStar: actual.flyingStar,
+						element: actual.element,
+						starType: actual.starType,
+						bazhaiFortune: room.bazhaiFortune,
+					},
+				});
+			}
+		}
+
+		if (mismatches.length) {
+			console.warn(
+				`[Bazhai Verify] ${mismatches.length}/${rooms.length} room(s) mismatched mapping`,
+				mismatches
+			);
+		} else {
+			console.log(
+				`[Bazhai Verify] mapping consistent for ${rooms.length} room(s) in ${group}`
+			);
+		}
+	};
 
 	// Check if required libraries are available
 	const checkLibraries = () => {
@@ -413,7 +476,12 @@ export default function BazhaiReportPage() {
 			console.log("API response:", result);
 
 			if (result.success && result.data) {
-				setAnalysisData(result.data);
+				verifyBazhaiConsistency(result.data);
+				setAnalysisData({
+					...result.data,
+					// Keep original design items so report layout view can render furniture too
+					layoutItems: dataWithDirections?.localItems || [],
+				});
 			} else {
 				throw new Error("No analysis data received from API");
 			}
@@ -880,6 +948,7 @@ export default function BazhaiReportPage() {
 						userProfile={analysisData.userProfile}
 						designSummary={analysisData.designSummary}
 						roomAnalyses={analysisData.roomAnalyses}
+						layoutItems={analysisData.layoutItems}
 						yearlyAdvice={analysisData.yearlyAdvice}
 						comprehensiveAdvice={analysisData.comprehensiveAdvice}
 					/>
