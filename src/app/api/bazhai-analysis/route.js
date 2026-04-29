@@ -687,8 +687,14 @@ export async function POST(request) {
 					};
 					bazhaiFortuneResult = "中性"; // Neutral position
 				} else {
-					fengShuiData = flyingStarsForYear[item.direction];
-					if (!fengShuiData) return null;
+					const baseFengShuiData = flyingStarsForYear[item.direction];
+					if (!baseFengShuiData) return null;
+					// Keep both legacy and new keys to avoid frontend "未知" regressions.
+					fengShuiData = {
+						...baseFengShuiData,
+						flyingStar: baseFengShuiData.star,
+						starType: baseFengShuiData.type,
+					};
 
 					bazhaiFortuneResult = getBazhaiResult(
 						mingGuaInfo.group,

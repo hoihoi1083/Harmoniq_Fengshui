@@ -681,6 +681,8 @@ export default function DesignPage({ params }) {
 	const [historyIndex, setHistoryIndex] = useState(0);
 	const [showUserInfoDialog, setShowUserInfoDialog] = useState(false);
 	const [pendingBazhaiReport, setPendingBazhaiReport] = useState(false);
+	const [pendingBazhaiPrintReport, setPendingBazhaiPrintReport] =
+		useState(false);
 	const [showTutorialWelcome, setShowTutorialWelcome] = useState(false); // Add this state
 	const [userInfo, setuserInfo] = useState({});
 	const [loading, setLoading] = useState(false);
@@ -1203,6 +1205,80 @@ export default function DesignPage({ params }) {
 			setLoading(false);
 		}
 	};
+	const onBazhaiPrintReport = async () => {
+		if (!session?.user?.userId) {
+			redirect("/auth/login");
+		}
+
+		const items = canvasRef.current.getLocalItems();
+		const rooms = items.filter((item) => item.type === "room");
+		if (rooms.length === 0) {
+			toast.error("請先添加房間後再進行八宅風水分析", {
+				autoClose: 3000,
+			});
+			return;
+		}
+
+		let userProfile = {
+			gender: session.user.gender || userInfo?.gender,
+			birthYear: session.user.birthYear || userInfo?.birthYear,
+			birthMonth: session.user.birthMonth || userInfo?.birthMonth,
+			birthDay: session.user.birthDay || userInfo?.birthDay,
+			birthHour: session.user.birthHour || userInfo?.birthHour,
+		};
+
+		if (!userProfile.birthYear && userInfo?.birthDateTime) {
+			const birthDate = new Date(userInfo.birthDateTime);
+			userProfile.birthYear = birthDate.getFullYear();
+			userProfile.birthMonth = birthDate.getMonth() + 1;
+			userProfile.birthDay = birthDate.getDate();
+			userProfile.birthHour = birthDate.getHours();
+		}
+
+		if (userProfile.gender === "male") {
+			userProfile.gender = "男";
+		} else if (userProfile.gender === "female") {
+			userProfile.gender = "女";
+		}
+
+		if (!userProfile.gender || !userProfile.birthYear) {
+			toast.error("進行八宅風水分析需要您的出生年份和性別資訊", {
+				autoClose: 3000,
+			});
+			setPendingBazhaiPrintReport(true);
+			setShowUserInfoDialog(true);
+			return;
+		}
+
+		try {
+			setLoading(true);
+			await onSaveProject();
+
+			const designData = getRoomDirection({
+				localItems: canvasRef.current.getLocalItems(),
+				canvasPosition: canvasRef.current.getPosition(),
+				compassRotation: canvasRef.current.getCompassRotation(),
+				scale: canvasRef.current.getScale(),
+			});
+
+			const analysisData = {
+				designData,
+				userProfile,
+				timestamp: Date.now(),
+			};
+
+			sessionStorage.setItem(
+				"bazhaiAnalysisData",
+				JSON.stringify(analysisData)
+			);
+
+			window.open(`/${locale}/bazhai-print-report`, "_blank");
+		} catch (error) {
+			toast.error("八宅風水列印版生成失敗: " + error.message);
+		} finally {
+			setLoading(false);
+		}
+	};
 	const onCoverReport = async () => {
 		if (!session?.user?.userId) {
 			redirect("/auth/login");
@@ -1330,7 +1406,12 @@ export default function DesignPage({ params }) {
 					setTimeout(() => {
 						onBazhaiReport();
 					}, 500);
-				} else {
+				}
+				if (pendingBazhaiPrintReport) {
+					setPendingBazhaiPrintReport(false);
+					setTimeout(() => {
+						onBazhaiPrintReport();
+					}, 500);
 				}
 			} else {
 				toast.error("保存失敗，請重試。");
@@ -1630,6 +1711,16 @@ export default function DesignPage({ params }) {
 													>
 														<span>🧭</span>
 														八宅風水
+													</button>
+													<button
+														onClick={
+															onBazhaiPrintReport
+														}
+														className="px-3 py-1.5 text-white cursor-pointer bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors text-xs flex items-center gap-1"
+														title="開啟八宅風水列印版報告"
+													>
+														<span>🖨️</span>
+														八宅列印版
 													</button>
 
 													{/* Add demo button */}

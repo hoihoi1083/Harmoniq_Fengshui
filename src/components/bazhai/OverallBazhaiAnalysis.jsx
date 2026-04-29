@@ -19,6 +19,7 @@ export default function OverallBazhaiAnalysis({
 	layoutItems,
 	yearlyAdvice,
 	comprehensiveAdvice,
+	initialLayerVisibility,
 }) {
 	const CURRENT_YEAR = new Date().getFullYear();
 	const [activeSection, setActiveSection] = useState("overview");
@@ -44,9 +45,15 @@ export default function OverallBazhaiAnalysis({
 	};
 
 	// Overlay layer states
-	const [showBazhaiLayer, setShowBazhaiLayer] = useState(false);
-	const [showFlyingStarLayer, setShowFlyingStarLayer] = useState(false);
-	const [showDirectionLayer, setShowDirectionLayer] = useState(false);
+	const [showBazhaiLayer, setShowBazhaiLayer] = useState(
+		initialLayerVisibility?.bazhai ?? false
+	);
+	const [showFlyingStarLayer, setShowFlyingStarLayer] = useState(
+		initialLayerVisibility?.flyingStar ?? false
+	);
+	const [showDirectionLayer, setShowDirectionLayer] = useState(
+		initialLayerVisibility?.direction ?? false
+	);
 
 	// Get the uploaded layout image from ImageContext
 	const { preview: layoutImage } = useImage();
