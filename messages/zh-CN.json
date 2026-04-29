@@ -1677,7 +1677,8 @@
 			"loveLife": "我想增强桃花运",
 			"healthConcern": "我身体会有隐患吗"
 		},
-		"paidReportPreview": "付费报告预览"
+		"paidReportPreview": "付费报告预览",
+		"flatLayoutFengShui": "家居平面风水测算：编辑户型布局并生成报告"
 	},
 	"fengShuiReport": {
 		"page": {

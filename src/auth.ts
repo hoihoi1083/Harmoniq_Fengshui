@@ -109,15 +109,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 				token.id = user.id;
 				token.userId = (user as any).userId || user.email;
 			}
+			// Keep DB user id on token refresh (OAuth only sends `user` on first sign-in)
+			if (!token.userId && token.email) {
+				token.userId = token.email as string;
+			}
 			return token;
 		},
 		async session({ session, token }) {
 			if (token && session.user) {
-				(session.user as any) = {
-					...session.user,
-					id: token.sub,
-					userId: token.userId || session.user.email,
-				};
+				const userId =
+					(token.userId as string) ||
+					(token.email as string) ||
+					session.user.email ||
+					"";
+				Object.assign(session.user as object, {
+					id: token.sub ?? session.user.id,
+					userId,
+				});
 			}
 			return session;
 		},

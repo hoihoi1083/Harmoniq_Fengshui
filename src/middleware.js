@@ -82,11 +82,14 @@ export default async function middleware(request) {
 		return response;
 	}
 
-	// Check if the user is authenticated
+	// Must match src/auth.ts cookies.sessionToken.name. Using secureCookie: true
+	// in production makes getToken look for __Secure-next-auth.session-token, but
+	// our app sets the cookie to next-auth.session-token — so getToken returned
+	// null in prod and users were sent to login despite being signed in.
 	const token = await getToken({
-		secureCookie: process.env.NODE_ENV !== "development",
 		req: request,
 		secret: process.env.NEXTAUTH_SECRET,
+		cookieName: "next-auth.session-token",
 	});
 	// If not authenticated, redirect to login page
 	if (!token) {

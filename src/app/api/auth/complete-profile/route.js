@@ -18,21 +18,16 @@ export async function POST(request) {
 			"provider",
 		];
 		for (const field of requiredFields) {
-			if (!data[field]) {
+			if (
+				data[field] === undefined ||
+				data[field] === null ||
+				data[field] === ""
+			) {
 				return NextResponse.json(
 					{ message: `Missing required field: ${field}` },
 					{ status: 400 }
 				);
 			}
-		}
-
-		// Check if user already exists
-		const existingUser = await User.findOne({ userId: data.userId });
-		if (existingUser) {
-			return NextResponse.json(
-				{ message: "User already exists" },
-				{ status: 400 }
-			);
 		}
 
 		// Validate birth date components
@@ -53,30 +48,42 @@ export async function POST(request) {
 			);
 		}
 
-		// Create new user
-		const newUser = new User({
-			userId: data.userId,
-			gender: data.gender,
-			birthYear: data.birthYear,
-			birthMonth: data.birthMonth,
-			birthDay: data.birthDay,
-			birthHour: data.birthHour,
-			email: data.email || null,
-			provider: data.provider,
-		});
+		const birthDateTime = new Date(
+			data.birthYear,
+			data.birthMonth - 1,
+			data.birthDay,
+			data.birthHour,
+			0,
+			0,
+			0
+		);
 
-		await newUser.save();
+		// Upsert user profile so existing logged-in users can complete/update profile
+		const updatedUser = await User.findOneAndUpdate(
+			{ userId: data.userId },
+			{
+				$set: {
+					gender: data.gender,
+					birthDateTime,
+					birthdayProvided: true,
+					email: data.email || undefined,
+					provider: data.provider,
+					updatedAt: new Date(),
+				},
+			},
+			{ new: true, upsert: true, setDefaultsOnInsert: true }
+		);
 
 		return NextResponse.json(
 			{
 				success: true,
 				user: {
-					id: newUser.userId,
-					gender: newUser.gender,
-					provider: newUser.provider,
+					id: updatedUser.userId,
+					gender: updatedUser.gender,
+					provider: updatedUser.provider,
 				},
 			},
-			{ status: 201 }
+			{ status: 200 }
 		);
 	} catch (error) {
 		console.error("Error saving user profile:", error);

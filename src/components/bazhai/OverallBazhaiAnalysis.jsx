@@ -3299,6 +3299,64 @@ export default function OverallBazhaiAnalysis({
 							)}
 						</div>
 					)}
+
+					{/* House direction summary */}
+					<div className="mb-4 text-center">
+						<div
+							className="inline-flex items-center px-4 py-2 bg-[#F5F5F5] rounded-full"
+							style={{
+								fontFamily: "Noto Serif TC, serif",
+								fontSize: "clamp(14px, 3vw, 20px)",
+								fontWeight: 700,
+								color: "#374A37",
+							}}
+						>
+							{houseDirectionInfo?.description || "未設定"}
+						</div>
+					</div>
+
+					{/* Layout map display (uploaded image first, fallback to saved room canvas) */}
+					{layoutImage ? (
+						<div
+							className="relative flex items-center justify-center w-full min-h-[320px] sm:min-h-[420px]"
+							style={{
+								filter:
+									showBazhaiLayer ||
+									showFlyingStarLayer ||
+									showDirectionLayer
+										? "grayscale(100%) brightness(0.7)"
+										: "none",
+								transition: "filter 0.3s ease",
+							}}
+						>
+							<img
+								src={layoutImage}
+								alt="Floor Plan Layout"
+								className="object-contain w-full h-full max-h-[720px] rounded-xl"
+							/>
+						</div>
+					) : (
+						<div className="roomcanvas-container relative w-full min-h-[420px]">
+							<div
+								style={{
+									filter:
+										showBazhaiLayer ||
+										showFlyingStarLayer ||
+										showDirectionLayer
+											? "grayscale(100%) brightness(0.7)"
+											: "none",
+									transition: "filter 0.3s ease",
+								}}
+							>
+								<RoomCanvas
+									activeRoom={activeRoom}
+									setActiveRoom={onSetActiveRoom}
+									onChangeDesignData={fetchDesignData}
+									onChangeRoomList={fetchRoomList}
+								/>
+							</div>
+						</div>
+					)}
 				</div>
 
 				<style jsx>{`

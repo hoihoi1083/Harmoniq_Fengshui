@@ -93,7 +93,10 @@ function AccessControlWrapper({ children, locale }) {
 		const checkAccess = async () => {
 			if (status === "loading") return;
 
-			if (!session?.user?.userId) {
+			// Align with auth session: Mongo userId is often the email; JWT may only set email
+			const resolvedUserId =
+				session?.user?.userId || session?.user?.email;
+			if (!resolvedUserId) {
 				router.push(
 					`/${locale}/auth/login?callbackUrl=/${locale}/design`
 				);
@@ -102,7 +105,7 @@ function AccessControlWrapper({ children, locale }) {
 
 			try {
 				const { status: apiStatus, data: userInfo } = await get(
-					`/api/users/${session.user.userId}`
+					`/api/users/${resolvedUserId}`
 				);
 				if (apiStatus === 0) {
 					if (userInfo.isLock) {
@@ -128,7 +131,7 @@ function AccessControlWrapper({ children, locale }) {
 
 	// 2. Poll for webhook database updates (KEEP THIS ONE)
 	useEffect(() => {
-		const userId = session?.user?.userId;
+		const userId = session?.user?.userId || session?.user?.email;
 		if (!userId || hasAccess) return;
 		const pollInterval = setInterval(async () => {
 			try {
@@ -146,7 +149,7 @@ function AccessControlWrapper({ children, locale }) {
 		return () => {
 			clearInterval(pollInterval);
 		};
-	}, [session?.user?.userId, hasAccess]);
+	}, [session?.user?.userId, session?.user?.email, hasAccess]);
 
 	// 3. Handle payment success URL parameters (KEEP THIS ONE)
 	useEffect(() => {
@@ -158,7 +161,7 @@ function AccessControlWrapper({ children, locale }) {
 			setLoading(true);
 
 			const recheckAccess = async () => {
-				const userId = session?.user?.userId;
+				const userId = session?.user?.userId || session?.user?.email;
 				if (userId) {
 					try {
 						// Wait for webhook to process
@@ -187,7 +190,7 @@ function AccessControlWrapper({ children, locale }) {
 
 			recheckAccess();
 		}
-	}, [session?.user?.userId, hasAccess]);
+	}, [session?.user?.userId, session?.user?.email, hasAccess]);
 
 	if (loading) {
 		return (
@@ -1158,15 +1161,20 @@ export default function DesignPage({ params }) {
 			setLoading(true);
 
 			// Debug: Log the session and data// Prepare API data
+			const resolvedUserId = session?.user?.userId || session?.user?.email;
+			if (!resolvedUserId) {
+				toast.error("無法識別當前用戶，請重新登入後再試。");
+				return;
+			}
 			const apiData = {
-				userId: session.user.userId,
+				userId: resolvedUserId,
 				gender: data.user.gender,
 				birthYear: data.user.birthDateTime.getFullYear(),
 				birthMonth: data.user.birthDateTime.getMonth() + 1,
 				birthDay: data.user.birthDateTime.getDate(),
 				birthHour: data.user.birthDateTime.getHours(),
 				email: session.user.email,
-				provider: session.user.provider || "google", // Default to google if provider is missing
+				provider: session?.user?.provider || "google", // Default to google if provider is missing
 			};
 
 			// Add family member data if provided

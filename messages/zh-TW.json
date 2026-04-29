@@ -1684,7 +1684,8 @@
 			"loveLife": "我想增強桃花運",
 			"healthConcern": "我身體會有隱患嗎"
 		},
-		"paidReportPreview": "付費報告預覽"
+		"paidReportPreview": "付費報告預覽",
+		"flatLayoutFengShui": "家居平面風水測算：編輯戶型佈局並產生報告"
 	},
 	"fengShuiReport": {
 		"page": {
