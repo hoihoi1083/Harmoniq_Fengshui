@@ -57,6 +57,62 @@ export function parseOverallSections(analysis) {
 	}
 }
 
+/**
+ * Breaks overall-analysis prose into bullet-friendly lines: respects newlines,
+ * leading bullets / numbering, then sentence boundaries (。；).
+ */
+export function splitOverallSectionIntoPoints(raw) {
+	const text = String(raw ?? "").trim();
+	if (!text) return [];
+
+	const stripMarkers = (line) =>
+		line
+			.replace(/^[-*•·]\s+/, "")
+			.replace(/^\d+[\.\、．]\s*/, "")
+			.replace(/^[（(][一二三四五六七八九十\d]+[）)]\s*/, "")
+			.trim();
+
+	const lines = text.split(/\r?\n/).map((l) => stripMarkers(l.trim())).filter(Boolean);
+	if (lines.length > 1) return lines;
+
+	const single = lines[0] || text;
+	const bySentence = single
+		.split(/(?<=[。；])\s*/)
+		.map((s) => s.trim())
+		.filter(Boolean);
+	if (bySentence.length > 1) return bySentence;
+
+	return [single];
+}
+
+function truncateSummaryLine(text, maxChars) {
+	const s = String(text ?? "").trim();
+	if (!s || s.length <= maxChars) return s;
+	const slice = s.slice(0, maxChars);
+	const pauses = ["。", "；", "，", "、"];
+	let cut = -1;
+	for (const p of pauses) {
+		const i = slice.lastIndexOf(p);
+		if (i > cut) cut = i;
+	}
+	if (cut >= Math.floor(maxChars * 0.45)) {
+		return slice.slice(0, cut + 1);
+	}
+	return `${slice.replace(/[，、；：]\s*$/, "").trimEnd()}…`;
+}
+
+/**
+ * Fewer, shorter bullets for print — easier to scan at a glance.
+ */
+export function condenseSummaryPoints(raw, options = {}) {
+	const maxItems = options.maxItems ?? 4;
+	const maxChars = options.maxChars ?? 96;
+	const points = splitOverallSectionIntoPoints(raw);
+	return points
+		.slice(0, maxItems)
+		.map((p) => truncateSummaryLine(p, maxChars));
+}
+
 export function parseRoomAI(aiText) {
 	if (!aiText)
 		return {

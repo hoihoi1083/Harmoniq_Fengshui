@@ -1,4 +1,7 @@
-import { getBazhaiNameByGroup } from "@/lib/bazhaiConfig";
+import {
+	getBazhaiFortuneByGroup,
+	getBazhaiNameByGroup,
+} from "@/lib/bazhaiConfig";
 import {
 	DIRECTION_ZH,
 	localizeDirectionText,
@@ -16,11 +19,54 @@ export default function PageRoomDetails({
 	return (
 		<div className="page-break bg-white p-[15mm] sm:p-[20mm] relative flex flex-col">
 			<h2
-				className="text-4xl font-bold text-[#374A37] mb-6"
+				className={`text-4xl font-bold text-[#374A37] ${chunkIndex === 0 ? "mb-3" : "mb-6"}`}
 				style={{ fontFamily: "Noto Serif TC, serif" }}
 			>
 				居室重點分析（第 {chunkIndex + 1} 頁）
 			</h2>
+			{chunkIndex === 0 ? (
+				<div
+					className="mb-2 rounded-lg border border-gray-200 bg-[#F9FAFB] px-2 py-1.5 leading-tight print-scale-88"
+					style={{ fontFamily: "Noto Serif TC, serif" }}
+				>
+					<div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-[#374151]">
+						<span className="font-bold text-[#1F2937]">膠囊</span>
+						<span className="inline-flex items-center gap-0.5">
+							<span
+								className="inline-block h-2 w-2 shrink-0 rounded-[2px]"
+								style={{ backgroundColor: "#A3B116" }}
+								aria-hidden
+							/>
+							綠＝流年吉且八宅吉
+						</span>
+						<span className="text-[#D1D5DB]" aria-hidden>
+							·
+						</span>
+						<span className="inline-flex items-center gap-0.5">
+							<span
+								className="inline-block h-2 w-2 shrink-0 rounded-[2px]"
+								style={{ backgroundColor: "#B45309" }}
+								aria-hidden
+							/>
+							琥珀＝流年吉、宅非吉
+						</span>
+						<span className="text-[#D1D5DB]" aria-hidden>
+							·
+						</span>
+						<span className="inline-flex items-center gap-0.5">
+							<span
+								className="inline-block h-2 w-2 shrink-0 rounded-[2px]"
+								style={{ backgroundColor: "#B4003C" }}
+								aria-hidden
+							/>
+							紅＝流年凶
+						</span>
+					</div>
+					<p className="mt-0.5 text-[10px] text-[#6B7280] leading-snug">
+						流年＝當年飛星；八宅＝命卦方位。出現棕框＝兩層不一樣，以「化解」為主、勿加碼。
+					</p>
+				</div>
+			) : null}
 			<div className="space-y-4 print-page-content print-scale-88">
 				{rooms.slice(0, 2).map((room, i) => {
 					const parsed = parseRoomAI(room.aiAnalysis);
@@ -37,13 +83,29 @@ export default function PageRoomDetails({
 						room?.fengShuiData?.type ||
 						"凶";
 					const roomName = room.roomType || "房間";
-					const pillColor = starType === "吉" ? "#A3B116" : "#B4003C";
+					const bazhaiFortune = getBazhaiFortuneByGroup(
+						mingGuaGroup || "西四命",
+						room.direction,
+					);
+					const bazhaiAuspicious =
+						String(bazhaiFortune || "").includes("吉");
+					/** 強化語境：流年與八宅皆吉；避免八宅凶位卻顯示「強化」 */
+					const useEnhancement =
+						starType === "吉" && bazhaiAuspicious;
+					const pillColor = useEnhancement
+						? "#A3B116"
+						: starType === "吉"
+							? "#B45309"
+							: "#B4003C";
 					const bazhaiName = getBazhaiNameByGroup(
 						mingGuaGroup || "西四命",
 						room.direction,
 					);
 					const bazhaiDesc = bazhaiName || "未定";
 					const annualText = `流年：${starType === "吉" ? "吉星" : "凶星"}`;
+					const showBazhaiConflictNote =
+						starType === "吉" &&
+						String(bazhaiFortune || "").includes("凶");
 					return (
 						<div
 							key={`room-${room.roomId || i}`}
@@ -96,44 +158,52 @@ export default function PageRoomDetails({
 									className="text-[20px] font-bold mb-2"
 									style={{
 										fontFamily: "Noto Serif TC, serif",
-										color:
-											starType === "吉"
-												? "#A3B116"
-												: "#B4003C",
+										color: useEnhancement
+											? "#A3B116"
+											: "#B4003C",
 									}}
 								>
-									{starType === "吉"
+									{useEnhancement
 										? "強化建議"
 										: "化解建議"}
 								</div>
+								{showBazhaiConflictNote ? (
+									<p
+										className="mb-2 rounded border border-amber-200/70 bg-amber-50/80 px-2 py-1 text-[10px] leading-snug text-[#78350F]"
+										style={{
+											fontFamily: "Noto Serif TC, serif",
+										}}
+									>
+										<span className="font-bold text-[#92400E]">
+											雙層提醒：
+										</span>
+										流年雖吉，八宅仍視為凶位——依下方化解調整，勿因流年好就加強使用。
+									</p>
+								) : null}
 								<div className="grid grid-cols-2 gap-2">
 									{[
 										{
-											title:
-												starType === "吉"
-													? "家具擺放"
-													: "環境調整",
+											title: useEnhancement
+												? "家具擺放"
+												: "環境調整",
 											key: "furniture",
 										},
 										{
-											title:
-												starType === "吉"
-													? "元素色彩"
-													: "擺件禁忌",
+											title: useEnhancement
+												? "元素色彩"
+												: "擺件禁忌",
 											key: "colors",
 										},
 										{
-											title:
-												starType === "吉"
-													? "生活習慣"
-													: "行為禁忌",
+											title: useEnhancement
+												? "生活習慣"
+												: "行為禁忌",
 											key: "habits",
 										},
 										{
-											title:
-												starType === "吉"
-													? "能量強化"
-													: "化煞措施",
+											title: useEnhancement
+												? "能量強化"
+												: "化煞措施",
 											key: "items",
 										},
 									].map((section) => {
@@ -141,6 +211,7 @@ export default function PageRoomDetails({
 											parsed?.recommendationGroups?.[
 												section.key
 											] || [];
+										const tagGreen = useEnhancement;
 										return (
 											<div
 												key={section.key}
@@ -150,13 +221,9 @@ export default function PageRoomDetails({
 													className="inline-flex items-center justify-center px-2 py-[2px] rounded text-white text-[11px] font-semibold mb-1 min-w-[74px]"
 													style={{
 														backgroundColor:
-															section.key ===
-															"items"
+															tagGreen
 																? "#A3B116"
-																: starType ===
-																	  "吉"
-																	? "#A3B116"
-																	: "#B4003C",
+																: "#B4003C",
 													}}
 												>
 													{section.title}

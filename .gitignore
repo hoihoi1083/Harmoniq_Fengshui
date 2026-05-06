@@ -20,6 +20,9 @@
 # production
 /build
 
+# local tooling venvs
+/.venv-marketing
+
 # misc
 .DS_Store
 *.pem

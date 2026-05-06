@@ -130,7 +130,9 @@ export default function PageLayoutAnalysis({
 						四吉位&流年飛星
 					</div>
 					<div className="space-y-1.5">
-						{starPanels.lucky.map((row, idx) => (
+						{starPanels.lucky.map((row, idx) => {
+							const isJi = String(row.fortune || "").includes("吉");
+							return (
 							<div
 								key={`lucky-${idx}`}
 								className="grid grid-cols-[1.6fr_0.9fr_1.3fr_0.7fr] gap-1"
@@ -144,9 +146,17 @@ export default function PageLayoutAnalysis({
 								<div className="bg-[#F3F4F6] rounded-lg px-2 py-1 truncate text-[#374A37] font-semibold">
 									{row.star}
 								</div>
-								<div className="bg-[#A0B10F] text-white rounded-lg px-2 py-1 text-center font-bold">吉</div>
+								<div
+									className="text-white rounded-lg px-2 py-1 text-center font-bold"
+									style={{
+										backgroundColor: isJi ? "#A0B10F" : "#B4003C",
+									}}
+								>
+									{isJi ? "吉" : "凶"}
+								</div>
 							</div>
-						))}
+							);
+						})}
 					</div>
 				</div>
 				<div className="rounded-2xl border border-gray-200 p-3 shadow-sm">
@@ -157,7 +167,9 @@ export default function PageLayoutAnalysis({
 						四凶位&流年飛星
 					</div>
 					<div className="space-y-1.5">
-						{starPanels.unlucky.map((row, idx) => (
+						{starPanels.unlucky.map((row, idx) => {
+							const isJi = String(row.fortune || "").includes("吉");
+							return (
 							<div
 								key={`bad-${idx}`}
 								className="grid grid-cols-[1.6fr_0.9fr_1.3fr_0.7fr] gap-1"
@@ -171,9 +183,17 @@ export default function PageLayoutAnalysis({
 								<div className="bg-[#F3F4F6] rounded-lg px-2 py-1 truncate text-[#9B1C4D] font-semibold">
 									{row.star}
 								</div>
-								<div className="bg-[#A0B10F] text-white rounded-lg px-2 py-1 text-center font-bold">凶</div>
+								<div
+									className="text-white rounded-lg px-2 py-1 text-center font-bold"
+									style={{
+										backgroundColor: isJi ? "#A0B10F" : "#B4003C",
+									}}
+								>
+									{isJi ? "吉" : "凶"}
+								</div>
 							</div>
-						))}
+							);
+						})}
 					</div>
 				</div>
 				</div>
