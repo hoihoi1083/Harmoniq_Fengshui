@@ -216,7 +216,6 @@ const PricePage = () => {
 			return;
 		}
 		const reportType = reportTypeMap[card.id];
-		if (reportType === "fengshui") return;
 		router.push(`/${locale}/report-preview?type=${reportType}`);
 	};
 
@@ -312,16 +311,11 @@ const PricePage = () => {
 
 	const PricingCard = ({ card, noNavigate = false }) => {
 		const useBlackText = isLightCard(card.image);
-		const isComingSoon = reportTypeMap[card.id] === "fengshui";
 		return (
 			<div
-				className={`relative overflow-hidden aspect-[16/9] w-full group min-h-[140px] sm:min-h-[160px] ${
-					isComingSoon
-						? "cursor-not-allowed opacity-95"
-						: "cursor-pointer"
-				}`}
+				className="relative overflow-hidden aspect-[16/9] w-full group min-h-[140px] sm:min-h-[160px] cursor-pointer"
 				onClick={
-					noNavigate || isComingSoon
+					noNavigate
 						? undefined
 						: () => {
 								const reportType = reportTypeMap[card.id];
@@ -339,13 +333,6 @@ const PricePage = () => {
 					sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
 					draggable={false}
 				/>
-				{isComingSoon && (
-					<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-						<span className="px-5 py-2 text-base sm:text-lg font-extrabold rounded-full bg-white/95 text-[#073E31] border border-[#073E31]/20 shadow-sm">
-							{locale === "zh-CN" ? "即将推出" : "即將推出"}
-						</span>
-					</div>
-				)}
 
 				{/* Bottom Controls - responsive padding and sizes */}
 				{/* <div className="absolute z-10 flex items-center justify-between bottom-3 left-2 right-2 sm:bottom-4 sm:left-3 sm:right-3 md:bottom-6 md:left-6 md:right-6">
@@ -517,19 +504,9 @@ const PricePage = () => {
 											key={key}
 											className="flex-shrink-0 snap-start w-[83vw] min-w-[80vw] sm:w-[80vw] sm:min-w-[80vw]"
 											onClick={() => {
-												if (
-													reportTypeMap[card.id] ===
-													"fengshui"
-												)
-													return;
 												handleCarouselCardClick(card);
 											}}
 											onKeyDown={(e) => {
-												if (
-													reportTypeMap[card.id] ===
-													"fengshui"
-												)
-													return;
 												if (
 													e.key === "Enter" ||
 													e.key === " "
@@ -539,12 +516,7 @@ const PricePage = () => {
 													);
 											}}
 											role="button"
-											tabIndex={
-												reportTypeMap[card.id] ===
-												"fengshui"
-													? -1
-													: 0
-											}
+											tabIndex={0}
 											aria-label={card.title}
 										>
 											<PricingCard

@@ -45,6 +45,12 @@ export async function POST(request, { params }) {
 				{ status: 403 },
 			);
 		}
+		if (order.paymentStatus !== "paid") {
+			return NextResponse.json(
+				{ success: false, error: "Order is not paid yet" },
+				{ status: 400 },
+			);
+		}
 
 		const item = (order.items || []).find(
 			(i) => String(i._id) === String(itemId),

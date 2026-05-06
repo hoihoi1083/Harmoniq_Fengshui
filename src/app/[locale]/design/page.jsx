@@ -45,7 +45,7 @@ import UserInfoDialog from "@/components/UserInfoDialog";
 import TutorialWelcomeDialog from "@/components/TutorialWelcomeDialog"; // Add this import
 import { AntdSpin } from "antd-spin";
 import { ToastContainer, toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import DemoOverlay from "@/components/DemoOverlay"; // Add this import
 import {
@@ -673,6 +673,12 @@ export default function DesignPage({ params }) {
 		})
 	);
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const flowMode = searchParams.get("mode") || "";
+	const fengshuiOrderId = searchParams.get("orderId") || "";
+	const fengshuiItemId = searchParams.get("itemId") || "";
+	const isFengshuiOrderFlow =
+		flowMode === "fengshui-report" && !!fengshuiOrderId && !!fengshuiItemId;
 	const [active, setActive] = useState(null);
 	const [isOverCanvas, setIsOverCanvas] = useState(false);
 	const [sidebarWidth, setSidebarWidth] = useState(0);
@@ -702,6 +708,14 @@ export default function DesignPage({ params }) {
 		rooms: 0,
 		hasDoor: false,
 		hasWindow: false,
+	});
+	const [fengshuiLayoutMeta, setFengshuiLayoutMeta] = useState({
+		layoutStatus: "not_started",
+		layoutLocked: false,
+		layoutDraftUpdatedAt: null,
+		isOrderPaid: false,
+		hasReportProfile: false,
+		canSubmitLayout: false,
 	});
 	// const defaultFurSize = { width: draggingItemSize, height: 32 }
 
@@ -1088,6 +1102,110 @@ export default function DesignPage({ params }) {
 			setLoading(false);
 		}
 	};
+
+	const getCurrentLayoutSnapshot = () => ({
+		localItems: canvasRef.current?.getLocalItems?.() || [],
+		canvasPosition: canvasRef.current?.getPosition?.() || { x: 0, y: 0 },
+		compassRotation: canvasRef.current?.getCompassRotation?.() || 0,
+		scale: canvasRef.current?.getScale?.() || 100,
+	});
+
+	const saveFengshuiOrderDraft = async ({ silent = false } = {}) => {
+		if (!isFengshuiOrderFlow) return { success: false };
+		try {
+			const payload = {
+				layoutDraftData: getCurrentLayoutSnapshot(),
+			};
+			const res = await fetch(
+				`/api/shop/orders/${fengshuiOrderId}/items/${fengshuiItemId}/layout-draft`,
+				{
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload),
+				},
+			);
+			const data = await res.json();
+			if (!res.ok || !data.success) {
+				throw new Error(data.error || "Save draft failed");
+			}
+			setFengshuiLayoutMeta((prev) => ({
+				...prev,
+				layoutStatus: data.data?.layoutStatus || "draft",
+				layoutLocked: !!data.data?.layoutLocked,
+				layoutDraftUpdatedAt: data.data?.layoutDraftUpdatedAt || null,
+				isOrderPaid: data.data?.isOrderPaid ?? prev.isOrderPaid,
+				hasReportProfile:
+					data.data?.hasReportProfile ?? prev.hasReportProfile,
+				canSubmitLayout:
+					data.data?.canSubmitLayout ?? prev.canSubmitLayout,
+			}));
+			if (!silent) {
+				toast.success("戶型草稿已保存");
+			}
+			return { success: true };
+		} catch (error) {
+			if (!silent) {
+				toast.error("保存戶型草稿失敗: " + error.message);
+			}
+			return { success: false, error };
+		}
+	};
+
+	const submitFengshuiOrderLayout = async () => {
+		if (!isFengshuiOrderFlow) return;
+		const saveResult = await saveFengshuiOrderDraft({ silent: true });
+		if (!saveResult.success) return;
+		try {
+			const res = await fetch(
+				`/api/shop/orders/${fengshuiOrderId}/items/${fengshuiItemId}/layout-submit`,
+				{ method: "POST" },
+			);
+			const data = await res.json();
+			if (!res.ok || !data.success) {
+				throw new Error(data.error || "Submit layout failed");
+			}
+			toast.success("戶型已提交，管理員可直接開始製作列印報告");
+			setFengshuiLayoutMeta((prev) => ({
+				...prev,
+				layoutStatus: "submitted",
+				layoutLocked: true,
+			}));
+			router.push(`/${locale}/orders/${fengshuiOrderId}`);
+		} catch (error) {
+			toast.error("提交戶型失敗: " + error.message);
+		}
+	};
+
+	useEffect(() => {
+		if (!isFengshuiOrderFlow) return;
+		const loadDraft = async () => {
+			try {
+				const res = await fetch(
+					`/api/shop/orders/${fengshuiOrderId}/items/${fengshuiItemId}/layout-draft`,
+				);
+				const data = await res.json();
+				if (!res.ok || !data.success) return;
+				const draft = data.data?.layoutDraftData;
+				setFengshuiLayoutMeta({
+					layoutStatus: data.data?.layoutStatus || "not_started",
+					layoutLocked: !!data.data?.layoutLocked,
+					layoutDraftUpdatedAt: data.data?.layoutDraftUpdatedAt || null,
+					isOrderPaid: !!data.data?.isOrderPaid,
+					hasReportProfile: !!data.data?.hasReportProfile,
+					canSubmitLayout: !!data.data?.canSubmitLayout,
+				});
+				if (!draft) return;
+				if (!canvasRef.current) return;
+				canvasRef.current.setLocalItems(draft.localItems || []);
+				canvasRef.current.setPosition(draft.canvasPosition || { x: 0, y: 0 });
+				canvasRef.current.setCompassRotation(draft.compassRotation || 0);
+				canvasRef.current.setScale(draft.scale || 100);
+				toast.info("已載入你上次保存的戶型草稿");
+			} catch (_e) {}
+		};
+		const timer = setTimeout(loadDraft, 700);
+		return () => clearTimeout(timer);
+	}, [isFengshuiOrderFlow, fengshuiOrderId, fengshuiItemId]);
 	const onGenReport = async () => {
 		if (!session?.user?.userId) {
 			redirect("/auth/login");
@@ -1722,6 +1840,36 @@ export default function DesignPage({ params }) {
 														<span>🖨️</span>
 														八宅列印版
 													</button>
+													{isFengshuiOrderFlow ? (
+														<>
+															{!fengshuiLayoutMeta.hasReportProfile ? (
+																<div className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] text-amber-800">
+																	請先回到訂單頁提交「出生日期 / 問題」後，才能完成提交戶型。
+																</div>
+															) : null}
+															<button
+																onClick={() =>
+																	saveFengshuiOrderDraft()
+																}
+																disabled={fengshuiLayoutMeta.layoutLocked}
+																className="px-3 py-1.5 text-white cursor-pointer bg-slate-600 rounded-lg hover:bg-slate-700 transition-colors text-xs disabled:opacity-60"
+															>
+																保存戶型草稿
+															</button>
+															<button
+																onClick={submitFengshuiOrderLayout}
+																disabled={
+																	fengshuiLayoutMeta.layoutLocked ||
+																	!fengshuiLayoutMeta.canSubmitLayout
+																}
+																className="px-3 py-1.5 text-white cursor-pointer bg-rose-600 rounded-lg hover:bg-rose-700 transition-colors text-xs disabled:opacity-60"
+															>
+																{fengshuiLayoutMeta.layoutLocked
+																	? "已提交"
+																	: "完成並提交戶型"}
+															</button>
+														</>
+													) : null}
 
 													{/* Add demo button */}
 													<button

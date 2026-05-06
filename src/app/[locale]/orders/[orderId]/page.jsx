@@ -20,6 +20,7 @@ import {
 	Lock,
 } from "lucide-react";
 import { toast } from "sonner";
+import { REPORT_PRODUCT_ID_BY_TYPE } from "@/lib/reportProducts";
 
 const GIFT_REPORT_LABELS = {
 	wealth: "財運",
@@ -132,10 +133,15 @@ export default function OrderConfirmationPage() {
 		order?.reportInput?.question ||
 		(order?.reportInput?.questions && Object.values(order.reportInput.questions || {}).some((q) => q));
 	const reportAlreadySubmitted = !!(order?.reportInput?.birthday && hasReportQuestion);
+	const isOrderPaid = order?.paymentStatus === "paid";
 
 	const handleSubmitReportInput = async (e) => {
 		e.preventDefault();
 		if (reportAlreadySubmitted || reportSubmitting) return;
+		if (!isOrderPaid) {
+			toast.error(locale === "zh-CN" ? "訂單尚未付款，暫不可提交報告資料" : "訂單尚未付款，暫不可提交報告資料");
+			return;
+		}
 		if (!reportForm.birthday?.trim()) {
 			toast.error(locale === "zh-CN" ? "請填寫出生日期" : "請填寫出生日期");
 			return;
@@ -187,6 +193,14 @@ export default function OrderConfirmationPage() {
 	// Submit per-item printed report info (for items with giftReportType === "report-print")
 	const handleSubmitPrintInfo = async (itemId) => {
 		if (printSubmittingIds[itemId]) return;
+		if (!isOrderPaid) {
+			toast.error(
+				locale === "zh-CN"
+					? "訂單尚未付款，暫不可提交報告資料"
+					: "訂單尚未付款，暫不可提交報告資料",
+			);
+			return;
+		}
 		const form = printForms[itemId] || {};
 		if (!form.birthday?.trim()) {
 			toast.error(
@@ -241,6 +255,25 @@ export default function OrderConfirmationPage() {
 		} finally {
 			setPrintSubmittingIds((prev) => ({ ...prev, [itemId]: false }));
 		}
+	};
+
+	const isFengshuiStandaloneReportItem = (item) => {
+		const product = item?.productId;
+		const productCode =
+			typeof product === "object" && product
+				? product.productId
+				: null;
+		return (
+			(item?.giftReportType === "report-print" ||
+				item?.giftReportType === "report-digital") &&
+			productCode === REPORT_PRODUCT_ID_BY_TYPE.fengshui
+		);
+	};
+
+	const openFengshuiCanvas = (itemId) => {
+		router.push(
+			`/${locale}/design?mode=fengshui-report&orderId=${params.orderId}&itemId=${itemId}`,
+		);
 	};
 
 	if (loading) {
@@ -565,7 +598,7 @@ export default function OrderConfirmationPage() {
 																	<div className="flex gap-3 pt-1">
 																		<Button
 																			type="submit"
-																			disabled={!!printSubmittingIds[item._id]}
+																			disabled={!isOrderPaid || !!printSubmittingIds[item._id]}
 																			className="bg-[#6B8E23] hover:bg-[#5A7A1E] text-white text-sm px-4 py-2 rounded-full"
 																		>
 																			{printSubmittingIds[item._id]
@@ -579,6 +612,52 @@ export default function OrderConfirmationPage() {
 																	</div>
 																</form>
 															)}
+
+															{isFengshuiStandaloneReportItem(item) ? (
+																<div className="mt-3 rounded-xl border border-[#E8EDE0] bg-[#F8FAF5] p-3">
+																	<div className="flex flex-wrap items-center gap-2 text-xs text-[#3F4F3A]">
+																		<span className="font-medium">
+																			{locale === "zh-CN"
+																				? "戶型繪製狀態："
+																				: "戶型繪製狀態："}
+																		</span>
+																		<span className="rounded-full bg-white px-2 py-0.5 border border-[#DCE6CF]">
+																			{item.layoutStatus === "submitted"
+																				? locale === "zh-CN"
+																					? "已提交"
+																					: "已提交"
+																				: item.layoutStatus === "draft"
+																					? locale === "zh-CN"
+																						? "草稿已保存"
+																						: "草稿已保存"
+																					: locale === "zh-CN"
+																						? "尚未開始"
+																						: "尚未開始"}
+																		</span>
+																		{item.layoutSubmittedAt ? (
+																			<span className="text-gray-500">
+																				{new Date(item.layoutSubmittedAt).toLocaleString()}
+																			</span>
+																		) : null}
+																	</div>
+																	<div className="mt-2">
+																		<Button
+																			type="button"
+																			onClick={() => openFengshuiCanvas(item._id)}
+																			disabled={!isOrderPaid || item.layoutLocked}
+																			className="bg-[#6B8E23] hover:bg-[#5A7A1E] text-white text-sm px-4 py-2 rounded-full"
+																		>
+																			{item.layoutLocked
+																				? locale === "zh-CN"
+																					? "戶型已提交（不可修改）"
+																					: "戶型已提交（不可修改）"
+																				: locale === "zh-CN"
+																					? "前往繪製 / 繼續戶型"
+																					: "前往繪製 / 繼續戶型"}
+																		</Button>
+																	</div>
+																</div>
+															) : null}
 														</div>
 													)}
 												</div>
@@ -618,6 +697,13 @@ export default function OrderConfirmationPage() {
 										</span>
 									)}
 								</div>
+								{!isOrderPaid && (
+									<div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+										{locale === "zh-CN"
+											? "訂單狀態未支付：完成付款後即可填寫報告資料。"
+											: "訂單狀態未支付：完成付款後即可填寫報告資料。"}
+									</div>
+								)}
 
 								{reportAlreadySubmitted ? (
 									<div className="space-y-3 bg-gray-50 p-6 rounded-2xl">
@@ -651,6 +737,7 @@ export default function OrderConfirmationPage() {
 											<Button
 												type="button"
 												onClick={() => setReportFormVisible(true)}
+												disabled={!isOrderPaid}
 												className="bg-[#6B8E23] hover:bg-[#5A7A1E] text-white"
 											>
 												{locale === "zh-CN" ? "填寫報告資料（僅可提交一次）" : "填寫報告資料（僅可提交一次）"}
@@ -705,7 +792,7 @@ export default function OrderConfirmationPage() {
 												<div className="flex gap-3">
 													<Button
 														type="submit"
-														disabled={reportSubmitting}
+														disabled={!isOrderPaid || reportSubmitting}
 														className="bg-[#6B8E23] hover:bg-[#5A7A1E] text-white"
 													>
 														{reportSubmitting

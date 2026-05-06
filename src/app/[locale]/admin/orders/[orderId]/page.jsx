@@ -46,6 +46,7 @@ function AdminOrderDetailContent({ orderId, locale }) {
 	const [updating, setUpdating] = useState(false);
 	const [editingTracking, setEditingTracking] = useState(false);
 	const [trackingNumber, setTrackingNumber] = useState("");
+	const [generatingItemId, setGeneratingItemId] = useState("");
 
 	function getCurrencySymbol(currency) {
 		if (!currency) return "HK$";
@@ -204,6 +205,58 @@ function AdminOrderDetailContent({ orderId, locale }) {
 				return <CheckCircle className="w-5 h-5 text-green-600" />;
 			default:
 				return <Clock className="w-5 h-5 text-gray-500" />;
+		}
+	};
+
+	const handleGenerateFengshuiPrint = async (itemId) => {
+		try {
+			setGeneratingItemId(itemId);
+			const response = await fetch(
+				`/api/admin/orders/${orderId}/items/${itemId}/generate-fengshui-print`,
+				{ method: "POST" },
+			);
+			const data = await response.json();
+			if (!response.ok || !data.success) {
+				throw new Error(data.error || "Generate report failed");
+			}
+			const prepared = data.data?.preparedAnalysisData;
+			if (!prepared) {
+				throw new Error("Prepared report data missing");
+			}
+			sessionStorage.setItem(
+				"bazhaiPrintReadyData",
+				JSON.stringify({
+					analysisData: prepared,
+					timestamp: Date.now(),
+					source: "admin",
+				}),
+			);
+			localStorage.setItem(
+				"bazhaiPrintReadyData",
+				JSON.stringify({
+					analysisData: prepared,
+					timestamp: Date.now(),
+					source: "admin",
+				}),
+			);
+			toast.success("已生成列印報告，正在開啟預覽");
+			const opened = window.open(`/${locale}/bazhai-print-report`, "_blank");
+			if (!opened) {
+				router.push(`/${locale}/bazhai-print-report`);
+			}
+			// Refresh latest item status
+			const refreshRes = await fetch(`/api/admin/orders/${orderId}`, {
+				cache: "no-store",
+				headers: { "Content-Type": "application/json" },
+			});
+			const refreshData = await refreshRes.json();
+			if (refreshRes.ok && refreshData.success) {
+				setOrder(refreshData.order);
+			}
+		} catch (error) {
+			toast.error(`生成失敗：${error.message}`);
+		} finally {
+			setGeneratingItemId("");
 		}
 	};
 
@@ -687,6 +740,58 @@ function AdminOrderDetailContent({ orderId, locale }) {
 															客戶尚未填寫此紙本報告的資料
 														</p>
 													)}
+													{item.layoutStatus ? (
+														<div className="mt-2 rounded-lg border border-slate-200 bg-white p-2">
+															<p className="text-xs font-medium text-slate-700">
+																風水戶型狀態：{item.layoutStatus}
+															</p>
+															{item.layoutSubmittedAt ? (
+																<p className="text-xs text-slate-500">
+																	戶型提交時間：
+																	{new Date(
+																		item.layoutSubmittedAt,
+																	).toLocaleString("zh-TW")}
+																</p>
+															) : null}
+															{item.layoutLocked ? (
+																<p className="text-xs text-green-700">
+																	已鎖定，客戶不可再修改
+																</p>
+															) : null}
+															{item.layoutGeneratedAt ? (
+																<p className="text-xs text-blue-700">
+																	報告生成時間：
+																	{new Date(
+																		item.layoutGeneratedAt,
+																	).toLocaleString("zh-TW")}
+																</p>
+															) : null}
+															{!item.reportPrintInfo?.birthday ? (
+																<p className="text-xs text-amber-700">
+																	需先提交客戶出生資料，才能生成列印報告
+																</p>
+															) : null}
+															<div className="pt-2">
+																<Button
+																	type="button"
+																	size="sm"
+																	onClick={() =>
+																		handleGenerateFengshuiPrint(item._id)
+																	}
+																	disabled={
+																		!item.layoutLocked ||
+																		!item.reportPrintInfo?.birthday ||
+																		generatingItemId === String(item._id)
+																	}
+																	className="bg-emerald-600 hover:bg-emerald-700 text-white"
+																>
+																	{generatingItemId === String(item._id)
+																		? "生成中..."
+																		: "生成並開啟列印報告"}
+																</Button>
+															</div>
+														</div>
+													) : null}
 												</div>
 											);
 										})}

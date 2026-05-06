@@ -965,17 +965,11 @@ const ReportPreviewPage = () => {
 											career: "/images/report-preview/career.png",
 										};
 
-										const isComingSoon = key === "fengshui";
 										return (
 											<div
 												key={key}
-												className={`flex-shrink-0 w-52 sm:w-64 overflow-hidden transition ${
-													isComingSoon
-														? "cursor-not-allowed opacity-95"
-														: "cursor-pointer"
-												}`}
+												className="flex-shrink-0 w-52 sm:w-64 overflow-hidden transition cursor-pointer"
 												onClick={(e) => {
-													if (isComingSoon) return;
 													handleCardClick(e, key);
 												}}
 											>
@@ -989,16 +983,6 @@ const ReportPreviewPage = () => {
 														fill
 														className="object-cover transition hover:scale-110"
 													/>
-													{isComingSoon && (
-														<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-															<span className="px-4 py-1.5 text-sm sm:text-base font-extrabold rounded-full bg-white/95 text-[#073E31] border border-[#073E31]/20 shadow-sm">
-																{locale ===
-																"zh-CN"
-																	? "即将推出"
-																	: "即將推出"}
-															</span>
-														</div>
-													)}
 												</div>
 												<div className="p-3 sm:p-4">
 													<h3 className="font-semibold text-[#073E31] mb-1.5 sm:mb-2 text-md sm:text-lg line-clamp-2">

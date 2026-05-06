@@ -3,7 +3,8 @@ import { stripe } from "@/lib/stripe";
 import dbConnect from "@/lib/mongoose";
 import User from "@/models/User";
 import CheckoutSession from "@/models/CheckoutSession";
-const endpointSecret = process.env.WHSEC;
+const endpointSecret =
+	process.env.STRIPE_WEBHOOK_SECRET || process.env.WHSEC;
 export async function POST(request) {
 	let event;
 	const text = await request.text();
@@ -11,6 +12,11 @@ export async function POST(request) {
 	const sig = headersList.get("stripe-signature");
 
 	try {
+		if (!endpointSecret) {
+			throw new Error(
+				"Missing webhook secret. Set STRIPE_WEBHOOK_SECRET (or WHSEC).",
+			);
+		}
 		event = stripe.webhooks.constructEvent(text, sig, endpointSecret);
 		console.log("Webhook received:", event.type, "ID:", event.id);
 

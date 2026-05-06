@@ -215,6 +215,18 @@ export default function AdminOrdersPage() {
 							>
 								<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 									<div className="flex-1">
+										{(() => {
+											const hasSubmittedFengshuiLayout = (order.items || []).some(
+												(i) => i.layoutStatus === "submitted",
+											);
+											return hasSubmittedFengshuiLayout ? (
+												<div className="mb-2">
+													<Badge className="bg-amber-100 text-amber-900 border-none">
+														風水戶型已提交，待生成列印報告
+													</Badge>
+												</div>
+											) : null;
+										})()}
 										<div className="flex items-center gap-3 mb-2">
 											<h3 className="font-semibold text-lg">
 												{order.orderId}

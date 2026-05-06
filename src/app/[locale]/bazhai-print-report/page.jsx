@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useLocale } from "next-intl";
 import Navbar from "@/components/Navbar";
@@ -32,6 +32,7 @@ import BazhaiPrintStyles from "./components/BazhaiPrintStyles";
 
 export default function BazhaiPrintReportPage() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const locale = useLocale();
 	const { data: session, status } = useSession();
 	const [loading, setLoading] = useState(true);
@@ -318,6 +319,23 @@ export default function BazhaiPrintReportPage() {
 				return;
 			}
 
+			const preparedData =
+				sessionStorage.getItem("bazhaiPrintReadyData") ||
+				localStorage.getItem("bazhaiPrintReadyData");
+			if (preparedData) {
+				try {
+					const parsedPrepared = JSON.parse(preparedData);
+					const isFresh = Date.now() - (parsedPrepared?.timestamp || 0) < 2 * 60 * 60 * 1000;
+					if (isFresh && parsedPrepared?.analysisData) {
+						setAnalysisData(parsedPrepared.analysisData);
+						setLoading(false);
+						return;
+					}
+				} catch (_e) {
+					// fall through to original sessionStorage flow
+				}
+			}
+
 			const storedData = sessionStorage.getItem("bazhaiAnalysisData");
 			if (!storedData) {
 				setError("找不到八宅分析資料，請先回到設計頁生成報告。");
@@ -373,7 +391,7 @@ export default function BazhaiPrintReportPage() {
 		};
 
 		run();
-	}, [status, session?.user, router, locale]);
+	}, [status, session?.user, router, locale, searchParams]);
 
 	useEffect(() => {
 		document.body.classList.add("print-report-view");

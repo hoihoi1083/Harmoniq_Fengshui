@@ -44,6 +44,12 @@ export async function POST(request, { params }) {
 				{ status: 403 }
 			);
 		}
+		if (order.paymentStatus !== "paid") {
+			return NextResponse.json(
+				{ success: false, error: "Order is not paid yet" },
+				{ status: 400 },
+			);
+		}
 
 		// Only treat normal gift reports from products (wealth/love/career/health).
 		// Exclude report-print / report-digital which use per-item API.
