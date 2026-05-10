@@ -146,7 +146,7 @@ const ServiceSection = () => {
 				{/* 2026 Lucky Crystals */}
 				<section className="py-1 md:py-10">
 					<h2
-						className="text-4xl md:text-5xl lg:text-5xl font-bold text-center md:mb-4 mb-5 text-[#2C2C2C]"
+						className="text-4xl md:text-5xl lg:text-5xl font-bold text-center md:mb-20 mb-5 text-[#2C2C2C]"
 						style={{
 							fontFamily:
 								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
@@ -154,39 +154,6 @@ const ServiceSection = () => {
 					>
 						{locale === "zh-CN" ? "2026幸运水晶" : "2026幸運水晶"}
 					</h2>
-					<p
-						className="text-xs md:text-sm text-center text-[#2C2C2C]/80 max-w-2xl mx-auto mb-8 md:mb-16 leading-relaxed"
-						style={{
-							fontFamily:
-								"var(--font-noto-serif-sc), 'Noto Serif SC', serif",
-						}}
-					>
-						{locale === "zh-CN" ? (
-							<>
-								2026 火马年，能量火旺。想把这股冲动转化为助力，就要挑对水晶。
-								<br />
-								想要稳定财运 → 黄色系水晶
-								<br />
-								想要冷静思考 → 黑色/蓝色系水晶
-								<br />
-								想要心情平和 → 白色/紫色系水晶
-								<br />
-								挑一颗属于你的幸运水晶，让 2026 的火能量成为推动你前进的力量吧！
-							</>
-						) : (
-							<>
-								2026 火馬年，能量火旺。想把這股衝動轉化為助力，就要挑對水晶。
-								<br />
-								想要穩定財運 → 黃色系水晶
-								<br />
-								想要冷靜思考 → 黑色／藍色系水晶
-								<br />
-								想要心情平和 → 白色／紫色系水晶
-								<br />
-								挑一顆屬於你的幸運水晶，讓 2026 的火能量成為推動你前進的力量吧！
-							</>
-						)}
-					</p>
 					{loadingProducts ? (
 						<div className="flex items-center justify-center py-12">
 							<div className="text-center">
@@ -248,7 +215,10 @@ const ServiceSection = () => {
 																	product
 																		.images[0]
 																}
-																alt={getProductName(product, locale)}
+																alt={getProductName(
+																	product,
+																	locale,
+																)}
 																fill
 																className="object-cover transition-transform duration-300 group-hover:scale-105"
 																sizes="260px"
@@ -259,7 +229,10 @@ const ServiceSection = () => {
 													</div>
 													<div className="p-3 space-y-2">
 														<h3 className="text-sm font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
-															{getProductName(product, locale)}
+															{getProductName(
+																product,
+																locale,
+															)}
 														</h3>
 														<div className="flex items-center gap-2">
 															<div className="flex">
@@ -364,7 +337,10 @@ const ServiceSection = () => {
 																product
 																	.images[0]
 															}
-															alt={getProductName(product, locale)}
+															alt={getProductName(
+																product,
+																locale,
+															)}
 															fill
 															className="object-cover transition-transform duration-300 group-hover:scale-105"
 															sizes="(max-width: 768px) 50vw, 25vw"
@@ -375,7 +351,10 @@ const ServiceSection = () => {
 												</div>
 												<div className="p-3 space-y-2">
 													<h3 className="text-sm md:text-base font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
-														{getProductName(product, locale)}
+														{getProductName(
+															product,
+															locale,
+														)}
 													</h3>
 													<div className="flex items-center gap-2">
 														<div className="flex">
@@ -526,7 +505,10 @@ const ServiceSection = () => {
 																	product
 																		.images[0]
 																}
-																alt={getProductName(product, locale)}
+																alt={getProductName(
+																	product,
+																	locale,
+																)}
 																fill
 																className="object-cover transition-transform duration-300 group-hover:scale-105"
 																sizes="260px"
@@ -537,7 +519,10 @@ const ServiceSection = () => {
 													</div>
 													<div className="p-3 space-y-2">
 														<h3 className="text-sm font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
-															{getProductName(product, locale)}
+															{getProductName(
+																product,
+																locale,
+															)}
 														</h3>
 														<div className="flex items-center gap-2">
 															<div className="flex">
@@ -642,7 +627,10 @@ const ServiceSection = () => {
 																product
 																	.images[0]
 															}
-															alt={getProductName(product, locale)}
+															alt={getProductName(
+																product,
+																locale,
+															)}
 															fill
 															className="object-cover transition-transform duration-300 group-hover:scale-105"
 															sizes="(max-width: 768px) 50vw, 25vw"
@@ -653,7 +641,10 @@ const ServiceSection = () => {
 												</div>
 												<div className="p-3 space-y-2">
 													<h3 className="text-sm md:text-base font-semibold text-[#8B7355] line-clamp-2 min-h-[2.5rem]">
-														{getProductName(product, locale)}
+														{getProductName(
+															product,
+															locale,
+														)}
 													</h3>
 													<div className="flex items-center gap-2">
 														<div className="flex">

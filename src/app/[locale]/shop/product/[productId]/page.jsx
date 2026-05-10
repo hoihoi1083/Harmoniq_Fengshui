@@ -21,6 +21,8 @@ import {
 	Plus,
 	Minus,
 	ChevronRight,
+	ChevronUp,
+	ChevronDown,
 	MessageSquare,
 	HelpCircle,
 	Check,
@@ -48,6 +50,7 @@ export default function ProductDetailPage() {
 	const [loading, setLoading] = useState(true);
 	const [quantity, setQuantity] = useState(1);
 	const [selectedImage, setSelectedImage] = useState(0);
+	const [thumbnailStart, setThumbnailStart] = useState(0);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 	const [activeTab, setActiveTab] = useState("reviews"); // reviews or faq
 	const [selectedSize, setSelectedSize] = useState(null);
@@ -86,6 +89,10 @@ export default function ProductDetailPage() {
 			fetchRelatedProducts();
 		}
 	}, [product]);
+
+	useEffect(() => {
+		setThumbnailStart(0);
+	}, [product?._id]);
 
 	useEffect(() => {
 		if (session?.user) setShowLoginWarning(false);
@@ -415,6 +422,14 @@ export default function ProductDetailPage() {
 		return elementEmojis[element] || "✨";
 	};
 
+	const thumbnails = product?.images || [];
+	const thumbsPerView = 5;
+	const maxThumbnailStart = Math.max(0, thumbnails.length - thumbsPerView);
+	const visibleThumbnails = thumbnails.slice(
+		thumbnailStart,
+		thumbnailStart + thumbsPerView,
+	);
+
 	// Mock reviews data
 	const reviews = [
 		{
@@ -523,26 +538,87 @@ export default function ProductDetailPage() {
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
 					{/* Left: Thumbnail Images */}
 					<div className="order-2 lg:col-span-1 lg:order-1">
-						<div className="flex gap-3 overflow-x-auto lg:flex-col lg:overflow-visible">
-							{product?.images &&
-								product.images.map((image, index) => (
-									<button
-										key={index}
-										onClick={() => setSelectedImage(index)}
-										className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-											selectedImage === index
-												? "border-[#8B7355] ring-2 ring-[#8B7355]/30"
-												: "border-gray-200 hover:border-gray-300"
-										}`}
-									>
-										<Image
-											src={image}
-											alt={`Thumbnail ${index + 1}`}
-											fill
-											className="object-cover"
-										/>
-									</button>
-								))}
+						{/* Mobile: keep horizontal scrolling thumbnails */}
+						<div className="flex gap-3 overflow-x-auto lg:hidden">
+							{thumbnails.map((image, index) => (
+								<button
+									key={index}
+									onClick={() => setSelectedImage(index)}
+									className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+										selectedImage === index
+											? "border-[#8B7355] ring-2 ring-[#8B7355]/30"
+											: "border-gray-200 hover:border-gray-300"
+									}`}
+								>
+									<Image
+										src={image}
+										alt={`Thumbnail ${index + 1}`}
+										fill
+										className="object-cover"
+									/>
+								</button>
+							))}
+						</div>
+
+						{/* Desktop: show 5 thumbnails with up/down arrows */}
+						<div className="hidden lg:flex lg:flex-col lg:items-center">
+							{thumbnails.length > thumbsPerView && (
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									onClick={() =>
+										setThumbnailStart((prev) => Math.max(0, prev - 1))
+									}
+									disabled={thumbnailStart === 0}
+									className="w-8 h-8 mb-2"
+									aria-label={locale === "zh-CN" ? "向上查看缩图" : "向上查看縮圖"}
+								>
+									<ChevronUp className="w-4 h-4" />
+								</Button>
+							)}
+
+							<div className="flex flex-col gap-3 h-[448px] overflow-hidden">
+								{visibleThumbnails.map((image, visibleIndex) => {
+									const index = thumbnailStart + visibleIndex;
+									return (
+										<button
+											key={index}
+											onClick={() => setSelectedImage(index)}
+											className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+												selectedImage === index
+													? "border-[#8B7355] ring-2 ring-[#8B7355]/30"
+													: "border-gray-200 hover:border-gray-300"
+											}`}
+										>
+											<Image
+												src={image}
+												alt={`Thumbnail ${index + 1}`}
+												fill
+												className="object-cover"
+											/>
+										</button>
+									);
+								})}
+							</div>
+
+							{thumbnails.length > thumbsPerView && (
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									onClick={() =>
+										setThumbnailStart((prev) =>
+											Math.min(maxThumbnailStart, prev + 1),
+										)
+									}
+									disabled={thumbnailStart >= maxThumbnailStart}
+									className="w-8 h-8 mt-2"
+									aria-label={locale === "zh-CN" ? "向下查看缩图" : "向下查看縮圖"}
+								>
+									<ChevronDown className="w-4 h-4" />
+								</Button>
+							)}
 						</div>
 					</div>
 
@@ -550,7 +626,7 @@ export default function ProductDetailPage() {
 					<div className="order-1 lg:col-span-5 lg:order-2">
 						<div
 							ref={imageRef}
-							className="relative overflow-visible aspect-square rounded-2xl bg-gray-50 group"
+							className="relative w-full h-[340px] sm:h-[420px] lg:h-[520px] overflow-visible rounded-2xl bg-gray-50 group"
 							onMouseMove={handleImageMouseMove}
 							onMouseEnter={handleImageMouseEnter}
 							onMouseLeave={handleImageMouseLeave}
@@ -565,8 +641,10 @@ export default function ProductDetailPage() {
 												product,
 												locale,
 											)}
-											fill
-											className="object-contain p-8"
+											width={1600}
+											height={1200}
+											className="w-full h-full object-contain p-1"
+											sizes="(max-width: 1024px) 100vw, 50vw"
 											priority
 										/>
 										{/* Zoom Icon Indicator */}
@@ -687,13 +765,35 @@ export default function ProductDetailPage() {
 							</div>
 						</div>
 
-						{/* Description */}
-						<div className="py-4 text-sm leading-relaxed text-gray-600 border-t border-b border-gray-200">
+						{/* Description + Benefits */}
+						<div className="py-4 space-y-3 text-sm leading-relaxed text-gray-600 border-t border-b border-gray-200">
 							<p>
 								{product
 									? getProductDescription(product, locale)
 									: ""}
 							</p>
+
+							{Array.isArray(product?.benefits) &&
+								product.benefits.length > 0 && (
+									<div className="pt-1">
+										<p className="mb-1 text-sm font-semibold text-gray-800">
+											{locale === "zh-CN"
+												? "主要功效"
+												: "主要功效"}
+										</p>
+										<ul className="space-y-1 list-disc list-inside text-gray-700">
+											{product.benefits.map(
+												(benefit, index) => (
+													<li
+														key={`${benefit}-${index}`}
+													>
+														{benefit}
+													</li>
+												),
+											)}
+										</ul>
+									</div>
+								)}
 						</div>
 
 						{/* Size Selector */}
