@@ -21,7 +21,17 @@
 /build
 
 # local tooling venvs
+/.venv
 /.venv-marketing
+/.venv-transcribe
+/.venv_video
+/.tmp_excel_venv
+/.venv-*/
+*.venv/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # misc
 .DS_Store

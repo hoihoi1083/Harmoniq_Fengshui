@@ -1,6 +1,6 @@
 # Shop Product Input - All Marketing Products (Detailed)
 
-This file contains detailed admin-input data for **all 29 products** generated from Desktop marketing batches.
+This file contains detailed admin-input data for **all 36 products** generated from Desktop marketing batches.
 
 Common defaults (unless specified otherwise):
 - `category`: `charm`
@@ -17,7 +17,7 @@ All product descriptions/benefits below are inferred from:
 - material combinations shown in script naming and cover semantics (e.g. 黑曜石+海藍寶, 綠幽靈+沉香, 草莓晶+粉晶+月光石)
 - usage scenarios implied by the marketing visual set (daily wear, workplace, emotional soothing, gifting, report bundle)
 
-### 29 Product Analysis Notes
+### 36 Product Analysis Notes
 
 1. 天然金髮晶灰月光貔貅：主軸是「招財納福 + 守護」，由「金發晶貔貅 / 招財納福 / 靈性守護」與多張細節圖確立財運+防護定位。  
 2. 阿拉善奇楠雙圈：主軸是「沉穩禪意 + 長期佩戴」，由「禪意護身 / 寧靜致遠 / 沉香奇楠」定位在安定與成熟氣場。  
@@ -48,6 +48,13 @@ All product descriptions/benefits below are inferred from:
 27. 藥珀：主軸是「沉穩安神 + 古樸氣質」，由「沉穩安神 / 古樸雅致」定位放鬆與穩定節奏。  
 28. 閃金太陽石：主軸是「活力外放 + 招財辟邪」，由「活力四射 / 招財辟邪」定位高能量曝光場景。  
 29. 天然紅膠花：主軸是「紅運與行動力」，由「招財納福 / 繁花似錦」定位人氣與積極突破。
+30. 紫水晶手鏈：主軸是「穩定思緒 + 靈感提升」，由系列中的禪意、靈性能量語義定位在專注與身心平衡。  
+31. 葡萄石手鏈圓珠：主軸是「清新療癒 + 人際柔和」，由清透色系與日常佩戴場景定位在情緒舒緩與氣質加分。  
+32. 灰月光石手串：主軸是「靜心靈性 + 直覺喚醒」，由「靜謐之美 / 守護心靈」與多組社群圖定位在情緒安定與覺察提升。  
+33. 招財貴人天然黃阿賽手鏈：主軸是「招財貴人 + 平安守護」，由封面「招財貴人 / 黃阿賽水晶 · 守護平安」定位財運與貴人支援。  
+34. 草莓晶手鏈：主軸是「桃花人緣 + 溫柔魅力」，由草莓晶主題圖與社交情境定位戀愛與日常親和力。  
+35. 黑金超七方糖水晶：主軸是「強勢財運 + 氣場提振」，由黑金超七的深色高對比視覺定位在事業衝刺與高階形象。  
+36. 藍虎眼石手串：主軸是「決策專注 + 防護穩場」，由藍虎眼石常見守護與洞察語義定位在職場判斷與壓力管理。
 
 ---
 
@@ -561,12 +568,142 @@ All product descriptions/benefits below are inferred from:
 - `specifications`: 材質=天然紅膠花水晶；尺寸=8-10mm；重量=20g
 - `imageFolderName`: `天然红胶花手链_ad_material_20260508`
 
+## 30) 風鈴|紫水晶手鏈
+- `name.zh_TW`: `風鈴|紫水晶手鏈`
+- `name.zh_CN`: `风铃|紫水晶手链`
+- `elementType`: `fire`
+- `isFeatured`: `false`
+- `description.zh_TW`: 紫水晶手鏈以沉穩紫色光澤展現靈性與專注感，適合希望穩定情緒節奏、提升判斷力與個人氣質的佩戴者。整體風格優雅耐看，日常與正式場合皆易搭配。
+- `description.zh_CN`: 紫水晶手链以沉稳紫色光泽展现灵性与专注感，适合希望稳定情绪节奏、提升判断力与个人气质的佩戴者。整体风格优雅耐看，日常与正式场合皆易搭配。
+- `priceCNY/HKD/TWD`: `960 / 1060 / 4180`
+- `stock/sold`: `72 / 6`
+- `tags`: `["事業","人緣","健康","平安"]`
+- `benefits`:
+  - 協助穩定心緒與思考節奏，降低焦躁與內耗
+  - 提升專注與判斷力，支持工作與學習效率
+  - 強化表達自信與個人氣場，提升對外互動品質
+  - 紫色系細膩有質感，適合長時間日常佩戴
+- `specifications`: 材質=天然紫水晶；尺寸=8-10mm；重量=20g
+- `imageFolderName`: `紫水晶手链_ad_material_20260507`
+
+## 31) 風鈴|葡萄石手鏈圓珠
+- `name.zh_TW`: `風鈴|葡萄石手鏈圓珠`
+- `name.zh_CN`: `风铃|葡萄石手链圆珠`
+- `elementType`: `wood`
+- `isFeatured`: `false`
+- `description.zh_TW`: 葡萄石手鏈圓珠以清透柔和的綠調呈現療癒感，適合想在忙碌生活中維持情緒穩定與人際舒適度的佩戴者。風格清新自然，適合日常與通勤搭配。
+- `description.zh_CN`: 葡萄石手链圆珠以清透柔和的绿调呈现疗愈感，适合想在忙碌生活中维持情绪稳定与人际舒适度的佩戴者。风格清新自然，适合日常与通勤搭配。
+- `priceCNY/HKD/TWD`: `920 / 1020 / 3980`
+- `stock/sold`: `66 / 4`
+- `tags`: `["健康","人緣","平安","事業"]`
+- `benefits`:
+  - 緩和壓力累積，幫助回到穩定與放鬆節奏
+  - 提升人際互動舒適度，減少溝通中的緊繃感
+  - 增加日常清新氣質，穿搭辨識度高且耐看
+  - 適合作為長期佩戴的療癒型入門款
+- `specifications`: 材質=葡萄石圓珠；尺寸=8-10mm；重量=19g
+- `imageFolderName`: `葡萄石手链圆珠_ad_material_20260507`
+
+## 32) 風鈴|灰月光石手串
+- `name.zh_TW`: `風鈴|灰月光石手串`
+- `name.zh_CN`: `风铃|灰月光石手串`
+- `elementType`: `water`
+- `isFeatured`: `false`
+- `description.zh_TW`: 灰月光石手串以柔和藍灰光澤呈現安定且內斂的氣質，主打靜心靈性與心緒守護，適合需要情緒修復與直覺提升的使用者。整體風格溫潤，適合日常與睡前放鬆情境。
+- `description.zh_CN`: 灰月光石手串以柔和蓝灰光泽呈现安定且内敛的气质，主打静心灵性与心绪守护，适合需要情绪修复与直觉提升的使用者。整体风格温润，适合日常与睡前放松情境。
+- `priceCNY/HKD/TWD`: `980 / 1080 / 4280`
+- `stock/sold`: `70 / 7`
+- `tags`: `["健康","平安","人緣","愛情"]`
+- `benefits`:
+  - 幫助平復情緒起伏，建立更穩定的日常節奏
+  - 提升內在覺察與直覺感，面對選擇更有方向
+  - 柔和光感可降低視覺壓力，佩戴體驗舒適
+  - 適合作為冥想、放鬆與睡前儀式的陪伴款
+- `specifications`: 材質=灰月光石；尺寸=8-10mm；重量=20g
+- `imageFolderName`: `灰月光石手串_ad_material_20260507`
+
+## 33) 風鈴|招財貴人天然黃阿賽手鏈
+- `name.zh_TW`: `風鈴|招財貴人天然黃阿賽手鏈`
+- `name.zh_CN`: `风铃|招财贵人天然黄阿赛手链`
+- `elementType`: `metal`
+- `isFeatured`: `false`
+- `description.zh_TW`: 招財貴人天然黃阿賽手鏈以明亮金黃色調呈現財運與守護寓意，主打招財聚氣、貴人加持與平安守護，適合希望強化事業機會與資源連結的佩戴者。
+- `description.zh_CN`: 招财贵人天然黄阿赛手链以明亮金黄色调呈现财运与守护寓意，主打招财聚气、贵人加持与平安守护，适合希望强化事业机会与资源连结的佩戴者。
+- `priceCNY/HKD/TWD`: `1080 / 1180 / 4680`
+- `stock/sold`: `62 / 5`
+- `tags`: `["財運","招財","事業","平安"]`
+- `benefits`:
+  - 聚焦財運目標，提升對商機與資源的敏感度
+  - 強化貴人運與合作運，增加關鍵時刻支援力
+  - 穩定心態與執行節奏，降低焦躁與分心
+  - 金黃配色具視覺能量感，適合衝刺期佩戴
+- `specifications`: 材質=天然黃阿賽水晶；尺寸=8-10mm；重量=21g
+- `imageFolderName`: `招财贵人天然黄阿赛手链_ad_material_20260507`
+
+## 34) 風鈴|草莓晶手鏈
+- `name.zh_TW`: `風鈴|草莓晶手鏈`
+- `name.zh_CN`: `风铃|草莓晶手链`
+- `elementType`: `fire`
+- `isFeatured`: `false`
+- `description.zh_TW`: 草莓晶手鏈以甜潤細緻的晶體光感呈現溫柔魅力，適合希望提升桃花、人緣與社交親和力的佩戴者。整體氣質柔和上鏡，日常佩戴與送禮都很合適。
+- `description.zh_CN`: 草莓晶手链以甜润细致的晶体光感呈现温柔魅力，适合希望提升桃花、人缘与社交亲和力的佩戴者。整体气质柔和上镜，日常佩戴与送礼都很合适。
+- `priceCNY/HKD/TWD`: `860 / 960 / 3680`
+- `stock/sold`: `88 / 12`
+- `tags`: `["愛情","桃花","人緣","健康"]`
+- `benefits`:
+  - 增加親和力與吸引力，提升社交互動順暢度
+  - 緩和情緒緊繃，讓表達更柔和自然
+  - 幫助建立正向自我感受，提升日常自信度
+  - 色澤甜美但不過度張揚，適合高頻佩戴
+- `specifications`: 材質=草莓晶；尺寸=8-10mm；重量=19g
+- `imageFolderName`: `草莓晶手链_ad_material_20260507`
+
+## 35) 風鈴|黑金超七方糖水晶
+- `name.zh_TW`: `風鈴|黑金超七方糖水晶`
+- `name.zh_CN`: `风铃|黑金超七方糖水晶`
+- `elementType`: `metal`
+- `isFeatured`: `false`
+- `description.zh_TW`: 黑金超七方糖水晶以深色基底結合金色光感，呈現高對比的力量氣場，主打招財聚氣與狀態提振，適合重視事業衝刺、目標執行與職場形象的佩戴者。
+- `description.zh_CN`: 黑金超七方糖水晶以深色基底结合金色光感，呈现高对比的力量气场，主打招财聚气与状态提振，适合重视事业冲刺、目标执行与职场形象的佩戴者。
+- `priceCNY/HKD/TWD`: `1280 / 1380 / 5480`
+- `stock/sold`: `44 / 5`
+- `tags`: `["財運","招財","事業","平安"]`
+- `benefits`:
+  - 強化目標導向與行動決心，提升執行效率
+  - 增加職場存在感與專業氣場，改善對外印象
+  - 聚焦財運與資源整合，支持業績與成長節奏
+  - 深色金光視覺辨識度高，適合重要場合佩戴
+- `specifications`: 材質=黑金超七方糖水晶；尺寸=8-10mm；重量=23g
+- `imageFolderName`: `黑金超七方糖水晶_ad_material_20260507`
+
+## 36) 風鈴|藍虎眼石手串
+- `name.zh_TW`: `風鈴|藍虎眼石手串`
+- `name.zh_CN`: `风铃|蓝虎眼石手串`
+- `elementType`: `water`
+- `isFeatured`: `false`
+- `description.zh_TW`: 藍虎眼石手串帶有沉穩藍調與金屬光澤感，主打決策清晰、專注提升與防護穩場，適合高壓節奏下需要維持理性判斷與穩定表現的使用者。
+- `description.zh_CN`: 蓝虎眼石手串带有沉稳蓝调与金属光泽感，主打决策清晰、专注提升与防护稳场，适合高压节奏下需要维持理性判断与稳定表现的使用者。
+- `priceCNY/HKD/TWD`: `980 / 1080 / 4280`
+- `stock/sold`: `58 / 4`
+- `tags`: `["事業","平安","財運","健康"]`
+- `benefits`:
+  - 協助整理思緒與判斷重點，提升決策清晰度
+  - 增強專注力與執行穩定度，降低分心與焦慮
+  - 提供防護邊界感，減少外界干擾帶來的內耗
+  - 沉穩色系百搭耐看，適合通勤與職場場合
+- `specifications`: 材質=藍虎眼石；尺寸=8-10mm；重量=21g
+- `imageFolderName`: `蓝虎眼石手串_ad_material_20260507`
+
 ---
 
 ## Final Upload Notes
 
 - Admin required fields: `name.zh_TW`, `name.zh_CN`, `description.zh_TW`, `description.zh_CN`, `category`, one of price fields, `stock`.
 - For product images, upload from each product folder `TC` first.
-- If you need, I can generate a ready-to-import JSON payload for all 29 products next.
+- Legacy folder exceptions for image upload:
+  - `紫水晶手链_ad_material_20260507` and `葡萄石手链圆珠_ad_material_20260507`: use `Traditional/` (zh_TW) and `Simplified/` (zh_CN).
+  - `灰月光石手串_ad_material_20260507`: use `灰月光石_tc/` (zh_TW) and `灰月光石_sc/` (zh_CN).
+  - `蓝虎眼石手串_ad_material_20260507`: images are at folder root (no locale subfolders); use root images for both locales.
+- If you need, I can generate a ready-to-import JSON payload for all 36 products next.
 
 ---

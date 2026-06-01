@@ -186,20 +186,6 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 								>
 									{t("home")}
 								</Link>
-								<Link
-									href="/smart-chat2"
-									className={`px-3 py-1 rounded-full transition-all font-noto-sans-hk duration-200 hover:opacity-80 ${
-										pathname === "/smart-chat2" ? "bg-[#A3B116]" : ""
-									}`}
-									style={{
-										color:
-											pathname === "/smart-chat2"
-												? "#fff"
-												: navTextColor,
-									}}
-								>
-									{t("smartChat")}
-								</Link>
 								{/* <button
 									onClick={() => navigateToSection("theory")}
 									className="transition-colors cursor-pointer hover:opacity-80"
@@ -341,14 +327,6 @@ export default function Navbar({ from, backgroundColor = "transparent" }) {
 							style={{ fontFamily: "Noto Serif TC, serif" }}
 						>
 							{t("home")}
-						</Link>
-						<Link
-							href="/smart-chat2"
-							className="block px-4 py-2 text-gray-800 transition-colors rounded hover:bg-gray-100"
-							onClick={() => setIsMobileMenuOpen(false)}
-							style={{ fontFamily: "Noto Serif TC, serif" }}
-						>
-							{t("smartChat")}
 						</Link>
 						<div
 							className="flex items-center justify-between block px-4 py-2 text-gray-400 cursor-not-allowed"

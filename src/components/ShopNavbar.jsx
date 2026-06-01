@@ -131,12 +131,6 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 								{locale === "zh-CN" ? "首页" : "首頁"}
 							</Link>
 							<Link
-								href={`/${locale}/smart-chat2`}
-								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
-							>
-								{locale === "zh-CN" ? "风铃聊天室" : "風鈴聊天室"}
-							</Link>
-							<Link
 								href={`/${locale}/comfort-chat`}
 								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
@@ -345,13 +339,6 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 									onClick={() => setMobileMenuOpen(false)}
 								>
 									{locale === "zh-CN" ? "首页" : "首頁"}
-								</Link>
-								<Link
-									href={`/${locale}/smart-chat2`}
-									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
-									onClick={() => setMobileMenuOpen(false)}
-								>
-									{locale === "zh-CN" ? "风铃聊天室" : "風鈴聊天室"}
 								</Link>
 								<Link
 									href={`/${locale}/comfort-chat`}

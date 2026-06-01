@@ -229,6 +229,29 @@ export async function POST(request) {
 			subject,
 			html,
 		});
+		if (result?.error) {
+			return NextResponse.json(
+				{
+					ok: false,
+					error:
+						result.error.message ||
+						result.error.name ||
+						"Resend rejected request",
+					resendError: result.error,
+				},
+				{ status: 502 }
+			);
+		}
+		if (!result?.data?.id) {
+			return NextResponse.json(
+				{
+					ok: false,
+					error: "Resend did not return message id",
+					resendRaw: result,
+				},
+				{ status: 502 }
+			);
+		}
 
 		return NextResponse.json({
 			ok: true,

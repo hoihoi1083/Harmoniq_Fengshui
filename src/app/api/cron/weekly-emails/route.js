@@ -294,6 +294,21 @@ export async function POST(request) {
 					subject,
 					html,
 				});
+				if (sendResult?.error) {
+					throw new Error(
+						`Resend rejected request: ${
+							sendResult.error.message ||
+							sendResult.error.name ||
+							JSON.stringify(sendResult.error)
+						}`
+					);
+				}
+				const resendId = sendResult?.data?.id;
+				if (!resendId) {
+					throw new Error(
+						"Resend returned no message id (send not confirmed)"
+					);
+				}
 
 				await User.updateOne(
 					{
@@ -316,7 +331,7 @@ export async function POST(request) {
 					results.sentTo.push({
 						to,
 						userId: user.userId,
-						resendId: sendResult?.data?.id ?? null,
+						resendId,
 					});
 				}
 			} catch (e) {

@@ -1,95 +1,131 @@
 #!/bin/bash
-# Detect and kill crypto miners, and remove miner files from disk (Enhanced Security)
+# Detect and kill crypto miners, suspicious droppers, and persistence artifacts.
 
-MINER_PROCESSES="xmrig|cpuminer|ccminer|ethminer|claymore|phoenixminer|t-rex|lolminer|nbminer|gminer|nicehash|stratum|cryptonight|monero|pulseadio"
-LOG_FILE="/home/ec2-user/miner-detection.log"
-# Project dir (same as deployment); use env or default
+set -u
+
+LOG_FILE="/home/ec2-user/fengshui-layout/logs/miner-detection.log"
 PROJECT_DIR="${FENGSHUI_LAYOUT:-$HOME/fengshui-layout}"
+SUSPICIOUS_EXIT=0
 
-# --- 1. Remove known miner files/dirs from project (so they can't be restarted) ---
-if [ -d "$PROJECT_DIR" ]; then
-    cd "$PROJECT_DIR" || true
-    for name in xmrig-6.21.0 xmrig.tar.gz xmrig-auto.tar.gz xmrig linux_amd64 lrt scanner_linux mist bbs nul pulseadio .pulseadio; do
-        if [ -e "$name" ]; then
-            echo "[$(date)] Removing miner file/dir: $name" >> "$LOG_FILE"
-            rm -rf "$name" 2>/dev/null || true
-        fi
-    done
-    # Any path matching xmrig*
-    find . -maxdepth 2 -name 'xmrig*' -exec rm -rf {} \; 2>/dev/null || true
-fi
+# Known miner/dropper indicators seen on this host + common miner families.
+IOC_PATTERN="xmrig|cpuminer|ccminer|ethminer|claymore|phoenixminer|t-rex|lolminer|nbminer|gminer|nicehash|stratum|cryptonight|monero|pulseadio|qStScw|z2MauN|193.135.9.84|185.205.210.67"
 
-# --- 1b. Remove known malware from home dir (e.g. .pulseadio typosquat) ---
-for name in .pulseadio pulseadio; do
-    if [ -e "$HOME/$name" ]; then
-        echo "[$(date)] Removing home-dir malware: $HOME/$name" >> "$LOG_FILE"
-        rm -rf "$HOME/$name" 2>/dev/null || true
+log() {
+    echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] $*" >> "$LOG_FILE"
+}
+
+kill_pid_force() {
+    local pid="$1"
+    kill -9 "$pid" 2>/dev/null || sudo kill -9 "$pid" 2>/dev/null || true
+}
+
+remove_path_if_exists() {
+    local target="$1"
+    if [ -e "$target" ]; then
+        log "Removing suspicious path: $target"
+        rm -rf "$target" 2>/dev/null || sudo rm -rf "$target" 2>/dev/null || true
+        SUSPICIOUS_EXIT=1
     fi
+}
+
+mkdir -p "$(dirname "$LOG_FILE")" 2>/dev/null || true
+
+log "=== miner scan started ==="
+
+# 1) Remove known malicious artifacts from project/home/tmp.
+for p in \
+    "$PROJECT_DIR/xmrig-6.21.0" \
+    "$PROJECT_DIR/xmrig.tar.gz" \
+    "$PROJECT_DIR/xmrig-auto.tar.gz" \
+    "$PROJECT_DIR/xmrig" \
+    "$PROJECT_DIR/linux_amd64" \
+    "$PROJECT_DIR/scanner_linux" \
+    "$PROJECT_DIR/mist" \
+    "$PROJECT_DIR/bbs" \
+    "$PROJECT_DIR/nul" \
+    "$PROJECT_DIR/pulseadio" \
+    "$PROJECT_DIR/.pulseadio" \
+    "$HOME/.pulseadio" \
+    "$HOME/pulseadio" \
+    "/tmp/nodes"; do
+    remove_path_if_exists "$p"
 done
 
-# --- 1b2. Remove known backdoor/suspicious binaries in home root (real nc/ncat live in /usr/bin) ---
-for name in nc ncat .nc .ncat; do
+# 2) Remove suspicious executable names in home root.
+for name in nc ncat .nc .ncat qStScw z2MauN lrt let; do
     if [ -f "$HOME/$name" ] && [ -x "$HOME/$name" ]; then
-        echo "[$(date)] Removing suspicious binary in home: $HOME/$name" >> "$LOG_FILE"
-        rm -f "$HOME/$name" 2>/dev/null || true
+        remove_path_if_exists "$HOME/$name"
     fi
 done
 
-# --- 1c. Remove suspicious executables in /dev/shm (common malware/miner location) ---
+# 3) Purge executable files in /dev/shm (except lock/socket/pid patterns).
 if [ -d /dev/shm ]; then
     for f in /dev/shm/*; do
         [ -e "$f" ] || continue
-        [ -f "$f" ] && [ -x "$f" ] || continue
+        [ -f "$f" ] || continue
+        [ -x "$f" ] || continue
         case "$(basename "$f")" in
             *.pid|*.sock|*.lock) continue ;;
         esac
-        echo "[$(date)] Removing executable in /dev/shm: $f" >> "$LOG_FILE"
-        rm -f "$f" 2>/dev/null || true
+        log "Removing executable in /dev/shm: $f"
+        rm -f "$f" 2>/dev/null || sudo rm -f "$f" 2>/dev/null || true
+        SUSPICIOUS_EXIT=1
     done
 fi
 
-# --- 2. Check for suspicious processes ---
-FOUND=$(ps aux | grep -iE "$MINER_PROCESSES" | grep -v grep)
-
-if [ ! -z "$FOUND" ]; then
-    echo "[$(date)] ALERT: Crypto miner detected!" >> $LOG_FILE
-    echo "$FOUND" >> $LOG_FILE
-    
-    # Kill the processes with sudo
-    ps aux | grep -iE "$MINER_PROCESSES" | grep -v grep | awk '{print $2}' | xargs -r sudo kill -9
-    echo "[$(date)] Killed miner processes" >> $LOG_FILE
-    
-    # Alert via system log
-    logger -t MINER_ALERT "Crypto miner detected and killed"
+# 4) Kill suspicious processes by command pattern.
+SUS_PROC_PIDS="$(ps -eo pid=,args= | awk -v pat="$IOC_PATTERN" -v self="$$" 'BEGIN{IGNORECASE=1} $0 ~ pat && $1 != self && tolower($0) !~ /detect-miners\.sh/ && tolower($0) !~ /awk -v pat=/ && tolower($0) !~ /ps -eo pid=/ {print $1}')"
+if [ -n "$SUS_PROC_PIDS" ]; then
+    log "Suspicious process(es) detected: $SUS_PROC_PIDS"
+    for pid in $SUS_PROC_PIDS; do
+        kill_pid_force "$pid"
+    done
+    logger -t MINER_ALERT "Suspicious process detected and killed"
+    SUSPICIOUS_EXIT=1
 fi
 
-# Check for high CPU usage (>80% indicates potential miner)
-HIGH_CPU=$(ps aux | awk '$3 > 80.0 {print $2,$11,$3}')
-if [ ! -z "$HIGH_CPU" ]; then
-    echo "[$(date)] High CPU processes: $HIGH_CPU" >> $LOG_FILE
+# 5) High CPU process telemetry (>80%).
+HIGH_CPU="$(ps -eo pid=,pcpu=,args= | awk '$2 > 80.0 {print $0}')"
+if [ -n "$HIGH_CPU" ]; then
+    log "High CPU process(es): $HIGH_CPU"
 fi
 
-# Check for suspicious systemd services
-SUSPICIOUS_SERVICES=$(sudo systemctl list-units --all | grep -iE 'miner|xmrig|crypto|ocean' | grep -v 'miner-detection')
-if [ ! -z "$SUSPICIOUS_SERVICES" ]; then
-    echo "[$(date)] ALERT: Suspicious systemd services found!" >> $LOG_FILE
-    echo "$SUSPICIOUS_SERVICES" >> $LOG_FILE
+# 6) Suspicious systemd services (system + user).
+SVC_SYSTEM="$(systemctl list-units --all --no-pager 2>/dev/null | awk 'BEGIN{IGNORECASE=1} /miner|xmrig|crypto|pulseadio|qStScw|z2MauN/ && tolower($0) !~ /miner-detection/ {print}')"
+SVC_USER="$(systemctl --user list-unit-files --no-pager 2>/dev/null | awk 'BEGIN{IGNORECASE=1} /miner|xmrig|crypto|pulseadio|qStScw|z2MauN/ && tolower($0) !~ /miner-detection/ {print}')"
+if [ -n "$SVC_SYSTEM$SVC_USER" ]; then
+    log "Suspicious systemd service entries found."
+    [ -n "$SVC_SYSTEM" ] && log "system units: $SVC_SYSTEM"
+    [ -n "$SVC_USER" ] && log "user units: $SVC_USER"
     logger -t MINER_ALERT "Suspicious systemd services detected"
+    SUSPICIOUS_EXIT=1
 fi
 
-# Check for hugepages allocation (crypto miner trick)
-HUGEPAGES=$(sysctl vm.nr_hugepages | awk '{print $3}')
-if [ "$HUGEPAGES" -gt 0 ]; then
-    echo "[$(date)] ALERT: Hugepages allocation detected: $HUGEPAGES" >> $LOG_FILE
-    sudo sysctl -w vm.nr_hugepages=0
-    echo "[$(date)] Reset hugepages to 0" >> $LOG_FILE
+# 7) Hugepages misuse check.
+HUGEPAGES="$(sysctl -n vm.nr_hugepages 2>/dev/null || echo 0)"
+if [ "${HUGEPAGES:-0}" -gt 0 ]; then
+    log "ALERT: Hugepages allocation detected: $HUGEPAGES"
+    sysctl -w vm.nr_hugepages=0 >/dev/null 2>&1 || sudo sysctl -w vm.nr_hugepages=0 >/dev/null 2>&1 || true
+    log "Hugepages reset attempt completed."
     logger -t MINER_ALERT "Hugepages allocation blocked"
+    SUSPICIOUS_EXIT=1
 fi
 
-# Check for hidden systemd user services
-HIDDEN_SERVICES=$(find ~/.config/systemd/user/ -name '*.service' 2>/dev/null | grep -v 'pm2')
-if [ ! -z "$HIDDEN_SERVICES" ]; then
-    echo "[$(date)] ALERT: Hidden user systemd services found!" >> $LOG_FILE
-    echo "$HIDDEN_SERVICES" >> $LOG_FILE
-    logger -t MINER_ALERT "Hidden systemd user services detected"
+# 8) Persistence checks in shell startup files.
+for rc in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.bash_profile"; do
+    [ -f "$rc" ] || continue
+    HIT="$(awk 'BEGIN{IGNORECASE=1} /curl .*193\.135\.9\.84|curl .*185\.205\.210\.67|wget .*193\.135\.9\.84|wget .*185\.205\.210\.67|authorized_keys|\/tmp\/nodes|base64 -d .*bash|nohup .*\/dev\/shm/ {print}' "$rc")"
+    if [ -n "$HIT" ]; then
+        log "ALERT: Suspicious startup command in $rc: $HIT"
+        logger -t MINER_ALERT "Suspicious shell startup persistence detected"
+        SUSPICIOUS_EXIT=1
+    fi
+done
+
+if [ "$SUSPICIOUS_EXIT" -eq 1 ]; then
+    log "=== miner scan completed: suspicious indicators found ==="
+    exit 1
 fi
+
+log "=== miner scan completed: clean ==="
+exit 0

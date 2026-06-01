@@ -544,11 +544,12 @@ export default function ProductDetailPage() {
 								<button
 									key={index}
 									onClick={() => setSelectedImage(index)}
-									className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+									className={`relative flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
 										selectedImage === index
 											? "border-[#8B7355] ring-2 ring-[#8B7355]/30"
 											: "border-gray-200 hover:border-gray-300"
 									}`}
+									style={{ width: "105px", height: "70px" }}
 								>
 									<Image
 										src={image}
@@ -578,18 +579,19 @@ export default function ProductDetailPage() {
 								</Button>
 							)}
 
-							<div className="flex flex-col gap-3 h-[448px] overflow-hidden">
+							<div className="flex flex-col gap-3 overflow-hidden" style={{ height: "398px" }}>
 								{visibleThumbnails.map((image, visibleIndex) => {
 									const index = thumbnailStart + visibleIndex;
 									return (
 										<button
 											key={index}
 											onClick={() => setSelectedImage(index)}
-											className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+											className={`relative flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
 												selectedImage === index
 													? "border-[#8B7355] ring-2 ring-[#8B7355]/30"
 													: "border-gray-200 hover:border-gray-300"
 											}`}
+											style={{ width: "105px", height: "70px" }}
 										>
 											<Image
 												src={image}
@@ -623,10 +625,11 @@ export default function ProductDetailPage() {
 					</div>
 
 					{/* Center: Main Image */}
-					<div className="order-1 lg:col-span-5 lg:order-2">
+					<div className="order-1 lg:col-span-6 lg:order-2">
 						<div
 							ref={imageRef}
-							className="relative w-full h-[340px] sm:h-[420px] lg:h-[520px] overflow-visible rounded-2xl bg-gray-50 group"
+							className="relative w-full max-h-[600px] overflow-visible rounded-2xl bg-gray-50 group"
+							style={{ aspectRatio: "3/2" }}
 							onMouseMove={handleImageMouseMove}
 							onMouseEnter={handleImageMouseEnter}
 							onMouseLeave={handleImageMouseLeave}
@@ -695,7 +698,7 @@ export default function ProductDetailPage() {
 					</div>
 
 					{/* Right: Product Info */}
-					<div className="order-3 space-y-6 lg:col-span-6">
+					<div className="order-3 space-y-6 lg:col-span-5">
 						{/* Product Title */}
 						<h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
 							{product ? getProductName(product, locale) : ""}
@@ -1215,7 +1218,7 @@ export default function ProductDetailPage() {
 									>
 										<div className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 rounded-xl hover:shadow-lg">
 											{/* Product Image */}
-											<div className="relative overflow-hidden aspect-square bg-gray-50">
+											<div className="relative overflow-hidden bg-gray-50" style={{ aspectRatio: "3/2" }}>
 												{relatedProduct.images &&
 												relatedProduct.images.length >
 													0 ? (
