@@ -39,8 +39,11 @@ http="${resp##*$'\n'__HTTP__}"
 body="${resp%$'\n'__HTTP__*}"
 echo "    HTTP ${http}"
 echo "    Body: ${body}"
-if echo "$body" | grep -q '"success":true'; then
-	echo "    OK: send-alert reported success. Check inbox: hoihoi1083@gmail.com (see send-alert route)."
+if echo "$body" | grep -q '"success":true' && echo "$body" | grep -q '"id":"'; then
+	echo "    OK: send-alert sent (Resend id present). Check inbox: hoihoi1083@gmail.com"
+elif echo "$body" | grep -q '"success":true'; then
+	echo "    FAIL: send-alert returned success but no Resend id — RESEND_API_KEY may be invalid."
+	exit 1
 else
 	echo "    FAIL: fix RESEND_API_KEY / app logs / pm2 before relying on cron email."
 	exit 1

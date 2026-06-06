@@ -112,15 +112,43 @@ export async function POST(request) {
 			html: alertHTML,
 		});
 
+		if (res?.error) {
+			const msg =
+				res.error.message ||
+				res.error.name ||
+				JSON.stringify(res.error);
+			console.error("❌ Alert email rejected by Resend:", {
+				error: msg,
+				subject: body.subject,
+				timestamp: new Date().toISOString(),
+			});
+			return NextResponse.json(
+				{ success: false, error: `Resend rejected request: ${msg}` },
+				{ status: 502 }
+			);
+		}
+
+		const resendId = res?.data?.id;
+		if (!resendId) {
+			console.error("❌ Alert email: Resend returned no message id");
+			return NextResponse.json(
+				{
+					success: false,
+					error: "Resend returned no message id (send not confirmed)",
+				},
+				{ status: 502 }
+			);
+		}
+
 		console.log("✅ Alert email sent:", {
-			id: res?.data?.id,
+			id: resendId,
 			subject: body.subject,
 			timestamp: new Date().toISOString(),
 		});
 
 		return NextResponse.json({
 			success: true,
-			id: res?.data?.id,
+			id: resendId,
 		});
 	} catch (error) {
 		console.error("❌ Alert email error:", error.message);

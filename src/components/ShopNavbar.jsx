@@ -137,6 +137,12 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 								{locale === "zh-CN" ? "暖心聊天" : "暖心聊天"}
 							</Link>
 							<Link
+								href={`/${locale}/world-cup`}
+								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
+							>
+								{locale === "zh-CN" ? "世界杯专区" : "世界盃專區"}
+							</Link>
+							<Link
 								href={`/${locale}/shop/all`}
 								className="text-gray-700 hover:text-[#6B8E23] font-medium transition-colors whitespace-nowrap"
 							>
@@ -346,6 +352,13 @@ export default function ShopNavbar({ onSearch, cartCount }) {
 									onClick={() => setMobileMenuOpen(false)}
 								>
 									{locale === "zh-CN" ? "暖心聊天" : "暖心聊天"}
+								</Link>
+								<Link
+									href={`/${locale}/world-cup`}
+									className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-colors"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									{locale === "zh-CN" ? "世界杯专区" : "世界盃專區"}
 								</Link>
 								<Link
 									href={`/${locale}/shop/all`}

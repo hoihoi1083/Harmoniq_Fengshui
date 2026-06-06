@@ -1883,5 +1883,9 @@
 			"coupleFetchFailed": "獲取合盤報告失敗",
 			"lifeFetchFailed": "獲取人生報告失敗"
 		}
+	},
+	"worldCup": {
+		"title": "2026 世界盃專區",
+		"subtitle": "小組賽 · 晉級圖 · 生日開運預測"
 	}
 }

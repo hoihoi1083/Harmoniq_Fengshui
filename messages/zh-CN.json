@@ -1876,5 +1876,9 @@
 			"coupleFetchFailed": "获取合盘报告失败",
 			"lifeFetchFailed": "获取人生报告失败"
 		}
+	},
+	"worldCup": {
+		"title": "2026 世界杯专区",
+		"subtitle": "小组赛 · 晋级图 · 生日开运预测"
 	}
 }
