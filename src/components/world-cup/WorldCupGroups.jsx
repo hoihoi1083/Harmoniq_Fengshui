@@ -1,6 +1,6 @@
 "use client";
 
-import { GROUPS } from "@/data/worldCup2026";
+import { GROUPS, getGroupTag } from "@/data/worldCup2026";
 import { computeGroupStandings, isGroupComplete } from "@/lib/worldCupUtils";
 import WorldCupSectionHeader from "./WorldCupSectionHeader";
 
@@ -16,26 +16,46 @@ export default function WorldCupGroups({ matches, selectedGroup, onSelectGroup }
 				<WorldCupSectionHeader
 					icon="🏟️"
 					title="小組賽分組"
-					subtitle="48 隊 · 12 組 · 前兩名晉級 32 強（積分榜隨賽果自動更新）"
+					subtitle="48 隊 · 12 組 · 前兩名晉級 32 強 · 8 個最佳第三名也可晉級"
 					badge={complete ? "晉級隊伍已更新" : null}
 				/>
 
 				{/* Horizontal scroll group tabs on mobile */}
 				<div className="-mx-1 mb-5 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:thin] md:flex-wrap md:overflow-visible">
-					{groupIds.map((id) => (
-						<button
-							key={id}
-							type="button"
-							onClick={() => onSelectGroup?.(id)}
-							className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-bold transition sm:px-4 sm:py-2 ${
-								activeId === id
-									? "bg-gradient-to-r from-[#064028] to-[#0B5E3A] text-[#F5C542] shadow-md"
-									: "border border-[#0B5E3A]/15 bg-[#F4F9F5] text-[#064028] hover:bg-[#E8F2EC]"
-							}`}
-						>
-							組 {id}
-						</button>
-					))}
+					{groupIds.map((id) => {
+						const tag = getGroupTag(id);
+						const isDeath = tag?.level === "death";
+						const isTough = tag?.level === "tough";
+						return (
+							<button
+								key={id}
+								type="button"
+								onClick={() => onSelectGroup?.(id)}
+								className={`relative shrink-0 rounded-full px-3.5 py-1.5 text-sm font-bold transition sm:px-4 sm:py-2 ${
+									activeId === id
+										? isDeath
+											? "bg-gradient-to-r from-[#5C1010] to-[#8B1A1A] text-[#F5C542] shadow-md"
+											: "bg-gradient-to-r from-[#064028] to-[#0B5E3A] text-[#F5C542] shadow-md"
+										: isDeath
+											? "border border-red-900/25 bg-red-50 text-[#5C1010] hover:bg-red-100"
+											: isTough
+												? "border border-[#F5C542]/40 bg-[#FFF9E6] text-[#064028] hover:bg-[#FFF3CC]"
+												: "border border-[#0B5E3A]/15 bg-[#F4F9F5] text-[#064028] hover:bg-[#E8F2EC]"
+								}`}
+							>
+								組 {id}
+								{tag && (
+									<span
+										className={`ml-1 text-[10px] font-bold ${
+											activeId === id ? "text-[#F5C542]/90" : "text-inherit opacity-80"
+										}`}
+									>
+										· {tag.tag}
+									</span>
+								)}
+							</button>
+						);
+					})}
 				</div>
 
 				<div className="mb-4 grid grid-cols-2 gap-2 sm:mb-6 sm:gap-3 lg:grid-cols-4">
@@ -60,9 +80,19 @@ export default function WorldCupGroups({ matches, selectedGroup, onSelectGroup }
 
 			{/* Mobile: card standings */}
 			<div className="space-y-2 px-4 pb-4 md:hidden">
-				{standings.map((row, index) => (
-					<StandingCard key={row.id} row={row} rank={index + 1} qualified={index < 2 && row.played > 0} />
-				))}
+				{standings.map((row, index) => {
+					const confirmed = complete && index < 2;
+					const provisional = !complete && index < 2 && row.played > 0;
+					return (
+						<StandingCard
+							key={row.id}
+							row={row}
+							rank={index + 1}
+							confirmed={confirmed}
+							provisional={provisional}
+						/>
+					);
+				})}
 			</div>
 
 			{/* Desktop: table */}
@@ -86,24 +116,34 @@ export default function WorldCupGroups({ matches, selectedGroup, onSelectGroup }
 						</tr>
 					</thead>
 					<tbody>
-						{standings.map((row, index) => (
+						{standings.map((row, index) => {
+							const confirmed = complete && index < 2;
+							const provisional = !complete && index < 2 && row.played > 0;
+							return (
 							<tr
 								key={row.id}
 								className={`border-b border-[#0B5E3A]/5 last:border-0 ${
-									index < 2 && row.played > 0
+									confirmed
 										? "bg-[#F5C542]/10"
-										: index % 2 === 0
-											? "bg-white"
-											: "bg-[#F4F9F5]/50"
+										: provisional
+											? "bg-[#FFF9E6]/80"
+											: index % 2 === 0
+												? "bg-white"
+												: "bg-[#F4F9F5]/50"
 								}`}
 							>
 								<td className="py-3 pl-4 pr-3 font-bold text-[#064028] lg:pl-6">{index + 1}</td>
 								<td className="py-3 pr-4">
 									<span className="mr-1.5 text-lg">{row.flag}</span>
 									<span className="font-semibold text-[#064028]">{row.name}</span>
-									{index < 2 && row.played > 0 && (
+									{confirmed && (
 										<span className="ml-1.5 rounded-full bg-[#064028] px-2 py-0.5 text-[10px] font-bold text-[#F5C542]">
 											晉級
+										</span>
+									)}
+									{provisional && (
+										<span className="ml-1.5 rounded-full border border-[#064028]/30 bg-white px-2 py-0.5 text-[10px] font-bold text-[#064028]">
+											暫列晉級區
 										</span>
 									)}
 								</td>
@@ -118,7 +158,8 @@ export default function WorldCupGroups({ matches, selectedGroup, onSelectGroup }
 									{row.points}
 								</td>
 							</tr>
-						))}
+							);
+						})}
 					</tbody>
 				</table>
 			</div>
@@ -126,13 +167,15 @@ export default function WorldCupGroups({ matches, selectedGroup, onSelectGroup }
 	);
 }
 
-function StandingCard({ row, rank, qualified }) {
+function StandingCard({ row, rank, confirmed, provisional }) {
 	return (
 		<div
 			className={`rounded-xl border p-3 ${
-				qualified
+				confirmed
 					? "border-[#F5C542]/40 bg-[#FFF9E6]"
-					: "border-[#0B5E3A]/10 bg-[#F4F9F5]"
+					: provisional
+						? "border-[#F5C542]/25 bg-[#FFFCF0]"
+						: "border-[#0B5E3A]/10 bg-[#F4F9F5]"
 			}`}
 		>
 			<div className="mb-2 flex items-center justify-between gap-2">
@@ -148,9 +191,14 @@ function StandingCard({ row, rank, qualified }) {
 					<p className="text-[10px] text-gray-500">分</p>
 				</div>
 			</div>
-			{qualified && (
+			{confirmed && (
 				<span className="mb-2 inline-block rounded-full bg-[#064028] px-2 py-0.5 text-[10px] font-bold text-[#F5C542]">
-					晉級區
+					晉級
+				</span>
+			)}
+			{provisional && (
+				<span className="mb-2 inline-block rounded-full border border-[#064028]/30 bg-white px-2 py-0.5 text-[10px] font-bold text-[#064028]">
+					暫列晉級區
 				</span>
 			)}
 			<div className="grid grid-cols-4 gap-1 text-center text-[11px] text-gray-600">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TOURNAMENT } from "@/data/worldCup2026";
+import { OPENING_MATCH, TOURNAMENT, getTeamById } from "@/data/worldCup2026";
 import { HERO_NAV, HOST_FLAGS, HOST_NAMES, scrollToSection } from "./worldCupTheme";
 
 function getCountdown(target) {
@@ -9,15 +9,18 @@ function getCountdown(target) {
 	const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 	const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
 	const mins = Math.floor((diff / (1000 * 60)) % 60);
-	return { days, hours, mins, started: diff === 0 };
+	const secs = Math.floor((diff / 1000) % 60);
+	return { days, hours, mins, secs, started: diff === 0 };
 }
 
 export default function WorldCupHero() {
-	const kickoff = new Date(`${TOURNAMENT.startDate}T20:00:00`);
+	const kickoff = new Date(OPENING_MATCH.kickoffUtc);
 	const [countdown, setCountdown] = useState(getCountdown(kickoff));
+	const home = getTeamById(OPENING_MATCH.homeId);
+	const away = getTeamById(OPENING_MATCH.awayId);
 
 	useEffect(() => {
-		const timer = setInterval(() => setCountdown(getCountdown(kickoff)), 60000);
+		const timer = setInterval(() => setCountdown(getCountdown(kickoff)), 1000);
 		return () => clearInterval(timer);
 	}, [kickoff]);
 
@@ -102,16 +105,19 @@ export default function WorldCupHero() {
 								⚽ 世足進行中
 							</p>
 						) : (
-							<div className="mt-3 grid grid-cols-3 gap-2 text-center sm:mt-4 sm:gap-3">
+							<div className="mt-3 grid grid-cols-4 gap-1.5 text-center sm:mt-4 sm:gap-2">
 								<CountdownUnit value={countdown.days} label="天" />
 								<CountdownUnit value={countdown.hours} label="時" />
 								<CountdownUnit value={countdown.mins} label="分" />
+								<CountdownUnit value={countdown.secs} label="秒" />
 							</div>
 						)}
 						<p className="mt-3 text-center text-[11px] text-white/50 sm:mt-4 sm:text-xs">
-							開幕戰 · 墨西哥 vs 南非
+							開幕戰 · {home?.name} vs {away?.name}
 						</p>
-						<p className="text-center text-[11px] text-white/40 sm:text-xs">2026/6/11 20:00</p>
+						<p className="text-center text-[11px] text-white/40 sm:text-xs">
+							{OPENING_MATCH.date.replace(/-/g, "/")} {OPENING_MATCH.kickoffLocal}（{OPENING_MATCH.venueNote}）
+						</p>
 					</div>
 				</div>
 			</div>

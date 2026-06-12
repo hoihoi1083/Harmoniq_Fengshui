@@ -104,7 +104,8 @@ export default function WorldCupBirthdayOracle({ matches }) {
 							<>
 								<p className="flex items-center gap-2 text-sm font-bold text-[#F5C542]">
 									<span>📅</span>
-									{result.date} 今晚 / 下一個比賽日
+									{result.date.replace(/-/g, "/")} 下一個比賽日
+									<span className="font-normal text-white/50">（當地開球時間）</span>
 								</p>
 								{result.predictions.map((item) => {
 									if (!item) return null;

@@ -7,15 +7,21 @@ import WorldCupHero from "@/components/world-cup/WorldCupHero";
 import WorldCupGroups from "@/components/world-cup/WorldCupGroups";
 import WorldCupBracket from "@/components/world-cup/WorldCupBracket";
 import WorldCupBirthdayOracle from "@/components/world-cup/WorldCupBirthdayOracle";
-import { INITIAL_MATCHES, getTeamById } from "@/data/worldCup2026";
+import { INITIAL_MATCHES, OPENING_MATCH, getTeamById } from "@/data/worldCup2026";
 import { getTonightMatches } from "@/lib/worldCupUtils";
 import { SECTION_SCROLL_MARGIN } from "@/components/world-cup/worldCupTheme";
+
+function formatWcDate(dateStr) {
+	if (!dateStr) return "";
+	return dateStr.replace(/-/g, "/");
+}
 
 export default function WorldCupPage() {
 	const [matches] = useState(INITIAL_MATCHES);
 	const [selectedGroup, setSelectedGroup] = useState("A");
 
 	const finished = matches.filter((m) => m.status === "finished");
+	const scheduled = matches.filter((m) => m.status === "scheduled");
 	const tonight = getTonightMatches(matches);
 
 	return (
@@ -39,13 +45,13 @@ export default function WorldCupPage() {
 						icon="🌍"
 						label="參賽隊伍"
 						value="48"
-						sub="史上最大規模"
+						sub="美加墨合辦"
 					/>
 					<StatCard
 						icon="🏟️"
-						label="小組"
-						value="12"
-						sub="A – L 組"
+						label="小組賽"
+						value={String(scheduled.length)}
+						sub="72 場已排定"
 					/>
 					<StatCard
 						icon="⚽"
@@ -74,6 +80,7 @@ export default function WorldCupPage() {
 						<UpcomingStrip
 							date={tonight.date}
 							matches={tonight.matches}
+							finishedCount={finished.length}
 						/>
 					</div>
 
@@ -147,7 +154,7 @@ function RecentResults({ matches }) {
 								</span>
 							</div>
 							<p className="text-center text-xs text-gray-400 sm:text-left">
-								{match.date}
+								{formatWcDate(match.date)} · 組 {match.groupId}
 							</p>
 						</div>
 					);
@@ -157,19 +164,40 @@ function RecentResults({ matches }) {
 	);
 }
 
-function UpcomingStrip({ date, matches }) {
+function UpcomingStrip({ date, matches, finishedCount = 0 }) {
+	const openingHome = getTeamById(OPENING_MATCH.homeId);
+	const openingAway = getTeamById(OPENING_MATCH.awayId);
+
 	return (
 		<section className="overflow-hidden rounded-2xl border border-[#F5C542]/30 bg-gradient-to-r from-[#FFF9E6] to-[#F4F9F5] shadow-md">
 			<div className="flex items-center gap-2 border-b border-[#F5C542]/20 px-4 py-3 sm:px-6 sm:py-4">
 				<span className="text-lg sm:text-xl">📅</span>
-				<h2 className="text-base font-black text-[#064028] sm:text-xl">
-					{date ? `${date} 賽程` : "即將開賽"}
-				</h2>
+				<div>
+					<h2 className="text-base font-black text-[#064028] sm:text-xl">
+						{date ? `${formatWcDate(date)} 賽程` : "即將開賽"}
+					</h2>
+					{date ? (
+						<p className="mt-0.5 text-[10px] text-gray-400 sm:text-xs">
+							開球時間為各場地當地時間
+							{finishedCount > 0 && ` · 已完成 ${finishedCount} 場`}
+						</p>
+					) : (
+						<p className="mt-0.5 text-[10px] text-gray-400 sm:text-xs">
+							開幕戰 {formatWcDate(OPENING_MATCH.date)} {OPENING_MATCH.kickoffLocal}（{OPENING_MATCH.venueNote}）
+						</p>
+					)}
+				</div>
 			</div>
 			{matches.length === 0 ? (
-				<p className="p-4 text-center text-sm text-gray-500 sm:p-6">
-					暫無排定賽程，開賽後會在此顯示。
-				</p>
+				<div className="p-4 text-center sm:p-6">
+					<p className="text-sm text-gray-500">暫無排定賽程。</p>
+					<p className="mt-2 text-sm font-bold text-[#064028]">
+						{openingHome?.flag} {openingHome?.name} vs {openingAway?.name} {openingAway?.flag}
+					</p>
+					<p className="mt-1 text-xs text-gray-400">
+						{formatWcDate(OPENING_MATCH.date)} {OPENING_MATCH.kickoffLocal} · {OPENING_MATCH.venueNote}
+					</p>
+				</div>
 			) : (
 				<div className="grid gap-2 p-4 sm:flex sm:flex-wrap sm:gap-3 sm:p-6">
 					{matches.map((match) => {

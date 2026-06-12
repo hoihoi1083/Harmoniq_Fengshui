@@ -105,19 +105,19 @@ export function isGroupComplete(groupId, matches) {
 	return finished >= 6;
 }
 
-/** Returns map like { A1: team, A2: team, A3: team } when enough data exists. */
+/** Returns map like { A1: team, A2: team, A3: team } once a group is complete. */
 export function getGroupQualifiers(matches) {
 	const qualifiers = {};
 
 	for (const groupId of Object.keys(GROUPS)) {
+		if (!isGroupComplete(groupId, matches)) continue;
+
 		const standings = computeGroupStandings(groupId, matches);
-		if (standings.length >= 2 && standings[0].played > 0) {
+		if (standings.length >= 2) {
 			qualifiers[`${groupId}1`] = standings[0];
-		}
-		if (standings.length >= 2 && standings[1].played > 0) {
 			qualifiers[`${groupId}2`] = standings[1];
 		}
-		if (standings.length >= 3 && standings[2].played > 0) {
+		if (standings.length >= 3) {
 			qualifiers[`${groupId}3`] = standings[2];
 		}
 	}
